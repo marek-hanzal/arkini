@@ -15,7 +15,9 @@ const stopLabels = {
 } as const;
 
 const itemReferenceFn = (project: Project, itemUid: string) => {
-	const item = project.config.items[itemUid];
+	const item = Object.hasOwn(project.config.items, itemUid)
+		? project.config.items[itemUid]
+		: undefined;
 	return item === undefined ? `${itemUid} [missing]` : `${item.title} [${itemUid}]`;
 };
 const quantityFn = ({ min, max }: { readonly min: number; readonly max: number }) =>
@@ -112,7 +114,7 @@ export const readItemChainTextFx = Effect.fn("readItemChainTextFx")(function* (
 	detail: GraphDetailSchema.Type = "full",
 	maxDepth = 5,
 ) {
-	if (project.config.items[itemUid] === undefined)
+	if (!Object.hasOwn(project.config.items, itemUid))
 		return yield* Effect.fail(new Error(`Item ${itemUid} does not exist in the open project.`));
 	const result = readItemChainsFn(project.config.items, itemUid, maxDepth);
 	const lines = [

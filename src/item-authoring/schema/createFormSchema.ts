@@ -1,4 +1,4 @@
-import { readItemOutcomeEntriesFn } from "~/game-config-validation/fn/readItemOutcomeEntriesFn";
+import { readTemplateReferenceIssuesFn } from "~/item-authoring/fn/readTemplateReferenceIssuesFn";
 import type { Project } from "~/project-authoring/type/Project";
 import { FormSchema } from "~/item-authoring/schema/FormSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
@@ -26,36 +26,12 @@ const readInputCollectionsFn = (item: ItemSchema.Type): ReadonlyArray<InputColle
 /** Adds project-local identity and selected-target validation to the canonical item form schema. */
 export const createFormSchema = (project: Pick<Project, "config">, _itemUid: string) =>
 	FormSchema.superRefine((item, context) => {
-		for (const entry of readItemOutcomeEntriesFn({
-			itemUid: item.uid,
-			item,
-		})) {
-			for (const [setIndex, set] of entry.outcome.set.entries())
-				for (const [rollIndex, roll] of set.roll.entries())
-					for (const [outcomeIndex, outcome] of roll.outcome.entries()) {
-						if (
-							outcome.type !== "template" ||
-							(project.config.templates ?? []).some(
-								({ uid }) => uid === outcome.templateUid,
-							)
-						)
-							continue;
-						context.addIssue({
-							code: "custom",
-							message: "Select an existing template.",
-							path: [
-								...entry.path.slice(2),
-								"set",
-								setIndex,
-								"roll",
-								rollIndex,
-								"outcome",
-								outcomeIndex,
-								"templateUid",
-							],
-						});
-					}
-		}
+		for (const issue of readTemplateReferenceIssuesFn(item, project.config.templates))
+			context.addIssue({
+				code: "custom",
+				message: "Select an existing template.",
+				path: issue.path,
+			});
 		for (const [mergeIndex, merge] of (item.merge ?? []).entries()) {
 			if (merge.action === "spend" && item.units === undefined)
 				context.addIssue({

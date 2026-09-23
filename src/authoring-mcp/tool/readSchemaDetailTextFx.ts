@@ -1,6 +1,9 @@
 import { Effect } from "effect";
 import { z } from "zod";
 
+// ItemSchema reaches megabytes at deeper expansion; callers can read remaining refs separately.
+export const schemaDetailResolveDepthLimit = 2;
+
 const schemaMaps = new Set([
 	"$defs",
 	"definitions",
@@ -114,6 +117,14 @@ export const readSchemaDetailTextFx = Effect.fn("readSchemaDetailTextFx")(
 	(id: string, resolveDepth = 0) =>
 		Effect.try({
 			try: () => {
+				if (
+					!Number.isInteger(resolveDepth) ||
+					resolveDepth < 0 ||
+					resolveDepth > schemaDetailResolveDepthLimit
+				)
+					throw new Error(
+						`resolveDepth must be an integer from 0 to ${schemaDetailResolveDepthLimit}. Read remaining $refs separately.`,
+					);
 				const schemas = z.toJSONSchema(z.globalRegistry, {
 					io: "input",
 					reused: "inline",

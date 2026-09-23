@@ -21,7 +21,7 @@ export const orderLinesFx = Effect.fn("orderItemLinesFx")(function* ({
 	readonly repository: ProjectRepositoryService;
 }) {
 	const item = project.config.items[itemUid];
-	if (item === undefined)
+	if (!Object.hasOwn(project.config.items, itemUid) || item === undefined)
 		return yield* Effect.fail(
 			new ProjectOperationError({
 				reason: "invalid-item",

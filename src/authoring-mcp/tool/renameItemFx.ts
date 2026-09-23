@@ -25,7 +25,9 @@ export const renameItemFx = Effect.fn("renameItemFx")(function* ({
 				`Revision ${revision} is stale; the open project is at revision ${project.revision}. Read item_config again before renaming the item.`,
 			),
 		);
-	const original = project.config.items[itemUid];
+	const original = Object.hasOwn(project.config.items, itemUid)
+		? project.config.items[itemUid]
+		: undefined;
 	if (original === undefined)
 		return yield* Effect.fail(new Error(`Item ${itemUid} does not exist.`));
 	const commit = yield* repository.upsertItemFx({

@@ -50,6 +50,48 @@ const setupFn = async () => {
 	};
 };
 
+it("rejects a missing Template outcome through HTTP without persisting the line or notifying the Editor", async () => {
+	const { client, notifyFn, readFn } = await setupFn();
+	const before = await readFn();
+	const result = await client.callTool({
+		name: "create_item_line",
+		arguments: jsonToolInputFn({
+			itemUid: "forge",
+			revision: before.revision,
+			line: {
+				...before.config.items.forge.lines[0]!,
+				id: "missing-template-line",
+				outcome: {
+					set: [
+						{
+							weight: 1,
+							rules: [],
+							roll: [
+								{
+									type: "guaranteed",
+									outcome: [
+										{
+											type: "template",
+											templateUid: "missing-template",
+											rules: [],
+										},
+									],
+								},
+							],
+						},
+					],
+				},
+			},
+		}),
+	});
+	expect(result.isError).toBe(true);
+	expect(result.content[0]).toMatchObject({
+		text: expect.stringContaining("template missing-template does not exist"),
+	});
+	expect(await readFn()).toEqual(before);
+	expect(notifyFn).not.toHaveBeenCalled();
+});
+
 it("appends and deletes exact lines without losing other item fields, rejecting invalid identity and incomplete input", async () => {
 	const { client, repository, notifyFn, readFn, projectId } = await setupFn();
 	const before = await readFn();

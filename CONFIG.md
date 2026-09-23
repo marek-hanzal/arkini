@@ -100,6 +100,8 @@ There is one Item schema, without an item-type discriminator. Authoring uses `cr
 
 MCP `item_detail` includes the project revision for lightweight authoring reads. `item_lines` returns ordered authored line identities and behavior flags, while `item_line_configs` returns canonical configs for up to 50 unique item/line pairs from one snapshot. Batch line reads preserve first-request order, deduplicate pairs, and explicitly report missing items, missing lines and ambiguous line IDs.
 
+Item/config writes validate Template outcome references on changed items under the repository write guard. Removing a template cannot strand an existing item outcome reference, including through a complete config replacement. Form feedback and write admission share the same item outcome traversal; unrelated pre-existing broken references do not block an unrelated edit.
+
 Item `uid` is the sole immutable definition identity, generated at creation and preserved through import/export and Serapack rebuilds. Config maps are keyed by UID; canonical references use `itemUid`. The Editor does not expose identity editing. Validation rejects duplicate source providers and disagreement between a definition UID, config key, or file path. Runtime `itemId` identifies a live instance, distinct from its definition UID.
 
 MCP `rename_item` selects an exact `itemUid` and changes only `title`. Resource identities are immutable and independent; resource authoring changes titles or replaces content without changing references. Writes retain the revision-guarded project lock and ordered best-effort file plan, without per-file atomic replacement or aggregate rollback. An interrupted write can leave an incomplete file.
@@ -172,4 +174,41 @@ edit the smallest owning root/item/resource
 → run the closing repository gate required by risk
 ```
 
-MCP `set_start_space` and `remove_start_space` edit one revision-guarded initial template assignment. `edit_project` can replace the complete `templates` collection or `start` section. `edit_project_layout` changes only fallback/new-template dimensions, never existing templates.
+### MCP scope
+
+Music and SFX are intentionally outside MCP authoring scope: the model cannot listen to and judge the audio. Do not add MCP audio catalogs, preview, import, editing, playlist management, or sound-event assignment tools. Audio selection and authoring belong to the Editor and its existing CLI workflows. Missing Music/SFX tools are not a parity defect.
+
+Resource lifecycle operations (including Artwork and general Images), image catalogs, and Build are also deliberately outside MCP automation scope. Keep resource import, replacement, metadata edits, deletion, optimization, and packaging in their existing Editor/CLI surfaces; do not add MCP counterparts. The existing read-only Artwork catalog remains available for assigning item visuals.
+
+Canonical JSON reads retain saved audio references when they are part of the requested entity; general entity round-tripping preserves them. This does not make audio an MCP authoring capability or require dedicated audio projections.
+
+### MCP Board Template authoring
+
+Prefer the focused tools below over resending the project configuration. Templates use immutable UIDs; cells use zero-based coordinates and existing item UIDs from `item_collection`.
+
+| Tool | Contract |
+| --- | --- |
+| `template_collection` | Paginated, optionally searched text: UID, title, dimensions, placement count and project revision. |
+| `template_detail` | Text for one UID: dimensions, every cell, revision and deletion blockers with reference paths. |
+| `template_config` | Canonical JSON `{ revision, template }`, including the complete `board` array. |
+| `create_template` | Generate a UID; optional dimensions default to project fallback dimensions, optional board to empty. |
+| `edit_template` | Patch title, dimensions or the complete board; omitted fields stay unchanged. Shrinking rejects stranded cells. |
+| `edit_template_cells` | Apply 1–100 ordered `place`, `replace`, `move` or `remove` changes in one commit. |
+| `delete_template` | Delete one unreferenced template; start assignments and Template outcomes block deletion with exact reference paths. |
+
+All mutations require the latest project `revision`, returned by reads and successful writes. Create, edit and cell edits accept `{ input: "<serialized JSON>" }`; their descriptions link exact `schema_detail` IDs. Delete accepts `{ templateUid, revision }` directly. For example, the decoded cell-edit input is:
+
+```json
+{
+  "revision": 12,
+  "templateUid": "grove-template-uid",
+  "changes": [
+    { "type": "place", "x": 0, "y": 1, "itemUid": "tree-item-uid" },
+    { "type": "move", "from": { "x": 2, "y": 0 }, "to": { "x": 3, "y": 0 } }
+  ]
+}
+```
+
+Place requires an empty destination; replace/remove require an occupied cell; move requires an occupied source and an empty destination. Unknown items, out-of-bounds cells or any invalid step reject the whole request before writing. Single-template tools preserve sibling templates and start assignments. They use the existing revision-guarded, best-effort Editor commit; there is no filesystem rollback or cascading reference rewrite.
+
+`set_start_space` and `remove_start_space` edit one revision-guarded initial template assignment. `edit_project` remains available to replace the complete `templates` collection or `start` section. `edit_project_layout` changes only fallback/new-template dimensions, never existing templates.

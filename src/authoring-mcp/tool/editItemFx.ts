@@ -19,7 +19,9 @@ export const editItemFx = Effect.fn("editItemFx")(function* ({
 	readonly project: Project;
 	readonly repository: ProjectRepositoryService;
 }) {
-	const current = project.config.items[input.itemUid];
+	const current = Object.hasOwn(project.config.items, input.itemUid)
+		? project.config.items[input.itemUid]
+		: undefined;
 	if (current === undefined)
 		return yield* Effect.fail(new Error(`Item ${input.itemUid} does not exist.`));
 	if (input.revision !== undefined && input.revision !== project.revision)

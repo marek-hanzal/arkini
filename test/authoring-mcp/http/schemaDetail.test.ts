@@ -1,7 +1,11 @@
 import Ajv2020 from "ajv/dist/2020";
 import { Effect } from "effect";
-import { createLine } from "~test/game-config-validation/support/gameValidationTestSource";
+import {
+	createLine,
+	createSimpleItem,
+} from "~test/game-config-validation/support/gameValidationTestSource";
 import { afterEach, describe, expect, it } from "vitest";
+import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 
 import {
 	cleanupMcpHarnesses,
@@ -34,7 +38,11 @@ describe("editor MCP authoring schema registry", () => {
 			return schema;
 		};
 
-		const pending = [
+		const roots = [
+			"ItemSchema",
+			"urn:serakki:schema:mcp:create-template-input",
+			"urn:serakki:schema:mcp:edit-template-input",
+			"urn:serakki:schema:mcp:edit-template-cells-input",
 			"urn:serakki:schema:mcp:create-item-input",
 			"urn:serakki:schema:mcp:edit-item-input",
 			"urn:serakki:schema:mcp:create-item-line-input",
@@ -42,6 +50,9 @@ describe("editor MCP authoring schema registry", () => {
 			"urn:serakki:schema:mcp:delete-item-line-input",
 			"urn:serakki:schema:mcp:edit-item-lines-input",
 			"urn:serakki:schema:mcp:edit-project-input",
+		];
+		const pending = [
+			...roots,
 		];
 		const visited = new Set<string>();
 		while (pending.length > 0) {
@@ -84,6 +95,7 @@ describe("editor MCP authoring schema registry", () => {
 				),
 				schemaUri(id),
 			);
+		for (const id of roots) expect(ajv.getSchema(schemaUri(id)), id).toBeDefined();
 		const validateLine = ajv.getSchema(schemaUri("CompleteItemLineSchema"));
 		if (validateLine === undefined) throw new Error("Missing public line schema.");
 		const lineWithoutWeight = {
@@ -120,7 +132,12 @@ describe("editor MCP authoring schema registry", () => {
 
 		const validateCreate = ajv.getSchema(schemaUri("urn:serakki:schema:mcp:create-item-input"));
 		const validatePatch = ajv.getSchema(schemaUri("ItemPatchSchema"));
-		if (validateCreate === undefined || validatePatch === undefined)
+		const validateItem = ajv.getSchema(schemaUri("ItemSchema"));
+		if (
+			validateCreate === undefined ||
+			validatePatch === undefined ||
+			validateItem === undefined
+		)
 			throw new Error("Missing public item schema.");
 		const lines = [
 			createLine({
@@ -136,6 +153,11 @@ describe("editor MCP authoring schema registry", () => {
 										{
 											type: "space",
 											space: 1,
+											rules: [],
+										},
+										{
+											type: "space",
+											space: 2,
 											rules: [],
 										},
 									],
@@ -157,6 +179,54 @@ describe("editor MCP authoring schema registry", () => {
 			}),
 			JSON.stringify(validatePatch.errors),
 		).toBe(true);
+
+		// Only receiver-owned Space merges are unique; ordered Space outcomes may repeat.
+		for (const count of [
+			0,
+			1,
+			2,
+		]) {
+			const merge = [
+				{
+					action: "use",
+					effect: "keep",
+					target: {
+						type: "item",
+						itemUid: "tree",
+					},
+				},
+				...Array.from(
+					{
+						length: count,
+					},
+					(_, space) => ({
+						action: "space",
+						effect: "keep",
+						space,
+					}),
+				),
+			];
+			const accepted = count <= 1;
+			const item = {
+				...createSimpleItem("portal"),
+				lines,
+				merge,
+			};
+			expect(
+				validateCreate({
+					...input,
+					merge,
+				}),
+			).toBe(accepted);
+			expect(
+				validatePatch({
+					lines,
+					merge,
+				}),
+			).toBe(accepted);
+			expect(validateItem(item)).toBe(accepted);
+			expect(ItemSchema.safeParse(item).success).toBe(accepted);
+		}
 
 		// The advertised Common graph must reject schedules that canonical saves reject.
 		const scheduled = {

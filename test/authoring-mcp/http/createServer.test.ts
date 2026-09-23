@@ -46,6 +46,13 @@ describe("editor MCP server", () => {
 			"rename_item",
 			"item_delete_impact",
 			"delete_item",
+			"template_collection",
+			"template_detail",
+			"template_config",
+			"create_template",
+			"edit_template",
+			"edit_template_cells",
+			"delete_template",
 			"project",
 			"item_meta",
 			"estimate",
@@ -89,6 +96,9 @@ describe("editor MCP server", () => {
 			type: "string",
 		});
 		const jsonInputToolNames = new Set([
+			"create_template",
+			"edit_template",
+			"edit_template_cells",
 			"create_item",
 			"edit_item",
 			"create_item_line",
@@ -117,19 +127,19 @@ describe("editor MCP server", () => {
 				`"urn:serakki:schema:mcp:${tool.name.replaceAll("_", "-")}-input"`,
 			);
 		}
-		const schemaIds = tools.tools
+		tools.tools
 			.filter(({ name }) => !jsonInputToolNames.has(name))
-			.map(({ inputSchema, name }) => {
+			.forEach(({ inputSchema, name }) => {
 				const expectedId =
-					name === "item_input" || name === "item_outcome"
-						? `urn:serakki:schema:mcp:${name.replaceAll("_", "-")}-relation`
-						: `urn:serakki:schema:mcp:${name.replaceAll("_", "-")}-input`;
+					name === "template_detail" || name === "template_config"
+						? "urn:serakki:schema:mcp:template-read-input"
+						: name === "item_input" || name === "item_outcome"
+							? `urn:serakki:schema:mcp:${name.replaceAll("_", "-")}-relation`
+							: `urn:serakki:schema:mcp:${name.replaceAll("_", "-")}-input`;
 				expectNamedJsonSchemaGraph(inputSchema, {
 					id: expectedId,
 				});
-				return inputSchema.$id;
 			});
-		expect(new Set(schemaIds).size).toBe(schemaIds.length);
 		expect(
 			tools.tools.find(({ name }) => name === "validate_project")?.inputSchema.properties,
 		).toMatchObject({

@@ -47,6 +47,7 @@ it("returns ordered canonical batch configs and missing IDs from one revision, w
 				"forge",
 				"tool",
 				"absent",
+				"toString",
 				"missing",
 			],
 		},
@@ -65,6 +66,7 @@ it("returns ordered canonical batch configs and missing IDs from one revision, w
 					missingItemUids: [
 						"missing",
 						"absent",
+						"toString",
 					],
 				},
 				null,
@@ -119,4 +121,34 @@ it("returns ordered canonical batch configs and missing IDs from one revision, w
 	});
 	expect(oversized.isError).toBe(true);
 	expect(readSpy).not.toHaveBeenCalled();
+
+	const inherited = await client.callTool({
+		name: "item_config",
+		arguments: {
+			itemUid: "constructor",
+		},
+	});
+	expect(inherited.isError).toBe(true);
+	expect(inherited.content).toMatchObject([
+		{
+			text: expect.stringContaining("Item constructor does not exist"),
+		},
+	]);
+	const inheritedLine = await client.callTool({
+		name: "item_line_configs",
+		arguments: {
+			lines: [
+				{
+					itemUid: "toString",
+					lineId: "missing",
+				},
+			],
+		},
+	});
+	expect(inheritedLine.isError).not.toBe(true);
+	expect(inheritedLine.content).toMatchObject([
+		{
+			text: expect.stringContaining('"reason": "item-not-found"'),
+		},
+	]);
 });

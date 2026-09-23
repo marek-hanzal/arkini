@@ -120,7 +120,9 @@ const readItemOriginRelationSubgraphFn = ({
 };
 
 const itemReferenceFn = (project: Project, itemUid: string) => {
-	const item = project.config.items[itemUid];
+	const item = Object.hasOwn(project.config.items, itemUid)
+		? project.config.items[itemUid]
+		: undefined;
 	return item === undefined ? `${itemUid} [missing]` : `${item.uid} [${item.title}]`;
 };
 
@@ -200,7 +202,9 @@ export const readItemRelationTextFx = Effect.fn("readItemRelationTextFx")(functi
 		readonly role: ItemOriginRelationRole;
 	},
 ) {
-	const item = project.config.items[itemUid];
+	const item = Object.hasOwn(project.config.items, itemUid)
+		? project.config.items[itemUid]
+		: undefined;
 	if (item === undefined)
 		return yield* Effect.fail(new Error(`Item ${itemUid} does not exist in the open project.`));
 	const graph = createAcquisitionGraphFn(project.config);

@@ -88,6 +88,21 @@ export const ItemSchema = z
 					hasSpace = true;
 				}
 			})
+			.meta({
+				contains: {
+					type: "object",
+					properties: {
+						action: {
+							const: "space",
+						},
+					},
+					required: [
+						"action",
+					],
+				},
+				minContains: 0,
+				maxContains: 1,
+			})
 			.optional()
 			.describe(
 				"Optional directional merges and at most one receiver-owned Space interaction.",

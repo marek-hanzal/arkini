@@ -203,7 +203,7 @@ export const registerGameplayDesignToolsFn = ({
 		"project_config",
 		{
 			description:
-				"Read JSON containing the complete editable non-item project config and its revision. The config contains full meta, resources, and start sections but intentionally excludes items. Read item_config for one complete item.",
+				"Read JSON containing the complete editable non-item project config and its revision. The config contains full meta, resources, templates, and start sections but intentionally excludes items. Prefer template_collection, template_detail or template_config to read a single template; read item_config for one complete item.",
 			inputSchema: ProjectConfigInputSchema,
 		},
 		async () => runToolFn(readProjectFx().pipe(Effect.map(readProjectConfigTextFn))),
@@ -211,7 +211,7 @@ export const registerGameplayDesignToolsFn = ({
 	server.registerTool(
 		"edit_project",
 		{
-			description: `Patch the open project's non-item config. Pass input as a serialized JSON object matching schema ${JSON.stringify(editProjectInputSchemaId)}; retrieve it and each returned $ref through schema_detail. Supplied top-level sections replace their complete values and omitted sections remain unchanged; this is not a nested merge. Read project_config first, preserve every unchanged value inside a replaced section, and copy its revision when freshness matters. The stable meta.id cannot be changed.`,
+			description: `Patch the open project's non-item config. Pass input as a serialized JSON object matching schema ${JSON.stringify(editProjectInputSchemaId)}; retrieve it and each returned $ref through schema_detail. Supplied top-level sections replace their complete values and omitted sections remain unchanged; this is not a nested merge. Read project_config first, preserve every unchanged value inside a replaced section, and copy its revision when freshness matters. The stable meta.id cannot be changed. Prefer create_template, edit_template, edit_template_cells and delete_template for focused template edits.`,
 			inputSchema: JsonToolInputSchema,
 		},
 		async ({ input }) =>
@@ -236,7 +236,7 @@ export const registerGameplayDesignToolsFn = ({
 		"edit_project_layout",
 		{
 			description:
-				"Patch one or more project layout capacities without replacing unrelated metadata. Shrinking rejects every authored start item that would fall outside the new board instead of deleting it. Read project_config first and copy its revision.",
+				"Patch fallback dimensions used for new templates. Existing templates keep their own dimensions; use edit_template to resize one. Read project_config first and copy its revision.",
 			inputSchema: EditProjectLayoutInputSchema,
 		},
 		async ({ board, revision }) =>
@@ -258,7 +258,7 @@ export const registerGameplayDesignToolsFn = ({
 		"set_start_space",
 		{
 			description:
-				"Assign an existing template to an initial space. Reusing a template creates independent runtime items. Read project_config first and copy its revision.",
+				"Assign an existing template to an initial space. Reusing a template creates independent runtime items. Use template_collection to find a template UID and project revision, or read project_config.",
 			inputSchema: SetStartSpaceInputSchema,
 		},
 		async ({ templateUid, space, revision }) =>

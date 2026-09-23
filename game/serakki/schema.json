@@ -1844,7 +1844,20 @@
 					"items": {
 						"$ref": "urn:serakki:schema:project#/$defs/MergeSchema"
 					},
-					"minItems": 1
+					"minItems": 1,
+					"contains": {
+						"type": "object",
+						"properties": {
+							"action": {
+								"const": "space"
+							}
+						},
+						"required": [
+							"action"
+						]
+					},
+					"minContains": 0,
+					"maxContains": 1
 				},
 				"clock": {
 					"$ref": "urn:serakki:schema:project#/$defs/ItemScheduleSchema"

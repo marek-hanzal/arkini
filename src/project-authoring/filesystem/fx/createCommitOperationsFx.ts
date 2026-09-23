@@ -1,3 +1,5 @@
+import { isDeepStrictEqual } from "node:util";
+import { readTemplateReferenceIssuesFn } from "~/item-authoring/fn/readTemplateReferenceIssuesFn";
 import {
 	ProjectResourceFileReplacementSchema,
 	ProjectResourceReplacementSchema,
@@ -49,6 +51,32 @@ const errorFn = (operation: ProjectRepositoryOperation, message: string, cause?:
 				message,
 				cause,
 			});
+
+/** Validate edited items and references broken by template removal; unrelated drafts remain editable. */
+const assertTemplateReferencesFx = Effect.fn("assertEditorTemplateReferencesFx")(function* (
+	config: GameConfigSchema.Type,
+	previous: GameConfigSchema.Type,
+	operation: "upsert-item" | "replace-config",
+) {
+	const removedTemplate =
+		previous.templates?.some(
+			({ uid }) => !config.templates?.some((template) => template.uid === uid),
+		) ?? false;
+	for (const [itemUid, item] of Object.entries(config.items)) {
+		const changed = !isDeepStrictEqual(previous.items[itemUid], item);
+		if (!changed && !removedTemplate) continue;
+		for (const issue of readTemplateReferenceIssuesFn(item, config.templates)) {
+			if (!changed && !previous.templates?.some(({ uid }) => uid === issue.templateUid))
+				continue;
+			return yield* Effect.fail(
+				errorFn(
+					operation,
+					`Item ${itemUid}, ${issue.path.join(".")}: template ${issue.templateUid} does not exist. Select an existing template.`,
+				),
+			);
+		}
+	}
+});
 
 const asCommitFn = (
 	{ resources: _resources, ...project }: Project,
@@ -241,6 +269,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 							[item.uid]: item,
 						},
 					});
+					yield* assertTemplateReferencesFx(config, state.project.config, "upsert-item");
 					return asCommitFn(
 						yield* commitFx({
 							state,
@@ -342,6 +371,11 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 				Effect.gen(function* () {
 					const state = yield* readStateFx(projectId);
 					yield* assertExpectedRevisionFx(state, expectedRevision, "replace-config");
+					yield* assertTemplateReferencesFx(
+						config,
+						state.project.config,
+						"replace-config",
+					);
 					return asCommitFn(
 						yield* commitFx({
 							allowProjectIdChange: true,

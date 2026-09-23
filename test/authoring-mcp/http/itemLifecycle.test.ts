@@ -161,7 +161,7 @@ describe("editor MCP item lifecycle", () => {
 		]);
 		expect(notes[0]?.updatedAtMs).toBeGreaterThan(note.updatedAtMs);
 	});
-	it("rejects incomplete and stale title edits without writing", async () => {
+	it("rejects incomplete, stale and inherited-identity title edits without writing", async () => {
 		const notify = vi.fn();
 		const { ownership, port, repository } = await createMcpHarness(Effect.runPromise, notify);
 		const created = await Effect.runPromise(
@@ -177,6 +177,23 @@ describe("editor MCP item lifecycle", () => {
 		ownership.setProjectContextFn(created.projectId);
 		await Effect.runPromise(ownership.startLocalFx);
 		const client = await connectMcpClient(port);
+		const inherited = await client.callTool({
+			name: "rename_item",
+			arguments: {
+				itemUid: "toString",
+				title: "Must not persist",
+				revision: created.revision,
+			},
+		});
+		expect(inherited.isError).toBe(true);
+		expect(inherited.content).toMatchObject([
+			{
+				text: expect.stringContaining("Item toString does not exist"),
+			},
+		]);
+		expect(await Effect.runPromise(repository.readProjectFx(created.projectId))).toEqual(
+			created,
+		);
 		for (const args of [
 			{
 				id: "hero",

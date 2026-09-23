@@ -1,4 +1,4 @@
-import { validateConfigReferencesFn } from "~/game-config-validation/fn/validateConfigReferencesFn";
+import { readTemplateDeleteBlockersFn } from "~/template-authoring/fn/readTemplateDeleteBlockersFn";
 import { Status } from "~/ui/ui/Status";
 import { TemplateSectionBar } from "~/template-authoring/ui/TemplateSectionBar";
 import { DetailFact, DetailFacts, DetailSection } from "~/item-authoring/ui/DetailDefinition";
@@ -27,20 +27,7 @@ export const TemplateDetail = ({
 	const project = useEditorProject();
 	const template = project.config.templates?.find((entry) => entry.uid === templateUid);
 	const translator = useTranslator();
-	const references = validateConfigReferencesFn({
-		config: {
-			...project.config,
-			templates: project.config.templates?.filter((entry) => entry.uid !== templateUid),
-		},
-		provenance: {
-			items: {},
-		},
-	}).filter(
-		(entry) =>
-			entry.code === "config:missing-reference" &&
-			entry.reference === "template" &&
-			entry.referenceId === templateUid,
-	);
+	const references = readTemplateDeleteBlockersFn(project.config, templateUid);
 	const navigateFn = useNavigate();
 	const editActionRef = useEditorEditShortcut();
 

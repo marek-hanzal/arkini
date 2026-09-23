@@ -42,7 +42,8 @@ export const editLinesFx = Effect.fn("editItemLinesFx")(function* ({
 				}),
 			);
 		const item = items[itemUid];
-		if (item === undefined) return yield* failFx(`Item ${itemUid} does not exist.`);
+		if (!Object.hasOwn(items, itemUid) || item === undefined)
+			return yield* failFx(`Item ${itemUid} does not exist.`);
 		if (revision !== project.revision)
 			return yield* Effect.fail(
 				new ProjectRepositoryError({

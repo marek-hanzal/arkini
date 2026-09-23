@@ -34,9 +34,10 @@ import { readDraftFn } from "~/item-authoring/fn/readDraftFn";
 import { readItemChainTextFx } from "./readItemChainTextFx";
 import { readItemEstimateTextFx } from "./readItemEstimateTextFx";
 import { readItemRelationTextFx } from "./readItemRelationTextFx";
-import { readSchemaDetailTextFx } from "./readSchemaDetailTextFx";
+import { readSchemaDetailTextFx, schemaDetailResolveDepthLimit } from "./readSchemaDetailTextFx";
 import { registerGameplayDesignToolsFn } from "./registerGameplayDesignTools";
 import { registerNoteToolsFn } from "./registerNoteTools";
+import { registerTemplateToolsFn } from "./registerTemplateTools";
 import { resolveSchemaId } from "./resolveSchemaId";
 import { parseToolInputJsonFx } from "./parseToolInputJsonFx";
 
@@ -208,10 +209,10 @@ const SchemaDetailInputSchema = z
 			.number()
 			.int()
 			.min(0)
-			.max(256)
+			.max(schemaDetailResolveDepthLimit)
 			.default(0)
 			.describe(
-				"Registered $ref expansion depth, 0–256. Zero preserves references; cycles and references at the depth limit remain unresolved.",
+				"Registered $ref expansion depth, 0–2. Zero preserves references; cycles and references at the depth limit remain unresolved.",
 			),
 		id: z
 			.string()
@@ -248,20 +249,24 @@ const readProjectTextFn = (project: Project) => {
 				]),
 		`Items: ${Object.keys(project.config.items).length}`,
 		`Resources: ${project.resources.length}`,
+		`Templates: ${project.config.templates?.length ?? 0} (template_collection)`,
 	].join("\n");
 };
 
 const readItemMetaTextFn = (project: Project) =>
 	`Total: ${Object.keys(project.config.items).length}`;
 
+/** Admit exact stored identities before any single-item projection. */
+const readItemFx = Effect.fn("readMcpItemFx")(function* (project: Project, itemUid: string) {
+	if (!Object.hasOwn(project.config.items, itemUid))
+		return yield* Effect.fail(new Error(`Item ${itemUid} does not exist in the open project.`));
+	return project.config.items[itemUid]!;
+});
+
 const readItemDetailTextFx = Effect.fn("readItemDetailTextFx")(
 	(project: Project, itemUid: string) =>
 		Effect.gen(function* () {
-			const item = project.config.items[itemUid];
-			if (item === undefined)
-				return yield* Effect.fail(
-					new Error(`Item ${itemUid} does not exist in the open project.`),
-				);
+			const item = yield* readItemFx(project, itemUid);
 			return [
 				`Item: ${item.title}`,
 				`Revision: ${project.revision}`,
@@ -281,11 +286,7 @@ const readItemDetailTextFx = Effect.fn("readItemDetailTextFx")(
 const readItemConfigTextFx = Effect.fn("readItemConfigTextFx")(
 	(project: Project, itemUid: string) =>
 		Effect.gen(function* () {
-			const item = project.config.items[itemUid];
-			if (item === undefined)
-				return yield* Effect.fail(
-					new Error(`Item ${itemUid} does not exist in the open project.`),
-				);
+			const item = yield* readItemFx(project, itemUid);
 			return JSON.stringify(
 				{
 					revision: project.revision,
@@ -300,11 +301,7 @@ const readItemConfigTextFx = Effect.fn("readItemConfigTextFx")(
 const readItemLineConfigTextFx = Effect.fn("readItemLineConfigTextFx")(
 	(project: Project, itemUid: string, lineId: string) =>
 		Effect.gen(function* () {
-			const item = project.config.items[itemUid];
-			if (item === undefined)
-				return yield* Effect.fail(
-					new Error(`Item ${itemUid} does not exist in the open project.`),
-				);
+			const item = yield* readItemFx(project, itemUid);
 			const matchingLines = item.lines.filter(({ id }) => id === lineId);
 			if (matchingLines.length === 0)
 				return yield* Effect.fail(
@@ -330,11 +327,7 @@ const readItemLineConfigTextFx = Effect.fn("readItemLineConfigTextFx")(
 
 const readItemLinesTextFx = Effect.fn("readItemLinesTextFx")((project: Project, itemUid: string) =>
 	Effect.gen(function* () {
-		const item = project.config.items[itemUid];
-		if (item === undefined)
-			return yield* Effect.fail(
-				new Error(`Item ${itemUid} does not exist in the open project.`),
-			);
+		const item = yield* readItemFx(project, itemUid);
 		return JSON.stringify(
 			{
 				revision: project.revision,
@@ -375,7 +368,9 @@ const readItemLineConfigsTextFn = (
 		const key = lineReferenceKeyFn(reference);
 		if (seen.has(key)) continue;
 		seen.add(key);
-		const item = project.config.items[reference.itemUid];
+		const item = Object.hasOwn(project.config.items, reference.itemUid)
+			? project.config.items[reference.itemUid]
+			: undefined;
 		if (item === undefined) {
 			issues.push({
 				...reference,
@@ -415,7 +410,9 @@ const readItemConfigsTextFn = (project: Project, itemUids: ReadonlyArray<string>
 		{
 			revision: project.revision,
 			items: uniqueItemUids.flatMap((itemUid) => {
-				const item = project.config.items[itemUid];
+				const item = Object.hasOwn(project.config.items, itemUid)
+					? project.config.items[itemUid]
+					: undefined;
 				return item === undefined
 					? []
 					: [
@@ -423,7 +420,7 @@ const readItemConfigsTextFn = (project: Project, itemUids: ReadonlyArray<string>
 						];
 			}),
 			missingItemUids: uniqueItemUids.filter(
-				(itemUid) => project.config.items[itemUid] === undefined,
+				(itemUid) => !Object.hasOwn(project.config.items, itemUid),
 			),
 		},
 		null,
@@ -491,7 +488,7 @@ const createServerFn = (
 		},
 		{
 			instructions:
-				"Every project tool targets only the project currently open in the Serakki editor. Results are concise plain text unless a tool explicitly promises JSON. Structurally large create and edit inputs are serialized JSON strings: retrieve the exact schema named by their tool description through schema_detail with optional resolveDepth (0–256) to inline registered references. Remaining $refs can be read through schema_detail again. Create and edit tools persist canonical saved editor state.",
+				"Every project tool targets only the project currently open in the Serakki editor. Results are concise plain text unless a tool explicitly promises JSON. Structurally large create and edit inputs are serialized JSON strings: retrieve the exact schema named by their tool description through schema_detail with optional resolveDepth (0–2) to inline registered references. Remaining $refs can be read through schema_detail again. Create and edit tools persist canonical saved editor state. For board templates, start with template_collection, then template_detail (text) or template_config (canonical JSON); use focused template mutations instead of replacing the project templates array.",
 		},
 	);
 	const readProjectFx = () => readCurrentProjectFx(repository, readProjectContextFn);
@@ -499,7 +496,7 @@ const createServerFn = (
 		"schema_detail",
 		{
 			description:
-				"Read one JSON Schema by its exact case-sensitive Zod registry ID. Optional resolveDepth (integer 0–256, default 0) expands that many registered $ref edges, independently in each branch. Cycles, unknown references and references at the depth limit remain as $ref. Local fragment references in embedded schemas retain their original resource ID. Depth limits nesting, not total response size. This tool does not require an open project.",
+				"Read one JSON Schema by its exact case-sensitive Zod registry ID. Optional resolveDepth (integer 0–2, default 0) expands that many registered $ref edges, independently in each branch. Cycles, unknown references and references at the depth limit remain as $ref. Local fragment references in embedded schemas retain their original resource ID. Depth limits nesting, not total response size. This tool does not require an open project.",
 			inputSchema: SchemaDetailInputSchema,
 		},
 		async ({ id, resolveDepth }) => runToolFn(readSchemaDetailTextFx(id, resolveDepth)),
@@ -685,6 +682,13 @@ const createServerFn = (
 	);
 
 	registerGameplayDesignToolsFn({
+		notifyProjectChangedFn,
+		readProjectFx,
+		repository,
+		runToolFn,
+		server,
+	});
+	registerTemplateToolsFn({
 		notifyProjectChangedFn,
 		readProjectFx,
 		repository,

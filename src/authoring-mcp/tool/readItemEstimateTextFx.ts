@@ -11,7 +11,9 @@ const formatNumberFn = (value: number) =>
 	Number.isInteger(value) ? String(value) : value.toFixed(2).replace(/\.00$/, "");
 
 const itemReferenceFn = (project: Project, itemUid: string) => {
-	const item = project.config.items[itemUid];
+	const item = Object.hasOwn(project.config.items, itemUid)
+		? project.config.items[itemUid]
+		: undefined;
 	return item === undefined ? `${itemUid} [missing]` : `${item.uid} [${item.title}]`;
 };
 
@@ -230,7 +232,9 @@ export const readItemEstimateTextFx = Effect.fn("readItemEstimateTextFx")(functi
 	quantity: number,
 	detail: GraphDetailSchema.Type = "full",
 ) {
-	const target = project.config.items[itemUid];
+	const target = Object.hasOwn(project.config.items, itemUid)
+		? project.config.items[itemUid]
+		: undefined;
 	if (target === undefined)
 		return yield* Effect.fail(new Error(`Item ${itemUid} does not exist in the open project.`));
 	const graph = createAcquisitionGraphFn(project.config);

@@ -68,6 +68,10 @@ it("counts reference edges rather than object nesting and expands shared sibling
 	expect(readFn("resolution.Root")).toEqual(original);
 });
 
+it("rejects deep expansion before resolving a registered schema", () => {
+	expect(() => readFn("ItemSchema", 3)).toThrow("resolveDepth must be an integer from 0 to 2");
+});
+
 it("keeps recursive and unknown references finite at maximum depth", () => {
 	const cycle: z.ZodType = registerFn(
 		z.lazy(() =>
@@ -87,7 +91,7 @@ it("keeps recursive and unknown references finite at maximum depth", () => {
 		}),
 		"resolution.CycleRoot",
 	);
-	const result = readFn("resolution.CycleRoot", 256);
+	const result = readFn("resolution.CycleRoot", 2);
 	for (const side of [
 		"a",
 		"b",
@@ -96,7 +100,7 @@ it("keeps recursive and unknown references finite at maximum depth", () => {
 			$ref: "resolution.Cycle",
 		});
 	expect(result.properties.unknown.$ref).toBe("resolution.Missing");
-	expect(readFn("resolution.Cycle", 256).properties.next.$ref).toBe("resolution.Cycle");
+	expect(readFn("resolution.Cycle", 2).properties.next.$ref).toBe("resolution.Cycle");
 });
 
 it("preserves reference sibling constraints and literal annotation data in a valid expanded schema", () => {
@@ -232,7 +236,7 @@ it("exposes bounded optional resolveDepth through MCP without requiring an open 
 	expect(await callFn(0)).toEqual(await callFn());
 	for (const depth of [
 		1,
-		256,
+		2,
 	]) {
 		const result = await callFn(depth);
 		expect(result.isError).not.toBe(true);
@@ -245,7 +249,7 @@ it("exposes bounded optional resolveDepth through MCP without requiring an open 
 	}
 	for (const invalid of [
 		-1,
-		257,
+		3,
 		1.5,
 		"2",
 		null,

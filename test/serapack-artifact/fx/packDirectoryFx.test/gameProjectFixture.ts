@@ -47,9 +47,23 @@ const config = GameConfigSchema.parse({
 			"job:started": "job-start",
 		},
 	},
+	templates: [
+		{
+			uid: "initial",
+			title: "Initial",
+			width: 2,
+			height: 2,
+			board: [],
+		},
+	],
 	start: {
 		currentSpace: 0,
-		board: [],
+		spaces: [
+			{
+				space: 0,
+				templateUid: "initial",
+			},
+		],
 	},
 	items: {
 		portal: {

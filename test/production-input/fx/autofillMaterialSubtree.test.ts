@@ -71,6 +71,7 @@ const stateFn = (origin: BoardLocationSchema.Type): StateSchema.Type => ({
 		speedUpGameplay: false,
 	},
 	currentSpace: 0,
+	templateUidBySpace: {},
 	items: [
 		{
 			id: "receiver",

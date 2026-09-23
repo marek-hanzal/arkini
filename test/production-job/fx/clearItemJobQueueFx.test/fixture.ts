@@ -10,6 +10,7 @@ export const clearItemJobQueueState = {
 		speedUpGameplay: false,
 	},
 	currentSpace: 0,
+	templateUidBySpace: {},
 	items: [
 		{
 			id: "runtime:forge:primary",

@@ -1,3 +1,4 @@
+import { PanelsTopLeft } from "lucide-react";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import type { OutcomeSchema } from "~/outcome/schema/OutcomeSchema";
 import { EditorCollectionOption } from "~/editor-control/ui/EditorCollectionOption";
@@ -44,6 +45,19 @@ export const OutcomeOption = ({
 						className="text-xs"
 					>
 						{translator.textFn("Space")} {outcome.space}
+					</span>
+				))}
+			{outcomes
+				.filter((outcome) => outcome.type === "template")
+				.map((outcome, index) => (
+					<span
+						key={`template:${index}`}
+						className="flex items-center gap-1 text-xs"
+					>
+						<PanelsTopLeft className="size-4" />
+						{project.config.templates?.find(
+							(template) => template.uid === outcome.templateUid,
+						)?.title ?? translator.textFn("No template selected")}
 					</span>
 				))}
 			{ids.map((id) => (

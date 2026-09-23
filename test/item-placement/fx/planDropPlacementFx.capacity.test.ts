@@ -25,6 +25,7 @@ it("rejects insufficient board capacity before allocating identities, including 
 			speedUpGameplay: false,
 		},
 		currentSpace: 0,
+		templateUidBySpace: {},
 		jobs: [],
 		jobQueue: [],
 		defaultLineByOwnerItemId: {},

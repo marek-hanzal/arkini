@@ -239,7 +239,7 @@ describe("saveFx", () => {
 			id: "fresh-water",
 			uid: editorTestPayload.config.items.water?.uid,
 		});
-		expect(fixture.registry.get(projectAtom)?.config.start.board[0]?.itemId).toBe(
+		expect(fixture.registry.get(projectAtom)?.config.templates![0]!.board[0]?.itemId).toBe(
 			"fresh-water",
 		);
 	});

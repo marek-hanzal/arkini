@@ -109,6 +109,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 	const processedReplacementKeys = new Set<string>();
 	const processedFeedbackKeys = new Set<string>();
 	let closed = false;
+	let initialized = false;
 
 	const retainNewestFeedbackKeysFn = () => {
 		while (processedFeedbackKeys.size > 256) {
@@ -225,6 +226,16 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 		readonly transition: GameTransition;
 	}) {
 		if (closed) return;
+		const boardEntrance =
+			!initialized ||
+			(presentCommittedEffects &&
+				(transition.previousRuntime?.currentSpace !== transition.runtime.currentSpace ||
+					transition.events.some(
+						(event) =>
+							event.type === "board:template-applied" &&
+							event.space === transition.runtime.currentSpace,
+					)));
+		initialized = true;
 		const nextItems = game.readOrThrowFn(
 			readTileActorsFx({
 				game,
@@ -322,6 +333,25 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 			});
 		}
 
+		const entranceDelayByActorId = new Map(
+			boardEntrance
+				? reconciliationPlan.arrivals
+						.filter((arrival) => arrival.kind === "add")
+						.sort(
+							(left, right) =>
+								left.visible.pose.y - right.visible.pose.y ||
+								left.visible.pose.x - right.visible.pose.x ||
+								left.visible.item.id.localeCompare(right.visible.item.id),
+						)
+						.map(
+							(arrival, index, arrivals) =>
+								[
+									arrival.visible.item.id,
+									index * Math.min(35, 700 / Math.max(1, arrivals.length - 1)),
+								] as const,
+						)
+				: [],
+		);
 		for (const arrival of reconciliationPlan.arrivals) {
 			const {
 				visible: { item, pose },
@@ -378,10 +408,11 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 						animator,
 					});
 				}
-				if (presentCommittedEffects && spawnCue === undefined) {
+				if ((presentCommittedEffects || boardEntrance) && spawnCue === undefined) {
 					yield* startActorEnterFx({
 						actor: created,
 						animator,
+						delayMs: entranceDelayByActorId.get(item.id),
 					});
 				}
 				continue;

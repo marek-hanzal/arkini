@@ -1,3 +1,4 @@
+import { ShortcutLabel } from "~/ui/ui/ShortcutLabel";
 import { formatForDisplay } from "@tanstack/react-hotkeys";
 import { useSectionShortcuts } from "~/ui/ui/useSectionShortcuts";
 import { Tooltip } from "~/ui/ui/Tooltip";
@@ -54,7 +55,10 @@ export const EditorSectionShortcutNavigation = <Value extends string>({
 							})}
 						>
 							{Icon === undefined ? null : <Icon className="size-4 shrink-0" />}
-							{option.label}
+							<ShortcutLabel
+								label={option.label}
+								shortcut={option.shortcut}
+							/>
 						</LinkButton>
 					</Tooltip>
 				);

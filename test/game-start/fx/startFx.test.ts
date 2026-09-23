@@ -1,3 +1,7 @@
+import { fromRuntimeFn } from "~/game-persistence/fn/fromRuntimeFn";
+import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
+import { planDropPlacementFx } from "~/item-placement/fx/planDropPlacementFx";
+import { readBoardSizeFn } from "~/game-runtime/fn/readBoardSizeFn";
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
@@ -9,23 +13,34 @@ import { startTestConfig } from "~test/game-start/support/startTestConfig";
 import { startFx } from "~/game-start/fx/startFx";
 
 describe("startFx", () => {
-	it("commits the exact sequential runtime for repeated item definitions in separate cells", () => {
+	it("reuses one template in distinct spaces with independent identities and dimensions", () => {
 		const config = GameConfigSchema.parse({
 			...startTestConfig,
+			templates: [
+				{
+					uid: "logs",
+					title: "Logs",
+					width: 2,
+					height: 1,
+					board: [
+						{
+							itemId: "log",
+							x: 0,
+							y: 0,
+						},
+					],
+				},
+			],
 			start: {
 				currentSpace: 0,
-				board: [
+				spaces: [
 					{
-						itemId: "log",
 						space: 0,
-						x: 0,
-						y: 0,
+						templateUid: "logs",
 					},
 					{
-						itemId: "log",
-						space: 0,
-						x: 1,
-						y: 0,
+						space: 1,
+						templateUid: "logs",
 					},
 				],
 			},
@@ -39,6 +54,24 @@ describe("startFx", () => {
 		);
 
 		expect(runtime.items).toHaveLength(2);
+		expect(runtime.items.map((item) => item.location)).toEqual([
+			{
+				scope: "board",
+				space: 0,
+				position: {
+					x: 0,
+					y: 0,
+				},
+			},
+			{
+				scope: "board",
+				space: 1,
+				position: {
+					x: 0,
+					y: 0,
+				},
+			},
+		]);
 		expect(new Set(runtime.items.map((item) => item.id)).size).toBe(2);
 	});
 
@@ -83,23 +116,35 @@ describe("startFx", () => {
 		expect(result.after).toBe(result.before);
 	});
 
-	it("rolls back the complete start when exact board placements conflict", () => {
+	it("rolls back the complete start when a template item cannot resolve", () => {
 		const config = GameConfigSchema.parse({
 			...startTestConfig,
+			templates: [
+				{
+					uid: "missing",
+					title: "Missing",
+					width: 2,
+					height: 1,
+					board: [
+						{
+							itemId: "tree",
+							x: 0,
+							y: 0,
+						},
+						{
+							itemId: "missing",
+							x: 1,
+							y: 0,
+						},
+					],
+				},
+			],
 			start: {
 				currentSpace: 0,
-				board: [
+				spaces: [
 					{
 						space: 0,
-						itemId: "tree",
-						x: 0,
-						y: 0,
-					},
-					{
-						space: 0,
-						itemId: "tree",
-						x: 0,
-						y: 0,
+						templateUid: "missing",
 					},
 				],
 			},
@@ -121,11 +166,6 @@ describe("startFx", () => {
 		);
 
 		expect(Result.isFailure(result.started)).toBe(true);
-		if (Result.isFailure(result.started)) {
-			expect(result.started.failure).toMatchObject({
-				_tag: "RuntimeInvalidError",
-			});
-		}
 		expect(result.runtime.items).toEqual([]);
 	});
 
@@ -158,4 +198,134 @@ describe("startFx", () => {
 		expect(result.attempts.filter(Result.isFailure)).toHaveLength(1);
 		expect(result.runtime.items).toHaveLength(1);
 	});
+});
+
+it("hydrates saved items while the loaded template remains dimension authority", () => {
+	const runtime = Effect.runSync(
+		startFx().pipe(
+			useGameFx({
+				config: startTestConfig,
+			}),
+		),
+	);
+	const state = fromRuntimeFn({
+		runtime,
+	});
+	const changedConfig = GameConfigSchema.parse({
+		...startTestConfig,
+		meta: {
+			...startTestConfig.meta,
+			board: {
+				width: 1,
+				height: 1,
+			},
+		},
+		templates: [
+			{
+				uid: "start",
+				title: "Changed",
+				width: 5,
+				height: 4,
+				board: [],
+			},
+		],
+	});
+	const hydrated = Effect.runSync(
+		fromStateFx({
+			state,
+		}).pipe(
+			useGameFx({
+				config: changedConfig,
+			}),
+		),
+	);
+	expect(
+		readBoardSizeFn({
+			runtime: hydrated,
+			config: changedConfig,
+			space: 0,
+		}),
+	).toEqual({
+		width: 5,
+		height: 4,
+	});
+	expect(
+		hydrated.items.map(({ id, location }) => ({
+			id,
+			location,
+		})),
+	).toEqual(
+		runtime.items.map(({ id, location }) => ({
+			id,
+			location,
+		})),
+	);
+	expect(
+		readBoardSizeFn({
+			runtime: hydrated,
+			config: changedConfig,
+			space: 99,
+		}),
+	).toEqual({
+		width: 1,
+		height: 1,
+	});
+});
+
+it("rejects drops that fit project defaults but exceed the destination space capacity", () => {
+	const config = GameConfigSchema.parse({
+		...startTestConfig,
+		templates: [
+			{
+				uid: "tiny",
+				title: "Tiny",
+				width: 1,
+				height: 1,
+				board: [],
+			},
+		],
+		start: {
+			currentSpace: 0,
+			spaces: [
+				{
+					space: 0,
+					templateUid: "tiny",
+				},
+			],
+		},
+	});
+	const result = Effect.runSync(
+		Effect.gen(function* () {
+			const runtime = yield* startFx();
+			return yield* Effect.result(
+				planDropPlacementFx({
+					runtime,
+					origin: {
+						scope: "board",
+						space: 0,
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+					drop: {
+						type: "item",
+						itemId: "log",
+						quantity: 2,
+						placement: "drop",
+					},
+				}),
+			);
+		}).pipe(
+			useGameFx({
+				config,
+			}),
+		),
+	);
+	expect(Result.isFailure(result)).toBe(true);
+	if (Result.isFailure(result))
+		expect(result.failure).toMatchObject({
+			_tag: "PlacementUnavailableError",
+			remainingQuantity: 1,
+		});
 });

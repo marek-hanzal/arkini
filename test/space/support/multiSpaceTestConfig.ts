@@ -52,6 +52,7 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 	},
 	start: {
 		currentSpace: 0,
+		spaces: [],
 	},
 	items: {
 		origin: {

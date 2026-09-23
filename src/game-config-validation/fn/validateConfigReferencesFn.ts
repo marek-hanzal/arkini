@@ -209,6 +209,24 @@ const validateOutcomeFn = ({
 		});
 	}
 
+	if (
+		drop.type === "template" &&
+		!config.templates?.some((template) => template.uid === drop.templateUid)
+	) {
+		diagnostics.push({
+			code: DiagnosticCodeEnumSchema.enum.ConfigMissingReference,
+			severity: DiagnosticSeverityEnumSchema.enum.Error,
+			path: [
+				...path,
+				"templateUid",
+			],
+			source,
+			message: `Template outcome references missing template ${drop.templateUid}.`,
+			reference: DiagnosticRecordEntityEnumSchema.enum.Template,
+			referenceId: drop.templateUid,
+		});
+	}
+
 	const ruleDiagnostics = drop.rules.map((rule, ruleIndex) =>
 		rule.when.map((when, whenIndex) =>
 			validateWhenReferenceFn({
@@ -304,24 +322,56 @@ export const validateConfigReferencesFn = ({
 	provenance,
 }: validateConfigReferencesFn.Props) => {
 	const diagnostics: GameDiagnosticsSchema.Type = [];
+	if (!config.start.spaces.some((entry) => entry.space === config.start.currentSpace)) {
+		diagnostics.push({
+			code: DiagnosticCodeEnumSchema.enum.StartInvalid,
+			severity: DiagnosticSeverityEnumSchema.enum.Error,
+			path: [
+				"start",
+				"currentSpace",
+			],
+			source: provenance.start,
+			message: `Initial space ${config.start.currentSpace} must have an assigned template before building.`,
+			failureTag: "InitialSpaceUnassigned",
+		});
+	}
 
-	for (const [index, value] of config.start.board.entries()) {
-		if (config.items[value.itemId] !== undefined) {
-			continue;
+	for (const [templateIndex, template] of (config.templates ?? []).entries()) {
+		for (const [cellIndex, cell] of template.board.entries()) {
+			if (config.items[cell.itemId] !== undefined) continue;
+			diagnostics.push({
+				code: DiagnosticCodeEnumSchema.enum.ConfigMissingReference,
+				severity: DiagnosticSeverityEnumSchema.enum.Error,
+				path: [
+					"templates",
+					templateIndex,
+					"board",
+					cellIndex,
+					"itemId",
+				],
+				source: provenance.templates,
+				message: `Template ${template.title} references missing item ${cell.itemId}.`,
+				reference: DiagnosticRecordEntityEnumSchema.enum.Item,
+				referenceId: cell.itemId,
+			});
 		}
+	}
+
+	for (const [index, assignment] of config.start.spaces.entries()) {
+		if (config.templates?.some((template) => template.uid === assignment.templateUid)) continue;
 		diagnostics.push({
 			code: DiagnosticCodeEnumSchema.enum.ConfigMissingReference,
 			severity: DiagnosticSeverityEnumSchema.enum.Error,
 			path: [
 				"start",
-				"board",
+				"spaces",
 				index,
-				"itemId",
+				"templateUid",
 			],
 			source: provenance.start,
-			message: `Initial board references missing item ${value.itemId}.`,
-			reference: DiagnosticRecordEntityEnumSchema.enum.Item,
-			referenceId: value.itemId,
+			message: `Initial space ${assignment.space} references missing template ${assignment.templateUid}.`,
+			reference: DiagnosticRecordEntityEnumSchema.enum.Template,
+			referenceId: assignment.templateUid,
 		});
 	}
 

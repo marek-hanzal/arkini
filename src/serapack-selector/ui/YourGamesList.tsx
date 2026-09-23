@@ -197,7 +197,7 @@ export const YourGamesList = ({
 									<button
 										type="button"
 										disabled={blocked}
-										className="grid size-8 shrink-0 cursor-pointer place-items-center border-0 bg-transparent p-0 text-subtle transition-colors hover:text-danger disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:text-subtle"
+										className="mr-6 grid size-10 shrink-0 cursor-pointer place-items-center border-0 bg-transparent p-0 text-subtle transition-colors hover:text-danger disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:text-subtle"
 										data-ui="YourGamesProjectDelete"
 										title={translator.textFn("Remove project")}
 										onClick={() => onDeleteProjectFn(row.candidate)}
@@ -210,7 +210,7 @@ export const YourGamesList = ({
 											projectId: row.candidate.project.projectId,
 										}}
 										disabled={blocked}
-										className="inline-flex items-center gap-1.5 text-xs"
+										className="inline-flex min-h-0 items-center justify-center gap-1.5 px-3 py-2 text-xs"
 									>
 										<Sparkles className="size-4" />
 										Editor
@@ -218,7 +218,7 @@ export const YourGamesList = ({
 								</>
 							) : (
 								<LinkButton
-									className="inline-flex items-center gap-1.5 text-xs"
+									className="inline-flex min-h-0 items-center justify-center gap-1.5 px-3 py-2 text-xs"
 									disabled={blocked}
 									onClick={() => onOpenEditorSerapackFn(row.serapack.packageId)}
 								>

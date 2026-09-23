@@ -1,18 +1,18 @@
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { EditorItemSearchThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
-import { useProjectStartItemPickerController } from "~/project-authoring/ui/useProjectStartItemPickerController";
+import { useBoardItemPickerController } from "~/board-authoring/ui/useBoardItemPickerController";
 import { ItemSpotlight } from "~/ui/ui/ItemSpotlight";
 import { Tx } from "~/translation/ui/Tx";
 
-interface ProjectStartItemPickerProps extends useProjectStartItemPickerController.Props {}
+interface BoardItemPickerProps extends useBoardItemPickerController.Props {}
 
-/** Selects one canonical item for the initial board. */
-export const ProjectStartItemPicker = (props: ProjectStartItemPickerProps) => {
+/** Selects one canonical item for an authored board. */
+export const BoardItemPicker = (props: BoardItemPickerProps) => {
 	const translator = useTranslator();
-	const controller = useProjectStartItemPickerController(props);
+	const controller = useBoardItemPickerController(props);
 	return (
 		<ItemSpotlight
-			dataUi="EditorProjectStartItemPicker"
+			dataUi="EditorBoardItemPicker"
 			emptyMessage={translator.textFn("No items can be placed here.")}
 			footer={
 				<p className="text-center text-xs text-muted">

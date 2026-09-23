@@ -65,6 +65,7 @@ const lifecycleConfig = GameConfigSchema.parse({
 	},
 	start: {
 		currentSpace: 0,
+		spaces: [],
 	},
 	items: {
 		"producer:trader": {
@@ -428,6 +429,7 @@ describe("job completion unit lifecycle", () => {
 				speedUpGameplay: false,
 			},
 			currentSpace: 0,
+			templateUidBySpace: {},
 			items: [
 				{
 					id: "runtime:trader",

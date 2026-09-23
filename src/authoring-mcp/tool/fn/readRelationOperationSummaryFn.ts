@@ -44,7 +44,7 @@ const outcomeLinesFn = (project: Project, outcome: OutcomeTableSchema.Type | und
 				roll.type === "chance" && roll.chance === 0
 					? []
 					: [
-							`  ${simpleSet ? "Outcomes" : `Roll ${rollIndex + 1}`}: ${roll.type === "chance" ? `chance ${roll.chance * 100}%` : "guaranteed"} ${roll.outcome.map((drop) => (drop.type === "space" ? `Space ${drop.space}${rulesFn(project, drop.rules)}` : `${itemFn(project, drop.itemId)} x${quantityFn(drop.quantity)}${drop.placement === "random" ? " random placement" : ""}${rulesFn(project, drop.rules)}`)).join("; ")}`,
+							`  ${simpleSet ? "Outcomes" : `Roll ${rollIndex + 1}`}: ${roll.type === "chance" ? `chance ${roll.chance * 100}%` : "guaranteed"} ${roll.outcome.map((drop) => (drop.type === "template" ? `Template ${project.config.templates?.find((template) => template.uid === drop.templateUid)?.title ?? drop.templateUid}${rulesFn(project, drop.rules)}` : drop.type === "space" ? `Space ${drop.space}${rulesFn(project, drop.rules)}` : `${itemFn(project, drop.itemId)} x${quantityFn(drop.quantity)}${drop.placement === "random" ? " random placement" : ""}${rulesFn(project, drop.rules)}`)).join("; ")}`,
 						],
 			),
 		];

@@ -18,6 +18,45 @@ const waterOutput = createOutput([
 ]);
 
 describe("forceDeleteFx", () => {
+	it("removes referenced template cells while retaining the template and unrelated placements", () => {
+		const template = {
+			uid: "template",
+			title: "Template",
+			width: 8,
+			height: 3,
+			board: [
+				{
+					x: 7,
+					y: 2,
+					itemId: "water",
+				},
+			],
+		};
+		const result = Effect.runSync(
+			forceDeleteFx({
+				config: {
+					...editorTestConfig,
+					templates: [
+						template,
+					],
+				},
+				itemId: "water",
+			}),
+		);
+		expect(result.config.templates).toEqual([
+			{
+				...template,
+				board: [],
+			},
+		]);
+		expect(result.impact.removedTemplateEntries).toEqual([
+			{
+				templateUid: "template",
+				title: "Template",
+				count: 1,
+			},
+		]);
+	});
 	it("clears Clock timer references and expiry outcome, retaining owners after their final line is removed", () => {
 		const clock = {
 			...createProducerItem({
@@ -139,7 +178,7 @@ describe("forceDeleteFx", () => {
 
 		expect(GameConfigSchema.parse(result.config)).toEqual(result.config);
 		expect(result.config.items.water).toBeUndefined();
-		expect(result.config.start.board).toEqual([]);
+		expect(result.config.templates![0]!.board).toEqual([]);
 		expect(result.config.items.oil).toMatchObject({
 			units: {
 				amount: 1,
@@ -154,6 +193,13 @@ describe("forceDeleteFx", () => {
 			],
 		});
 		expect(result.impact).toEqual({
+			removedTemplateEntries: [
+				{
+					templateUid: "initial",
+					title: "Initial",
+					count: 1,
+				},
+			],
 			removedClockRules: [],
 			removedUnitOutcomeOwnerIds: [
 				"oil",
@@ -172,26 +218,27 @@ describe("forceDeleteFx", () => {
 					ruleNumber: 1,
 				},
 			],
-			removedStartEntries: {
-				board: 1,
-			},
 		});
 	});
 
 	it("retains a passive Common owner after its last dependent line is removed", () => {
 		const config = GameConfigSchema.parse({
 			...editorTestConfig,
-			start: {
-				...editorTestConfig.start,
-				board: [
-					{
-						itemId: "producer",
-						space: 0,
-						x: 0,
-						y: 0,
-					},
-				],
-			},
+			templates: [
+				{
+					uid: "initial",
+					title: "Initial",
+					width: 2,
+					height: 2,
+					board: [
+						{
+							itemId: "producer",
+							x: 0,
+							y: 0,
+						},
+					],
+				},
+			],
 			items: {
 				...editorTestConfig.items,
 				producer: createProducerItem({
@@ -211,7 +258,7 @@ describe("forceDeleteFx", () => {
 		expect(result.config.items.producer).toMatchObject({
 			lines: [],
 		});
-		expect(result.config.start.board).toEqual(config.start.board);
+		expect(result.config.templates![0]!.board).toEqual(config.templates![0]!.board);
 		expect(GameConfigSchema.parse(result.config)).toEqual(result.config);
 	});
 });

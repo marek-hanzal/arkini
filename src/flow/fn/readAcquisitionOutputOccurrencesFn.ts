@@ -34,7 +34,7 @@ interface OutputOccurrence {
 }
 
 interface AcquisitionOutputModel {
-	readonly compilation: "complete" | "state-space-unsupported";
+	readonly compilation: "complete" | "state-space-unsupported" | "template-reset-unsupported";
 	readonly occurrences: ReadonlyArray<OutputOccurrence>;
 	readonly outputDistribution: ReadonlyArray<AcquisitionOperationOutcome>;
 }
@@ -345,7 +345,11 @@ export const readAcquisitionOutputOccurrencesFn = (
 		);
 	const normalizedGroupDistribution = normalizeDistributionFn(groupDistribution);
 	return {
-		compilation: "complete",
+		compilation: output.set.some((set) =>
+			set.roll.some((roll) => roll.outcome.some((outcome) => outcome.type === "template")),
+		)
+			? "template-reset-unsupported"
+			: "complete",
 		occurrences: drafts.map((draft) => ({
 			...draft,
 			occurrenceQuantityDistribution: occurrenceMarginals.get(draft.id) ?? [],

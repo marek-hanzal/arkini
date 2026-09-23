@@ -62,272 +62,261 @@
 			"line-input:autofill-started": "r8j85m4ar8fhx0ialyk6f1u4"
 		}
 	},
+	"templates": [
+		{
+			"uid": "blnlysibqlvgocdqibrsovdf",
+			"title": "Default Template",
+			"width": 17,
+			"height": 11,
+			"board": [
+				{
+					"x": 8,
+					"y": 7,
+					"itemId": "forest"
+				},
+				{
+					"x": 8,
+					"y": 6,
+					"itemId": "base-camp"
+				},
+				{
+					"x": 6,
+					"y": 6,
+					"itemId": "tree"
+				},
+				{
+					"x": 10,
+					"y": 6,
+					"itemId": "tree"
+				},
+				{
+					"x": 7,
+					"y": 5,
+					"itemId": "stone-deposit"
+				},
+				{
+					"x": 8,
+					"y": 5,
+					"itemId": "tree"
+				},
+				{
+					"x": 9,
+					"y": 5,
+					"itemId": "stone-deposit"
+				},
+				{
+					"x": 9,
+					"y": 4,
+					"itemId": "tree"
+				},
+				{
+					"x": 7,
+					"y": 4,
+					"itemId": "tree"
+				},
+				{
+					"x": 8,
+					"y": 3,
+					"itemId": "foundation-chest"
+				}
+			]
+		},
+		{
+			"uid": "kuuffstuxxozvrnsunxgqxtt",
+			"title": "The End",
+			"width": 14,
+			"height": 7,
+			"board": [
+				{
+					"x": 1,
+					"y": 1,
+					"itemId": "tree"
+				},
+				{
+					"x": 1,
+					"y": 2,
+					"itemId": "tree"
+				},
+				{
+					"x": 1,
+					"y": 3,
+					"itemId": "tree"
+				},
+				{
+					"x": 1,
+					"y": 4,
+					"itemId": "tree"
+				},
+				{
+					"x": 1,
+					"y": 5,
+					"itemId": "tree"
+				},
+				{
+					"x": 2,
+					"y": 1,
+					"itemId": "tree"
+				},
+				{
+					"x": 3,
+					"y": 1,
+					"itemId": "tree"
+				},
+				{
+					"x": 2,
+					"y": 3,
+					"itemId": "tree"
+				},
+				{
+					"x": 2,
+					"y": 5,
+					"itemId": "tree"
+				},
+				{
+					"x": 3,
+					"y": 5,
+					"itemId": "tree"
+				},
+				{
+					"x": 5,
+					"y": 5,
+					"itemId": "tree"
+				},
+				{
+					"x": 5,
+					"y": 4,
+					"itemId": "tree"
+				},
+				{
+					"x": 5,
+					"y": 3,
+					"itemId": "tree"
+				},
+				{
+					"x": 5,
+					"y": 2,
+					"itemId": "tree"
+				},
+				{
+					"x": 5,
+					"y": 1,
+					"itemId": "tree"
+				},
+				{
+					"x": 6,
+					"y": 2,
+					"itemId": "tree"
+				},
+				{
+					"x": 7,
+					"y": 3,
+					"itemId": "tree"
+				},
+				{
+					"x": 8,
+					"y": 4,
+					"itemId": "tree"
+				},
+				{
+					"x": 8,
+					"y": 5,
+					"itemId": "tree"
+				},
+				{
+					"x": 8,
+					"y": 3,
+					"itemId": "tree"
+				},
+				{
+					"x": 8,
+					"y": 2,
+					"itemId": "tree"
+				},
+				{
+					"x": 8,
+					"y": 1,
+					"itemId": "tree"
+				},
+				{
+					"x": 10,
+					"y": 1,
+					"itemId": "tree"
+				},
+				{
+					"x": 10,
+					"y": 2,
+					"itemId": "tree"
+				},
+				{
+					"x": 10,
+					"y": 3,
+					"itemId": "tree"
+				},
+				{
+					"x": 10,
+					"y": 4,
+					"itemId": "tree"
+				},
+				{
+					"x": 10,
+					"y": 5,
+					"itemId": "tree"
+				},
+				{
+					"x": 11,
+					"y": 5,
+					"itemId": "tree"
+				},
+				{
+					"x": 12,
+					"y": 4,
+					"itemId": "tree"
+				},
+				{
+					"x": 12,
+					"y": 3,
+					"itemId": "tree"
+				},
+				{
+					"x": 12,
+					"y": 2,
+					"itemId": "tree"
+				},
+				{
+					"x": 11,
+					"y": 1,
+					"itemId": "tree"
+				}
+			]
+		},
+		{
+			"uid": "3e7226b5-4205-4a57-87e3-5cd875a27c88",
+			"title": "Farmland",
+			"width": 17,
+			"height": 11,
+			"board": [
+				{
+					"x": 8,
+					"y": 5,
+					"itemId": "homeland-portal"
+				}
+			]
+		}
+	],
 	"start": {
 		"currentSpace": 0,
-		"board": [
+		"spaces": [
 			{
-				"x": 1,
-				"y": 1,
-				"space": 1,
-				"itemId": "tree"
-			},
-			{
-				"x": 1,
-				"y": 2,
-				"space": 1,
-				"itemId": "tree"
-			},
-			{
-				"x": 1,
-				"y": 3,
-				"space": 1,
-				"itemId": "tree"
-			},
-			{
-				"x": 1,
-				"y": 4,
-				"space": 1,
-				"itemId": "tree"
-			},
-			{
-				"x": 1,
-				"y": 5,
-				"space": 1,
-				"itemId": "tree"
-			},
-			{
-				"x": 2,
-				"y": 1,
-				"space": 1,
-				"itemId": "tree"
-			},
-			{
-				"x": 3,
-				"y": 1,
-				"space": 1,
-				"itemId": "tree"
-			},
-			{
-				"x": 2,
-				"y": 3,
-				"space": 1,
-				"itemId": "tree"
-			},
-			{
-				"x": 2,
-				"y": 5,
-				"space": 1,
-				"itemId": "tree"
-			},
-			{
-				"x": 3,
-				"y": 5,
-				"space": 1,
-				"itemId": "tree"
-			},
-			{
-				"x": 5,
-				"y": 5,
-				"space": 1,
-				"itemId": "tree"
-			},
-			{
-				"x": 5,
-				"y": 4,
-				"space": 1,
-				"itemId": "tree"
-			},
-			{
-				"x": 5,
-				"y": 3,
-				"space": 1,
-				"itemId": "tree"
-			},
-			{
-				"x": 5,
-				"y": 2,
-				"space": 1,
-				"itemId": "tree"
-			},
-			{
-				"x": 5,
-				"y": 1,
-				"space": 1,
-				"itemId": "tree"
-			},
-			{
-				"x": 6,
-				"y": 2,
-				"space": 1,
-				"itemId": "tree"
-			},
-			{
-				"x": 7,
-				"y": 3,
-				"space": 1,
-				"itemId": "tree"
-			},
-			{
-				"x": 8,
-				"y": 4,
-				"space": 1,
-				"itemId": "tree"
-			},
-			{
-				"x": 8,
-				"y": 5,
-				"space": 1,
-				"itemId": "tree"
-			},
-			{
-				"x": 8,
-				"y": 3,
-				"space": 1,
-				"itemId": "tree"
-			},
-			{
-				"x": 8,
-				"y": 2,
-				"space": 1,
-				"itemId": "tree"
-			},
-			{
-				"x": 8,
-				"y": 1,
-				"space": 1,
-				"itemId": "tree"
-			},
-			{
-				"x": 10,
-				"y": 1,
-				"space": 1,
-				"itemId": "tree"
-			},
-			{
-				"x": 10,
-				"y": 2,
-				"space": 1,
-				"itemId": "tree"
-			},
-			{
-				"x": 10,
-				"y": 3,
-				"space": 1,
-				"itemId": "tree"
-			},
-			{
-				"x": 10,
-				"y": 4,
-				"space": 1,
-				"itemId": "tree"
-			},
-			{
-				"x": 10,
-				"y": 5,
-				"space": 1,
-				"itemId": "tree"
-			},
-			{
-				"x": 11,
-				"y": 5,
-				"space": 1,
-				"itemId": "tree"
-			},
-			{
-				"x": 12,
-				"y": 4,
-				"space": 1,
-				"itemId": "tree"
-			},
-			{
-				"x": 12,
-				"y": 3,
-				"space": 1,
-				"itemId": "tree"
-			},
-			{
-				"x": 12,
-				"y": 2,
-				"space": 1,
-				"itemId": "tree"
-			},
-			{
-				"x": 11,
-				"y": 1,
-				"space": 1,
-				"itemId": "tree"
-			},
-			{
-				"x": 8,
-				"y": 4,
 				"space": 0,
-				"itemId": "foundation-chest"
+				"templateUid": "blnlysibqlvgocdqibrsovdf"
 			},
 			{
-				"x": 8,
-				"y": 5,
-				"space": 0,
-				"itemId": "base-camp"
+				"space": 1,
+				"templateUid": "kuuffstuxxozvrnsunxgqxtt"
 			},
 			{
-				"x": 6,
-				"y": 5,
-				"space": 0,
-				"itemId": "tree"
-			},
-			{
-				"x": 7,
-				"y": 3,
-				"space": 0,
-				"itemId": "tree"
-			},
-			{
-				"x": 9,
-				"y": 3,
-				"space": 0,
-				"itemId": "tree"
-			},
-			{
-				"x": 10,
-				"y": 5,
-				"space": 0,
-				"itemId": "tree"
-			},
-			{
-				"x": 8,
-				"y": 7,
-				"space": 0,
-				"itemId": "tree"
-			},
-			{
-				"x": 8,
-				"y": 6,
-				"space": 0,
-				"itemId": "forest"
-			},
-			{
-				"x": 9,
-				"y": 4,
-				"space": 0,
-				"itemId": "stone-deposit"
-			},
-			{
-				"x": 7,
-				"y": 4,
-				"space": 0,
-				"itemId": "stone-deposit"
-			},
-			{
-				"x": 8,
-				"y": 8,
-				"space": 0,
-				"itemId": "forest-portal"
-			},
-			{
-				"x": 7,
-				"y": 5,
 				"space": 2,
-				"itemId": "homeland-portal"
+				"templateUid": "3e7226b5-4205-4a57-87e3-5cd875a27c88"
 			}
 		]
 	}

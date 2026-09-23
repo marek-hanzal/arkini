@@ -6,6 +6,10 @@ import type {
 
 export type ItemEstimateDiagnostic =
 	| {
+			readonly kind: "template-reset-unsupported";
+			readonly routeId: string;
+	  }
+	| {
 			readonly kind: "weighted-clock-pool-unsupported";
 			readonly routeId: string;
 	  }

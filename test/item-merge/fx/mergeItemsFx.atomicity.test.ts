@@ -56,6 +56,7 @@ const blockedOutputState = (includeBlocker = true) =>
 			speedUpGameplay: false,
 		},
 		currentSpace: 0,
+		templateUidBySpace: {},
 		items: [
 			boardItem("source", "source", 0),
 			boardItem("target", "target", 1),

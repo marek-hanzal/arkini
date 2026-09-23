@@ -3,6 +3,7 @@ import { z } from "zod";
 /** The finite vocabulary of committed gameplay events published by one Game. */
 export const GameEventEnumSchema = z
 	.enum({
+		BoardTemplateApplied: "board:template-applied",
 		CurrentSpaceChanged: "current-space:changed",
 		JobQueued: "job:queued",
 		LineInputAutofillStarted: "line-input:autofill-started",

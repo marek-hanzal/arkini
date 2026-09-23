@@ -79,6 +79,7 @@ const configFn = (outcome: OutcomeTableSchema.Type, width = 3) =>
 		},
 		start: {
 			currentSpace: 0,
+			spaces: [],
 		},
 		items: {
 			owner: {

@@ -11,6 +11,7 @@ const runtime = (currentSpace: number): GameTransition["runtime"] => ({
 		speedUpGameplay: false,
 	},
 	currentSpace,
+	templateUidBySpace: {},
 	items: [],
 	jobs: [],
 	jobQueue: [],

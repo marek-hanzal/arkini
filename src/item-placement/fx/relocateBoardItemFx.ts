@@ -1,3 +1,4 @@
+import { readBoardSizeFn } from "~/game-runtime/fn/readBoardSizeFn";
 import { Effect } from "effect";
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
@@ -31,7 +32,11 @@ export const relocateBoardItemFx = Effect.fn("relocateBoardItemFx")(function* ({
 	const config = yield* GameConfigFx;
 	const available = readEmptyLocationsFn({
 		locations: readBoardLocationsFn({
-			size: config.meta.board,
+			size: readBoardSizeFn({
+				runtime,
+				config,
+				space: origin.space,
+			}),
 			space: origin.space,
 		}),
 		runtime: {

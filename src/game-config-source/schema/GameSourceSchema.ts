@@ -1,3 +1,4 @@
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { z } from "zod";
 
 import { IdSchema } from "~/game-value/schema/IdSchema";
@@ -47,8 +48,9 @@ export const GameSourceSchema = z
 			"The optional SFX event assignments contributed by this source fragment.",
 		),
 		/**
-		 * Optional new-game state contributed by this source fragment.
+		 * Optional reusable templates contributed by this source fragment.
 		 */
+		templates: GameConfigSchema.shape.templates,
 		start: StartSchema.optional().describe(
 			"The optional initial Board state contributed by this source fragment.",
 		),

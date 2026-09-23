@@ -14,6 +14,7 @@ export const fromConfigFx = Effect.fn("fromConfigFx")(function* () {
 			speedUpGameplay: false,
 		},
 		currentSpace: config.start.currentSpace,
+		templateUidBySpace: {},
 		items: [],
 		jobs: [],
 		jobQueue: [],

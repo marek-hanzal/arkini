@@ -84,6 +84,7 @@ const maximumWitnessSearchStates = 8;
 const isPartialDiagnosticFn = (diagnostic: ItemEstimateDiagnostic) =>
 	diagnostic.kind === "joint-output-accounting-unsupported" ||
 	diagnostic.kind === "finite-owner-lifetime-unsupported" ||
+	diagnostic.kind === "template-reset-unsupported" ||
 	diagnostic.kind === "weighted-clock-pool-unsupported" ||
 	diagnostic.kind === "quantity-limit-exceeded" ||
 	diagnostic.kind === "witness-search-exhausted";
@@ -277,6 +278,16 @@ const materializeCandidateSelectionFn = (
 										quantity: missing,
 										routeId: route.id,
 									},
+					],
+					status: "failure",
+				};
+			if (route.operation?.outputCompilation === "template-reset-unsupported")
+				return {
+					diagnostics: [
+						{
+							kind: "template-reset-unsupported",
+							routeId: route.id,
+						},
 					],
 					status: "failure",
 				};

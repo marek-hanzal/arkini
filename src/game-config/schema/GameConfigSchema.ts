@@ -1,3 +1,4 @@
+import { TemplateSchema } from "~/board-template/schema/TemplateSchema";
 import { z } from "zod";
 
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
@@ -40,8 +41,19 @@ export const GameConfigSchema = z
 		 */
 		sfx: SfxSchema.optional().describe("Optional SFX event assignments for this game."),
 		/**
-		 * Board contents created for a new game.
+		 * Reusable authored boards, packaged for future application by gameplay.
 		 */
+		templates: z
+			.array(TemplateSchema)
+			.refine(
+				(templates) =>
+					new Set(templates.map((template) => template.uid)).size === templates.length,
+				"Template UIDs must be unique.",
+			)
+			.optional()
+			.describe(
+				"Reusable board templates with independent dimensions and no space identity.",
+			),
 		start: StartSchema.describe("The initial Board contents created for a new game."),
 		/**
 		 * Canonical game items keyed by their unique identifier.

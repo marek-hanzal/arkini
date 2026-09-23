@@ -1,3 +1,4 @@
+import { readBoardSizeFn } from "~/game-runtime/fn/readBoardSizeFn";
 import { Effect, Random } from "effect";
 import { match } from "ts-pattern";
 import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
@@ -61,13 +62,18 @@ export const planBoardPlacementFx = Effect.fn("planBoardPlacementFx")(function* 
 	runtime,
 }: PlanBoardPlacementProps) {
 	const config = yield* GameConfigFx;
+	const size = readBoardSizeFn({
+		runtime,
+		config,
+		space: origin.space,
+	});
 	const placementOrigin = yield* resolveBoardPlacementOriginFx({
 		origin,
 		placement,
-		size: config.meta.board,
+		size,
 	});
 	const boardLocations = readBoardLocationsFn({
-		size: config.meta.board,
+		size,
 		space: origin.space,
 	});
 	const locations = orderGridLocationsFn({

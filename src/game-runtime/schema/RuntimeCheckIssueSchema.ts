@@ -20,7 +20,6 @@ import { InputSlotInvalidIssueSchema } from "~/production-input/schema/InputSlot
 import { DuplicateItemIdIssueSchema } from "./DuplicateItemIdIssueSchema";
 import { ItemUnitsIssueSchema } from "./ItemUnitsIssueSchema";
 import { LocationOccupiedIssueSchema } from "./LocationOccupiedIssueSchema";
-import { LocationOutOfBoundsIssueSchema } from "./LocationOutOfBoundsIssueSchema";
 import { DefaultLineIssueSchema } from "~/production-line/schema/DefaultLineIssueSchema";
 import { LineInputClosedIssueSchema } from "~/production-line/schema/LineInputClosedIssueSchema";
 
@@ -51,7 +50,6 @@ export const RuntimeCheckIssueSchema = z
 		LineInputClosedIssueSchema,
 		DeliveryTargetIssueSchema,
 		LocationOccupiedIssueSchema,
-		LocationOutOfBoundsIssueSchema,
 	])
 	.meta({
 		id: "RuntimeCheckIssueSchema",

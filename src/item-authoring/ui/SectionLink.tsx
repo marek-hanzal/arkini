@@ -1,3 +1,4 @@
+import { ShortcutLabel } from "~/ui/ui/ShortcutLabel";
 import { formatForDisplay } from "@tanstack/react-hotkeys";
 
 import { useTranslator } from "~/translation/ui/useTranslator";
@@ -79,7 +80,10 @@ export const SectionLink = ({
 			inactiveProps={inactiveProps}
 			className={sectionLinkClassName}
 		>
-			{label}
+			<ShortcutLabel
+				label={label}
+				shortcut={section.shortcut}
+			/>
 		</LinkButtonLink>
 	);
 	if (section.shortcut === undefined) return link;

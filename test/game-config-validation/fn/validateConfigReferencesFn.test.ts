@@ -18,7 +18,7 @@ const compileItems = (
 	items: Record<string, unknown>,
 	start: StartSchema.Type = {
 		currentSpace: 0,
-		board: [],
+		spaces: [],
 	},
 ) =>
 	Effect.runPromise(
@@ -97,12 +97,10 @@ describe("completed config reference validation", () => {
 			},
 			{
 				currentSpace: 0,
-				board: [
+				spaces: [
 					{
 						space: 0,
-						itemId: "item:missing-start",
-						x: 0,
-						y: 0,
+						templateUid: "template:missing",
 					},
 				],
 			},
@@ -114,8 +112,8 @@ describe("completed config reference validation", () => {
 		expect(missing).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
-					reference: DiagnosticRecordEntityEnumSchema.enum.Item,
-					referenceId: "item:missing-start",
+					reference: DiagnosticRecordEntityEnumSchema.enum.Template,
+					referenceId: "template:missing",
 				}),
 				expect.objectContaining({
 					reference: DiagnosticRecordEntityEnumSchema.enum.Item,

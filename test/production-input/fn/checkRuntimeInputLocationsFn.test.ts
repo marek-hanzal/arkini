@@ -65,6 +65,7 @@ describe("checkRuntimeInputLocationsFn", () => {
 					speedUpGameplay: false,
 				},
 				currentSpace: 0,
+				templateUidBySpace: {},
 				items: [
 					owner,
 					inputItem({

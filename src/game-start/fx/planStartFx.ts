@@ -1,11 +1,11 @@
+import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { Effect } from "effect";
-import { resolveItemFx } from "~/item-resolution/fx/resolveItemFx";
-import { createRuntimeItemFx } from "~/game-runtime/fx/createRuntimeItemFx";
-import { createRuntimeItemIdFx } from "~/game-runtime/fx/createRuntimeItemIdFx";
+import { applyBoardTemplateRuntimeFx } from "~/board-template/fx/applyBoardTemplateRuntimeFx";
 import { assertRuntimeFx } from "~/game-runtime/fx/assertRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { StartSchema } from "~/game-start/schema/StartSchema";
-/** Builds one exact identity per authored Board cell, then validates the complete runtime. */
+
+/** Uses the same destructive template operation as later gameplay, then validates one complete start. */
 export const planStartFx = Effect.fn("planStartFx")(function* ({
 	runtime,
 	start,
@@ -13,34 +13,23 @@ export const planStartFx = Effect.fn("planStartFx")(function* ({
 	readonly runtime: RuntimeSchema.Type;
 	readonly start: StartSchema.Type;
 }) {
-	const items = yield* Effect.forEach(start.board, (entry) =>
-		Effect.gen(function* () {
-			return yield* createRuntimeItemFx({
-				id: yield* createRuntimeItemIdFx(),
-				item: yield* resolveItemFx({
-					itemId: entry.itemId,
-				}),
-				location: {
-					scope: "board",
-					space: entry.space,
-					position: {
-						x: entry.x,
-						y: entry.y,
-					},
-				},
-			});
-		}),
-	);
-	const next = {
+	let draft = {
 		...runtime,
 		currentSpace: start.currentSpace,
-		items: [
-			...runtime.items,
-			...items,
-		],
 	};
-	yield* assertRuntimeFx({
-		runtime: next,
-	});
-	return next;
+	const events: GameEventSchema.Type[] = [];
+	for (const assignment of start.spaces) {
+		const applied = yield* applyBoardTemplateRuntimeFx({
+			runtime: draft,
+			...assignment,
+		});
+		draft = applied.runtime;
+		events.push(...applied.events);
+	}
+	return {
+		runtime: yield* assertRuntimeFx({
+			runtime: draft,
+		}),
+		events,
+	};
 });

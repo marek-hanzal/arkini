@@ -1,3 +1,14 @@
+import { readOutcomeCollectionSummaryFn } from "~/production-authoring/fn/readOutcomeCollectionSummaryFn";
+import { TemplateSelector } from "~/template-authoring/ui/TemplateSelector";
+import {
+	CircleCheck,
+	Dice5,
+	Package,
+	DoorOpen,
+	MapPin,
+	Shuffle,
+	PanelsTopLeft,
+} from "lucide-react";
 import { LinkButton } from "~/ui/ui/LinkButton";
 import { match } from "ts-pattern";
 
@@ -35,6 +46,7 @@ const readOutcomeSummaryFn = (outcome: OutcomeSchema.Type, textFn: (key: string)
 	const rules = outcome.rules.length;
 	const ruleSummary = rules === 0 ? "" : ` · ${rules} ${textFn(rules === 1 ? "rule" : "rules")}`;
 	if (outcome.type === "space") return `${textFn("Space")} ${outcome.space}${ruleSummary}`;
+	if (outcome.type === "template") return `${textFn("Template")}${ruleSummary}`;
 	const { min, max } = outcome.quantity;
 	const quantity = min === max ? `×${min}` : `×${min}–${max}`;
 	const placement = textFn(outcome.placement === "drop" ? "Local drop" : "Random");
@@ -56,39 +68,71 @@ const OutcomeFields = ({
 	readonly initialWhenIndex?: number;
 	readonly value: OutcomeSchema.Type;
 }) => {
+	const project = useEditorProject();
 	const validationIssues = useFormValidationIssues(value);
 	const translator = useTranslator();
 	return (
 		<div className="grid gap-3">
-			<EditorChoiceControl
-				label={translator.textFn("Outcome type")}
-				value={value.type}
-				options={[
-					{
-						value: "item",
-						label: translator.textFn("Item"),
-					},
-					{
-						value: "space",
-						label: translator.textFn("Space"),
-					},
-				]}
-				onChangeFn={(type) => {
-					if (type === value.type) return;
-					onChangeFn(
-						type === "item"
-							? {
-									...structuredClone(DraftDefaults.itemOutcome),
-									rules: value.rules,
-								}
-							: {
-									type: "space",
-									space: 0,
-									rules: value.rules,
-								},
-					);
-				}}
-			/>
+			<div className="grid grid-cols-2 items-end gap-3">
+				<EditorChoiceControl
+					label={translator.textFn("Outcome type")}
+					value={value.type}
+					options={[
+						{
+							value: "item",
+							icon: <Package className="size-4 shrink-0" />,
+							label: translator.textFn("Item"),
+						},
+						{
+							value: "space",
+							icon: <DoorOpen className="size-4 shrink-0" />,
+							label: translator.textFn("Space"),
+						},
+						{
+							value: "template",
+							icon: <PanelsTopLeft className="size-4 shrink-0" />,
+							label: translator.textFn("Template"),
+							description: translator.textFn(
+								"Replaces the producer's space with this template, removing its items and active production.",
+							),
+						},
+					]}
+					onChangeFn={(type) => {
+						if (type === value.type) return;
+						onChangeFn(
+							type === "item"
+								? {
+										...structuredClone(DraftDefaults.itemOutcome),
+										rules: value.rules,
+									}
+								: type === "template"
+									? {
+											type: "template",
+											templateUid: "",
+											rules: value.rules,
+										}
+									: {
+											type: "space",
+											space: 0,
+											rules: value.rules,
+										},
+						);
+					}}
+				/>
+				{value.type === "template" ? (
+					<TemplateSelector
+						templates={project.config.templates ?? []}
+						value={value.templateUid}
+						error={readEditorFormValidationErrorFn(validationIssues, "templateUid")}
+						onChangeFn={(templateUid) =>
+							onChangeFn({
+								...value,
+								templateUid,
+							})
+						}
+					/>
+				) : null}
+			</div>
 			{value.type === "item" ? (
 				<>
 					<EditorItemReferenceControl
@@ -132,11 +176,13 @@ const OutcomeFields = ({
 								{
 									description: <Mx label="Local drop placement help" />,
 									label: translator.textFn("Local drop"),
+									icon: <MapPin className="size-4" />,
 									value: "drop",
 								},
 								{
 									description: <Mx label="Random drop placement help" />,
 									label: translator.textFn("Random"),
+									icon: <Shuffle className="size-4" />,
 									value: "random",
 								},
 							]}
@@ -149,7 +195,7 @@ const OutcomeFields = ({
 						/>
 					</div>
 				</>
-			) : (
+			) : value.type === "space" ? (
 				<EditorNumberControl
 					error={readEditorFormValidationErrorFn(validationIssues, "space")}
 					description={<Mx label="Target space help" />}
@@ -176,7 +222,7 @@ const OutcomeFields = ({
 						</LinkButton>
 					}
 				/>
-			)}
+			) : null}
 			<SectionEnd />
 			<RulesControl
 				initialRuleIndex={initialRuleIndex}
@@ -241,13 +287,19 @@ const OutcomeList = ({
 					const label =
 						outcome.type === "item"
 							? readItemLabelFn(outcome.itemId, translator.textFn("No item selected"))
-							: `${translator.textFn("Space")} ${outcome.space}`;
+							: outcome.type === "template"
+								? (project.config.templates?.find(
+										(template) => template.uid === outcome.templateUid,
+									)?.title ?? translator.textFn("No template selected"))
+								: `${translator.textFn("Space")} ${outcome.space}`;
 					return `${translator.textFn("Outcome")} ${index + 1} — ${label}`;
 				}}
 				itemSearchTermsFn={(index) => [
 					value[index].type === "item"
 						? value[index].itemId
-						: `${translator.textFn("Space")} ${value[index].space}`,
+						: value[index].type === "template"
+							? value[index].templateUid
+							: `${translator.textFn("Space")} ${value[index].space}`,
 				]}
 				label={translator.textFn("Outcomes")}
 				itemMetaFn={(index) => readOutcomeSummaryFn(value[index], translator.textFn)}
@@ -339,11 +391,13 @@ const RollControl = ({
 						{
 							description: <Mx label="Guaranteed roll type help" />,
 							label: translator.textFn("Guaranteed"),
+							icon: <CircleCheck className="size-4" />,
 							value: "guaranteed",
 						},
 						{
 							description: <Mx label="Chance roll type help" />,
 							label: translator.textFn("Chance"),
+							icon: <Dice5 className="size-4" />,
 							value: "chance",
 						},
 					]}
@@ -436,6 +490,7 @@ export const RollSetControl = ({
 	readonly value: RollSetSchema.Type;
 }) => {
 	const readItemLabelFn = useEditorItemOptionLabel();
+	const project = useEditorProject();
 	const translator = useTranslator();
 	const validationIssues = useFormValidationIssues(value);
 	const invalidRollIndex = useFormValidationFocusIndex(value, "roll");
@@ -495,29 +550,21 @@ export const RollSetControl = ({
 				key={initialRollIndex}
 				itemLabelFn={(rollIndex) => {
 					const roll = value.roll[rollIndex];
-					const label = readDraftRollOutcomesFn(roll)
-						.map((outcome) =>
-							outcome.type === "item"
-								? readItemLabelFn(
-										outcome.itemId,
-										translator.textFn("No item selected"),
-									)
-								: `${translator.textFn("Space")} ${outcome.space}`,
-						)
-						.join(", ");
+					const { label } = readOutcomeCollectionSummaryFn({
+						outcomes: readDraftRollOutcomesFn(roll),
+						templates: project.config.templates,
+						readItemLabelFn,
+						textFn: translator.textFn,
+					});
 					return `${translator.textFn(roll.type === undefined ? "Roll" : RollTypeLabelByType[roll.type])} ${rollIndex + 1} — ${label || translator.textFn("No outcome configured.")}`;
 				}}
 				itemSearchTermsFn={(rollIndex) =>
-					readDraftRollOutcomesFn(value.roll[rollIndex]).flatMap((outcome) => [
-						...(outcome.type === "item"
-							? [
-									outcome.itemId,
-									readItemLabelFn(outcome.itemId, ""),
-								]
-							: [
-									`Space ${outcome.space}`,
-								]),
-					])
+					readOutcomeCollectionSummaryFn({
+						outcomes: readDraftRollOutcomesFn(value.roll[rollIndex]),
+						templates: project.config.templates,
+						readItemLabelFn,
+						textFn: translator.textFn,
+					}).searchTerms
 				}
 				renderItemContentFn={(rollIndex, label) => (
 					<OutcomeOption

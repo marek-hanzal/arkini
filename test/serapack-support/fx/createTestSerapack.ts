@@ -20,14 +20,27 @@ export const testSerapackConfig = GameConfigSchema.parse({
 			height: 2,
 		},
 	},
+	templates: [
+		{
+			uid: "initial",
+			title: "Initial",
+			width: 2,
+			height: 2,
+			board: [
+				{
+					itemId: "water",
+					x: 1,
+					y: 0,
+				},
+			],
+		},
+	],
 	start: {
 		currentSpace: 0,
-		board: [
+		spaces: [
 			{
-				itemId: "water",
 				space: 0,
-				x: 1,
-				y: 0,
+				templateUid: "initial",
 			},
 		],
 	},

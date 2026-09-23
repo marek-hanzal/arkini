@@ -1,3 +1,4 @@
+import { MousePointer2, Flame, Coins, DoorOpen, ShieldCheck, Trash2, Replace } from "lucide-react";
 import { useTranslator } from "~/translation/ui/useTranslator";
 
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
@@ -48,22 +49,26 @@ export const MergeField = ({
 							{
 								description: <Mx label="Merge source use help" />,
 								label: translator.textFn("Use"),
+								icon: <MousePointer2 className="size-4" />,
 								value: "use",
 							},
 							{
 								description: <Mx label="Merge source consume help" />,
 								label: translator.textFn("Consume"),
+								icon: <Flame className="size-4" />,
 								value: "consume",
 							},
 							{
 								description: <Mx label="Merge source spend help" />,
 								disabled: !sourceUnitsEnabled,
 								label: translator.textFn("Spend"),
+								icon: <Coins className="size-4" />,
 								value: "spend",
 							},
 							{
 								description: <Mx label="Merge source space help" />,
 								label: translator.textFn("Space"),
+								icon: <DoorOpen className="size-4" />,
 								value: "space",
 							},
 						]}
@@ -144,22 +149,26 @@ export const MergeField = ({
 							{
 								description: <Mx label="Merge target keep help" />,
 								label: translator.textFn("Keep"),
+								icon: <ShieldCheck className="size-4" />,
 								value: "keep",
 							},
 							{
 								description: <Mx label="Merge target remove help" />,
 								label: translator.textFn("Remove"),
+								icon: <Trash2 className="size-4" />,
 								value: "remove",
 							},
 							{
 								description: <Mx label="Merge target replace help" />,
 								label: translator.textFn("Replace"),
+								icon: <Replace className="size-4" />,
 								value: "replace",
 							},
 							{
 								description: <Mx label="Merge target spend help" />,
 								disabled: !targetUnitsEnabled,
 								label: translator.textFn("Spend"),
+								icon: <Coins className="size-4" />,
 								value: "spend",
 							},
 						]}

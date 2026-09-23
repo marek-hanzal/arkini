@@ -1,0 +1,55 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "kfex38vvnfqn5iavk06en63s",
+		"id": "wooden-scoop",
+		"title": "Wooden Scoop",
+		"draft": true,
+		"ui": "simple",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"wooden-scoop"
+			]
+		},
+		"maxQueueSize": 1,
+		"lines": [
+			{
+				"id": "destroy-the-world",
+				"title": "destroy-the-world",
+				"description": "boom",
+				"clockWeight": 1,
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"outcome": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"outcome": [
+										{
+											"type": "template",
+											"templateUid": "kuuffstuxxozvrnsunxgqxtt",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

@@ -8,6 +8,7 @@ This map separates authored values, portable source, diagnostics, semantic valid
 | --- | --- | --- |
 | `game-value` | Foundational immutable identity, required text, quantity and whole-millisecond time schemas | [`../game-value/schema/IdSchema.ts`](../game-value/schema/IdSchema.ts), [`../game-value/schema/TimeSchema.ts`](../game-value/schema/TimeSchema.ts) |
 | `game-config` | Completed authored aggregate and loaded-config capability | [`schema/GameConfigSchema.ts`](schema/GameConfigSchema.ts), [`context/GameConfigFx.ts`](context/GameConfigFx.ts) |
+| `board-template` | Space-less authored boards with immutable UID and independent dimensions | [`../board-template/schema/TemplateSchema.ts`](../board-template/schema/TemplateSchema.ts) |
 | `sfx-event` | Exact assignable SFX vocabulary across committed gameplay and explicit presentation interactions | [`../sfx-event/schema/SfxEventEnumSchema.ts`](../sfx-event/schema/SfxEventEnumSchema.ts) |
 | `game-config-source` | Portable filenames, source schemas, discovery, parsing and generated JSON Schema | [`../game-config-source/schema/ProjectSchema.ts`](../game-config-source/schema/ProjectSchema.ts), [`../game-config-source/fx/collectSourceFilesFx.ts`](../game-config-source/fx/collectSourceFilesFx.ts) |
 | `game-config-resource` | Typed source descriptors, usage, rename, discovery, bounded admission, streamed PNG optimization, Ogg/Opus edge trimming and Item-artwork normalization | [`../game-config-resource/schema/ResourceSchema.ts`](../game-config-resource/schema/ResourceSchema.ts), [`../game-config-resource/fx/transcodeAudioResourceFileFx.ts`](../game-config-resource/fx/transcodeAudioResourceFileFx.ts), [`../game-config-resource/fx/normalizeArtworkPngFileFx.ts`](../game-config-resource/fx/normalizeArtworkPngFileFx.ts) |
@@ -23,7 +24,7 @@ The foundational schema direction is explicit:
 
 - `game-value` imports only Zod. It owns scalar meaning, not an aggregate, role, lifecycle or behavior.
 - Config, Item, Location, Production, queries and other authored contracts may compose those exact scalars directly.
-- `game-config → item-definition + game-start + game-value + item-location + sfx-event` because `GameConfigSchema` is the completed authored aggregate, `MetaSchema` composes Board layout schema, and SFX assignments use the exact shared event vocabulary.
+- `game-config → item-definition + game-start + board-template + game-value + item-location + sfx-event` because `GameConfigSchema` is the completed authored aggregate, `MetaSchema` composes Board layout schema, and SFX assignments use the exact shared event vocabulary.
 - `item-definition → production-line + outcome + item-schedule + item-merge + game-value` because Item capabilities embed those authored contracts.
 - Production behavior reads Item definitions, so that domain-level pair still crosses schema composition in one direction and behavior in the other.
 

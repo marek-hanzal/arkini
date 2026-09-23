@@ -42,6 +42,7 @@ export const fromStateFx = Effect.fn("fromStateFx")(function* ({ state }: FromSt
 				...state.cheats,
 			},
 			currentSpace: state.currentSpace,
+			templateUidBySpace: state.templateUidBySpace,
 			items,
 			jobs: state.jobs,
 			jobQueue: state.jobQueue,

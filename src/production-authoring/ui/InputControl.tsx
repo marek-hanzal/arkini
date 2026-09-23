@@ -1,3 +1,12 @@
+import {
+	MousePointer2,
+	Boxes,
+	Coins,
+	Flame,
+	LockKeyhole,
+	Crosshair,
+	LocateFixed,
+} from "lucide-react";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import type { InputSchema as LineInputSchema } from "~/production-input/schema/InputSchema";
 import { match } from "ts-pattern";
@@ -58,12 +67,14 @@ const UnitsPaidByControl = ({
 			options={[
 				{
 					description: <Mx label="Units paid by target help" />,
+					icon: <Crosshair className="size-4 shrink-0" />,
 					label: translator.textFn("Target"),
 					value: "target",
 				},
 				{
 					description: <Mx label="Units paid by self help" />,
 					disabled: !selfUnitsEnabled,
+					icon: <LocateFixed className="size-4 shrink-0" />,
 					label: translator.textFn("Self"),
 					value: "self",
 				},
@@ -152,11 +163,13 @@ const MaterialModeControl = ({
 			options={[
 				{
 					description: <Mx label="Consume material mode help" />,
+					icon: <Flame className="size-4 shrink-0" />,
 					label: translator.textFn("Consume"),
 					value: "consume",
 				},
 				{
 					description: <Mx label="Reserve material mode help" />,
+					icon: <LockKeyhole className="size-4 shrink-0" />,
 					label: translator.textFn("Reserve"),
 					value: "reserve",
 				},
@@ -343,20 +356,24 @@ export const InputControl = ({
 	const inputTypeOptions = [
 		{
 			description: <Mx label="Simple input type help" />,
+			icon: <MousePointer2 className="size-4 shrink-0" />,
 			label: translator.textFn("Simple"),
 			value: "simple",
 		},
 		{
 			description: <Mx label="Materials input type help" />,
+			icon: <Boxes className="size-4 shrink-0" />,
 			label: translator.textFn("Materials"),
 			value: "materials",
 		},
 		{
 			description: <Mx label="Units input type help" />,
+			icon: <Coins className="size-4 shrink-0" />,
 			label: translator.textFn("Units"),
 			value: "units",
 		},
 	] as const satisfies ReadonlyArray<{
+		readonly icon: ReactNode;
 		readonly description: ReactNode;
 		readonly label: string;
 		readonly value: LineInputSchema.Type["type"];

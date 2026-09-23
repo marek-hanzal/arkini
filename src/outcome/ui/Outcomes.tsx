@@ -91,15 +91,23 @@ const OutcomeRoll = <Item extends OutcomeProjection.Item>({
 			data-roll-kind={roll.kind}
 		>
 			{roll.outcome.map((item, index) =>
-				item.type === "space" ? (
+				item.type !== "item" ? (
 					<div
 						key={index}
-						data-ui="SpaceOutcome"
+						data-ui="NonItemOutcome"
 						className="grid gap-1.5 text-sm"
 					>
 						<div>
 							{eyebrow}
-							<Tx label="Space" /> {item.space}
+							{item.type === "space" ? (
+								<>
+									<Tx label="Space" /> {item.space}
+								</>
+							) : (
+								<>
+									<Tx label="Template" /> {item.title ?? item.templateUid}
+								</>
+							)}
 						</div>
 						{item.activeRuleHints.map((hint, hintIndex) => (
 							<p

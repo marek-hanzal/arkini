@@ -38,8 +38,9 @@ describe("repository note item relationships", () => {
 					...project.config,
 					start: {
 						...project.config.start,
-						board: [],
+						spaces: [],
 					},
+					templates: [],
 					items: {
 						renamed: {
 							...project.config.items.water!,
@@ -138,8 +139,9 @@ describe("repository note item relationships", () => {
 					...project.config,
 					start: {
 						...project.config.start,
-						board: [],
+						spaces: [],
 					},
+					templates: [],
 					items: {
 						...project.config.items,
 						oil: {

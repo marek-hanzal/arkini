@@ -1,3 +1,4 @@
+import { DoorOpen } from "lucide-react";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { EditorCollectionOption } from "~/editor-control/ui/EditorCollectionOption";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
@@ -41,15 +42,24 @@ export const MergeOption = ({
 				</span>
 			}
 		>
-			<EditorItemThumbnail
-				size="md"
-				className="rounded-md"
-				resourceIds={
-					target?.artwork.default ?? [
-						"",
-					]
-				}
-			/>
+			{merge.action === "space" ? (
+				<span
+					className="grid size-18 shrink-0 place-items-center rounded-md bg-canvas/70 text-accent"
+					data-ui="MergeSpaceThumbnail"
+				>
+					<DoorOpen className="size-9" />
+				</span>
+			) : (
+				<EditorItemThumbnail
+					size="md"
+					className="rounded-md"
+					resourceIds={
+						target?.artwork.default ?? [
+							"",
+						]
+					}
+				/>
+			)}
 		</EditorCollectionOption>
 	);
 };

@@ -1,3 +1,4 @@
+import { ShortcutLabel } from "~/ui/ui/ShortcutLabel";
 import { EditorAudioPreviewPlayer } from "~/audio-authoring/ui/EditorAudioPreviewPlayer";
 import { Overlay } from "~/ui/ui/Overlay";
 import { formatForDisplay } from "@tanstack/react-hotkeys";
@@ -406,7 +407,10 @@ export const EditorAudioResourceDetail = ({
 										"data-ui-selected": false,
 									}}
 								>
-									<Tx label={tab.label} />
+									<ShortcutLabel
+										label={translator.textFn(tab.label)}
+										shortcut={tab.shortcut}
+									/>
 								</LinkButtonLink>
 							</Tooltip>
 						))}

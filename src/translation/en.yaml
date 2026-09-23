@@ -247,9 +247,9 @@ Board:
   dynamic: true
 Board editing help:
   value: |
-    Every Space has its own Board; all Boards share the same **Width** and **Height**.
+    Choose a **Template** for each **Space**. The template supplies its dimensions and starting items; the same template can be assigned to several spaces.
 
-    Use **Space** to switch between Spaces 0–31. Changes stay with the selected Space, even before you save.
+    Use **Space** to switch between nonnegative space numbers. Editing this board changes the selected template, including every assignment that uses it. Save commits the assignments and template together. Unassigned spaces start empty with the project’s default dimensions.
 Board placement:
   value: Where to place
 Bring in a Serapack to play or edit:
@@ -466,6 +466,8 @@ Count range condition help:
     Passes when the total is between **Minimum** and **Maximum**, including both ends.
 
     Example: `2–4` accepts 2, 3 or 4 items.
+Create a template to prepare a reusable board.:
+  value: Create a template to prepare a reusable board.
 Create item:
   value: Create item
 Create note:
@@ -486,6 +488,10 @@ Custom:
   dynamic: true
 Default:
   value: Default
+Default board height:
+  value: Default board height
+Default board width:
+  value: Default board width
 Delete:
   value: Delete
 Delete artwork:
@@ -508,6 +514,8 @@ Deleting audio removes its file, metadata and assignments. This cannot be undone
   value: Deleting audio removes its file, metadata and assignments. This cannot be undone.
 Deleting this audio also removes the assignments listed below.:
   value: Deleting this audio also removes the assignments listed below.
+Deleting this template removes its saved board layout from the project.:
+  value: Deleting this template removes its saved board layout from the project.
 Depends on conditions:
   value: Depends on conditions
 Depleted:
@@ -1209,6 +1217,8 @@ Near-Close:
   dynamic: true
 New item:
   value: New item
+New template:
+  value: New template
 New version:
   value: New version
 No About avatars configured.:
@@ -1272,6 +1282,8 @@ No matching music:
   value: No matching music
 No matching sound effects:
   value: No matching sound effects
+No matching templates:
+  value: No matching templates
 No merges for this item:
   value: No merges for this item
 No music yet:
@@ -1297,6 +1309,10 @@ No slots have a sound assigned. Switch to All and drag a sound onto a slot.:
   value: No slots have a sound assigned. Switch to All and drag a sound onto a slot.
 No sound effects yet:
   value: No sound effects yet
+No template selected:
+  value: No template selected
+No templates yet:
+  value: No templates yet
 No unassigned slots:
   value: No unassigned slots
 None:
@@ -1641,6 +1657,8 @@ Replacement:
   dynamic: true
 Replacement item:
   value: Replacement item
+Replaces the producer's space with this template, removing its items and active production.:
+  value: Replaces the producer's space with this template, removing its items and active production.
 Required:
   value: Required
 Required by:
@@ -1745,9 +1763,13 @@ Search item title, ID or type…:
   value: Search item title, ID or type…
 Search music…:
   value: Search music…
+Search templates...:
+  value: Search templates...
 Searches matching items in every board space in the current game.:
   value: Searches matching items in every board space in the current game.
   dynamic: true
+Select a template for this Space. Unassigned spaces start empty.:
+  value: Select a template for this Space. Unassigned spaces start empty.
 Select an item with Units enabled.:
   value: Select an item with Units enabled.
 Select an item.:
@@ -1854,6 +1876,21 @@ Target unit cost help:
     - **Cost:** Units removed each time the action or job starts.
 
     The payer stays in place. At zero Units, it depletes normally.
+Template:
+  value: Template
+Template not found.:
+  value: Template not found.
+Templates:
+  value: Templates
+Templates help:
+  value: |
+    **Templates are prepared board spaces for gameplay.** Each template describes a complete board: its width, height, and the items placed in its cells.
+
+    Use **General** to name the template and set its width and height, and **Board** to arrange its contents. Click an empty cell to add an item, drag an item to move it, or right-click it to remove it.
+
+    Each template has a stable **UID**. Changing its title or contents keeps that identity. Templates have their own dimensions; the project board size only supplies the initial dimensions when creating one.
+
+    A template has no Space number. The same layout can be used for different spaces. Templates are included in the Serapack. A new game creates independent items for each assigned Space. Saved games keep their existing items. Board dimensions always come from the loaded Serapack’s assigned template, or the project defaults for unassigned spaces.
 That's everything you can make for now!:
   value: That's everything you can make for now!
 The project changed. Refresh and try again.:
@@ -1887,6 +1924,10 @@ This item is unreachable.:
 This item produces nothing:
   value: This item produces nothing
   dynamic: true
+This template can be deleted:
+  value: This template can be deleted
+This template cannot be deleted yet:
+  value: This template cannot be deleted yet
 "This will also:":
   value: "This will also:"
 Time:
@@ -1897,6 +1938,8 @@ Title:
   value: Title
 Try a different search or change the active filters.:
   value: Try another search or change the **active filters**.
+Try a different search.:
+  value: Try a different search.
 Try again:
   value: Try again
 Unassigned:
@@ -2054,8 +2097,6 @@ count:
   value: count
 entries:
   value: entries
-entry:
-  value: entry
 from:
   value: from
 from authored start:
@@ -2100,8 +2141,6 @@ space:
   value: space
 spend:
   value: spend
-starting:
-  value: starting
 unit from owner:
   value: unit from this item
 unit from target:

@@ -43,7 +43,7 @@ export const createFreshProjectFx = Effect.fn("createFreshEditorProjectFx")(func
 		},
 		start: {
 			currentSpace: 0,
-			board: [],
+			spaces: [],
 		},
 		items: {},
 	});

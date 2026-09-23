@@ -12,6 +12,7 @@ const state: StateSchema.Type = {
 		speedUpGameplay: false,
 	},
 	currentSpace: 0,
+	templateUidBySpace: {},
 	items: [],
 	jobs: [],
 	jobQueue: [],

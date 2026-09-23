@@ -17,6 +17,8 @@ const itemReferenceFn = (project: Project, itemId: string) => {
 
 const diagnosticTextFn = (diagnostic: ItemEstimateDiagnostic) => {
 	switch (diagnostic.kind) {
+		case "template-reset-unsupported":
+			return `${diagnostic.routeId} replaces its owner space with a template, which static Estimate cannot simulate`;
 		case "weighted-clock-pool-unsupported":
 			return `${diagnostic.routeId} depends on weighted Clock alternatives whose shared pulse timing static Estimate cannot resolve.`;
 		case "finite-owner-lifetime-unsupported":
@@ -54,6 +56,8 @@ const amountLinesFn = (
 
 const limitationTextFn = (limitation: ItemEstimate["limitations"][number]) => {
 	switch (limitation) {
+		case "template-resets-not-simulated":
+			return "template board replacement and its created or removed items are not simulated";
 		case "conditional-runtime-adjustments-ignored":
 			return "conditional runtime adjustments are ignored";
 		case "negative-availability-constraints-ignored":

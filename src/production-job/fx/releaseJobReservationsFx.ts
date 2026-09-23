@@ -34,6 +34,7 @@ export const releaseJobReservationsFx = Effect.fn("releaseJobReservationsFx")(fu
 		}),
 		(state, reservation) =>
 			Effect.gen(function* () {
+				if (!state.runtime.items.some((item) => item.id === reservation.id)) return state;
 				const placement = yield* overflow === "discard"
 					? placeRuntimeItemBestEffortFx({
 							itemId: reservation.id,

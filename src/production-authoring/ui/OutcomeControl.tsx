@@ -1,3 +1,5 @@
+import { readOutcomeCollectionSummaryFn } from "~/production-authoring/fn/readOutcomeCollectionSummaryFn";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import type { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
 import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
@@ -20,6 +22,7 @@ interface OutcomeControlProps {
 
 /** Edits weighted outcome sets through their concrete RollSet domain. */
 export const OutcomeControl = ({ onChangeFn, value }: OutcomeControlProps) => {
+	const project = useEditorProject();
 	const translator = useTranslator();
 	const { outcomeSetIndex, outcomeRollIndex, outcomeIndex, ruleIndex, whenIndex } =
 		useFormSession();
@@ -43,34 +46,21 @@ export const OutcomeControl = ({ onChangeFn, value }: OutcomeControlProps) => {
 				key={outcomeSetIndex}
 				itemLabelFn={(index) => {
 					const roll = sets[index]?.roll[0];
-					const label =
-						roll === undefined
-							? ""
-							: readDraftRollOutcomesFn(roll)
-									.map((outcome) =>
-										outcome.type === "item"
-											? readItemLabelFn(
-													outcome.itemId,
-													translator.textFn("No item selected"),
-												)
-											: `${translator.textFn("Space")} ${outcome.space}`,
-									)
-									.join(", ");
+					const { label } = readOutcomeCollectionSummaryFn({
+						outcomes: roll === undefined ? [] : readDraftRollOutcomesFn(roll),
+						templates: project.config.templates,
+						readItemLabelFn,
+						textFn: translator.textFn,
+					});
 					return `${translator.textFn("Outcome set")} ${index + 1} — ${label || translator.textFn("No outcome configured.")}`;
 				}}
 				itemSearchTermsFn={(index) =>
-					(sets[index]?.roll ?? [])
-						.flatMap(readDraftRollOutcomesFn)
-						.flatMap((outcome) => [
-							...(outcome.type === "item"
-								? [
-										outcome.itemId,
-										readItemLabelFn(outcome.itemId, ""),
-									]
-								: [
-										`Space ${outcome.space}`,
-									]),
-						])
+					readOutcomeCollectionSummaryFn({
+						outcomes: (sets[index]?.roll ?? []).flatMap(readDraftRollOutcomesFn),
+						templates: project.config.templates,
+						readItemLabelFn,
+						textFn: translator.textFn,
+					}).searchTerms
 				}
 				renderItemContentFn={(index, label) => (
 					<OutcomeOption

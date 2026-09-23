@@ -26,6 +26,7 @@ describe("readGameDiagnosticHistoryEntryFn", () => {
 					speedUpGameplay: false,
 				},
 				currentSpace: 0,
+				templateUidBySpace: {},
 				items: [
 					{
 						id: "runtime:forge",

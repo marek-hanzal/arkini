@@ -56,6 +56,7 @@ export const readItemDetailMaterialAutofillAvailabilityFx = Effect.fn(
 
 		if (candidate.location.scope === LocationScopeEnumSchema.enum.Delivery) {
 			if (
+				candidate.location.origin.space !== space ||
 				!matchesQueryLocationFn({
 					location: candidate.location.origin,
 					origin,
@@ -73,6 +74,7 @@ export const readItemDetailMaterialAutofillAvailabilityFx = Effect.fn(
 
 		if (
 			candidate.location.scope !== LocationScopeEnumSchema.enum.Board ||
+			candidate.location.space !== space ||
 			!matchesQueryLocationFn({
 				location: candidate.location,
 				origin,

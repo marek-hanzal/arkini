@@ -1,3 +1,4 @@
+import { TemplateUidBySpaceSchema } from "~/game-runtime/schema/TemplateUidBySpaceSchema";
 import { z } from "zod";
 
 import { CheatStateSchema } from "~/game-runtime/schema/CheatStateSchema";
@@ -16,6 +17,7 @@ export const RuntimeSchema = z
 		currentSpace: NonNegativeIntegerSchema.describe(
 			"The persistent board space currently presented to the player.",
 		),
+		templateUidBySpace: TemplateUidBySpaceSchema,
 		items: z
 			.array(RuntimeItemSchema)
 			.describe("Every hydrated live item currently owned by the runtime."),

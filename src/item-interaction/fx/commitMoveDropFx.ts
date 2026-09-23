@@ -1,3 +1,5 @@
+import { GameConfigFx } from "~/game-config/context/GameConfigFx";
+import { readBoardSizeFn } from "~/game-runtime/fn/readBoardSizeFn";
 import { Array, Data, Effect, Option, pipe } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
@@ -27,6 +29,8 @@ class LocationOccupiedError extends Data.TaggedError("LocationOccupiedError")<{
 	readonly itemId: IdSchema.Type;
 	readonly location: BoardLocationSchema.Type;
 }> {}
+
+class InvalidDropLocationError extends Data.TaggedError("InvalidDropLocationError") {}
 
 interface MoveItemProps {
 	readonly itemId: IdSchema.Type;
@@ -129,6 +133,19 @@ const moveItemFx = Effect.fn("moveItemFx")(function* ({
 					}),
 				);
 			}
+			const config = yield* GameConfigFx;
+			const size = readBoardSizeFn({
+				runtime,
+				config,
+				space: location.space,
+			});
+			if (
+				location.position.x < 0 ||
+				location.position.y < 0 ||
+				location.position.x >= size.width ||
+				location.position.y >= size.height
+			)
+				return yield* Effect.fail(new InvalidDropLocationError());
 			const movedItem = yield* reviseRuntimeItemFx({
 				item: {
 					...item,
@@ -193,6 +210,12 @@ export const commitMoveDropFx = Effect.fn("commitMoveDropFx")(function* ({
 			}),
 		),
 		Effect.catchTags({
+			InvalidDropLocationError: () =>
+				Effect.succeed({
+					kind: DropItemResultKind.Reject,
+					reason: DropItemRejectedReason.InvalidTarget,
+					itemId: sourceItemId,
+				}),
 			LocationOccupiedError: (error) =>
 				Effect.succeed({
 					kind: DropItemResultKind.Reject,

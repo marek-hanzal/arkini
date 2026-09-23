@@ -44,6 +44,7 @@ it("discards passive input descendants and default-line intent while preserving 
 			speedUpGameplay: false,
 		},
 		currentSpace: 0,
+		templateUidBySpace: {},
 		items: [
 			root,
 			passiveChild,
@@ -95,6 +96,7 @@ it("rejects active or queued work anywhere beneath the discarded ownership tree"
 				speedUpGameplay: false,
 			},
 			currentSpace: 0,
+			templateUidBySpace: {},
 			items: [
 				root,
 				passiveChild,

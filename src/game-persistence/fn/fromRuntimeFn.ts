@@ -46,6 +46,7 @@ export const fromRuntimeFn = ({ runtime }: Props) => {
 			...runtime.cheats,
 		},
 		currentSpace: runtime.currentSpace,
+		templateUidBySpace: runtime.templateUidBySpace,
 		items,
 		jobs: runtime.jobs,
 		jobQueue: runtime.jobQueue,

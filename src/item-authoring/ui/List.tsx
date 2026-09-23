@@ -1,3 +1,4 @@
+import { ShortcutLabel } from "~/ui/ui/ShortcutLabel";
 import { formatForDisplay } from "@tanstack/react-hotkeys";
 import { Tooltip } from "~/ui/ui/Tooltip";
 import { useSectionShortcuts } from "~/ui/ui/useSectionShortcuts";
@@ -313,7 +314,10 @@ export const List = ({
 							})}
 						>
 							<FilePenLine className="size-4 shrink-0" />
-							{translator.textFn("Draft")}
+							<ShortcutLabel
+								label={translator.textFn("Draft")}
+								shortcut="d"
+							/>
 						</LinkButton>
 					</Tooltip>
 				</EditorSectionBar>

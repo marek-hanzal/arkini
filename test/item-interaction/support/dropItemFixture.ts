@@ -19,6 +19,7 @@ export const configInput = {
 	},
 	start: {
 		currentSpace: 0,
+		spaces: [],
 	},
 	items: {
 		water: {

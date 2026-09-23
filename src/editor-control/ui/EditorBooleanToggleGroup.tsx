@@ -5,6 +5,7 @@ import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { Tooltip } from "~/ui/ui/Tooltip";
 
 interface EditorBooleanToggleGroupOption {
+	readonly icon?: ReactNode;
 	readonly description: ReactNode;
 	readonly label: string;
 	readonly onChangeFn: (selected: boolean) => void;
@@ -41,6 +42,7 @@ export const EditorBooleanToggleGroup = ({
 							},
 						})}
 					>
+						{option.icon}
 						{option.label}
 						<Info className="size-3.5 opacity-70" />
 					</button>

@@ -54,6 +54,7 @@ const createTransition = (sequence: number): GameTransition =>
 				speedUpGameplay: false,
 			},
 			currentSpace: 0,
+			templateUidBySpace: {},
 			items: [],
 			jobs: [],
 			jobQueue: [],

@@ -16,6 +16,104 @@ import {
 } from "./packDirectoryFx.test/gameProjectFixture";
 
 describe("packDirectoryFx game-project contract", () => {
+	it.effect("rejects a build with no template assigned to the initial space", () =>
+		Effect.gen(function* () {
+			const fileSystem = yield* FileSystem.FileSystem;
+			const path = yield* Path.Path;
+			const input = yield* writeGameProjectFixtureFx();
+			const gamePath = path.join(input, "game.json");
+			const game = JSON.parse(yield* fileSystem.readFileString(gamePath));
+			yield* fileSystem.writeFileString(
+				gamePath,
+				JSON.stringify({
+					...game,
+					start: {
+						currentSpace: 0,
+						spaces: [],
+					},
+				}),
+			);
+			const result = yield* Effect.result(
+				packDirectoryFx({
+					input,
+				}),
+			);
+			expect(result).toMatchObject({
+				_tag: "Failure",
+				failure: {
+					_tag: "GameValidationError",
+					diagnostics: expect.arrayContaining([
+						expect.objectContaining({
+							failureTag: "InitialSpaceUnassigned",
+						}),
+					]),
+				},
+			});
+		}).pipe(Effect.provide(NodeServices.layer)),
+	);
+
+	it.effect("preserves independent template dimensions and placements in the packed config", () =>
+		Effect.gen(function* () {
+			const fileSystem = yield* FileSystem.FileSystem;
+			const path = yield* Path.Path;
+			const input = yield* writeGameProjectFixtureFx();
+			const gamePath = path.join(input, "game.json");
+			const game = JSON.parse(yield* fileSystem.readFileString(gamePath));
+			const templates = [
+				{
+					uid: "template",
+					title: "The End",
+					width: 8,
+					height: 3,
+					board: [
+						{
+							x: 7,
+							y: 2,
+							itemId: "portal",
+						},
+					],
+				},
+			];
+			yield* fileSystem.writeFileString(
+				gamePath,
+				JSON.stringify({
+					...game,
+					start: {
+						...game.start,
+						spaces: [
+							{
+								space: 0,
+								templateUid: "template",
+							},
+						],
+					},
+					templates,
+				}),
+			);
+			const packed = yield* packDirectoryFx({
+				input,
+			});
+			const envelope = yield* decodeTestSerapackEnvelopeFx(
+				yield* fileSystem.readFile(packed.serapack),
+			);
+			const payload = yield* decodeTestSerapackPayloadFx(envelope.payload);
+			expect(payload.config.templates).toEqual(templates);
+			expect(payload.config.meta.board).toEqual({
+				width: 2,
+				height: 2,
+			});
+			expect(payload.config.start).toEqual({
+				...game.start,
+				spaces: [
+					{
+						space: 0,
+						templateUid: "template",
+					},
+				],
+			});
+		}).pipe(Effect.provide(NodeServices.layer)),
+	);
+
 	it.effect("stamps the source revision so a new revision changes the package identity", () =>
 		Effect.gen(function* () {
 			const fileSystem = yield* FileSystem.FileSystem;

@@ -1,3 +1,4 @@
+import { readBoardSizeFn } from "~/game-runtime/fn/readBoardSizeFn";
 import { Effect } from "effect";
 
 import type { GameEngine } from "~/playable-game/type/GameEngine";
@@ -162,14 +163,21 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			surface,
 		});
 		registerRollbackFn(drag.closeFx);
+		const initialRuntime = game.getTransitionSnapshotFn().runtime;
+		const initialSize = readBoardSizeFn({
+			runtime: initialRuntime,
+			config: game.config,
+			space: initialRuntime.currentSpace,
+		});
 		const layout = readMainLayoutFn({
-			boardHeight: game.config.meta.board.height,
-			boardWidth: game.config.meta.board.width,
+			boardHeight: initialSize.height,
+			boardWidth: initialSize.width,
 			fixedCellSize: 512,
 			height: application.app.screen.height,
 			width: application.app.screen.width,
 		});
 		const camera = yield* createBoardCameraFx({
+			animationDriver,
 			canStartLeftPanFx: (x, y) =>
 				surface
 					.readTargetFactsFx(x, y)
@@ -213,9 +221,34 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 
 		const applyTransitionFn = (transition: GameTransition, delivery: "hydrate" | "present") => {
 			if (closed) return;
+			const previousSize = readBoardSizeFn({
+				runtime: latestTransition.runtime,
+				config: game.config,
+				space: latestTransition.runtime.currentSpace,
+			});
+			const nextSize = readBoardSizeFn({
+				runtime: transition.runtime,
+				config: game.config,
+				space: transition.runtime.currentSpace,
+			});
 			latestTransition = transition;
 			// Surface hit testing and actor reconciliation must observe one committed snapshot.
 			RendererRuntime.runSync(surface.setTransitionFx(transition));
+			if (previousSize.width !== nextSize.width || previousSize.height !== nextSize.height) {
+				RendererRuntime.runSync(surface.redrawFx);
+				const nextLayout = readMainLayoutFn({
+					boardHeight: nextSize.height,
+					boardWidth: nextSize.width,
+					fixedCellSize: 512,
+					height: application.app.screen.height,
+					width: application.app.screen.width,
+				});
+				RendererRuntime.runSync(
+					camera.setSurfacesFx([
+						nextLayout.board,
+					]),
+				);
+			}
 			RendererRuntime.runSync(
 				delivery === "hydrate"
 					? reconciler.hydrateFx(transition)

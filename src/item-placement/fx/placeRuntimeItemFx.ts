@@ -1,3 +1,4 @@
+import { readBoardSizeFn } from "~/game-runtime/fn/readBoardSizeFn";
 import { Effect } from "effect";
 
 import { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
@@ -68,7 +69,11 @@ const readRuntimeItemDropLocationFx = Effect.fn("readRuntimeItemDropLocationFx")
 		locations: excludeGridLocationsFn({
 			excludedLocations,
 			locations: readBoardLocationsFn({
-				size: config.meta.board,
+				size: readBoardSizeFn({
+					runtime,
+					config,
+					space: origin.space,
+				}),
 				space: origin.space,
 			}),
 		}),

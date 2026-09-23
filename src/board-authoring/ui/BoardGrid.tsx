@@ -1,3 +1,4 @@
+import "./BoardGrid.css";
 import { Plus } from "lucide-react";
 import {
 	type PointerEvent as ReactPointerEvent,
@@ -10,41 +11,38 @@ import {
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import { useEditorItemSearchOptions } from "~/authoring-form/ui/useEditorItemSearchOptions";
-import { ProjectStartItemPicker } from "~/project-authoring/ui/ProjectStartItemPicker";
-import type {
-	ProjectStartGridCell,
-	ProjectStartGridPosition,
-} from "~/project-authoring/type/ProjectStartGridCell";
-import { useProjectStartGridDrag } from "~/project-authoring/ui/useProjectStartGridDrag";
+import { BoardItemPicker } from "~/board-authoring/ui/BoardItemPicker";
+import type { BoardGridCell, BoardGridPosition } from "~/board-authoring/type/BoardGridCell";
+import { useBoardGridDrag } from "~/board-authoring/ui/useBoardGridDrag";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { ButtonLink } from "~/ui/ui/Button";
 
-interface ProjectStartGridCommonProps {
-	readonly cells: ReadonlyArray<ProjectStartGridCell>;
+interface BoardGridCommonProps {
+	readonly cells: ReadonlyArray<BoardGridCell>;
 	readonly height: number;
 	readonly width: number;
 }
 
-interface ProjectStartGridDetailProps extends ProjectStartGridCommonProps {
+interface BoardGridDetailProps extends BoardGridCommonProps {
 	readonly items: Readonly<Record<string, ItemSchema.Type>>;
 	readonly mode: "detail";
 	readonly projectId: string;
 }
 
-interface ProjectStartGridEditProps extends ProjectStartGridCommonProps {
-	readonly invalidCells?: ReadonlyArray<ProjectStartGridPosition>;
+interface BoardGridEditProps extends BoardGridCommonProps {
+	readonly invalidCells?: ReadonlyArray<BoardGridPosition>;
 	readonly mode: "edit";
-	readonly onCellsChangeFn: (cells: ReadonlyArray<ProjectStartGridCell>) => void;
+	readonly onCellsChangeFn: (cells: ReadonlyArray<BoardGridCell>) => void;
 }
 
-type ProjectStartGridProps = ProjectStartGridDetailProps | ProjectStartGridEditProps;
+type BoardGridProps = BoardGridDetailProps | BoardGridEditProps;
 
-const positionKeyFn = ({ x, y }: ProjectStartGridPosition) => `${x}:${y}`;
+const positionKeyFn = ({ x, y }: BoardGridPosition) => `${x}:${y}`;
 
 const moveCellFn = (
-	cells: ReadonlyArray<ProjectStartGridCell>,
-	source: ProjectStartGridCell,
-	target: ProjectStartGridPosition,
+	cells: ReadonlyArray<BoardGridCell>,
+	source: BoardGridCell,
+	target: BoardGridPosition,
 ) => [
 	...cells.filter(
 		({ x, y }) => (x !== source.x || y !== source.y) && (x !== target.x || y !== target.y),
@@ -55,7 +53,7 @@ const moveCellFn = (
 	},
 ];
 
-const ProjectStartGridCellContent = ({
+const BoardGridCellContent = ({
 	empty,
 	resourceIds,
 }: {
@@ -75,7 +73,7 @@ const ProjectStartGridCellContent = ({
 	</>
 );
 
-const ProjectStartGridSlot = ({
+const BoardGridSlot = ({
 	cell,
 	isDragSource,
 	isDragTarget,
@@ -88,34 +86,35 @@ const ProjectStartGridSlot = ({
 	startDragFn,
 	suppressClickRef,
 }: {
-	readonly cell: ProjectStartGridCell | undefined;
+	readonly cell: BoardGridCell | undefined;
 	readonly isDragSource: boolean;
 	readonly isDragTarget: boolean;
 	readonly invalid: boolean;
 	readonly item: ItemSchema.Type | undefined;
 	readonly onDeleteFn: () => void;
-	readonly onMoveFn: (offset: ProjectStartGridPosition) => void;
+	readonly onMoveFn: (offset: BoardGridPosition) => void;
 	readonly onOpenFn: () => void;
-	readonly position: ProjectStartGridPosition;
+	readonly position: BoardGridPosition;
 	readonly startDragFn: (
 		event: ReactPointerEvent<HTMLButtonElement>,
-		source: ProjectStartGridCell,
+		source: BoardGridCell,
 	) => void;
 	readonly suppressClickRef: RefObject<boolean>;
 }) => (
 	<button
-		className="relative grid aspect-square w-full min-w-0 min-h-0 [container-type:inline-size] place-items-center rounded-lg border border-line bg-surface/70 text-subtle transition-[background-color,border-color,opacity,box-shadow] enabled:cursor-pointer enabled:hover:border-line-strong enabled:hover:bg-surface-raised data-[ui-drag-source=true]:opacity-30 data-[ui-drag-target=true]:border-accent data-[ui-drag-target=true]:ring-2 data-[ui-drag-target=true]:ring-accent/60 data-[ui-drag-target=true]:ring-offset-1 data-[ui-drag-target=true]:ring-offset-canvas data-[ui-invalid=true]:border-danger data-[ui-invalid=true]:ring-2 data-[ui-invalid=true]:ring-danger/35"
-		data-start-grid-cell="true"
+		className="relative grid aspect-square w-full min-w-0 min-h-0 [container-type:inline-size] place-items-center border-0 bg-transparent p-0 text-subtle inset-ring-0 transition-[background-color,border-color,opacity,box-shadow] enabled:cursor-pointer enabled:hover:shadow-[inset_0_0_0_1px_var(--ak-accent)] data-[ui-drag-source=true]:opacity-30 data-[ui-drag-target=true]:inset-ring-2 data-[ui-drag-target=true]:inset-ring-accent/60 data-[ui-invalid=true]:inset-ring-2 data-[ui-invalid=true]:inset-ring-danger/35"
+		data-board-grid-cell="true"
 		data-x={position.x}
 		data-y={position.y}
 		title={item?.title || item?.id}
 		type="button"
 		{...readDataUiFn({
-			dataUi: "EditorProjectStartGridSlot",
+			dataUi: "EditorBoardGridSlot",
 			state: {
 				dragSource: isDragSource,
 				dragTarget: isDragTarget,
 				invalid,
+				alternate: (position.x + position.y) % 2 === 1,
 			},
 		})}
 		onClick={(event) => {
@@ -164,34 +163,34 @@ const ProjectStartGridSlot = ({
 			if (cell !== undefined) startDragFn(event, cell);
 		}}
 	>
-		<ProjectStartGridCellContent
+		<BoardGridCellContent
 			empty={<Plus className="size-[15%] opacity-35" />}
 			resourceIds={item?.artwork.default}
 		/>
 	</button>
 );
 
-const ProjectStartGridSurface = ({
+const BoardGridSurface = ({
 	cells,
 	edit,
 	height,
 	items,
 	projectId,
 	width,
-}: ProjectStartGridCommonProps & {
+}: BoardGridCommonProps & {
 	readonly edit?: {
 		readonly dragVisual?: {
-			readonly source: ProjectStartGridCell;
+			readonly source: BoardGridCell;
 			readonly targetKey?: string;
 		};
 		readonly gridRef: RefObject<HTMLDivElement | null>;
 		readonly invalidPositionKeys: ReadonlySet<string>;
-		readonly onDeleteFn: (position: ProjectStartGridPosition) => void;
-		readonly onMoveFn: (cell: ProjectStartGridCell, offset: ProjectStartGridPosition) => void;
-		readonly onOpenFn: (position: ProjectStartGridPosition) => void;
+		readonly onDeleteFn: (position: BoardGridPosition) => void;
+		readonly onMoveFn: (cell: BoardGridCell, offset: BoardGridPosition) => void;
+		readonly onOpenFn: (position: BoardGridPosition) => void;
 		readonly startDragFn: (
 			event: ReactPointerEvent<HTMLButtonElement>,
-			source: ProjectStartGridCell,
+			source: BoardGridCell,
 		) => void;
 		readonly suppressClickRef: RefObject<boolean>;
 	};
@@ -216,16 +215,19 @@ const ProjectStartGridSurface = ({
 	return (
 		<div
 			className="min-w-0 max-w-full overflow-x-auto"
-			data-ui="EditorProjectStartGrid"
+			data-ui="EditorBoardGrid"
 			data-mode={edit === undefined ? "detail" : "edit"}
 		>
 			<div
-				className="mx-auto grid gap-1.5"
+				className="mx-auto grid overflow-hidden border border-line bg-surface/78"
+				data-ui="EditorBoardGridSurface"
 				ref={edit?.gridRef}
 				style={{
 					gridTemplateColumns: `repeat(${Math.max(1, width)}, minmax(0, 1fr))`,
 					// Fit square cells to the panel width and a viewport-bounded preview height.
-					width: `min(100%, calc((70dvh - ${Math.max(0, height - 1)} * 0.375rem) / ${Math.max(1, height)} * ${Math.max(1, width)} + ${Math.max(0, width - 1)} * 0.375rem))`,
+					width: `min(100%, calc(70dvh / ${Math.max(1, height)} * ${Math.max(1, width)}))`,
+					// Gameplay rounds the outer board by 16 px per 512 px world cell.
+					borderRadius: `${100 / (32 * Math.max(1, width))}% / ${100 / (32 * Math.max(1, height))}%`,
 				}}
 			>
 				{positions.map((position) => {
@@ -234,17 +236,22 @@ const ProjectStartGridSurface = ({
 					const item = cell === undefined ? undefined : items[cell.itemId];
 					if (edit === undefined) {
 						const className =
-							"relative grid aspect-square w-full min-w-0 min-h-0 [container-type:inline-size] place-items-center rounded-lg border border-line bg-surface/70 p-0 text-subtle shadow-none";
+							"relative grid aspect-square w-full min-w-0 min-h-0 [container-type:inline-size] place-items-center border-0 bg-transparent p-0 text-subtle shadow-none";
 						const content = (
-							<ProjectStartGridCellContent resourceIds={item?.artwork.default} />
+							<BoardGridCellContent resourceIds={item?.artwork.default} />
 						);
 						return cell !== undefined &&
 							item !== undefined &&
 							projectId !== undefined ? (
 							<ButtonLink
-								className={`${className} hover:border-accent`}
+								className={`${className} hover:shadow-[inset_0_0_0_1px_var(--ak-accent)]`}
 								data-item-id={item.id}
-								data-ui="EditorProjectStartGridSlot"
+								{...readDataUiFn({
+									dataUi: "EditorBoardGridSlot",
+									state: {
+										alternate: (position.x + position.y) % 2 === 1,
+									},
+								})}
 								key={key}
 								params={{
 									itemUid: item.uid,
@@ -259,7 +266,12 @@ const ProjectStartGridSurface = ({
 						) : (
 							<div
 								className={className}
-								data-ui="EditorProjectStartGridSlot"
+								{...readDataUiFn({
+									dataUi: "EditorBoardGridSlot",
+									state: {
+										alternate: (position.x + position.y) % 2 === 1,
+									},
+								})}
 								key={key}
 								title={item?.title || item?.id}
 							>
@@ -272,7 +284,7 @@ const ProjectStartGridSurface = ({
 						edit.dragVisual.source.x === position.x &&
 						edit.dragVisual.source.y === position.y;
 					return (
-						<ProjectStartGridSlot
+						<BoardGridSlot
 							cell={cell}
 							isDragSource={isDragSource}
 							isDragTarget={edit.dragVisual?.targetKey === key}
@@ -295,7 +307,7 @@ const ProjectStartGridSurface = ({
 	);
 };
 
-const ProjectStartGridDragPreview = ({
+const BoardGridDragPreview = ({
 	clientX,
 	clientY,
 	cellSize,
@@ -310,7 +322,7 @@ const ProjectStartGridDragPreview = ({
 }) => (
 	<div
 		className="pointer-events-none fixed top-0 left-0 z-[90] grid [container-type:inline-size] place-items-center rounded-lg border border-accent bg-surface-raised/95 text-foreground shadow-2xl"
-		data-ui="EditorProjectStartGridDragPreview"
+		data-ui="EditorBoardGridDragPreview"
 		ref={previewRef}
 		style={{
 			transform: `translate3d(${clientX + 12}px, ${clientY + 12}px, 0)`,
@@ -318,28 +330,28 @@ const ProjectStartGridDragPreview = ({
 			height: cellSize,
 		}}
 	>
-		<ProjectStartGridCellContent resourceIds={resourceIds} />
+		<BoardGridCellContent resourceIds={resourceIds} />
 	</div>
 );
 
-const ProjectStartGridEdit = ({
+const BoardGridEdit = ({
 	cells,
 	height,
 	invalidCells = [],
 	onCellsChangeFn,
 	width,
-}: ProjectStartGridEditProps) => {
+}: BoardGridEditProps) => {
 	const { items } = useEditorItemSearchOptions();
 	const gridRef = useRef<HTMLDivElement>(null);
-	const [pickerCell, setPickerCellFn] = useState<ProjectStartGridPosition>();
+	const [pickerCell, setPickerCellFn] = useState<BoardGridPosition>();
 	const invalidPositionKeys = new Set(invalidCells.map(positionKeyFn));
-	const { dragPreviewRef, dragVisual, startDragFn, suppressClickRef } = useProjectStartGridDrag({
+	const { dragPreviewRef, dragVisual, startDragFn, suppressClickRef } = useBoardGridDrag({
 		gridRef,
 		onMoveFn: (source, target) => onCellsChangeFn(moveCellFn(cells, source, target)),
 	});
 	const changeCellFn = (
-		position: ProjectStartGridPosition,
-		changeFn: (cell: ProjectStartGridCell | undefined) => ProjectStartGridCell | undefined,
+		position: BoardGridPosition,
+		changeFn: (cell: BoardGridCell | undefined) => BoardGridCell | undefined,
 	) => {
 		const index = cells.findIndex(({ x, y }) => x === position.x && y === position.y);
 		const current = cells[index];
@@ -361,7 +373,7 @@ const ProjectStartGridEdit = ({
 
 	return (
 		<>
-			<ProjectStartGridSurface
+			<BoardGridSurface
 				cells={cells}
 				edit={{
 					dragVisual,
@@ -386,7 +398,7 @@ const ProjectStartGridEdit = ({
 				width={width}
 			/>
 			{pickerCell === undefined ? null : (
-				<ProjectStartItemPicker
+				<BoardItemPicker
 					onCloseFn={() => setPickerCellFn(undefined)}
 					onSelectFn={(itemId) =>
 						changeCellFn(pickerCell, () => ({
@@ -397,7 +409,7 @@ const ProjectStartGridEdit = ({
 				/>
 			)}
 			{dragVisual === undefined ? null : (
-				<ProjectStartGridDragPreview
+				<BoardGridDragPreview
 					clientX={dragVisual.clientX}
 					clientY={dragVisual.clientY}
 					cellSize={dragVisual.cellSize}
@@ -409,10 +421,6 @@ const ProjectStartGridEdit = ({
 	);
 };
 
-/** Presents one canonical starting grid and adds editing gestures only in edit mode. */
-export const ProjectStartGrid = (props: ProjectStartGridProps) =>
-	props.mode === "detail" ? (
-		<ProjectStartGridSurface {...props} />
-	) : (
-		<ProjectStartGridEdit {...props} />
-	);
+/** Presents one authored board and adds editing gestures only in edit mode. */
+export const BoardGrid = (props: BoardGridProps) =>
+	props.mode === "detail" ? <BoardGridSurface {...props} /> : <BoardGridEdit {...props} />;

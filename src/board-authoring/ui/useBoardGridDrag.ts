@@ -8,49 +8,46 @@ import {
 } from "react";
 
 import { PointerDragThreshold } from "~/ui/constant/PointerDragThreshold";
-import type {
-	ProjectStartGridCell,
-	ProjectStartGridPosition,
-} from "~/project-authoring/type/ProjectStartGridCell";
+import type { BoardGridCell, BoardGridPosition } from "~/board-authoring/type/BoardGridCell";
 
-interface ProjectStartGridDrag {
+interface BoardGridDrag {
 	phase: "dragging" | "pressed";
 	readonly pointerId: number;
 	readonly pressX: number;
 	readonly pressY: number;
-	readonly source: ProjectStartGridCell;
+	readonly source: BoardGridCell;
 	readonly cellSize: number;
-	target?: ProjectStartGridPosition;
+	target?: BoardGridPosition;
 }
 
-interface ProjectStartGridDragVisual {
+interface BoardGridDragVisual {
 	readonly clientX: number;
 	readonly clientY: number;
-	readonly source: ProjectStartGridCell;
+	readonly source: BoardGridCell;
 	readonly cellSize: number;
 	readonly targetKey?: string;
 }
 
-const positionKeyFn = ({ x, y }: ProjectStartGridPosition) => `${x}:${y}`;
+const positionKeyFn = ({ x, y }: BoardGridPosition) => `${x}:${y}`;
 
 /** Owns modifier-pointer drag admission, global continuation, preview, and completion. */
-export const useProjectStartGridDrag = ({
+export const useBoardGridDrag = ({
 	gridRef,
 	onMoveFn,
 }: {
 	readonly gridRef: RefObject<HTMLDivElement | null>;
-	readonly onMoveFn: (source: ProjectStartGridCell, target: ProjectStartGridPosition) => void;
+	readonly onMoveFn: (source: BoardGridCell, target: BoardGridPosition) => void;
 }) => {
-	const dragRef = useRef<ProjectStartGridDrag | undefined>(undefined);
+	const dragRef = useRef<BoardGridDrag | undefined>(undefined);
 	const dragPreviewRef = useRef<HTMLDivElement>(null);
 	const moveFn = useEffectEvent(onMoveFn);
 	const suppressClickRef = useRef(false);
-	const [dragVisual, setDragVisualFn] = useState<ProjectStartGridDragVisual>();
+	const [dragVisual, setDragVisualFn] = useState<BoardGridDragVisual>();
 
 	useEffect(() => {
 		const readTargetFn = (target: EventTarget | null) => {
 			if (!(target instanceof Element)) return undefined;
-			const cell = target.closest<HTMLElement>("[data-start-grid-cell]");
+			const cell = target.closest<HTMLElement>("[data-board-grid-cell]");
 			if (cell === null || gridRef.current?.contains(cell) !== true) return undefined;
 			const x = Number(cell.dataset.x);
 			const y = Number(cell.dataset.y);
@@ -140,10 +137,7 @@ export const useProjectStartGridDrag = ({
 		gridRef,
 	]);
 
-	const startDragFn = (
-		event: ReactPointerEvent<HTMLButtonElement>,
-		source: ProjectStartGridCell,
-	) => {
+	const startDragFn = (event: ReactPointerEvent<HTMLButtonElement>, source: BoardGridCell) => {
 		if (event.button !== 0 || (!event.altKey && !event.metaKey)) return;
 		event.preventDefault();
 		dragRef.current = {

@@ -20,14 +20,15 @@ export const startFx = Effect.fn("startFx")(function* () {
 				);
 			}
 
-			const nextRuntime = yield* planStartFx({
+			const result = yield* planStartFx({
 				runtime,
 				start: config.start,
 			});
 
 			return [
-				nextRuntime,
-				nextRuntime,
+				result.runtime,
+				result.runtime,
+				result.events,
 			] as const;
 		});
 	});

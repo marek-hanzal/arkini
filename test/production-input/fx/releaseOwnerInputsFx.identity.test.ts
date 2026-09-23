@@ -52,6 +52,7 @@ const config = GameConfigSchema.parse({
 	},
 	start: {
 		currentSpace: 0,
+		spaces: [],
 	},
 	items: {
 		outer: {
@@ -205,6 +206,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 				speedUpGameplay: false,
 			},
 			currentSpace: 0,
+			templateUidBySpace: {},
 			items: [
 				boardOwner,
 				{
@@ -264,6 +266,7 @@ it("preserves one impure buffered root and its passive subtree", () => {
 			speedUpGameplay: false,
 		},
 		currentSpace: 0,
+		templateUidBySpace: {},
 		items: [
 			boardOwner,
 			inputItem({
@@ -345,6 +348,7 @@ it("rolls back the whole removal when one impure root has no exclusive cell", ()
 			speedUpGameplay: false,
 		},
 		currentSpace: 0,
+		templateUidBySpace: {},
 		items: [
 			boardOwner,
 			inputItem({

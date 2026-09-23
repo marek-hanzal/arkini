@@ -31,8 +31,23 @@ export const config = GameConfigSchema.parse({
 			height: 1,
 		},
 	},
+	templates: [
+		{
+			uid: "start",
+			title: "Start",
+			width: 4,
+			height: 1,
+			board: [],
+		},
+	],
 	start: {
 		currentSpace: 0,
+		spaces: [
+			{
+				space: 0,
+				templateUid: "start",
+			},
+		],
 	},
 	items: {
 		first: {

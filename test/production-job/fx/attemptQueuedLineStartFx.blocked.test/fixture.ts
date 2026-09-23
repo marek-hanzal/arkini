@@ -204,6 +204,7 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 			speedUpGameplay: false,
 		},
 		currentSpace: 0,
+		templateUidBySpace: {},
 		defaultLineByOwnerItemId: {},
 		jobs: [],
 		jobQueue: [

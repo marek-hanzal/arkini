@@ -4,7 +4,7 @@ import { act, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { ProjectStartItemPicker } from "~/project-authoring/ui/ProjectStartItemPicker";
+import { BoardItemPicker } from "~/board-authoring/ui/BoardItemPicker";
 import { TranslationTestProvider } from "~test/support/TranslationTestProvider";
 
 (
@@ -63,7 +63,7 @@ const PickerHarness = ({ onSelect }: { readonly onSelect: (itemId: string) => vo
 				Open
 			</button>
 			{open ? (
-				<ProjectStartItemPicker
+				<BoardItemPicker
 					onCloseFn={() => setOpen(false)}
 					onSelectFn={onSelect}
 				/>
@@ -102,7 +102,7 @@ const renderPicker = async (
 	};
 };
 
-describe("ProjectStartItemPicker", () => {
+describe("BoardItemPicker", () => {
 	it("lists board items and restores focus after exact selection", async () => {
 		const onSelect = vi.fn();
 		const { container, opener } = await renderPicker(onSelect);
@@ -124,17 +124,15 @@ describe("ProjectStartItemPicker", () => {
 		await act(async () => lens.click());
 
 		expect(onSelect).toHaveBeenCalledExactlyOnceWith("lens");
-		expect(container.querySelector('[data-ui="EditorProjectStartItemPicker"]')).toBeNull();
+		expect(container.querySelector('[data-ui="EditorBoardItemPicker"]')).toBeNull();
 		expect(document.activeElement).toBe(opener);
 	});
 
 	it("closes only from the backdrop surface", async () => {
 		const { container, opener } = await renderPicker(vi.fn());
-		const spotlight = container.querySelector<HTMLElement>(
-			'[data-ui="EditorProjectStartItemPicker"]',
-		);
+		const spotlight = container.querySelector<HTMLElement>('[data-ui="EditorBoardItemPicker"]');
 		const backdrop = container.querySelector<HTMLElement>(
-			'[data-ui="EditorProjectStartItemPickerBackdrop"]',
+			'[data-ui="EditorBoardItemPickerBackdrop"]',
 		);
 		if (spotlight === null || backdrop === null) throw new Error("Expected mounted Spotlight.");
 
@@ -145,7 +143,7 @@ describe("ProjectStartItemPicker", () => {
 				}),
 			);
 		});
-		expect(container.querySelector('[data-ui="EditorProjectStartItemPicker"]')).not.toBeNull();
+		expect(container.querySelector('[data-ui="EditorBoardItemPicker"]')).not.toBeNull();
 		await act(async () => {
 			backdrop.dispatchEvent(
 				new MouseEvent("pointerdown", {
@@ -153,7 +151,7 @@ describe("ProjectStartItemPicker", () => {
 				}),
 			);
 		});
-		expect(container.querySelector('[data-ui="EditorProjectStartItemPicker"]')).toBeNull();
+		expect(container.querySelector('[data-ui="EditorBoardItemPicker"]')).toBeNull();
 		expect(document.activeElement).toBe(opener);
 	});
 });

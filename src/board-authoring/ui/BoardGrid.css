@@ -1,0 +1,11 @@
+/* Board preview and editing share the gameplay board palette and contiguous cells. */
+[data-ui="EditorBoardGridSurface"] > [data-ui="EditorBoardGridSlot"] {
+	background-color: color-mix(in srgb, var(--ak-tile-grid-slot-surface-a) 92%, transparent);
+	outline: 1px solid color-mix(in srgb, var(--ak-line) 55%, transparent);
+	outline-offset: -0.5px;
+	border-radius: 0;
+}
+
+[data-ui="EditorBoardGridSurface"] > [data-ui="EditorBoardGridSlot"][data-ui-alternate="true"] {
+	background-color: color-mix(in srgb, var(--ak-tile-grid-slot-surface-b) 92%, transparent);
+}

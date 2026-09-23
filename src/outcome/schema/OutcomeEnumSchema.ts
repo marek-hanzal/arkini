@@ -4,6 +4,7 @@ export const OutcomeEnumSchema = z
 	.enum({
 		Item: "item",
 		Space: "space",
+		Template: "template",
 	})
 	.meta({
 		id: "OutcomeEnumSchema",

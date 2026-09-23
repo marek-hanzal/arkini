@@ -7,7 +7,10 @@ import type { SurfaceLayout } from "~/game-scene/type/SceneLayout";
 
 import { readBoardEdgePanFn } from "~/game-scene/fn/readBoardEdgePanFn";
 
+import type { AnimationControl, AnimationDriver } from "~/tile-rendering/service/AnimationDriver";
+
 interface Props {
+	readonly animationDriver: AnimationDriver;
 	readonly canStartLeftPanFx?: (x: number, y: number) => Effect.Effect<boolean>;
 	readonly application: PixiApplicationOwner;
 	readonly drag: {
@@ -30,6 +33,7 @@ export namespace createBoardCameraFx {
 	export interface Output {
 		readonly cancelInteractionFx: Effect.Effect<void>;
 		readonly setInteractionBlockedFx: (blocked: boolean) => Effect.Effect<void>;
+		readonly setSurfacesFx: (surfaces: Props["surfaces"]) => Effect.Effect<void>;
 		readonly closeFx: Effect.Effect<void>;
 	}
 }
@@ -37,6 +41,7 @@ export namespace createBoardCameraFx {
 /** One camera transforms every canvas layer; actor and drop coordinates remain world-local. */
 export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 	canStartLeftPanFx,
+	animationDriver,
 	application,
 	drag,
 	dragThreshold,
@@ -55,6 +60,13 @@ export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 	let width = app.screen.width;
 	let height = app.screen.height;
 	let blocked = false;
+	let fitAnimation: AnimationControl | null = null;
+	let fitGeneration = 0;
+	const stopFitFn = () => {
+		fitGeneration += 1;
+		if (fitAnimation !== null) RendererRuntime.runSync(fitAnimation.stopFx);
+		fitAnimation = null;
+	};
 	let closed = false;
 	let pan: {
 		readonly pointerId: number;
@@ -62,12 +74,12 @@ export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 		x: number;
 		y: number;
 	} | null = null;
-	const left = Math.min(...surfaces.map((surface) => surface.x));
-	const top = Math.min(...surfaces.map((surface) => surface.y));
-	const right = Math.max(...surfaces.map((surface) => surface.x + surface.width));
-	const bottom = Math.max(...surfaces.map((surface) => surface.y + surface.height));
+	let left = Math.min(...surfaces.map((surface) => surface.x));
+	let top = Math.min(...surfaces.map((surface) => surface.y));
+	let right = Math.max(...surfaces.map((surface) => surface.x + surface.width));
+	let bottom = Math.max(...surfaces.map((surface) => surface.y + surface.height));
 
-	const cameraSurface: SurfaceLayout = {
+	let cameraSurface: SurfaceLayout = {
 		...surfaces[0],
 		x: left,
 		y: top,
@@ -140,6 +152,7 @@ export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 			stopEdgePanFn();
 			return;
 		}
+		if (fitAnimation !== null) return;
 		edgePointer = {
 			pointerId: event.pointerId,
 			clientX: event.clientX,
@@ -154,14 +167,45 @@ export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 		edgeFrameTime = clock.currentTimeMillisUnsafe();
 		cancelEdgeFrameFn = RendererRuntime.runSync(frames.scheduleFx(edgeFrameFn));
 	};
-	const fitFn = () => {
+	const fitFn = (animate = false) => {
+		stopFitFn();
 		const scale = Math.min(width / (right - left + 256), height / (bottom - top + 256), 1);
-		stage.scale.set(scale);
-		stage.position.set(
-			(width - (right + left) * scale) / 2,
-			(height - (bottom + top) * scale) / 2,
+		const x = (width - (right + left) * scale) / 2;
+		const y = (height - (bottom + top) * scale) / 2;
+		if (!animate) {
+			stage.scale.set(scale);
+			stage.position.set(x, y);
+			invalidateFn();
+			return;
+		}
+		const from = {
+			x: stage.x,
+			y: stage.y,
+			scale: stage.scale.x,
+		};
+		const generation = fitGeneration;
+		fitAnimation = RendererRuntime.runSync(
+			animationDriver.startTweenFx({
+				from: 0,
+				to: 1,
+				durationMs: 650,
+				curve: {
+					kind: "ease-in-out",
+				},
+				onCompleteFn: () => {
+					if (generation === fitGeneration) fitAnimation = null;
+				},
+				onUpdateFn: (progress) => {
+					if (closed || generation !== fitGeneration) return;
+					stage.scale.set(from.scale + (scale - from.scale) * progress);
+					stage.position.set(
+						from.x + (x - from.x) * progress,
+						from.y + (y - from.y) * progress,
+					);
+					invalidateFn();
+				},
+			}),
 		);
-		invalidateFn();
 	};
 	const updateInteractionFn = () => {
 		const panning = pan?.phase === "dragging";
@@ -178,6 +222,7 @@ export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 		updateInteractionFn();
 	};
 	const cancelFn = () => {
+		stopFitFn();
 		stopEdgePanFn();
 		finishPanFn();
 		RendererRuntime.runSync(drag.cancelInteractionFx);
@@ -223,6 +268,7 @@ export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 			});
 			if (!RendererRuntime.runSync(canStartLeftPanFx(point.x, point.y))) return;
 		}
+		stopFitFn();
 		pan = {
 			phase: "pressed",
 			pointerId: event.pointerId,
@@ -262,6 +308,7 @@ export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 	};
 	const wheelFn = (event: WheelEvent) => {
 		if (closed || blocked) return;
+		stopFitFn();
 		stopEdgePanFn();
 		event.preventDefault();
 		if (pan !== null) return;
@@ -308,6 +355,22 @@ export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 
 	return {
 		cancelInteractionFx: Effect.sync(cancelFn),
+		setSurfacesFx: (nextSurfaces) =>
+			Effect.sync(() => {
+				cancelFn();
+				left = Math.min(...nextSurfaces.map((surface) => surface.x));
+				top = Math.min(...nextSurfaces.map((surface) => surface.y));
+				right = Math.max(...nextSurfaces.map((surface) => surface.x + surface.width));
+				bottom = Math.max(...nextSurfaces.map((surface) => surface.y + surface.height));
+				cameraSurface = {
+					...nextSurfaces[0],
+					x: left,
+					y: top,
+					width: right - left,
+					height: bottom - top,
+				};
+				fitFn(true);
+			}),
 		setInteractionBlockedFx: (nextBlocked: boolean) =>
 			Effect.sync(() => {
 				blocked = nextBlocked;

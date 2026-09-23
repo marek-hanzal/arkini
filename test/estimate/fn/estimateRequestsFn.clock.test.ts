@@ -84,14 +84,27 @@ const createClockGraph = async ({
 					other: createSimpleItem("other"),
 					expired: createSimpleItem("expired"),
 				},
+				templates: [
+					{
+						uid: "initial",
+						title: "Initial",
+						width: 3,
+						height: 3,
+						board: [
+							{
+								itemId: "clock",
+								x: 0,
+								y: 0,
+							},
+						],
+					},
+				],
 				start: {
 					currentSpace: 0,
-					board: [
+					spaces: [
 						{
-							itemId: "clock",
-							x: 0,
-							y: 0,
 							space: 0,
+							templateUid: "initial",
 						},
 					],
 				},

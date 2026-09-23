@@ -1,3 +1,4 @@
+import { readStartBoardFn } from "~/game-start/fn/readStartBoardFn";
 import { Order } from "effect";
 
 import type { AcquisitionGraph, AcquisitionLimitation } from "~/flow/type/AcquisitionGraph";
@@ -35,6 +36,12 @@ const readItemOutputsFn = (item: ItemSchema.Type) => {
 const readLimitationsFn = (config: GameConfigSchema.Type) => {
 	const limitations = new Set<AcquisitionLimitation>();
 	for (const item of Object.values(config.items)) {
+		if (
+			readItemOutputsFn(item).some((output) =>
+				readOutputDropsFn(output).some((outcome) => outcome.type === "template"),
+			)
+		)
+			limitations.add("template-resets-not-simulated");
 		for (const line of item.lines) {
 			if (
 				line.rules.some(
@@ -85,7 +92,7 @@ const addStartQuantityFn = (quantities: Map<string, number>, itemId: string) =>
 
 const readStartQuantityByItemIdFn = (config: GameConfigSchema.Type) => {
 	const quantities = new Map<string, number>();
-	for (const item of config.start.board) addStartQuantityFn(quantities, item.itemId);
+	for (const item of readStartBoardFn(config)) addStartQuantityFn(quantities, item.itemId);
 	return quantities;
 };
 

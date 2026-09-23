@@ -72,6 +72,7 @@ export const settleActionUnitsFx = Effect.fn("settleActionUnitsFx")(function* ({
 		}),
 		(state, spend) =>
 			Effect.gen(function* () {
+				if (!state.runtime.items.some((item) => item.id === spend.itemId)) return state;
 				const result = yield* spendActionUnitsFx({
 					actionId,
 					cost: spend.cost,

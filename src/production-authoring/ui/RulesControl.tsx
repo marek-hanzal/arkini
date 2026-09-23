@@ -1,3 +1,14 @@
+import {
+	CircleCheck,
+	CircleOff,
+	Eye,
+	EyeOff,
+	Timer,
+	Gauge,
+	SearchCheck,
+	Hash,
+	MoveHorizontal,
+} from "lucide-react";
 import { match } from "ts-pattern";
 
 import type { QuerySchema } from "~/item-query/schema/QuerySchema";
@@ -54,6 +65,15 @@ type DraftRule =
 			readonly type?: undefined;
 			readonly when: DraftWhen[];
 	  };
+
+const RuleTypeIcon = {
+	enable: <CircleCheck className="size-4 shrink-0" />,
+	disable: <CircleOff className="size-4 shrink-0" />,
+	show: <Eye className="size-4 shrink-0" />,
+	hide: <EyeOff className="size-4 shrink-0" />,
+	"runtime:adjust": <Timer className="size-4 shrink-0" />,
+	"runtime:multiplier": <Gauge className="size-4 shrink-0" />,
+} satisfies Record<RuleType, ReactNode>;
 
 const RuleTypeTranslationKey = {
 	disable: "Disable",
@@ -192,16 +212,19 @@ const WhenControl = ({
 					options={[
 						{
 							description: <Mx label="Exists condition help" />,
+							icon: <SearchCheck className="size-4 shrink-0" />,
 							label: translator.textFn("Exists"),
 							value: "exists",
 						},
 						{
 							description: <Mx label="Exact count condition help" />,
+							icon: <Hash className="size-4 shrink-0" />,
 							label: translator.textFn("Exact count"),
 							value: "count",
 						},
 						{
 							description: <Mx label="Count range condition help" />,
+							icon: <MoveHorizontal className="size-4 shrink-0" />,
 							label: translator.textFn("Count range"),
 							value: "range",
 						},
@@ -357,14 +380,15 @@ const RuleControl = ({
 	const translator = useTranslator();
 	return (
 		<article className="grid gap-3">
-			<div className="flex items-end gap-3">
-				<div className="min-w-0 flex-1">
+			<div className="flex items-end justify-end gap-3">
+				<div className="min-w-0">
 					<EditorChoiceControl
 						error={readEditorFormValidationErrorFn(validationIssues, "type")}
 						label={translator.textFn("Rule type")}
 						description={ruleTypeDescription}
 						value={rule.type}
 						options={allowedTypes.map((type) => ({
+							icon: RuleTypeIcon[type],
 							description: readRuleTypeDescriptionFn(type, ruleTarget),
 							label: translator.textFn(RuleTypeTranslationKey[type]),
 							value: type,

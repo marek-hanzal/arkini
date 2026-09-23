@@ -88,6 +88,7 @@ const runDepletion = (blockReturn = false) => {
 			speedUpGameplay: false,
 		},
 		currentSpace: 0,
+		templateUidBySpace: {},
 		items: [
 			{
 				id: "source",

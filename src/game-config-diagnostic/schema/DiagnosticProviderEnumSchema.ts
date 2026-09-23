@@ -7,6 +7,7 @@ export const DiagnosticProviderEnumSchema = z
 		Music: "music",
 		Sfx: "sfx",
 		Resources: "resources",
+		Templates: "templates",
 		Start: "start",
 	})
 	.meta({

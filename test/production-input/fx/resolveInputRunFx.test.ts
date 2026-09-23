@@ -55,6 +55,7 @@ describe("resolveInputRunFx", () => {
 						speedUpGameplay: false,
 					},
 					currentSpace: 0,
+					templateUidBySpace: {},
 					items: [
 						owner,
 					],
@@ -85,6 +86,7 @@ describe("resolveInputRunFx", () => {
 				speedUpGameplay: false,
 			},
 			currentSpace: 0,
+			templateUidBySpace: {},
 			items: [
 				owner,
 				bufferedItem({
@@ -187,6 +189,7 @@ describe("resolveInputRunFx", () => {
 						speedUpGameplay: false,
 					},
 					currentSpace: 0,
+					templateUidBySpace: {},
 					items: [
 						owner,
 						target,

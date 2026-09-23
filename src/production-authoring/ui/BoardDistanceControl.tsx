@@ -1,3 +1,4 @@
+import { LocateFixed, Focus, Scan, Radar, Telescope, Orbit } from "lucide-react";
 import type { QuerySchema } from "~/item-query/schema/QuerySchema";
 import { EditorChoiceControl } from "~/editor-control/ui/EditorValueControls";
 import { BoardDistancePresentation } from "~/item-query/ui/QueryPresentation";
@@ -8,26 +9,32 @@ const boardDistanceOptions = [
 	{
 		...BoardDistancePresentation.self,
 		value: "self",
+		icon: <LocateFixed className="size-4 shrink-0" />,
 	},
 	{
 		...BoardDistancePresentation.close,
 		value: "close",
+		icon: <Focus className="size-4 shrink-0" />,
 	},
 	{
 		...BoardDistancePresentation["near-close"],
 		value: "near-close",
+		icon: <Scan className="size-4 shrink-0" />,
 	},
 	{
 		...BoardDistancePresentation.near,
 		value: "near",
+		icon: <Radar className="size-4 shrink-0" />,
 	},
 	{
 		...BoardDistancePresentation.far,
 		value: "far",
+		icon: <Telescope className="size-4 shrink-0" />,
 	},
 	{
 		...BoardDistancePresentation.universe,
 		value: "universe",
+		icon: <Orbit className="size-4 shrink-0" />,
 	},
 ] as const;
 

@@ -164,6 +164,9 @@ const assembleGameSourcesFn = (sources: ReadonlyArray<GameSourceFileSchema.Type>
 				.with(DiagnosticProviderEnumSchema.enum.Resources, () => {
 					value.resources = source.value.resources;
 				})
+				.with(DiagnosticProviderEnumSchema.enum.Templates, () => {
+					value.templates = source.value.templates;
+				})
 				.with(DiagnosticProviderEnumSchema.enum.Start, () => {
 					value.start = source.value.start;
 				})
@@ -225,6 +228,7 @@ const readSourcePathFn = (
 	if (root === "resources") {
 		return provenance.resources;
 	}
+	if (root === "templates") return provenance.templates;
 	if (root === "start") {
 		return provenance.start;
 	}

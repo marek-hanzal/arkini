@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { validateStartStateFx } from "~/game-config-validation/fx/validateStartStateFx";
 import { startTestConfig } from "~test/game-start/support/startTestConfig";
 import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticCodeEnumSchema";
@@ -24,26 +23,38 @@ describe("validateStartStateFx", () => {
 	});
 
 	it("rejects conflicting board locations", () => {
-		const config = GameConfigSchema.parse({
+		const config = {
 			...startTestConfig,
+			templates: [
+				{
+					uid: "invalid",
+					title: "Invalid",
+					width: 2,
+					height: 2,
+					board: [
+						{
+							itemId: "tree",
+							x: 0,
+							y: 0,
+						},
+						{
+							itemId: "tree",
+							x: 0,
+							y: 0,
+						},
+					],
+				},
+			],
 			start: {
 				currentSpace: 0,
-				board: [
+				spaces: [
 					{
 						space: 0,
-						itemId: "tree",
-						x: 0,
-						y: 0,
-					},
-					{
-						space: 0,
-						itemId: "tree",
-						x: 0,
-						y: 0,
+						templateUid: "invalid",
 					},
 				],
 			},
-		});
+		};
 		const diagnostics = Effect.runSync(
 			validateStartStateFx({
 				config,

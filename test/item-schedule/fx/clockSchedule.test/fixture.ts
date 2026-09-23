@@ -31,6 +31,7 @@ export const createClockConfig = (
 		},
 		start: {
 			currentSpace: 0,
+			spaces: [],
 		},
 		items: {
 			clock: {

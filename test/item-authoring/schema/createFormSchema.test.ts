@@ -1,3 +1,4 @@
+import { editorTestConfig } from "~test/project-authoring/support/editorTestPayload";
 import { describe, expect, it } from "vitest";
 
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
@@ -409,4 +410,93 @@ describe("createFormSchema", () => {
 			}),
 		);
 	});
+});
+
+it("preserves a template outcome in an item draft and rejects a removed template reference", () => {
+	const source = createProducerItem({
+		id: "portal",
+	});
+	const form = readFormValues(source);
+	const edited = {
+		...form,
+		lines: form.lines!.map((line) => ({
+			...line,
+			outcome: {
+				set: [
+					{
+						rules: [],
+						roll: [
+							{
+								type: "guaranteed",
+								outcome: [
+									{
+										type: "template",
+										templateUid: "destination",
+										rules: [],
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+		})),
+	};
+	const config = {
+		...editorTestConfig,
+		items: {
+			portal: source,
+		},
+		templates: [
+			{
+				uid: "destination",
+				title: "Destination",
+				width: 2,
+				height: 2,
+				board: [],
+			},
+		],
+	} as GameConfigSchema.Type;
+	const parsed = createFormSchema(
+		{
+			config,
+		},
+		source.uid,
+	).safeParse(edited);
+	expect(parsed.success).toBe(true);
+	if (parsed.success)
+		expect(parsed.data.lines[0]!.outcome!.set[0]!.roll[0]!.outcome[0]).toEqual({
+			type: "template",
+			templateUid: "destination",
+			rules: [],
+		});
+	const missing = createFormSchema(
+		{
+			config: {
+				...config,
+				templates: [],
+			},
+		},
+		source.uid,
+	).safeParse(edited);
+	expect(missing.success).toBe(false);
+	if (!missing.success)
+		expect(missing.error.issues).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					path: [
+						"lines",
+						0,
+						"outcome",
+						"set",
+						0,
+						"roll",
+						0,
+						"outcome",
+						0,
+						"templateUid",
+					],
+				}),
+			]),
+		);
 });

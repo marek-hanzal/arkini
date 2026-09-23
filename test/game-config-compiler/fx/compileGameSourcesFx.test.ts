@@ -17,6 +17,119 @@ const compile = (...sources: GameSourceFileSchema.Type[]) =>
 	Effect.runPromise(compileGameSourcesFx(sources));
 
 describe("compileGameSourcesFx", () => {
+	it("blocks builds without a template assignment for the selected initial space", async () => {
+		const root = createRootSource({
+			start: {
+				currentSpace: 4,
+				spaces: [],
+			},
+		});
+		const result = await compile(root);
+		expect(result.diagnostics).toContainEqual(
+			expect.objectContaining({
+				code: DiagnosticCodeEnumSchema.enum.StartInvalid,
+				failureTag: "InitialSpaceUnassigned",
+				path: [
+					"start",
+					"currentSpace",
+				],
+				source: root.path,
+			}),
+		);
+	});
+
+	it("reports missing template item references at their exact authored path", async () => {
+		const root = createRootSource();
+		const result = await compile({
+			...root,
+			value: {
+				...root.value,
+				templates: [
+					{
+						uid: "template",
+						title: "Template",
+						width: 2,
+						height: 2,
+						board: [
+							{
+								x: 1,
+								y: 1,
+								itemId: "missing",
+							},
+						],
+					},
+				],
+			},
+		});
+		expect(result.diagnostics).toContainEqual(
+			expect.objectContaining({
+				code: DiagnosticCodeEnumSchema.enum.ConfigMissingReference,
+				source: root.path,
+				path: [
+					"templates",
+					0,
+					"board",
+					0,
+					"itemId",
+				],
+				referenceId: "missing",
+			}),
+		);
+	});
+
+	it.each([
+		{
+			board: [
+				{
+					x: 2,
+					y: 0,
+					itemId: "item:a",
+				},
+			],
+			message: "Template item is outside its board dimensions.",
+		},
+		{
+			board: [
+				{
+					x: 0,
+					y: 0,
+					itemId: "item:a",
+				},
+				{
+					x: 0,
+					y: 0,
+					itemId: "item:a",
+				},
+			],
+			message: "Template items must occupy distinct cells.",
+		},
+	])("rejects unusable authored template placements: $message", async ({ board, message }) => {
+		const root = createRootSource();
+		const result = await compile({
+			...root,
+			value: {
+				...root.value,
+				templates: [
+					{
+						uid: "template",
+						title: "Template",
+						width: 2,
+						height: 2,
+						board,
+					},
+				],
+			},
+		});
+		expect(result.config).toBeUndefined();
+		expect(result.diagnostics).toContainEqual(
+			expect.objectContaining({
+				code: DiagnosticCodeEnumSchema.enum.ConfigSchema,
+				source: root.path,
+				message,
+			}),
+		);
+	});
+
 	it("produces one completed schema-valid game config", async () => {
 		const item = createSimpleItem("item:a");
 		const result = await compile(
@@ -256,9 +369,23 @@ describe("compileGameSourcesFx", () => {
 							height: 1,
 						},
 					},
+					templates: [
+						{
+							uid: "initial",
+							title: "Initial",
+							width: 1,
+							height: 1,
+							board: [],
+						},
+					],
 					start: {
 						currentSpace: 0,
-						board: [],
+						spaces: [
+							{
+								space: 0,
+								templateUid: "initial",
+							},
+						],
 					},
 				},
 			}),

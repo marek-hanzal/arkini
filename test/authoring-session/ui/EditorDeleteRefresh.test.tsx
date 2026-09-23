@@ -60,9 +60,10 @@ it.each([
 		revision: 0,
 		config: {
 			...editorTestPayload.config,
+			templates: [],
 			start: {
 				...editorTestPayload.config.start,
-				board: [],
+				spaces: [],
 			},
 		},
 		resources: [

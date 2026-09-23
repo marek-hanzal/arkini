@@ -122,7 +122,7 @@ export const createEstimateTopologyFn = (graph: AcquisitionGraph): EstimateTopol
 		graph.routes.filter(
 			(route) =>
 				route.executionConstraint !== undefined ||
-				route.operation?.outputCompilation === "state-space-unsupported",
+				route.operation?.outputCompilation !== undefined,
 		),
 	);
 	const routesByFact = new Map<string, AcquisitionRoute[]>();

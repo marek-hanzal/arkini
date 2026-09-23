@@ -1,3 +1,4 @@
+import { readBoardSizeFn } from "~/game-runtime/fn/readBoardSizeFn";
 import { Effect } from "effect";
 
 import { CheatModeDisabledError } from "~/game-cheat/error/CheatModeDisabledError";
@@ -42,14 +43,19 @@ export const spawnCheatItemFx = Effect.fn("spawnCheatItemFx")(function* ({
 					}),
 				);
 			}
+			const size = readBoardSizeFn({
+				runtime,
+				config,
+				space: runtime.currentSpace,
+			});
 			const plan = yield* planBoardPlacementFx({
 				item,
 				origin: {
 					scope: LocationScopeEnumSchema.enum.Board,
 					space: runtime.currentSpace,
 					position: {
-						x: Math.floor(config.meta.board.width / 2),
-						y: Math.floor(config.meta.board.height / 2),
+						x: Math.floor(size.width / 2),
+						y: Math.floor(size.height / 2),
 					},
 				},
 				placement: PlacementSchema.enum.Drop,

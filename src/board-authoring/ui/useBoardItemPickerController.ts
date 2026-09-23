@@ -2,7 +2,7 @@ import { useEditorItemSearchOptions } from "~/authoring-form/ui/useEditorItemSea
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { EditorSearchOption } from "~/editor-control/ui/EditorSearchCombobox";
 
-export namespace useProjectStartItemPickerController {
+export namespace useBoardItemPickerController {
 	export interface Props {
 		readonly onCloseFn: () => void;
 		readonly onSelectFn: (itemId: string) => void;
@@ -15,11 +15,11 @@ export namespace useProjectStartItemPickerController {
 	}
 }
 
-/** Owns item selection for the initial board. */
-export const useProjectStartItemPickerController = ({
+/** Owns item selection for an authored board. */
+export const useBoardItemPickerController = ({
 	onCloseFn,
 	onSelectFn,
-}: useProjectStartItemPickerController.Props): useProjectStartItemPickerController.Output => {
+}: useBoardItemPickerController.Props): useBoardItemPickerController.Output => {
 	const { items, options } = useEditorItemSearchOptions();
 	const selectItemFn = (itemId: string) => {
 		const option = options.find((option) => option.id === itemId);

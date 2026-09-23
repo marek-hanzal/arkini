@@ -14,7 +14,9 @@ interface ReadOutcomePlacementItemEventsProps {
 /** Translates concrete placement results into exact committed spawn facts. */
 export const readOutcomePlacementItemEventsFx = Effect.fn("readOutcomePlacementItemEventsFx")(
 	function* ({ originItemId, placement }: ReadOutcomePlacementItemEventsProps) {
-		const events: GameEventSchema.Type[] = [];
+		const events: GameEventSchema.Type[] = [
+			...(placement.events ?? []),
+		];
 		for (const drop of placement.item) {
 			for (const runtimeItem of drop.placement.spawn) {
 				const item = Option.getOrUndefined(narrowBoardRuntimeItemFn(runtimeItem));

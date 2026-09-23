@@ -23,8 +23,23 @@ export const createConfig = (amount = 1, inputCount = 1) =>
 				height: 2,
 			},
 		},
+		templates: [
+			{
+				uid: "start",
+				title: "Start",
+				width: 5,
+				height: 2,
+				board: [],
+			},
+		],
 		start: {
 			currentSpace: 0,
+			spaces: [
+				{
+					space: 0,
+					templateUid: "start",
+				},
+			],
 		},
 		items: {
 			payer: {

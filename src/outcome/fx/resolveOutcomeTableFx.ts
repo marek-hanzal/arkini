@@ -1,3 +1,4 @@
+import { resolveOutcomeRulesEnabledFx } from "./resolveOutcomeRulesEnabledFx";
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 import type { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
@@ -63,6 +64,25 @@ export const resolveOutcomeTableFx = Effect.fn("resolveOutcomeTableFx")(function
 							resolveSpaceOutcomeFx({
 								outcome,
 								origin,
+							}),
+					)
+					.with(
+						{
+							type: "template",
+						},
+						(outcome) =>
+							Effect.gen(function* () {
+								if (
+									!(yield* resolveOutcomeRulesEnabledFx({
+										origin,
+										rules: outcome.rules,
+									}))
+								)
+									return undefined;
+								return {
+									type: "template",
+									templateUid: outcome.templateUid,
+								} satisfies ResolvedOutcome.Template;
 							}),
 					)
 					.exhaustive(),

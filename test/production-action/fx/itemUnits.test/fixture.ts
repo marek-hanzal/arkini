@@ -129,6 +129,7 @@ export const unitsConfig = GameConfigSchema.parse({
 	},
 	start: {
 		currentSpace: 0,
+		spaces: [],
 	},
 	items: {
 		"producer:shrine": {

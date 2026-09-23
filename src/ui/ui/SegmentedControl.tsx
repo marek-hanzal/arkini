@@ -5,6 +5,7 @@ import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { Tooltip } from "~/ui/ui/Tooltip";
 
 interface SegmentedControlOption<Value extends string> {
+	readonly icon?: ReactNode;
 	readonly description?: ReactNode;
 	readonly disabled?: boolean;
 	readonly label: ReactNode;
@@ -68,7 +69,7 @@ export const SegmentedControl = <Value extends string>({
 				<button
 					key={option.value}
 					type="button"
-					className={`ak-segmented-option relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-none border font-semibold ${disabledTooltipReference ? "w-full pointer-events-none" : overlapClassName} ${edgeClassName} ${fill ? "flex-1" : ""} ${SegmentedControlSizeClassName[size]}`}
+					className={`ak-segmented-option group/shortcut relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-none border font-semibold ${disabledTooltipReference ? "w-full pointer-events-none" : overlapClassName} ${edgeClassName} ${fill ? "flex-1" : ""} ${SegmentedControlSizeClassName[size]}`}
 					disabled={optionDisabled}
 					onClick={() => onChangeFn(option.value)}
 					{...readDataUiFn({
@@ -81,6 +82,7 @@ export const SegmentedControl = <Value extends string>({
 						},
 					})}
 				>
+					{option.icon}
 					{option.label}
 					{option.description === undefined ? null : (
 						<Info className="size-3.5 opacity-70" />

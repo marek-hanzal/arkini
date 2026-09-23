@@ -7,7 +7,7 @@ import type { Project } from "~/project-authoring/type/Project";
 import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
 import { TitleSchema } from "~/game-value/schema/TitleSchema";
 import { IdSchema } from "~/game-value/schema/IdSchema";
-import { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
+import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 import { SizeSchema } from "~/item-location/schema/SizeSchema";
 import { deleteItemFx } from "./deleteItemFx";
 import { EditProjectInputSchema } from "./EditProjectInputSchema";
@@ -19,7 +19,7 @@ import { readItemDeleteImpactFx } from "./readItemDeleteImpactFx";
 import { readProjectValidationTextFx } from "./readProjectValidationTextFx";
 import { renameItemFx } from "./renameItemFx";
 import { resolveSchemaId } from "./resolveSchemaId";
-import { updateStartItemFx } from "./updateStartItemFx";
+import { updateStartSpaceFx } from "./updateStartSpaceFx";
 
 interface ToolResult {
 	[key: string]: unknown;
@@ -116,33 +116,29 @@ const EditProjectLayoutInputSchema = z
 		description: "A revision-pinned patch of the board size.",
 	});
 
-const SetStartItemInputSchema = z
+const SetStartSpaceInputSchema = z
 	.object({
 		revision: RevisionSchema,
-		location: BoardLocationSchema.describe(
-			"The exact initial slot to set. Board locations require an explicit numeric space.",
-		),
-		itemId: IdSchema.describe("The exact canonical item ID to place initially."),
+		space: NonNegativeIntegerSchema,
+		templateUid: IdSchema,
 	})
 	.strict()
 	.meta({
-		$id: "urn:serakki:schema:mcp:set-start-item-input",
-		title: "Set start item tool input",
-		description: "One exact initial item to insert or replace at a grid location.",
+		$id: "urn:serakki:schema:mcp:set-start-space-input",
+		title: "Set initial space template",
+		description:
+			"Assign a reusable template to one initial space at an exact project revision.",
 	});
-
-const RemoveStartItemInputSchema = z
+const RemoveStartSpaceInputSchema = z
 	.object({
 		revision: RevisionSchema,
-		location: BoardLocationSchema.describe(
-			"The exact initial slot to clear. Board locations require an explicit numeric space.",
-		),
+		space: NonNegativeIntegerSchema,
 	})
 	.strict()
 	.meta({
-		$id: "urn:serakki:schema:mcp:remove-start-item-input",
-		title: "Remove start item tool input",
-		description: "The exact occupied initial grid location to clear.",
+		$id: "urn:serakki:schema:mcp:remove-start-space-input",
+		title: "Remove initial space template",
+		description: "Remove one initial space assignment at an exact project revision.",
 	});
 
 const readProjectConfigTextFn = (project: Project) =>
@@ -155,6 +151,7 @@ const readProjectConfigTextFn = (project: Project) =>
 				meta: project.config.meta,
 				resources: project.config.resources,
 				start: project.config.start,
+				templates: project.config.templates,
 			},
 		},
 		null,
@@ -188,7 +185,10 @@ const readItemDeleteImpactTextFx = Effect.fn("readItemDeleteImpactTextFx")(funct
 		`- Expiry outcomes removed from: ${formatListFn(impact.removedExpiryOutcomeOwnerIds)}`,
 		`- Lines removed: ${formatListFn(impact.removedLines.map(({ ownerItemId, lineId }) => `${ownerItemId}/${lineId}`))}`,
 		`- Merge rules removed: ${formatListFn(impact.removedMergeRules.map(({ ownerItemId, ruleNumber }) => `${ownerItemId}#${ruleNumber}`))}`,
-		`- Start entries removed: board ${impact.removedStartEntries.board}`,
+		...impact.removedTemplateEntries.map(
+			(template) =>
+				`- Template ${template.title} (${template.templateUid}): ${template.count} placements removed`,
+		),
 	);
 	return lines.join("\n");
 });
@@ -264,22 +264,22 @@ export const registerGameplayDesignToolsFn = ({
 			),
 	);
 	server.registerTool(
-		"set_start_item",
+		"set_start_space",
 		{
 			description:
-				"Insert or replace one exact initial item. A board location must include its numeric space. The item must exist, fit the layout. Read project_config first and copy its revision.",
-			inputSchema: SetStartItemInputSchema,
+				"Assign an existing template to an initial space. Reusing a template creates independent runtime items. Read project_config first and copy its revision.",
+			inputSchema: SetStartSpaceInputSchema,
 		},
-		async ({ itemId, location, revision }) =>
+		async ({ templateUid, space, revision }) =>
 			runToolFn(
 				readProjectFx().pipe(
 					Effect.flatMap((project) =>
-						updateStartItemFx({
+						updateStartSpaceFx({
 							change: {
-								itemId,
+								templateUid,
 								type: "set",
 							},
-							location,
+							space,
 							notifyProjectChangedFn,
 							project,
 							repository,
@@ -290,21 +290,21 @@ export const registerGameplayDesignToolsFn = ({
 			),
 	);
 	server.registerTool(
-		"remove_start_item",
+		"remove_start_space",
 		{
 			description:
-				"Remove the item at one exact initial location. A board location must include its numeric space, so equal coordinates in another space remain untouched. Read project_config first and copy its revision.",
-			inputSchema: RemoveStartItemInputSchema,
+				"Remove one initial space assignment without modifying the template. The unmapped space starts empty with project fallback dimensions. Read project_config first and copy its revision.",
+			inputSchema: RemoveStartSpaceInputSchema,
 		},
-		async ({ location, revision }) =>
+		async ({ space, revision }) =>
 			runToolFn(
 				readProjectFx().pipe(
 					Effect.flatMap((project) =>
-						updateStartItemFx({
+						updateStartSpaceFx({
 							change: {
 								type: "remove",
 							},
-							location,
+							space,
 							notifyProjectChangedFn,
 							project,
 							repository,

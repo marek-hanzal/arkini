@@ -27,7 +27,7 @@ beforeEach(async () => {
 afterEach(async () => harness.close());
 
 describe("filesystem Editor project build", () => {
-	it("builds a newly created empty project before its first Editor build", async () => {
+	it("requires an initial template assignment before building a newly created project", async () => {
 		const repository = await harness.openRepository();
 		const project = await Effect.runPromise(
 			createFreshProjectFx("fresh-game").pipe(
@@ -40,9 +40,48 @@ describe("filesystem Editor project build", () => {
 					projectId: project.projectId,
 				}),
 			),
+		).rejects.toMatchObject({
+			diagnostics: expect.arrayContaining([
+				expect.objectContaining({
+					failureTag: "InitialSpaceUnassigned",
+				}),
+			]),
+		});
+		await Effect.runPromise(
+			repository.replaceConfigFx({
+				projectId: project.projectId,
+				expectedRevision: project.revision,
+				config: {
+					...project.config,
+					templates: [
+						{
+							uid: "initial",
+							title: "Initial",
+							width: 2,
+							height: 3,
+							board: [],
+						},
+					],
+					start: {
+						currentSpace: 0,
+						spaces: [
+							{
+								space: 0,
+								templateUid: "initial",
+							},
+						],
+					},
+				},
+			}),
+		);
+		await expect(
+			Effect.runPromise(
+				repository.buildProjectFx({
+					projectId: project.projectId,
+				}),
+			),
 		).resolves.toMatchObject({
 			projectId: project.projectId,
-			revision: project.revision,
 		});
 	});
 

@@ -94,6 +94,26 @@ const palette = {
 
 const game = {
 	config: {
+		start: {
+			spaces: [
+				{
+					space: 1,
+					templateUid: "small",
+				},
+			],
+		},
+		templates: [
+			{
+				uid: "wide",
+				width: 4,
+				height: 2,
+			},
+			{
+				uid: "small",
+				width: 2,
+				height: 1,
+			},
+		],
 		meta: {
 			board: {
 				height: 7,
@@ -104,6 +124,7 @@ const game = {
 	getTransitionSnapshotFn: () => ({
 		runtime: {
 			currentSpace: 0,
+			templateUidBySpace: {},
 		},
 	}),
 } as unknown as GameEngine;
@@ -264,9 +285,14 @@ describe("main surface", () => {
 			surface.setTransitionFx({
 				runtime: {
 					currentSpace: 1,
+					templateUidBySpace: {
+						1: "small",
+					},
 				},
-			} as ReturnType<GameEngine["getTransitionSnapshotFn"]>),
+			} as unknown as ReturnType<GameEngine["getTransitionSnapshotFn"]>),
 		);
+		Effect.runSync(surface.redrawFx);
+		expect(Effect.runSync(surface.readTargetFactsFx(2 * 512 + 1, 1)).target).toBeNull();
 		Effect.runSync(
 			actorStore.replaceCanonicalItemsFx([
 				nextSpaceItem,
@@ -280,6 +306,18 @@ describe("main surface", () => {
 				),
 			).occupant,
 		).toBe(nextSpaceItem);
+		Effect.runSync(
+			surface.setTransitionFx({
+				runtime: {
+					currentSpace: 1,
+					templateUidBySpace: {
+						1: "wide",
+					},
+				},
+			} as unknown as ReturnType<GameEngine["getTransitionSnapshotFn"]>),
+		);
+		Effect.runSync(surface.redrawFx);
+		expect(Effect.runSync(surface.readTargetFactsFx(2 * 512 + 1, 1)).target).not.toBeNull();
 	});
 
 	it("destroys its owned display tree without closing borrowed drop feedback", () => {

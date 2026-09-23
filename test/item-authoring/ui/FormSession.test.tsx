@@ -190,7 +190,7 @@ beforeEach(() => {
 			},
 			start: {
 				currentSpace: 0,
-				board: [],
+				spaces: [],
 			},
 			items: {
 				[item.id]: item,

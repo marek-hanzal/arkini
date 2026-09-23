@@ -12,7 +12,7 @@ import { renameFx } from "~/item-authoring/fx/renameFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 describe("renameFx", () => {
-	it("rewrites Clock timer rules and expiry output without changing its line identities", () => {
+	it("rewrites Clock timer rules and expiry outcome without changing its line identities", () => {
 		const config = GameConfigSchema.parse({
 			...editorTestConfig,
 			items: {
@@ -83,7 +83,7 @@ describe("renameFx", () => {
 			0,
 			"roll",
 			0,
-			"drop",
+			"outcome",
 			0,
 			"itemId",
 		]);
@@ -99,7 +99,7 @@ describe("renameFx", () => {
 	});
 
 	it("rewrites exact references across start, selectors, inputs, and outputs", () => {
-		const output = createOutput([
+		const outcome = createOutput([
 			{
 				itemId: "water",
 			},
@@ -122,7 +122,7 @@ describe("renameFx", () => {
 					],
 					units: {
 						amount: 1,
-						output,
+						outcome,
 					},
 				},
 				producer: createProducerItem({
@@ -147,7 +147,7 @@ describe("renameFx", () => {
 									},
 								},
 							],
-							output,
+							outcome,
 						}),
 					],
 				}),

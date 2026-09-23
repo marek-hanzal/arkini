@@ -26,8 +26,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "spoiled-sack",
 										"quantity": {
 											"min": 1,

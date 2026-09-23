@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { createAcquisitionGraphFn } from "~/flow/fn/createAcquisitionGraphFn";
 import { compileGameSourcesFx } from "~/game-config-compiler/fx/compileGameSourcesFx";
-import { OutputSchema } from "~/production-output/schema/OutputSchema";
+import { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
 import {
 	createProducerItem,
 	createRootSource,
@@ -12,7 +12,7 @@ import {
 
 describe("createAcquisitionGraphFn output distributions", () => {
 	it("keeps authored occurrences and marks the shared operation when joint compilation overflows", async () => {
-		const output = OutputSchema.parse({
+		const output = OutcomeTableSchema.parse({
 			set: [
 				{
 					rules: [],
@@ -22,8 +22,9 @@ describe("createAcquisitionGraphFn output distributions", () => {
 						},
 						(_, index) => ({
 							chance: 0.5,
-							drop: [
+							outcome: [
 								{
+									type: "item",
 									itemId: `chance:${index}`,
 									quantity: {
 										max: 1,
@@ -57,7 +58,7 @@ describe("createAcquisitionGraphFn output distributions", () => {
 						...items,
 						maker: createProducerItem({
 							id: "maker",
-							output,
+							outcome: output,
 						}),
 					},
 				}),

@@ -479,15 +479,16 @@ describe("validateGameResourcesFn", () => {
 							type: "simple" as const,
 						},
 					],
-					output: {
+					outcome: {
 						set: [
 							{
 								rules: [],
 								roll: [
 									{
 										type: "guaranteed" as const,
-										drop: [
+										outcome: [
 											{
+												type: "item",
 												itemId: targetId,
 												quantity: {
 													min: 1,

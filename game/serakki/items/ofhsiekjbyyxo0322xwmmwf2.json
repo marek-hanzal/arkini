@@ -25,8 +25,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "empty-well",
 										"quantity": {
 											"min": 1,
@@ -59,7 +60,7 @@
 						"type": "simple"
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 10,
@@ -67,8 +68,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "amethyst",
 											"quantity": {
 												"min": 1,
@@ -87,8 +89,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "sapphire",
 											"quantity": {
 												"min": 1,
@@ -107,8 +110,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "diamond",
 											"quantity": {
 												"min": 1,
@@ -127,8 +131,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "emerald",
 											"quantity": {
 												"min": 1,

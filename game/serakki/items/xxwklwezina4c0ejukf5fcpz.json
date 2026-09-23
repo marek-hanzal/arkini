@@ -21,7 +21,7 @@
 					"itemId": "fertilized-grain-field"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -29,8 +29,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "empty-sack",
 											"quantity": {
 												"min": 1,
@@ -61,8 +62,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "spoiled-sack",
 										"quantity": {
 											"min": 1,

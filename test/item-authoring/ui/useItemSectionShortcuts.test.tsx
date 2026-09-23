@@ -78,10 +78,6 @@ describe("Item Detail section shortcuts", () => {
 				"clock",
 			],
 			[
-				"t",
-				"action",
-			],
-			[
 				"s",
 				"estimate",
 			],

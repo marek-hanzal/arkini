@@ -11,13 +11,13 @@ import {
 } from "~test/production-job/fx/completeJobTransitionFx.blueprint.test/fixture";
 
 describe("blueprint depleted-owner accounting", () => {
-	it("subtracts exactly one depleted owner, including when no lifecycle output exists", () => {
+	it("subtracts exactly one depleted owner, including when no lifecycle outcome exists", () => {
 		const result = runBlueprint(
 			Effect.gen(function* () {
 				const noOutput = yield* spawnBlueprintFx({
-					id: "runtime:depletion-self-no-output",
+					id: "runtime:depletion-self-no-outcome",
 					space: 0,
-					itemId: "blueprint:depletion-self-no-output",
+					itemId: "blueprint:depletion-self-no-outcome",
 					x: 0,
 					y: 0,
 				});

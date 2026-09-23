@@ -1,7 +1,7 @@
 import type { Project } from "~/project-authoring/type/Project";
 import type { AcquisitionRoute } from "~/flow/type/AcquisitionGraph";
 import type { ItemOriginSource } from "~/flow/type/ItemOriginSource";
-import type { OutputSchema } from "~/production-output/schema/OutputSchema";
+import type { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
 import type { QuerySchema } from "~/item-query/schema/QuerySchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 import type { RuleSchema } from "~/production-line/schema/RuleSchema";
@@ -30,21 +30,21 @@ const rulesFn = (project: Project, rules: ReadonlyArray<RuleSchema.Type>) =>
 		? ""
 		: ` rules: ${rules.map((rule) => `${rule.type}${rule.type === "runtime:adjust" ? ` ${rule.adjustMs} ms` : rule.type === "runtime:multiplier" ? ` x${rule.multiplier}` : ""}(${rule.when.map((when) => whenFn(project, when)).join(" AND ")})`).join("; ")}`;
 
-const outputLinesFn = (project: Project, output: OutputSchema.Type | undefined): string[] =>
-	(output?.set ?? []).flatMap((set, setIndex) => {
+const outcomeLinesFn = (project: Project, outcome: OutcomeTableSchema.Type | undefined): string[] =>
+	(outcome?.set ?? []).flatMap((set, setIndex) => {
 		const simpleSet =
-			output?.set.length === 1 && set.rules.length === 0 && set.roll.length === 1;
+			outcome?.set.length === 1 && set.rules.length === 0 && set.roll.length === 1;
 		return [
 			...(simpleSet
 				? []
 				: [
-						`  Output set ${setIndex + 1}: weight ${set.weight}${rulesFn(project, set.rules)}`,
+						`  Outcome set ${setIndex + 1}: weight ${set.weight}${rulesFn(project, set.rules)}`,
 					]),
 			...set.roll.flatMap((roll, rollIndex) =>
 				roll.type === "chance" && roll.chance === 0
 					? []
 					: [
-							`  ${simpleSet ? "Outputs" : `Roll ${rollIndex + 1}`}: ${roll.type === "chance" ? `chance ${roll.chance * 100}%` : "guaranteed"} ${roll.drop.map((drop) => `${itemFn(project, drop.itemId)} x${quantityFn(drop.quantity)}${drop.placement === "random" ? " random placement" : ""}${rulesFn(project, drop.rules)}`).join("; ")}`,
+							`  ${simpleSet ? "Outcomes" : `Roll ${rollIndex + 1}`}: ${roll.type === "chance" ? `chance ${roll.chance * 100}%` : "guaranteed"} ${roll.outcome.map((drop) => (drop.type === "space" ? `Space ${drop.space}${rulesFn(project, drop.rules)}` : `${itemFn(project, drop.itemId)} x${quantityFn(drop.quantity)}${drop.placement === "random" ? " random placement" : ""}${rulesFn(project, drop.rules)}`)).join("; ")}`,
 						],
 			),
 		];
@@ -109,7 +109,9 @@ const mergeLinesFn = (
 		? []
 		: [
 				`  Merge: ${includeOwner ? `${itemFn(project, sourceId)} / ` : ""}rule ${mergeIndex + 1}; Runtime: instant`,
-				`  Inputs: source x1 ${merge.action}; target ${itemFn(project, merge.target.itemId)} x1 ${merge.effect}${sourceId === merge.target.itemId ? "; distinct source/target instances" : ""}`,
+				merge.action === "space"
+					? `  Inputs: any dragged item transported to space ${merge.space}; receiver ${itemFn(project, sourceId)} x1 ${merge.effect}`
+					: `  Inputs: source x1 ${merge.action}; target ${itemFn(project, merge.target.itemId)} x1 ${merge.effect}${sourceId === merge.target.itemId ? "; distinct source/target instances" : ""}`,
 			];
 };
 
@@ -128,7 +130,7 @@ export const readRelationOperationSummaryFn = (
 				? []
 				: [
 						...lineLinesFn(project, source.ownerItemId, line),
-						...outputLinesFn(project, line.output),
+						...outcomeLinesFn(project, line.outcome),
 					];
 		}
 		case "merge": {
@@ -137,17 +139,17 @@ export const readRelationOperationSummaryFn = (
 				...mergeLinesFn(project, source.ownerItemId, reference.ruleNumber - 1),
 				...(merge?.effect === "replace"
 					? [
-							`  Replacement output: ${itemFn(project, merge.result)} x1`,
+							`  Replacement outcome: ${itemFn(project, merge.result)} x1`,
 						]
 					: []),
-				...outputLinesFn(project, merge?.output),
+				...outcomeLinesFn(project, merge?.outcome),
 			];
 		}
 		case "expiry":
 			return [
 				`  Inputs: ${itemFn(project, source.ownerItemId)} x1 expires; Runtime: ${(source.runtimeMs ?? 0) / 1_000} s`,
 				`  Clock gates: enabled=${owner?.clock?.enable}${rulesFn(project, owner?.clock?.rules ?? [])}`,
-				...outputLinesFn(project, owner?.clock?.onExpire),
+				...outcomeLinesFn(project, owner?.clock?.onExpire),
 			];
 		case "units": {
 			// The canonical source groups all depletion triggers. Show each distinct trigger once, not once per emitted drop.
@@ -192,8 +194,8 @@ export const readRelationOperationSummaryFn = (
 						...mergeLinesFn(project, metadata.sourceItemId, metadata.mergeIndex, true),
 					];
 				}),
-				"  Outputs per depleted instance; each participant rolls separately:",
-				...outputLinesFn(project, owner?.units?.output),
+				"  Outcomes per depleted instance; each participant rolls separately:",
+				...outcomeLinesFn(project, owner?.units?.outcome),
 			];
 		}
 	}

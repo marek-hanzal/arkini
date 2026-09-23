@@ -253,9 +253,9 @@ it.each([
 		sectionId: "clock",
 		ownerUid: "consumer-uid",
 		search: {
-			outputSet: 1,
-			outputRoll: 2,
-			outputDrop: 1,
+			outcomeSet: 1,
+			outcomeRoll: 2,
+			outcomeIndex: 1,
 		},
 	},
 	{
@@ -269,9 +269,9 @@ it.each([
 		ownerUid: "consumer-uid",
 		search: {
 			lineId: "specific-line",
-			outputSet: 1,
-			outputRoll: 2,
-			outputDrop: 1,
+			outcomeSet: 1,
+			outcomeRoll: 2,
+			outcomeIndex: 1,
 		},
 	},
 	{
@@ -284,9 +284,9 @@ it.each([
 		ownerUid: "unrelated-uid",
 		search: {
 			merge: 2,
-			outputSet: 1,
-			outputRoll: 2,
-			outputDrop: 1,
+			outcomeSet: 1,
+			outcomeRoll: 2,
+			outcomeIndex: 1,
 		},
 	},
 	{
@@ -300,9 +300,9 @@ it.each([
 		ownerUid: "unrelated-uid",
 		search: {
 			lineId: "specific-line",
-			outputSet: 1,
-			outputRoll: 2,
-			outputDrop: 1,
+			outcomeSet: 1,
+			outcomeRoll: 2,
+			outcomeIndex: 1,
 		},
 	},
 ] as const)(
@@ -315,7 +315,7 @@ it.each([
 				roll: {
 					setIndex: 1,
 					rollIndex: 2,
-					dropIndex: 1,
+					outcomeIndex: 1,
 					rollType: "guaranteed",
 				},
 			},
@@ -407,7 +407,9 @@ it("links each input or condition occurrence with its own selector coordinates",
 	state.origins = [
 		{
 			source: {
-				type: "action",
+				type: "line",
+				lineIndex: 0,
+				title: "First line",
 			},
 			role: "input",
 			inputIndex: 2,
@@ -451,9 +453,10 @@ it("links each input or condition occurrence with its own selector coordinates",
 			params: {
 				projectId: "project-one",
 				itemUid: "consumer-uid",
-				sectionId: "action",
+				sectionId: "production",
 			},
 			search: {
+				lineId: "specific-line",
 				input: 2,
 			},
 		},

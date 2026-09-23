@@ -1,6 +1,4 @@
-import { dropItemFx } from "~/item-interaction/fx/dropItemFx";
-import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
-import { createItemBase } from "~test/game-config-validation/support/gameValidationTestSource";
+import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
@@ -9,7 +7,6 @@ import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import { activateItemActionFx } from "~/item-action/fx/activateItemActionFx";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";
 
@@ -24,18 +21,6 @@ const createConfig = (distance: "far" | "universe") => {
 		...base,
 		items: {
 			...base.items,
-			portal: {
-				...createItemBase("portal"),
-				uid: "portal",
-				id: "portal",
-				title: "Portal",
-				description: "Moves the active board to the destination space.",
-
-				action: {
-					type: "space" as const,
-					space: 1,
-				},
-			},
 			permit: {
 				...base.items.tool,
 				uid: "permit",
@@ -48,7 +33,7 @@ const createConfig = (distance: "far" | "universe") => {
 				uid: "ingot",
 				id: "ingot",
 				title: "Ingot",
-				description: "Completion output.",
+				description: "Completion outcome.",
 			},
 			blocker: {
 				...base.items.tool,
@@ -78,15 +63,16 @@ const createConfig = (distance: "far" | "universe") => {
 							],
 						},
 					],
-					output: {
+					outcome: {
 						set: [
 							{
 								rules: [],
 								roll: [
 									{
 										type: "guaranteed",
-										drop: [
+										outcome: [
 											{
+												type: "item" as const,
 												itemId: "ingot",
 												quantity: {
 													min: 1,
@@ -107,42 +93,32 @@ const createConfig = (distance: "far" | "universe") => {
 	});
 };
 
+// Hydrated ownership can live on any Board; relocation is fixture setup, not a portal behavior.
 const moveOwnerToSpaceFx = Effect.fn("moveOwnerToSpaceFx")(function* (space: number) {
-	const runtime = yield* readRuntimeFx();
-	const owner = runtime.items.find((item) => item.id === ownerItemId)!;
-	const portal = yield* spawnItemFx({
-		id: "runtime:portal",
-		itemId: "portal",
-		location: {
-			scope: "board",
-			space: runtime.currentSpace,
-			position: {
-				x: 4,
-				y: 0,
+	yield* modifyRuntimeFx((runtime) =>
+		Effect.succeed([
+			undefined,
+			{
+				...runtime,
+				currentSpace: space,
+				items: runtime.items.map((item) =>
+					item.id === ownerItemId
+						? {
+								...item,
+								location: {
+									scope: "board" as const,
+									space,
+									position: {
+										x: 0,
+										y: 0,
+									},
+								},
+							}
+						: item,
+				),
 			},
-		},
-	});
-	const result = yield* dropItemFx({
-		sourceItemId: owner.id,
-		sourceRevision: owner.revision,
-		sourceLocation: owner.location as BoardLocationSchema.Type,
-		target: {
-			kind: "slot",
-			location: portal.location as BoardLocationSchema.Type,
-			occupant: {
-				itemId: portal.id,
-				revision: portal.revision,
-			},
-		},
-	});
-	if (result.kind !== "move") throw new Error("Expected portal transfer.");
-	yield* activateItemActionFx({
-		currentSpace: runtime.currentSpace,
-		itemId: portal.id,
-		location: portal.location,
-		revision: portal.revision,
-	});
-	if (space !== 1) throw new Error("Expected destination space.");
+		] as const),
+	);
 });
 
 const prepareTravelFx = Effect.fn("prepareTravelFx")(function* () {
@@ -192,7 +168,7 @@ describe("multi-space owner ownership graph", () => {
 		]);
 	});
 
-	it("keeps universe dependencies and materializes output plus reservations in the destination space", () => {
+	it("keeps universe dependencies and materializes outcome plus reservations in the destination space", () => {
 		const runtime = Effect.runSync(
 			Effect.gen(function* () {
 				yield* prepareTravelFx();

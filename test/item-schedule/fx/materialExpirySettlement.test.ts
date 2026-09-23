@@ -40,7 +40,7 @@ const runFn = (config: GameConfigSchema.Type) =>
 	);
 
 describe("committed material expiry settlement", () => {
-	it("places expiry output once after aborting the material owner job", () => {
+	it("places expiry outcome once after aborting the material owner job", () => {
 		const base = createTemporaryMaterialLifecycleTestConfig();
 		const config = GameConfigSchema.parse({
 			...base,
@@ -50,7 +50,7 @@ describe("committed material expiry settlement", () => {
 					...base.items.temporary,
 					clock: {
 						...base.items.temporary!.clock,
-						onExpire: base.items.owner!.lines[0]!.output,
+						onExpire: base.items.owner!.lines[0]!.outcome,
 					},
 				},
 			},
@@ -74,8 +74,8 @@ describe("committed material expiry settlement", () => {
 		"kill-switch",
 	] as const)("settles a last-unit owner when its material aborts under %s", (expiryMode) => {
 		const config = lastUnitConfigFn(expiryMode);
-		const output = config.items.owner!.units!.output!;
-		output.set[0]!.roll[0]!.drop[0]!.rules = [
+		const outcome = config.items.owner!.units!.outcome!;
+		outcome.set[0]!.roll[0]!.outcome[0]!.rules = [
 			{
 				type: "enable",
 				when: [
@@ -93,7 +93,7 @@ describe("committed material expiry settlement", () => {
 			},
 		];
 		// Both outputs must still see the owner removed earlier in the same candidate.
-		config.items.temporary!.clock!.onExpire = output;
+		config.items.temporary!.clock!.onExpire = outcome;
 
 		const result = runFn(config);
 		expect(result.expired.runtime.jobs).toEqual([]);
@@ -117,7 +117,7 @@ describe("committed material expiry settlement", () => {
 	});
 	it("returns a reserved identity into the depleted owner's freed cell", () => {
 		const config = lastUnitConfigFn("loose-kill");
-		config.items.owner!.units!.output = undefined;
+		config.items.owner!.units!.outcome = undefined;
 		config.items.owner!.lines[0]!.input.push({
 			type: "materials",
 			query: {

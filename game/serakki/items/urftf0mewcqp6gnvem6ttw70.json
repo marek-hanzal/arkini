@@ -19,7 +19,7 @@
 					"itemId": "burning-oven"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -27,8 +27,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "copper-pan-with-popcorn",
 											"quantity": {
 												"min": 1,
@@ -59,8 +60,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "spoiled-copper-pan",
 										"quantity": {
 											"min": 1,

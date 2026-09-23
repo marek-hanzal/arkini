@@ -13,7 +13,6 @@ const itemPatch = z
 		units: ItemSchema.shape.units.nullable(),
 		description: ItemSchema.shape.description.nullable(),
 		merge: ItemSchema.shape.merge.nullable(),
-		action: ItemSchema.shape.action.nullable(),
 		clock: ItemSchema.shape.clock.nullable(),
 		ui: ItemSchema.shape.ui.removeDefault().optional(),
 		lines: ItemSchema.shape.lines.removeDefault().optional(),

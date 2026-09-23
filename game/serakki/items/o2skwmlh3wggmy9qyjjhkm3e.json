@@ -21,7 +21,7 @@
 					"itemId": "campfire-burning"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -29,8 +29,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "burned-sack-with-corn-kernels",
 											"quantity": {
 												"min": 1,
@@ -54,7 +55,7 @@
 					"itemId": "fertilized-corn-field"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -62,8 +63,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "empty-sack",
 											"quantity": {
 												"min": 1,
@@ -94,8 +96,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "spoiled-sack",
 										"quantity": {
 											"min": 1,

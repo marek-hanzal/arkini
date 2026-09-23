@@ -1,11 +1,11 @@
 import { abortJobRuntimeFx } from "~/production-job/fx/abortJobRuntimeFx";
 import { forceRemoveRuntimeItemFx } from "~/game-runtime/fx/forceRemoveRuntimeItemFx";
 import { Effect, Random } from "effect";
-import type { OutputSchema } from "~/production-output/schema/OutputSchema";
-import { outputFx } from "~/production-output/fx/outputFx";
-import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
+import type { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
+import { resolveOutcomeTableFx } from "~/outcome/fx/resolveOutcomeTableFx";
+import { applyOutcomeTableFx } from "~/outcome/fx/applyOutcomeTableFx";
 import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItemIdentityFx";
-import { readOutputPlacementItemEventsFx } from "~/game-event/fx/readOutputPlacementItemEventsFx";
+import { readOutcomePlacementItemEventsFx } from "~/game-event/fx/readOutcomePlacementItemEventsFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
@@ -14,19 +14,19 @@ import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema"
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 
-/** Common atomic identity expiry: detach, resolve against the input snapshot, then place output. */
+/** Common atomic identity expiry: detach, resolve against the input snapshot, then place outcome. */
 export const expireItemRuntimeFx = Effect.fn("expireItemRuntimeFx")(function* ({
 	item,
 	removalMode,
 	origin,
-	output,
+	outcome,
 	randomSeed,
 	runtime,
 }: {
 	readonly item: RuntimeItemSchema.Type;
 	readonly removalMode?: "kill-switch";
 	readonly origin: BoardLocationSchema.Type;
-	readonly output?: OutputSchema.Type;
+	readonly outcome?: OutcomeTableSchema.Type;
 	readonly randomSeed: string;
 	readonly runtime: RuntimeSchema.Type;
 }) {
@@ -68,34 +68,34 @@ export const expireItemRuntimeFx = Effect.fn("expireItemRuntimeFx")(function* ({
 		draft = aborted.runtime;
 		events.push(...aborted.events);
 	}
-	if (output !== undefined) {
+	if (outcome !== undefined) {
 		const placed = yield* Effect.gen(function* () {
-			const resolved = yield* outputFx({
+			const resolved = yield* resolveOutcomeTableFx({
+				ownerItemId: item.id,
 				origin,
-				output,
+				outcome,
 			}).pipe(
 				Effect.provideService(RuntimeFx, {
 					read: Effect.succeed(runtime),
 				}),
 			);
-			if (resolved.drop.length === 0)
+			if (resolved.roll.length === 0)
 				return {
 					runtime: draft,
 					events: [] as GameEventSchema.Type[],
 					replacementPlaced: false,
 				};
-			const [placement, withOutput] = yield* applyOutputPlacementFx({
+			const [placement, withOutcome] = yield* applyOutcomeTableFx({
 				overflow: removalMode === "kill-switch" ? "discard" : undefined,
-				origin,
-				output: resolved,
+				outcome: resolved,
 				runtime: draft,
 			});
-			const placementEvents = yield* readOutputPlacementItemEventsFx({
+			const placementEvents = yield* readOutcomePlacementItemEventsFx({
 				originItemId: item.id,
 				placement,
 			});
 			return {
-				runtime: withOutput,
+				runtime: withOutcome,
 				events: [
 					...placementEvents,
 					...(placement.discarded ?? []).map(
@@ -104,7 +104,7 @@ export const expireItemRuntimeFx = Effect.fn("expireItemRuntimeFx")(function* ({
 							ownerItemId: item.id,
 							canonicalItemId: loss.itemId,
 							quantity: loss.quantity,
-							source: "expiry-output",
+							source: "expiry-outcome",
 							reason: loss.reason,
 						}),
 					),

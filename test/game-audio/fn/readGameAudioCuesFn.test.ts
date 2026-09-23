@@ -195,7 +195,7 @@ describe("readGameAudioCuesFn", () => {
 							ownerItemId: "runtime:producer",
 							canonicalItemId: "item:output",
 							quantity: 2,
-							source: "expiry-output",
+							source: "expiry-outcome",
 							reason: "board:full",
 						},
 					],

@@ -1,4 +1,4 @@
-import type { DropRuleSchema } from "~/production-output/schema/DropRuleSchema";
+import type { OutcomeRuleSchema } from "~/outcome/schema/OutcomeRuleSchema";
 import { expect, it } from "vitest";
 
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
@@ -7,6 +7,7 @@ import { createMergeTestConfig } from "~test/item-merge/support/createMergeTestC
 
 it("keeps exact drop positions including repeated identities in output sets", () => {
 	const drop = {
+		type: "item" as const,
 		itemId: "result",
 		placement: "drop" as const,
 		quantity: {
@@ -23,7 +24,7 @@ it("keeps exact drop positions including repeated identities in output sets", ()
 				type: "item",
 				itemId: "target",
 			},
-			output: {
+			outcome: {
 				set: [
 					{
 						weight: 1,
@@ -31,7 +32,7 @@ it("keeps exact drop positions including repeated identities in output sets", ()
 						roll: [
 							{
 								type: "guaranteed",
-								drop: [
+								outcome: [
 									drop,
 									drop,
 								],
@@ -44,7 +45,7 @@ it("keeps exact drop positions including repeated identities in output sets", ()
 						roll: [
 							{
 								type: "guaranteed",
-								drop: [
+								outcome: [
 									drop,
 								],
 							},
@@ -57,7 +58,7 @@ it("keeps exact drop positions including repeated identities in output sets", ()
 							{
 								type: "chance",
 								chance: 0.5,
-								drop: [
+								outcome: [
 									drop,
 								],
 							},
@@ -72,25 +73,25 @@ it("keeps exact drop positions including repeated identities in output sets", ()
 			setIndex: 0,
 			rollIndex: 0,
 			rollType: "guaranteed",
-			dropIndex: 0,
+			outcomeIndex: 0,
 		},
 		{
 			setIndex: 0,
 			rollIndex: 0,
 			rollType: "guaranteed",
-			dropIndex: 1,
+			outcomeIndex: 1,
 		},
 		{
 			setIndex: 1,
 			rollIndex: 0,
 			rollType: "guaranteed",
-			dropIndex: 0,
+			outcomeIndex: 0,
 		},
 		{
 			setIndex: 2,
 			rollIndex: 0,
 			rollType: "chance",
-			dropIndex: 0,
+			outcomeIndex: 0,
 		},
 	].map((roll) => ({
 		source: {
@@ -260,7 +261,7 @@ it("retains input and condition positions without turning absence-only guards in
 });
 
 it("keeps set eligibility separate from individual drop conditions", () => {
-	const rule: DropRuleSchema.Type = {
+	const rule: OutcomeRuleSchema.Type = {
 		type: "enable",
 		when: [
 			{
@@ -283,7 +284,7 @@ it("keeps set eligibility separate from individual drop conditions", () => {
 				type: "item",
 				itemId: "target",
 			},
-			output: {
+			outcome: {
 				set: [
 					{
 						weight: 1,
@@ -293,8 +294,9 @@ it("keeps set eligibility separate from individual drop conditions", () => {
 						roll: [
 							{
 								type: "guaranteed",
-								drop: [
+								outcome: [
 									{
+										type: "item",
 										itemId: "result",
 										quantity: {
 											min: 1,
@@ -342,7 +344,7 @@ it("keeps set eligibility separate from individual drop conditions", () => {
 			roll: {
 				setIndex: 0,
 				rollIndex: 0,
-				dropIndex: 0,
+				outcomeIndex: 0,
 				rollType: "guaranteed",
 			},
 		},

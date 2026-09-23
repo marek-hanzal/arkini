@@ -15,7 +15,7 @@
 		},
 		"units": {
 			"amount": 32,
-			"output": {
+			"outcome": {
 				"set": [
 					{
 						"weight": 1,
@@ -23,8 +23,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "empty-mine",
 										"quantity": {
 											"min": 1,
@@ -83,7 +84,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -91,8 +92,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "copper-ore",
 											"quantity": {
 												"min": 3,
@@ -151,7 +153,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -159,8 +161,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "copper-ore",
 											"quantity": {
 												"min": 3,
@@ -170,6 +173,7 @@
 											"rules": []
 										},
 										{
+											"type": "item",
 											"itemId": "empty-lantern",
 											"quantity": {
 												"min": 1,

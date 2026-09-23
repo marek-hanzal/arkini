@@ -1,6 +1,6 @@
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import type { OutputSchema } from "~/production-output/schema/OutputSchema";
-import type { DropSchema } from "~/production-output/schema/DropSchema";
+import type { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
+import type { OutcomeSchema } from "~/outcome/schema/OutcomeSchema";
 
 export namespace readItemChainsFn {
 	export type Stop = "final" | "retained" | "spent" | "cycle" | "depth" | "missing" | "ongoing";
@@ -53,6 +53,7 @@ export namespace readItemChainsFn {
 	export interface Chain {
 		readonly id: string;
 		readonly kind: "merge" | "clock";
+		readonly space?: number;
 		readonly ownerId: string;
 		readonly targetId?: string;
 		readonly steps: readonly Step[];
@@ -124,18 +125,18 @@ export const readItemChainsFn = (
 		};
 	};
 	const outputFn = (
-		output: OutputSchema.Type | undefined,
+		output: OutcomeTableSchema.Type | undefined,
 		path: string,
 		depth: number,
 		ancestors: readonly string[],
 	): readItemChainsFn.Node[] => {
 		const nodes: readItemChainsFn.Node[] = [];
 		const appendFn = (
-			drop: DropSchema.Type,
+			drop: OutcomeSchema.Type,
 			suffix: string,
 			meta: readItemChainsFn.OutputPath,
 		) => {
-			if (drop.quantity.max === 0) return;
+			if (drop.type !== "item" || drop.quantity.max === 0) return;
 			if (remaining <= 0) {
 				truncated = true;
 				omitted++;
@@ -161,7 +162,7 @@ export const readItemChainsFn = (
 					conditional: set.rules.length > 0,
 					chance: roll.type === "chance" ? roll.chance : undefined,
 				};
-				for (const [dropIndex, drop] of roll.drop.entries())
+				for (const [dropIndex, drop] of roll.outcome.entries())
 					appendFn(drop, `${setIndex}/${rollIndex}/${dropIndex}`, meta);
 			}
 		}
@@ -190,7 +191,7 @@ export const readItemChainsFn = (
 				remaining--;
 				const nextPath = `${path}/pulse/${lineIndex}`;
 				const before = omitted;
-				const branches = outputFn(line.output, nextPath, depth + 1, ancestors);
+				const branches = outputFn(line.outcome, nextPath, depth + 1, ancestors);
 				steps.push({
 					path: nextPath,
 					kind: "pulse",
@@ -288,9 +289,12 @@ export const readItemChainsFn = (
 			break;
 		}
 		remaining--;
-		// Canonical merge admission uses the first exact target rule, never reverse matching.
-		if (seenTargets.has(merge.target.itemId)) continue;
-		seenTargets.add(merge.target.itemId);
+		const targetId = merge.action === "space" ? root.id : merge.target.itemId;
+		// Receiver-owned transport retains an anonymous source; only its concrete target consequences are projected.
+		if (merge.action !== "space") {
+			if (seenTargets.has(targetId)) continue;
+			seenTargets.add(targetId);
+		}
 		const path = `merge/${mergeIndex}`;
 		const before = omitted;
 		const branches: readItemChainsFn.Node[] = [];
@@ -299,7 +303,7 @@ export const readItemChainsFn = (
 		else if (merge.effect === "keep" || merge.effect === "spend")
 			branches.push(
 				nodeFn(
-					merge.target.itemId,
+					targetId,
 					`${path}/target`,
 					1,
 					[],
@@ -308,7 +312,7 @@ export const readItemChainsFn = (
 					merge.effect === "keep" ? "retained" : "spent",
 				),
 			);
-		if (merge.action !== "consume")
+		if (merge.action !== "consume" && merge.action !== "space")
 			branches.push(
 				nodeFn(
 					root.id,
@@ -320,7 +324,7 @@ export const readItemChainsFn = (
 					merge.action === "use" ? "retained" : "spent",
 				),
 			);
-		branches.push(...outputFn(merge.output, `${path}/output`, 1, []));
+		branches.push(...outputFn(merge.outcome, `${path}/output`, 1, []));
 		// Spending may exhaust either participant. These are conditional merge side
 		// effects; existing identities are not restarted with a fresh Clock.
 		for (const [role, participant] of [
@@ -330,12 +334,12 @@ export const readItemChainsFn = (
 			],
 			[
 				"target",
-				merge.effect === "spend" ? items[merge.target.itemId] : undefined,
+				merge.effect === "spend" ? items[targetId] : undefined,
 			],
 		] as const) {
-			if (participant?.units?.output === undefined) continue;
+			if (participant?.units?.outcome === undefined) continue;
 			branches.push(
-				...outputFn(participant.units.output, `${path}/${role}-depletion`, 1, []).map(
+				...outputFn(participant.units.outcome, `${path}/${role}-depletion`, 1, []).map(
 					(node) => ({
 						...node,
 						output:
@@ -354,7 +358,7 @@ export const readItemChainsFn = (
 				path,
 				kind: "merge",
 				ownerId: root.id,
-				targetId: merge.target.itemId,
+				targetId: targetId,
 				mergeIndex,
 				sourceAction: merge.action,
 				targetEffect: merge.effect,
@@ -368,8 +372,13 @@ export const readItemChainsFn = (
 		chains.push({
 			id: path,
 			kind: "merge",
+			...(merge.action === "space"
+				? {
+						space: merge.space,
+					}
+				: {}),
 			ownerId: root.id,
-			targetId: merge.target.itemId,
+			targetId: targetId,
 			steps,
 		});
 	}

@@ -11,8 +11,9 @@ export const createRelationTraversalProject = () => {
 				rules: [],
 				roll: [
 					{
-						drop: [
+						outcome: [
 							{
+								type: "item",
 								itemId,
 								placement: "drop" as const,
 								quantity: {
@@ -65,7 +66,7 @@ export const createRelationTraversalProject = () => {
 					type: "materials" as const,
 				},
 			],
-			output: readOutput(outputItemId),
+			outcome: readOutput(outputItemId),
 			title: `${title} Run`,
 		})),
 	});

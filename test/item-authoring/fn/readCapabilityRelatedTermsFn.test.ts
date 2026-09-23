@@ -3,11 +3,12 @@ import { expect, it } from "vitest";
 import { readCapabilityRelatedTermsFn } from "~/item-authoring/fn/readCapabilityRelatedTermsFn";
 import { createLineFn } from "~/production-authoring/fn/createLineFn";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
-import type { DropSchema } from "~/production-output/schema/DropSchema";
+import type { OutcomeSchema } from "~/outcome/schema/OutcomeSchema";
 import { editorTestConfig } from "~test/project-authoring/support/editorTestPayload";
 
-const dropFn = (itemId: string): DropSchema.Type => ({
+const dropFn = (itemId: string): OutcomeSchema.Type => ({
 	itemId,
+	type: "item" as const,
 	quantity: {
 		min: 1,
 		max: 1,
@@ -16,7 +17,7 @@ const dropFn = (itemId: string): DropSchema.Type => ({
 	rules: [],
 });
 
-it("finds inputs, rule dependencies and every authored output alternative without expanding their capabilities", () => {
+it("finds inputs, rule dependencies and every authored outcome alternative without expanding their capabilities", () => {
 	const line: LineSchema.Type = {
 		...createLineFn([], "Line", "Description"),
 		input: [
@@ -63,7 +64,7 @@ it("finds inputs, rule dependencies and every authored output alternative withou
 				],
 			},
 		],
-		output: {
+		outcome: {
 			set: [
 				{
 					weight: 1,
@@ -71,14 +72,14 @@ it("finds inputs, rule dependencies and every authored output alternative withou
 					roll: [
 						{
 							type: "guaranteed",
-							drop: [
+							outcome: [
 								dropFn("water"),
 							],
 						},
 						{
 							type: "chance",
 							chance: 0.5,
-							drop: [
+							outcome: [
 								dropFn("chance-result"),
 							],
 						},
@@ -106,7 +107,7 @@ it("finds inputs, rule dependencies and every authored output alternative withou
 					roll: [
 						{
 							type: "guaranteed",
-							drop: [
+							outcome: [
 								dropFn("alternative-a"),
 								{
 									...dropFn("alternative-b"),
@@ -120,7 +121,7 @@ it("finds inputs, rule dependencies and every authored output alternative withou
 														distance: "far",
 														selector: {
 															type: "item",
-															itemId: "output-permit",
+															itemId: "outcome-permit",
 														},
 													},
 												},
@@ -152,11 +153,11 @@ it("finds inputs, rule dependencies and every authored output alternative withou
 		"set-permit",
 		"alternative-a",
 		"alternative-b",
-		"output-permit",
+		"outcome-permit",
 	]);
 });
 
-it("finds merge targets, replacement items and extra output by ID and title", () => {
+it("finds merge targets, replacement items and extra outcome by ID and title", () => {
 	expect(
 		readCapabilityRelatedTermsFn(
 			{
@@ -167,7 +168,7 @@ it("finds merge targets, replacement items and extra output by ID and title", ()
 					itemId: "target",
 				},
 				result: "water",
-				output: {
+				outcome: {
 					set: [
 						{
 							weight: 1,
@@ -175,7 +176,7 @@ it("finds merge targets, replacement items and extra output by ID and title", ()
 							roll: [
 								{
 									type: "guaranteed",
-									drop: [
+									outcome: [
 										dropFn("extra"),
 									],
 								},

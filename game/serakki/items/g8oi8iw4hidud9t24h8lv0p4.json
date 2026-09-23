@@ -19,7 +19,7 @@
 					"itemId": "cauldron-with-lye"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -27,8 +27,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "dirty-cutting-board",
 											"quantity": {
 												"min": 1,
@@ -59,8 +60,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "cutting-board-with-spoiled-animal-fat",
 										"quantity": {
 											"min": 1,

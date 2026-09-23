@@ -12,7 +12,7 @@ export const StateItemSchema = z
 	.object({
 		schedule: ScheduleStateSchema.optional(),
 		mergeSequence: NonNegativeIntegerSchema.optional().describe(
-			"Successful source merges on this surviving identity; omitted means zero.",
+			"Successful merges owned by this surviving identity; omitted means zero.",
 		),
 		/**
 		 * Stable identity of this live item.

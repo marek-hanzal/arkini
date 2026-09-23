@@ -144,7 +144,7 @@ it("returns a timed input with its exact identity and elapsed clock intact", () 
 	);
 });
 
-it("rolls back the buffered identities and queue when no output position is available", () => {
+it("rolls back the buffered identities and queue when no outcome position is available", () => {
 	const config = GameConfigSchema.parse({
 		...queuedInputTestConfig,
 		meta: {

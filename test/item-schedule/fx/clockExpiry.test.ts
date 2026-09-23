@@ -3,7 +3,7 @@ import { setSpeedUpGameplayFx } from "~/game-cheat/fx/setSpeedUpGameplayFx";
 import { Effect, Random } from "effect";
 import { describe, expect, it } from "vitest";
 import { expireIdleScheduledItemsFx } from "~/item-schedule/fx/expireIdleScheduledItemsFx";
-import { OutputSchema } from "~/production-output/schema/OutputSchema";
+import { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
 import { useGameFx } from "~test/support/useGameFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import {
@@ -217,16 +217,17 @@ describe("Clock expiry settlement", () => {
 		]);
 	});
 
-	it("keeps blocked expiry atomic and preserves its random output across retries", () => {
-		const output = OutputSchema.parse({
+	it("keeps blocked expiry atomic and preserves its random outcome across retries", () => {
+		const outcome = OutcomeTableSchema.parse({
 			set: [
 				{
 					rules: [],
 					roll: [
 						{
 							type: "guaranteed",
-							drop: [
+							outcome: [
 								{
+									type: "item" as const,
 									itemId: "expired",
 									quantity: {
 										min: 2,
@@ -287,7 +288,7 @@ describe("Clock expiry settlement", () => {
 						clock: {
 							intervalMs: 100,
 							durationMs: 100,
-							onExpire: output,
+							onExpire: outcome,
 						},
 					}),
 				}),

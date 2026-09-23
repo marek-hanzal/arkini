@@ -2,12 +2,9 @@ import { Effect, Option } from "effect";
 
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import { resolveLineInputStoreFn } from "~/production-input/fn/resolveLineInputStoreFn";
 import { isSameGridLocationFn } from "~/item-location/fn/isSameGridLocationFn";
 import { readGridLocationClaimAtFn } from "~/item-location/fn/readGridLocationClaimAtFn";
 import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationClaimsFn";
-import { readBoardLocationsFn } from "~/item-placement/fn/readBoardLocationsFn";
-import { readEmptyLocationsFn } from "~/item-placement/fn/readEmptyLocationsFn";
 import { resolveMergeRuleFx } from "~/item-merge/fx/resolveMergeRuleFx";
 import type { DropItemCommand } from "~/item-interaction/type/DropItemCommand";
 import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
@@ -25,11 +22,6 @@ export namespace readDropItemPreviewFx {
 					| typeof DropItemResultKind.Merge;
 		  }
 		| {
-				readonly kind: typeof DropItemResultKind.StoreInput;
-				readonly lineId: string;
-				readonly inputIndex: number;
-		  }
-		| {
 				readonly kind: typeof DropItemResultKind.Ignored;
 				readonly reason: DropItemIgnoredReason;
 		  }
@@ -42,15 +34,6 @@ export namespace readDropItemPreviewFx {
 const rejectedFn = (reason: DropItemRejectedReason): readDropItemPreviewFx.Result => ({
 	kind: DropItemResultKind.Reject,
 	reason,
-});
-
-const storeInputPreviewFn = ({
-	lineId,
-	inputIndex,
-}: resolveLineInputStoreFn.Result): readDropItemPreviewFx.Result => ({
-	kind: DropItemResultKind.StoreInput,
-	lineId,
-	inputIndex,
 });
 
 /** Reads the current authoritative semantic kind of one prospective item drop without mutating runtime. */
@@ -109,9 +92,6 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 		) {
 			return rejectedFn(DropItemRejectedReason.InvalidTarget);
 		}
-		if (target.inputStore !== undefined) {
-			return rejectedFn(DropItemRejectedReason.Blocked);
-		}
 		return {
 			kind: DropItemResultKind.Move,
 		} satisfies readDropItemPreviewFx.Result;
@@ -152,33 +132,6 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 	) {
 		return rejectedFn(DropItemRejectedReason.InvalidTarget);
 	}
-	if (targetItem.item.action?.type === "space") {
-		const config = yield* GameConfigFx;
-		const destination = readEmptyLocationsFn({
-			locations: readBoardLocationsFn({
-				size: config.meta.board,
-				space: targetItem.item.action.space,
-			}),
-			runtime,
-		})[0];
-		return destination === undefined
-			? rejectedFn(DropItemRejectedReason.Blocked)
-			: ({
-					kind: DropItemResultKind.Move,
-				} satisfies readDropItemPreviewFx.Result);
-	}
-	if (target.inputStore !== undefined) {
-		const inputStore = resolveLineInputStoreFn({
-			lineId: target.inputStore.lineId,
-			inputIndex: target.inputStore.inputIndex,
-			owner: targetItem,
-			runtime,
-			source,
-		});
-		return inputStore === undefined
-			? rejectedFn(DropItemRejectedReason.Blocked)
-			: storeInputPreviewFn(inputStore);
-	}
 	if (targetItem.location.scope === LocationScopeEnumSchema.enum.Board) {
 		const mergeRule = yield* resolveMergeRuleFx({
 			source,
@@ -189,14 +142,6 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 				kind: DropItemResultKind.Merge,
 			} satisfies readDropItemPreviewFx.Result;
 		}
-	}
-	const inputStore = resolveLineInputStoreFn({
-		owner: targetItem,
-		runtime,
-		source,
-	});
-	if (inputStore !== undefined) {
-		return storeInputPreviewFn(inputStore);
 	}
 	return {
 		kind: DropItemResultKind.Swap,

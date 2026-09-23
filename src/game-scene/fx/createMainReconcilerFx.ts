@@ -259,12 +259,6 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 		const inputMotionFeedbackPrefixes = new Set(
 			inputMotionCues.map((cue) => `${cue.sequence}:${cue.eventIndex}:`),
 		);
-		const inputMotionActorIds = new Set(
-			inputMotionCues.flatMap((cue) => [
-				cue.sourceActorId,
-				cue.targetActorId,
-			]),
-		);
 		const belongsToInputMotionFn = (cue: TileActorFeedbackCue) => {
 			for (const prefix of inputMotionFeedbackPrefixes) {
 				if (cue.key.startsWith(prefix)) return true;
@@ -272,14 +266,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 			return false;
 		};
 		const feedbackCues = presentCommittedEffects
-			? [
-					...readTileActorFeedbackCuesFn(transition).filter(
-						(cue) => !belongsToInputMotionFn(cue),
-					),
-					...dropSnapshot.feedback.flatMap(({ cues }) =>
-						cues.filter((cue) => !inputMotionActorIds.has(cue.actorId)),
-					),
-				]
+			? readTileActorFeedbackCuesFn(transition).filter((cue) => !belongsToInputMotionFn(cue))
 			: [];
 		const replacementActorIds = new Set(replacements.map(({ actorId }) => actorId));
 		if (presentCommittedEffects) {
@@ -517,9 +504,6 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 			textures,
 		});
 		yield* runFeedbackCuesFx(feedbackCues);
-		for (const feedback of dropSnapshot.feedback) {
-			yield* dropPresentation.clearFeedbackFx(feedback.generation);
-		}
 		yield* dropPresentation.reconcileActorsFx();
 		yield* motion.startFx;
 		yield* drag.requestRefreshFx;

@@ -73,7 +73,7 @@ describe("merge random stream lifecycle", () => {
 				const output = yield* mergeFx();
 				return {
 					saved,
-					output,
+					outcome: output,
 				};
 			}).pipe(
 				useGameFx({
@@ -97,7 +97,7 @@ describe("merge random stream lifecycle", () => {
 				}),
 			),
 		);
-		expect(restored).toEqual(live.output);
+		expect(restored).toEqual(live.outcome);
 	});
 
 	it("keeps an existing identity's stream when another merge replaces its definition", () => {

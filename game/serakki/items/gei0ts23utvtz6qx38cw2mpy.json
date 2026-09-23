@@ -37,7 +37,7 @@
 					"itemId": "sick-cow"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -45,8 +45,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "dirty-jar",
 											"quantity": {
 												"min": 1,
@@ -70,7 +71,7 @@
 					"itemId": "sick-pig"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -78,8 +79,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "dirty-jar",
 											"quantity": {
 												"min": 1,
@@ -103,7 +105,7 @@
 					"itemId": "sick-sheep"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -111,8 +113,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "dirty-jar",
 											"quantity": {
 												"min": 1,
@@ -136,7 +139,7 @@
 					"itemId": "sick-goose"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -144,8 +147,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "dirty-jar",
 											"quantity": {
 												"min": 1,
@@ -169,7 +173,7 @@
 					"itemId": "sick-chicken"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -177,8 +181,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "dirty-jar",
 											"quantity": {
 												"min": 1,
@@ -202,7 +207,7 @@
 					"itemId": "sick-wolf"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -210,8 +215,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "dirty-jar",
 											"quantity": {
 												"min": 1,
@@ -235,7 +241,7 @@
 					"itemId": "sick-bear"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -243,8 +249,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "dirty-jar",
 											"quantity": {
 												"min": 1,
@@ -268,7 +275,7 @@
 					"itemId": "sick-beagle"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -276,8 +283,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "dirty-jar",
 											"quantity": {
 												"min": 1,
@@ -301,7 +309,7 @@
 					"itemId": "sick-beagle-puppy"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -309,8 +317,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "dirty-jar",
 											"quantity": {
 												"min": 1,
@@ -334,7 +343,7 @@
 					"itemId": "sick-british-shorthair"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -342,8 +351,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "dirty-jar",
 											"quantity": {
 												"min": 1,
@@ -367,7 +377,7 @@
 					"itemId": "sick-british-shorthair-kitten"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -375,8 +385,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "dirty-jar",
 											"quantity": {
 												"min": 1,

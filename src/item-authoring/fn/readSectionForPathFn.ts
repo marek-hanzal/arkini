@@ -3,13 +3,10 @@ import type { SectionId } from "~/item-authoring/type/Section";
 /** Maps one canonical item-schema path to its route-owned form section. */
 export const readSectionForPathFn = (path: ReadonlyArray<PropertyKey>): SectionId => {
 	switch (path[0]) {
-		case "action":
-			return "action";
 		case "music":
 			return "identity";
 		case "artwork":
 			return "artwork";
-			return "identity";
 		case "units":
 			return "units";
 		case "merge":

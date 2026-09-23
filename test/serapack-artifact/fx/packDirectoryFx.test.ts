@@ -170,10 +170,40 @@ describe("packDirectoryFx game-project contract", () => {
 			expect(payload.config.items.water?.artwork.scale).toBe(0.65);
 			expect(payload.config.items.portal?.artwork.scale).toBe(1);
 			expect(payload.config.items.portal).toMatchObject({
-				action: {
-					type: "space" as const,
-					space: 9,
-				},
+				lines: [
+					{
+						id: "travel",
+						title: "Travel",
+						description: "Travel",
+						default: true,
+						runtimeMs: 0,
+						input: [
+							{
+								type: "simple",
+							},
+						],
+						rules: [],
+						outcome: {
+							set: [
+								{
+									rules: [],
+									roll: [
+										{
+											type: "guaranteed",
+											outcome: [
+												{
+													type: "space",
+													space: 9,
+													rules: [],
+												},
+											],
+										},
+									],
+								},
+							],
+						},
+					},
+				],
 			});
 		}).pipe(Effect.provide(NodeServices.layer)),
 	);

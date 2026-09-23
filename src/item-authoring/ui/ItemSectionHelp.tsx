@@ -15,15 +15,6 @@ export const ItemSectionHelp: Record<SectionId, EditorPageHelpContent> = {
 			</>
 		),
 	},
-	action: {
-		title: <Tx label="Action" />,
-		content: (
-			<>
-				<Mx label="Item action help" />
-				<Mx label="Item section copy help" />
-			</>
-		),
-	},
 	production: {
 		title: <Tx label="Production" />,
 		content: (

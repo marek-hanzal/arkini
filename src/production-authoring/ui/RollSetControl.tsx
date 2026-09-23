@@ -1,17 +1,18 @@
+import { LinkButton } from "~/ui/ui/LinkButton";
 import { match } from "ts-pattern";
 
 import { DraftDefaults } from "~/production-authoring/ui/DraftDefaults";
 import { QuantityControl } from "~/production-authoring/ui/QuantityControl";
 import { RulesControl } from "~/production-authoring/ui/RulesControl";
-import type { DropSchema } from "~/production-output/schema/DropSchema";
-import type { RollSchema } from "~/production-output/schema/RollSchema";
-import type { RollSetSchema } from "~/production-output/schema/RollSetSchema";
+import type { OutcomeSchema } from "~/outcome/schema/OutcomeSchema";
+import type { RollSchema } from "~/outcome/schema/RollSchema";
+import type { RollSetSchema } from "~/outcome/schema/RollSetSchema";
 import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
-import { OutputDropOption } from "~/production-authoring/ui/OutputDropOption";
+import { OutcomeOption } from "~/production-authoring/ui/OutcomeOption";
 import {
-	readDraftRollDropsFn,
+	readDraftRollOutcomesFn,
 	type DraftRoll,
-} from "~/production-authoring/fn/readDraftRollDropsFn";
+} from "~/production-authoring/fn/readDraftRollOutcomesFn";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { SectionEnd } from "~/ui/ui/SectionEnd";
 import { EditorChoiceControl, EditorNumberControl } from "~/editor-control/ui/EditorValueControls";
@@ -28,99 +29,161 @@ import { readRequiredEditorCollectionErrorFn } from "~/editor-control/fn/readReq
 import { Mx } from "~/translation/ui/Mx";
 import { useTranslator } from "~/translation/ui/useTranslator";
 
-type DropListValue = DropSchema.Type[];
+type OutcomeListValue = OutcomeSchema.Type[];
 const readChancePercentFn = (chance: number) => Number((chance * 100).toFixed(6));
-const readDropSummaryFn = (drop: DropSchema.Type, textFn: (key: string) => string) => {
-	const { min, max } = drop.quantity;
+const readOutcomeSummaryFn = (outcome: OutcomeSchema.Type, textFn: (key: string) => string) => {
+	const rules = outcome.rules.length;
+	const ruleSummary = rules === 0 ? "" : ` · ${rules} ${textFn(rules === 1 ? "rule" : "rules")}`;
+	if (outcome.type === "space") return `${textFn("Space")} ${outcome.space}${ruleSummary}`;
+	const { min, max } = outcome.quantity;
 	const quantity = min === max ? `×${min}` : `×${min}–${max}`;
-	const placement = textFn(drop.placement === "drop" ? "Local drop" : "Random");
-	const rules = drop.rules.length;
-	return `${quantity} · ${placement}${rules === 0 ? "" : ` · ${rules} ${textFn(rules === 1 ? "rule" : "rules")}`}`;
+	const placement = textFn(outcome.placement === "drop" ? "Local drop" : "Random");
+	return `${quantity} · ${placement}${ruleSummary}`;
 };
 const RollTypeLabelByType = {
 	chance: "Chance",
 	guaranteed: "Guaranteed",
 } as const satisfies Record<RollSchema.Type["type"], string>;
 
-const DropControl = ({
+const OutcomeFields = ({
 	initialRuleIndex,
 	initialWhenIndex,
 	onChangeFn,
 	value,
 }: {
-	readonly onChangeFn: (drop: DropSchema.Type) => void;
+	readonly onChangeFn: (outcome: OutcomeSchema.Type) => void;
 	readonly initialRuleIndex?: number;
 	readonly initialWhenIndex?: number;
-	readonly value: DropSchema.Type;
+	readonly value: OutcomeSchema.Type;
 }) => {
 	const validationIssues = useFormValidationIssues(value);
 	const translator = useTranslator();
 	return (
 		<div className="grid gap-3">
-			<EditorItemReferenceControl
-				error={readEditorFormValidationErrorFn(validationIssues, "itemId")}
-				label={translator.textFn("Dropped item")}
-				value={value.itemId}
-				onChangeFn={(itemId) =>
-					onChangeFn({
-						...value,
-						itemId,
-					})
-				}
+			<EditorChoiceControl
+				label={translator.textFn("Outcome type")}
+				value={value.type}
+				options={[
+					{
+						value: "item",
+						label: translator.textFn("Item"),
+					},
+					{
+						value: "space",
+						label: translator.textFn("Space"),
+					},
+				]}
+				onChangeFn={(type) => {
+					if (type === value.type) return;
+					onChangeFn(
+						type === "item"
+							? {
+									...structuredClone(DraftDefaults.itemOutcome),
+									rules: value.rules,
+								}
+							: {
+									type: "space",
+									space: 0,
+									rules: value.rules,
+								},
+					);
+				}}
 			/>
-			<div className="flex flex-wrap items-end justify-between gap-3">
-				<div className="min-w-0 basis-full sm:basis-1/2">
-					<QuantityControl
-						minimumError={readEditorFormValidationErrorFn(
-							validationIssues,
-							"quantity",
-							"min",
-						)}
-						maximumError={readEditorFormValidationErrorFn(
-							validationIssues,
-							"quantity",
-							"max",
-						)}
-						value={value.quantity}
-						onChangeFn={(quantity) =>
+			{value.type === "item" ? (
+				<>
+					<EditorItemReferenceControl
+						error={readEditorFormValidationErrorFn(validationIssues, "itemId")}
+						label={translator.textFn("Item")}
+						value={value.itemId}
+						onChangeFn={(itemId) =>
 							onChangeFn({
 								...value,
-								quantity,
+								itemId,
 							})
 						}
 					/>
-				</div>
-				<EditorChoiceControl
-					error={readEditorFormValidationErrorFn(validationIssues, "placement")}
-					label={translator.textFn("Board placement")}
-					value={value.placement}
-					options={[
-						{
-							description: <Mx label="Local drop placement help" />,
-							label: translator.textFn("Local drop"),
-							value: "drop",
-						},
-						{
-							description: <Mx label="Random drop placement help" />,
-							label: translator.textFn("Random"),
-							value: "random",
-						},
-					]}
-					onChangeFn={(placement) =>
+					<div className="flex flex-wrap items-end justify-between gap-3">
+						<div className="min-w-0 basis-1/2">
+							<QuantityControl
+								minimumError={readEditorFormValidationErrorFn(
+									validationIssues,
+									"quantity",
+									"min",
+								)}
+								maximumError={readEditorFormValidationErrorFn(
+									validationIssues,
+									"quantity",
+									"max",
+								)}
+								value={value.quantity}
+								onChangeFn={(quantity) =>
+									onChangeFn({
+										...value,
+										quantity,
+									})
+								}
+							/>
+						</div>
+						<EditorChoiceControl
+							error={readEditorFormValidationErrorFn(validationIssues, "placement")}
+							label={translator.textFn("Board placement")}
+							value={value.placement}
+							options={[
+								{
+									description: <Mx label="Local drop placement help" />,
+									label: translator.textFn("Local drop"),
+									value: "drop",
+								},
+								{
+									description: <Mx label="Random drop placement help" />,
+									label: translator.textFn("Random"),
+									value: "random",
+								},
+							]}
+							onChangeFn={(placement) =>
+								onChangeFn({
+									...value,
+									placement,
+								})
+							}
+						/>
+					</div>
+				</>
+			) : (
+				<EditorNumberControl
+					error={readEditorFormValidationErrorFn(validationIssues, "space")}
+					description={<Mx label="Target space help" />}
+					label={translator.textFn("Target space")}
+					min={0}
+					value={value.space}
+					onChangeFn={(space) =>
 						onChangeFn({
 							...value,
-							placement,
+							space,
 						})
 					}
+					trailing={
+						<LinkButton
+							className="whitespace-nowrap"
+							onClick={() =>
+								onChangeFn({
+									...value,
+									space: Math.floor(Math.random() * 897) + 128,
+								})
+							}
+						>
+							{translator.textFn("Pick random space")}
+						</LinkButton>
+					}
 				/>
-			</div>
+			)}
 			<SectionEnd />
 			<RulesControl
 				initialRuleIndex={initialRuleIndex}
 				initialWhenIndex={initialWhenIndex}
 				rules={value.rules}
-				target="drop"
-				description={<Mx label="Drop rules help" />}
+				target="outcome"
+				description={<Mx label="Outcome rules help" />}
 				allowedTypes={[
 					"enable",
 					"disable",
@@ -128,7 +191,7 @@ const DropControl = ({
 				onChangeFn={(rules) =>
 					onChangeFn({
 						...value,
-						rules: rules as DropSchema.Type["rules"],
+						rules: rules as OutcomeSchema.Type["rules"],
 					})
 				}
 			/>
@@ -136,73 +199,83 @@ const DropControl = ({
 	);
 };
 
-const DropList = ({
+const OutcomeList = ({
 	initialRuleIndex,
 	initialWhenIndex,
-	initialDropIndex,
+	initialOutcomeIndex,
 	onChangeFn,
 	value,
 }: {
-	readonly initialDropIndex?: number;
-	readonly onChangeFn: (drops: DropListValue) => void;
+	readonly initialOutcomeIndex?: number;
+	readonly onChangeFn: (outcomes: OutcomeListValue) => void;
 	readonly initialRuleIndex?: number;
 	readonly initialWhenIndex?: number;
-	readonly value: DropListValue;
+	readonly value: OutcomeListValue;
 }) => {
 	const readItemLabelFn = useEditorItemOptionLabel();
 	const project = useEditorProject();
 	const items = project.config?.items ?? {};
 	const translator = useTranslator();
 	const validationIssues = useFormValidationIssues(value);
-	const invalidDropIndex = useFormValidationFocusIndex(value as object);
+	const invalidOutcomeIndex = useFormValidationFocusIndex(value as object);
 	return (
 		<section className="grid gap-3">
 			<EditorFormSectionDivider
-				description={<Mx label="Drops help" />}
-				title={translator.textFn("Drops")}
+				description={<Mx label="Outcomes help" />}
+				title={translator.textFn("Outcomes")}
 				variant="secondary"
 			/>
 			<EditorCollectionSelector
-				dataUi="EditorDropsCollection"
+				dataUi="EditorOutcomesCollection"
 				count={value.length}
 				error={readRequiredEditorCollectionErrorFn(
 					validationIssues,
 					value.length,
 					1,
-					translator.textFn("Add at least one drop."),
+					translator.textFn("Add at least one outcome."),
 				)}
-				initialSelectedIndex={initialDropIndex}
-				key={initialDropIndex}
-				itemLabelFn={(index) =>
-					`${translator.textFn("Drop")} ${index + 1} — ${readItemLabelFn(
-						value[index].itemId,
-						translator.textFn("No item selected"),
-					)}`
-				}
+				initialSelectedIndex={initialOutcomeIndex}
+				key={initialOutcomeIndex}
+				itemLabelFn={(index) => {
+					const outcome = value[index];
+					const label =
+						outcome.type === "item"
+							? readItemLabelFn(outcome.itemId, translator.textFn("No item selected"))
+							: `${translator.textFn("Space")} ${outcome.space}`;
+					return `${translator.textFn("Outcome")} ${index + 1} — ${label}`;
+				}}
 				itemSearchTermsFn={(index) => [
-					value[index].itemId,
+					value[index].type === "item"
+						? value[index].itemId
+						: `${translator.textFn("Space")} ${value[index].space}`,
 				]}
-				label={translator.textFn("Drops")}
-				itemMetaFn={(index) => readDropSummaryFn(value[index], translator.textFn)}
+				label={translator.textFn("Outcomes")}
+				itemMetaFn={(index) => readOutcomeSummaryFn(value[index], translator.textFn)}
 				renderItemContentFn={(index, label) => (
-					<OutputDropOption
+					<OutcomeOption
 						label={label}
-						drops={[
+						outcomes={[
 							value[index],
 						]}
-						summary={readDropSummaryFn(value[index], translator.textFn)}
+						summary={readOutcomeSummaryFn(value[index], translator.textFn)}
 					/>
 				)}
 				renderSelectedItemPreviewFn={(index) => (
 					<EditorItemSearchThumbnail
-						item={index === undefined ? undefined : items[value[index].itemId]}
+						item={
+							index === undefined
+								? undefined
+								: value[index].type === "item"
+									? items[value[index].itemId]
+									: undefined
+						}
 						selected
 					/>
 				)}
 				onAddFn={() =>
 					onChangeFn([
 						...value,
-						structuredClone(DraftDefaults.drop),
+						structuredClone(DraftDefaults.itemOutcome),
 					])
 				}
 				onDuplicateFn={(index) =>
@@ -215,18 +288,22 @@ const DropList = ({
 				onRemoveFn={(index) =>
 					onChangeFn(value.filter((_current, currentIndex) => currentIndex !== index))
 				}
-				selectedIndex={invalidDropIndex}
+				selectedIndex={invalidOutcomeIndex}
 			>
 				{(index) => (
-					<DropControl
-						initialRuleIndex={index === initialDropIndex ? initialRuleIndex : undefined}
-						initialWhenIndex={index === initialDropIndex ? initialWhenIndex : undefined}
+					<OutcomeFields
+						initialRuleIndex={
+							index === initialOutcomeIndex ? initialRuleIndex : undefined
+						}
+						initialWhenIndex={
+							index === initialOutcomeIndex ? initialWhenIndex : undefined
+						}
 						value={value[index]}
 						onChangeFn={(next) =>
 							onChangeFn(
 								value.map((current, currentIndex) =>
 									currentIndex === index ? next : current,
-								) as DropListValue,
+								) as OutcomeListValue,
 							)
 						}
 					/>
@@ -239,11 +316,11 @@ const DropList = ({
 const RollControl = ({
 	initialRuleIndex,
 	initialWhenIndex,
-	initialDropIndex,
+	initialOutcomeIndex,
 	onChangeFn,
 	value,
 }: {
-	readonly initialDropIndex?: number;
+	readonly initialOutcomeIndex?: number;
 	readonly onChangeFn: (roll: RollSchema.Type) => void;
 	readonly initialRuleIndex?: number;
 	readonly initialWhenIndex?: number;
@@ -281,15 +358,15 @@ const RollControl = ({
 								type: "guaranteed",
 							},
 							(roll) => (
-								<DropList
+								<OutcomeList
 									initialRuleIndex={initialRuleIndex}
 									initialWhenIndex={initialWhenIndex}
-									value={roll.drop}
-									initialDropIndex={initialDropIndex}
-									onChangeFn={(drop) =>
+									value={roll.outcome}
+									initialOutcomeIndex={initialOutcomeIndex}
+									onChangeFn={(outcome) =>
 										onChangeFn({
 											...roll,
-											drop: drop as typeof roll.drop,
+											outcome: outcome as typeof roll.outcome,
 										})
 									}
 								/>
@@ -319,15 +396,15 @@ const RollControl = ({
 											})
 										}
 									/>
-									<DropList
+									<OutcomeList
 										initialRuleIndex={initialRuleIndex}
 										initialWhenIndex={initialWhenIndex}
-										value={roll.drop}
-										initialDropIndex={initialDropIndex}
-										onChangeFn={(drop) =>
+										value={roll.outcome}
+										initialOutcomeIndex={initialOutcomeIndex}
+										onChangeFn={(outcome) =>
 											onChangeFn({
 												...roll,
-												drop: drop as typeof roll.drop,
+												outcome: outcome as typeof roll.outcome,
 											})
 										}
 									/>
@@ -345,14 +422,14 @@ export const RollSetControl = ({
 	index,
 	showWeight,
 	initialRollIndex,
-	initialDropIndex,
+	initialOutcomeIndex,
 	onChangeFn,
 	value,
 }: {
 	readonly index: number;
 	readonly showWeight: boolean;
 	readonly initialRollIndex?: number;
-	readonly initialDropIndex?: number;
+	readonly initialOutcomeIndex?: number;
 	readonly onChangeFn: (set: RollSetSchema.Type) => void;
 	readonly initialRuleIndex?: number;
 	readonly initialWhenIndex?: number;
@@ -366,7 +443,7 @@ export const RollSetControl = ({
 		<section className="grid gap-3">
 			{showWeight ? (
 				<EditorNumberControl
-					description={<Mx label="Output set weight help" />}
+					description={<Mx label="Outcome set weight help" />}
 					error={readEditorFormValidationErrorFn(validationIssues, "weight")}
 					label={translator.textFn("Relative set weight")}
 					value={value.weight}
@@ -385,7 +462,7 @@ export const RollSetControl = ({
 				rules={value.rules}
 				target="set"
 				label={translator.textFn("Set rules")}
-				description={<Mx label="Output set rules help" />}
+				description={<Mx label="Outcome set rules help" />}
 				allowedTypes={[
 					"enable",
 					"disable",
@@ -418,24 +495,37 @@ export const RollSetControl = ({
 				key={initialRollIndex}
 				itemLabelFn={(rollIndex) => {
 					const roll = value.roll[rollIndex];
-					return `${translator.textFn(roll.type === undefined ? "Roll" : RollTypeLabelByType[roll.type])} ${rollIndex + 1} — ${readItemLabelFn(
-						readDraftRollDropsFn(roll)[0]?.itemId ?? "",
-						translator.textFn("No item selected"),
-					)}`;
+					const label = readDraftRollOutcomesFn(roll)
+						.map((outcome) =>
+							outcome.type === "item"
+								? readItemLabelFn(
+										outcome.itemId,
+										translator.textFn("No item selected"),
+									)
+								: `${translator.textFn("Space")} ${outcome.space}`,
+						)
+						.join(", ");
+					return `${translator.textFn(roll.type === undefined ? "Roll" : RollTypeLabelByType[roll.type])} ${rollIndex + 1} — ${label || translator.textFn("No outcome configured.")}`;
 				}}
 				itemSearchTermsFn={(rollIndex) =>
-					readDraftRollDropsFn(value.roll[rollIndex]).flatMap((drop) => [
-						drop.itemId,
-						readItemLabelFn(drop.itemId, ""),
+					readDraftRollOutcomesFn(value.roll[rollIndex]).flatMap((outcome) => [
+						...(outcome.type === "item"
+							? [
+									outcome.itemId,
+									readItemLabelFn(outcome.itemId, ""),
+								]
+							: [
+									`Space ${outcome.space}`,
+								]),
 					])
 				}
 				renderItemContentFn={(rollIndex, label) => (
-					<OutputDropOption
+					<OutcomeOption
 						label={label}
-						drops={readDraftRollDropsFn(value.roll[rollIndex])}
+						outcomes={readDraftRollOutcomesFn(value.roll[rollIndex])}
 					/>
 				)}
-				label={`${translator.textFn("Output set")} ${index + 1} ${translator.textFn("rolls")}`}
+				label={`${translator.textFn("Outcome set")} ${index + 1} ${translator.textFn("rolls")}`}
 				onAddFn={() =>
 					onChangeFn({
 						...value,
@@ -474,8 +564,8 @@ export const RollSetControl = ({
 							rollIndex === initialRollIndex ? initialWhenIndex : undefined
 						}
 						value={value.roll[rollIndex]}
-						initialDropIndex={
-							rollIndex === initialRollIndex ? initialDropIndex : undefined
+						initialOutcomeIndex={
+							rollIndex === initialRollIndex ? initialOutcomeIndex : undefined
 						}
 						onChangeFn={(next) =>
 							onChangeFn({

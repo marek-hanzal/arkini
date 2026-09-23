@@ -129,7 +129,7 @@ it("does not age a Clock created by a job completion until the next simulation b
 					id: "a",
 					default: true,
 					clock: true,
-					output: createOutput([
+					outcome: createOutput([
 						{
 							itemId: "clock",
 						},

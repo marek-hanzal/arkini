@@ -9,7 +9,7 @@ import {
 	mergeFn,
 	outputFn,
 } from "./readItemChainsFn.test/fixtures";
-import { OutputSchema } from "~/production-output/schema/OutputSchema";
+import { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
 describe("chain termination and authored output boundaries", () => {
 	it("distinguishes a truncated Clock from a final item", () => {
 		const items = catalogFn(
@@ -72,7 +72,7 @@ describe("chain termination and authored output boundaries", () => {
 	});
 
 	it("preserves roll/set grouping and conditional sets and excludes impossible chance rolls", () => {
-		const output = OutputSchema.parse({
+		const output = OutcomeTableSchema.parse({
 			set: [
 				{
 					weight: 2,
@@ -81,7 +81,7 @@ describe("chain termination and authored output boundaries", () => {
 						{
 							type: "chance",
 							chance: 0,
-							drop: outputFn("never").set[0].roll[0].drop,
+							outcome: outputFn("never").set[0].roll[0].outcome,
 						},
 						...outputFn("a", "b").set[0].roll,
 					],
@@ -194,7 +194,7 @@ describe("chain termination and authored output boundaries", () => {
 						},
 						action: "use",
 						effect: "keep",
-						output: outputFn("drop"),
+						outcome: outputFn("drop"),
 					},
 					mergeFn("target", "shadowed"),
 				],

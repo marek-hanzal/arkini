@@ -184,8 +184,8 @@ const readItemDeleteImpactTextFx = Effect.fn("readItemDeleteImpactTextFx")(funct
 	}
 	lines.push(
 		"Force cleanup:",
-		`- Unit outputs removed from: ${formatListFn(impact.removedUnitOutputOwnerIds)}`,
-		`- Expiry outputs removed from: ${formatListFn(impact.removedExpiryOutputOwnerIds)}`,
+		`- Unit outcomes removed from: ${formatListFn(impact.removedUnitOutcomeOwnerIds)}`,
+		`- Expiry outcomes removed from: ${formatListFn(impact.removedExpiryOutcomeOwnerIds)}`,
 		`- Lines removed: ${formatListFn(impact.removedLines.map(({ ownerItemId, lineId }) => `${ownerItemId}/${lineId}`))}`,
 		`- Merge rules removed: ${formatListFn(impact.removedMergeRules.map(({ ownerItemId, ruleNumber }) => `${ownerItemId}#${ruleNumber}`))}`,
 		`- Start entries removed: board ${impact.removedStartEntries.board}`,

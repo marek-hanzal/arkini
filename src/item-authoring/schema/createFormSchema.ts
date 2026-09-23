@@ -19,13 +19,6 @@ const readInputCollectionsFn = (item: ItemSchema.Type): ReadonlyArray<InputColle
 					index,
 				],
 			});
-	if (item.action !== undefined)
-		collections.push({
-			input: item.action.input,
-			path: [
-				"action",
-			],
-		});
 	return collections;
 };
 
@@ -54,7 +47,8 @@ export const createFormSchema = (project: Pick<Project, "config">, itemUid: stri
 					],
 				});
 			if (merge.effect !== "spend") continue;
-			const selectedItem = project.config.items[merge.target.itemId];
+			const selectedItem =
+				merge.action === "space" ? item : project.config.items[merge.target.itemId];
 			const target = selectedItem?.uid === item.uid ? item : selectedItem;
 			if (target === undefined || target.units !== undefined) continue;
 			context.addIssue({

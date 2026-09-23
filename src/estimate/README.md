@@ -44,6 +44,7 @@ Item Chain is a separate authored consequence projection in [`readItemChainsFn`]
 
 ## Estimate semantics
 
+- Receiver-owned Space interactions retain their concrete replacement and outcome references in Connections and Item Chain. Acquisition routes and Estimate exclude these interactions because the anonymous transported source has no exact authored acquisition requirement; this exclusion is not a runtime impossibility.
 - Estimate is optimistic static authored-dependency analysis using bounded output distributions and expected first-hitting time.
 - Indivisible deterministic batches round up; stochastic outputs retain authored probability.
 - Route selection is deterministic and quantity-aware. Stable route identity breaks equal-cost ties.

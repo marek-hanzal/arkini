@@ -89,7 +89,7 @@ describe("job completion transition", () => {
 		expect(result.restored).toEqual(result.immediate);
 	});
 
-	it("reports exact spawned output identities from the committed completion", () => {
+	it("reports exact spawned outcome identities from the committed completion", () => {
 		const config = createRandomCompletionConfig();
 		const result = Effect.runSync(
 			Effect.gen(function* () {
@@ -128,7 +128,7 @@ describe("job completion transition", () => {
 		}
 	});
 
-	it("rejects an absent stale job before producing output", () => {
+	it("rejects an absent stale job before producing outcome", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const prepared = yield* prepareRandomCompletionRuntimeFx();

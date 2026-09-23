@@ -3,7 +3,7 @@ import { Clock } from "lucide-react";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { DetailFact, DetailFacts } from "~/item-authoring/ui/DetailDefinition";
-import { OutputDetail } from "~/item-authoring/ui/OutputDetail";
+import { OutcomeDetail } from "~/item-authoring/ui/OutcomeDetail";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { DisabledCapabilityDetail } from "~/item-authoring/ui/DisabledCapabilityDetail";
 import { useTranslator } from "~/translation/ui/useTranslator";
@@ -88,12 +88,12 @@ export const ClockDetail = ({
 				<RulesDetail rules={clock.rules} />
 			</EditorRootCard>
 			{clock.durationMs === undefined ? null : (
-				<EditorRootCard dataUi="EditorClockExpiryOutputCard">
-					<OutputDetail
-						emptyLabel={translator.textFn("No expiry output configured.")}
-						output={clock.onExpire}
-						description={<Mx label="Authored Clock expiry output summary help" />}
-						title={translator.textFn("Expiry output")}
+				<EditorRootCard dataUi="EditorClockExpiryOutcomeCard">
+					<OutcomeDetail
+						emptyLabel={translator.textFn("No expiry outcome configured.")}
+						outcome={clock.onExpire}
+						description={<Mx label="Authored Clock expiry outcome summary help" />}
+						title={translator.textFn("Expiry outcome")}
 					/>
 				</EditorRootCard>
 			)}

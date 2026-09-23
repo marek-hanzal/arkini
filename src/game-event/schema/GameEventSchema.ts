@@ -112,8 +112,8 @@ const itemDiscardedEventSchema = z
 			"consumed-input",
 			"reservation",
 			"buffer",
-			"expiry-output",
-			"depletion-output",
+			"expiry-outcome",
+			"depletion-outcome",
 		]),
 		reason: z.enum([
 			"job-aborted",
@@ -156,19 +156,6 @@ const itemSpawnedEventSchema = z
 		itemId: IdSchema,
 		canonicalItemId: IdSchema,
 		originItemId: IdSchema,
-		location: BoardLocationSchema,
-	})
-	.strict();
-
-const itemPortalTransferredEventSchema = z
-	.object({
-		type: GameEventEnumSchema.extract([
-			"ItemPortalTransferred",
-		]),
-		itemId: IdSchema,
-		canonicalItemId: IdSchema,
-		portalItemId: IdSchema,
-		previousLocation: BoardLocationSchema,
 		location: BoardLocationSchema,
 	})
 	.strict();
@@ -299,7 +286,6 @@ export const GameEventSchema = z.discriminatedUnion("type", [
 	itemSpawnedEventSchema,
 	itemPlacedEventSchema,
 	itemSwappedEventSchema,
-	itemPortalTransferredEventSchema,
 	itemConsumedEventSchema,
 	itemInputStoredEventSchema,
 	itemUnitSpentEventSchema,

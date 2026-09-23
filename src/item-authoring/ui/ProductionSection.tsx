@@ -66,8 +66,6 @@ const ProductionFields = withFieldGroupFn({
 							const lines = linesField.state.value ?? [];
 							const addLineFn = () => {
 								const currentLines = form.state.values.lines ?? [];
-								if (currentLines.length === 0)
-									form.setFieldValue("action", undefined);
 								const line = createLineFn(currentLines, "", "");
 								form.setFieldValue("lines", [
 									...currentLines,

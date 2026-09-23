@@ -24,8 +24,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "hungry-beagle",
 										"quantity": {
 											"min": 1,
@@ -35,6 +36,7 @@
 										"rules": []
 									},
 									{
+										"type": "item",
 										"itemId": "sword",
 										"quantity": {
 											"min": 1,
@@ -44,6 +46,7 @@
 										"rules": []
 									},
 									{
+										"type": "item",
 										"itemId": "shield",
 										"quantity": {
 											"min": 1,
@@ -53,6 +56,7 @@
 										"rules": []
 									},
 									{
+										"type": "item",
 										"itemId": "steel-armor",
 										"quantity": {
 											"min": 1,

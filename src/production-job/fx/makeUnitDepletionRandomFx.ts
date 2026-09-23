@@ -20,7 +20,7 @@ export const makeUnitDepletionRandomFx = Effect.fn("makeUnitDepletionRandomFx")(
 	job: JobSchema.Type;
 	program: Effect.Effect<Result, Error, Requirements>;
 }) {
-	// The seed namespace is stable gameplay identity; terminology changes must not reroll output.
+	// The seed namespace is stable gameplay identity; terminology changes must not reroll outcome.
 	return yield* program.pipe(
 		Random.withSeed(
 			`serakki:charge-depletion:v${UnitDepletionRandomVersion}:${job.id}:${itemId}`,

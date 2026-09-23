@@ -28,7 +28,7 @@
 					"itemId": "bucket-with-water"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -36,8 +36,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "scrubbing-brush",
 											"quantity": {
 												"min": 1,

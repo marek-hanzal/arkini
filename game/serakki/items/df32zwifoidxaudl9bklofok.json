@@ -71,7 +71,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -79,8 +79,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "goose",
 											"quantity": {
 												"min": 1,
@@ -90,6 +91,7 @@
 											"rules": []
 										},
 										{
+											"type": "item",
 											"itemId": "empty-bucket",
 											"quantity": {
 												"min": 1,
@@ -133,7 +135,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -141,8 +143,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "empty-goose-pen",
 											"quantity": {
 												"min": 1,
@@ -186,7 +189,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -194,8 +197,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "goose-farm-blueprint",
 											"quantity": {
 												"min": 1,

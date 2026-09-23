@@ -35,8 +35,9 @@ const guaranteedOutput = ({
 			roll: [
 				{
 					type: "guaranteed" as const,
-					drop: [
+					outcome: [
 						{
+							type: "item" as const,
 							itemId,
 							quantity,
 							placement,
@@ -57,8 +58,9 @@ const emptyChanceOutput = (itemId: string) => ({
 				{
 					type: "chance" as const,
 					chance: 0,
-					drop: [
+					outcome: [
 						{
+							type: "item" as const,
 							itemId,
 							quantity: {
 								min: 1,
@@ -222,7 +224,7 @@ export const createTemporaryLifetimeTestConfig = () =>
 								type: "simple",
 							},
 						],
-						output: guaranteedOutput({
+						outcome: guaranteedOutput({
 							itemId: "temporaryPlain",
 						}),
 						rules: [],

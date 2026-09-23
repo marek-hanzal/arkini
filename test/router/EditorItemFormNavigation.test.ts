@@ -22,12 +22,12 @@ describe("item form deep-link admission", () => {
 		expect(
 			validateSearch({
 				merge: 2,
-				outputSet: -1,
-				outputRoll: Number.NaN,
+				outcomeSet: -1,
+				outcomeRoll: Number.NaN,
 				input: 1.5,
 				rule: "1",
 				when: -1,
-				outputDrop: -1,
+				outcomeIndex: -1,
 			}),
 		).toEqual({
 			merge: 2,
@@ -38,18 +38,18 @@ describe("item form deep-link admission", () => {
 				rule: 1,
 				when: 3,
 				lineId: "line-two",
-				outputSet: 1,
-				outputRoll: 2,
-				outputDrop: 1,
+				outcomeSet: 1,
+				outcomeRoll: 2,
+				outcomeIndex: 1,
 			}),
 		).toEqual({
 			input: 2,
 			rule: 1,
 			when: 3,
 			lineId: "line-two",
-			outputSet: 1,
-			outputRoll: 2,
-			outputDrop: 1,
+			outcomeSet: 1,
+			outcomeRoll: 2,
+			outcomeIndex: 1,
 		});
 	});
 });

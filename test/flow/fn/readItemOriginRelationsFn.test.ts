@@ -89,7 +89,7 @@ describe("item origin relations", () => {
 			},
 			{
 				fromItemId: "forge",
-				outputIndex: 0,
+				outcomeIndex: 0,
 				role: "output",
 				toItemId: "ingot",
 			},

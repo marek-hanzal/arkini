@@ -10,7 +10,7 @@ import {
 	startLineFx,
 } from "./itemUnits.test/fixture";
 
-it("rolls back the whole start when depletion output cannot be placed", () => {
+it("rolls back the whole start when depletion outcome cannot be placed", () => {
 	const result = run(
 		Effect.gen(function* () {
 			const owner = yield* spawnItemFx({

@@ -19,7 +19,7 @@
 					"itemId": "bobik"
 				},
 				"action": "use",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -27,8 +27,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "toy-sheep",
 											"quantity": {
 												"min": 1,

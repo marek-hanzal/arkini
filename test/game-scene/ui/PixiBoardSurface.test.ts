@@ -23,7 +23,6 @@ const boardState = vi.hoisted(() => ({
 	navigate: vi.fn(() => Promise.resolve()),
 	openItemDetail: vi.fn(),
 	runDrop: vi.fn(),
-	runSpaceActivation: vi.fn(() => Promise.resolve(true)),
 	registerInteraction: vi.fn(),
 	enqueueLine: vi.fn(),
 	enqueueLineState: {
@@ -60,7 +59,6 @@ vi.mock("@effect/atom-react", () => ({
 vi.mock("~/tile-interaction/ui/useTileCommands", () => ({
 	useTileCommands: () => ({
 		runDropFn: boardState.runDrop,
-		runItemActionFn: boardState.runSpaceActivation,
 	}),
 }));
 
@@ -147,7 +145,6 @@ afterEach(async () => {
 	boardState.navigate.mockClear();
 	boardState.openItemDetail.mockClear();
 	boardState.runDrop.mockClear();
-	boardState.runSpaceActivation.mockClear();
 	boardState.registerInteraction.mockClear();
 	boardState.enqueueLine.mockClear();
 	boardState.enqueueLineState = {

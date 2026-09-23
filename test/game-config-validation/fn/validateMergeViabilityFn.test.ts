@@ -62,6 +62,38 @@ const mergeDiagnostics = async (items: Record<string, unknown>) =>
 	);
 
 describe("validateMergeViabilityFn", () => {
+	it("checks receiver Units for a Space interaction target Spend", async () => {
+		const portal = {
+			...createSimpleItem("portal"),
+			merge: [
+				{
+					action: "space",
+					space: 1,
+					effect: "spend",
+				},
+			],
+		};
+		expect(
+			await mergeDiagnostics({
+				portal,
+			}),
+		).toMatchObject([
+			{
+				reason: InvalidMergeReasonEnumSchema.enum.TargetUnitsDisabled,
+			},
+		]);
+		expect(
+			await mergeDiagnostics({
+				portal: {
+					...portal,
+					units: {
+						amount: 2,
+					},
+				},
+			}),
+		).toEqual([]);
+	});
+
 	it("requires Units on a source that uses the Spend action", async () => {
 		const source = mergeSource({
 			action: "spend",

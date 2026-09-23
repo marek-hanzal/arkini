@@ -12,13 +12,13 @@ import type { InputSchema } from "~/production-action/schema/InputSchema";
 import { TypeSchema as InputTypeSchema } from "~/production-input/schema/TypeSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
-import type { DropSchema } from "~/production-output/schema/DropSchema";
-import type { OutputSchema } from "~/production-output/schema/OutputSchema";
+import type { OutcomeSchema } from "~/outcome/schema/OutcomeSchema";
+import type { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
 import type { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 
 import { readItemLineEntriesFn } from "./readItemLineEntriesFn";
-import { readItemOutputEntriesFn } from "./readItemOutputEntriesFn";
+import { readItemOutcomeEntriesFn } from "./readItemOutcomeEntriesFn";
 
 const validateSelectorReferenceFn = ({
 	config,
@@ -182,19 +182,19 @@ const validateLineReferencesFn = ({
 	];
 };
 
-const validateDropFn = ({
+const validateOutcomeFn = ({
 	config,
 	drop,
 	path,
 	source,
 }: {
 	config: GameConfigSchema.Type;
-	drop: DropSchema.Type;
+	drop: OutcomeSchema.Type;
 	path: DiagnosticPathSchema.Type;
 	source?: string;
 }) => {
 	const diagnostics: GameDiagnosticsSchema.Type = [];
-	if (config.items[drop.itemId] === undefined) {
+	if (drop.type === "item" && config.items[drop.itemId] === undefined) {
 		diagnostics.push({
 			code: DiagnosticCodeEnumSchema.enum.ConfigMissingReference,
 			severity: DiagnosticSeverityEnumSchema.enum.Error,
@@ -203,7 +203,7 @@ const validateDropFn = ({
 				"itemId",
 			],
 			source,
-			message: `Drop references missing item ${drop.itemId}.`,
+			message: `Item outcome references missing item ${drop.itemId}.`,
 			reference: DiagnosticRecordEntityEnumSchema.enum.Item,
 			referenceId: drop.itemId,
 		});
@@ -232,20 +232,20 @@ const validateDropFn = ({
 	];
 };
 
-const validateOutputReferencesFn = ({
+const validateOutcomeReferencesFn = ({
 	config,
-	output,
+	outcome,
 	path,
 	source,
 }: {
 	config: GameConfigSchema.Type;
-	output: OutputSchema.Type;
+	outcome: OutcomeTableSchema.Type;
 	path: DiagnosticPathSchema.Type;
 	source?: string;
 }) => {
 	const diagnostics: GameDiagnosticsSchema.Type = [];
 
-	for (const [setIndex, set] of output.set.entries()) {
+	for (const [setIndex, set] of outcome.set.entries()) {
 		for (const [ruleIndex, rule] of set.rules.entries()) {
 			for (const [whenIndex, when] of rule.when.entries()) {
 				diagnostics.push(
@@ -267,9 +267,9 @@ const validateOutputReferencesFn = ({
 			}
 		}
 		for (const [rollIndex, roll] of set.roll.entries()) {
-			for (const [dropIndex, drop] of roll.drop.entries()) {
+			for (const [dropIndex, drop] of roll.outcome.entries()) {
 				diagnostics.push(
-					...validateDropFn({
+					...validateOutcomeFn({
 						config,
 						drop,
 						source,
@@ -279,7 +279,7 @@ const validateOutputReferencesFn = ({
 							setIndex,
 							"roll",
 							rollIndex,
-							"drop",
+							"outcome",
 							dropIndex,
 						],
 					}),
@@ -327,30 +327,18 @@ export const validateConfigReferencesFn = ({
 
 	for (const [itemId, item] of Object.entries(config.items)) {
 		const source = provenance.items[itemId];
-		const action = item.action;
 		const clock = item.clock;
-		if (action !== undefined || clock !== undefined) {
-			const rules = action?.rules ?? clock?.rules ?? [];
+		if (clock !== undefined) {
 			diagnostics.push(
 				...validateActionReferencesFn({
 					config,
-					inputs: (action?.input ?? []).map((input, index) => ({
-						input,
-						index,
-					})),
-					path:
-						action === undefined
-							? [
-									"items",
-									itemId,
-									"clock",
-								]
-							: [
-									"items",
-									itemId,
-									"action",
-								],
-					rules: rules.map((rule, index) => ({
+					inputs: [],
+					path: [
+						"items",
+						itemId,
+						"clock",
+					],
+					rules: clock.rules.map((rule, index) => ({
 						rule,
 						index,
 					})),
@@ -359,20 +347,21 @@ export const validateConfigReferencesFn = ({
 			);
 		}
 		for (const [mergeIndex, merge] of (item.merge ?? []).entries()) {
-			diagnostics.push(
-				...validateSelectorReferenceFn({
-					config,
-					selector: merge.target,
-					path: [
-						"items",
-						itemId,
-						"merge",
-						mergeIndex,
-						"target",
-					],
-					source,
-				}),
-			);
+			if (merge.action !== "space")
+				diagnostics.push(
+					...validateSelectorReferenceFn({
+						config,
+						selector: merge.target,
+						path: [
+							"items",
+							itemId,
+							"merge",
+							mergeIndex,
+							"target",
+						],
+						source,
+					}),
+				);
 
 			match(merge)
 				.with(
@@ -436,16 +425,16 @@ export const validateConfigReferencesFn = ({
 			);
 		}
 
-		const outputs = readItemOutputEntriesFn({
+		const outputs = readItemOutcomeEntriesFn({
 			itemId,
 			item,
 		});
-		for (const output of outputs) {
+		for (const outcome of outputs) {
 			diagnostics.push(
-				...validateOutputReferencesFn({
+				...validateOutcomeReferencesFn({
 					config,
-					output: output.output,
-					path: output.path,
+					outcome: outcome.outcome,
+					path: outcome.path,
 					source,
 				}),
 			);

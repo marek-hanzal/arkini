@@ -19,7 +19,7 @@
 					"itemId": "corn-field"
 				},
 				"action": "use",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -27,8 +27,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "corn",
 											"quantity": {
 												"min": 2,
@@ -52,7 +53,7 @@
 					"itemId": "flax-field"
 				},
 				"action": "use",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -60,8 +61,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "flax",
 											"quantity": {
 												"min": 2,
@@ -85,7 +87,7 @@
 					"itemId": "cow"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -93,8 +95,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "animal-bones---tier-1",
 											"quantity": {
 												"min": 2,
@@ -104,6 +107,7 @@
 											"rules": []
 										},
 										{
+											"type": "item",
 											"itemId": "spoiled-raw-game-meat",
 											"quantity": {
 												"min": 2,

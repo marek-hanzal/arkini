@@ -21,8 +21,9 @@ const guaranteedOutput = (itemId: string) => ({
 			roll: [
 				{
 					type: "guaranteed" as const,
-					drop: [
+					outcome: [
 						{
+							type: "item" as const,
 							itemId,
 							quantity: {
 								min: 1,
@@ -82,7 +83,7 @@ export const createTemporaryMaterialLifecycleTestConfig = (runtimeMs = 1_000) =>
 								mode: "consume",
 							},
 						],
-						output: guaranteedOutput("product"),
+						outcome: guaranteedOutput("product"),
 						rules: [],
 					},
 				],

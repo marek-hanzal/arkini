@@ -54,8 +54,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "spoiled-corn-kernels",
 										"quantity": {
 											"min": 1,

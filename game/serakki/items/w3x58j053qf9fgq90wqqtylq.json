@@ -19,7 +19,7 @@
 					"itemId": "honeycomb"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -27,8 +27,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "honey",
 											"quantity": {
 												"min": 1,
@@ -52,7 +53,7 @@
 					"itemId": "cauldron-with-jam"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -60,8 +61,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "jam",
 											"quantity": {
 												"min": 1,

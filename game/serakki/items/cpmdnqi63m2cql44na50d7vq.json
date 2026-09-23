@@ -28,7 +28,7 @@
 					"itemId": "sheep"
 				},
 				"action": "use",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -36,8 +36,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "wool",
 											"quantity": {
 												"min": 1,
@@ -61,7 +62,7 @@
 					"itemId": "pillow-with-coins"
 				},
 				"action": "use",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -69,8 +70,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "clutter",
 											"quantity": {
 												"min": 1,
@@ -94,7 +96,7 @@
 					"itemId": "british-shorthair"
 				},
 				"action": "use",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -102,8 +104,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "bio-waste",
 											"quantity": {
 												"min": 1,
@@ -136,7 +139,7 @@
 					"itemId": "beagle"
 				},
 				"action": "use",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -144,8 +147,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "bio-waste",
 											"quantity": {
 												"min": 1,
@@ -169,7 +173,7 @@
 					"itemId": "wild-boar"
 				},
 				"action": "use",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -177,8 +181,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "boar-bristles",
 											"quantity": {
 												"min": 2,
@@ -220,7 +225,7 @@
 					"itemId": "bio-waste"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -228,8 +233,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "dirty-scissors",
 											"quantity": {
 												"min": 1,
@@ -261,7 +267,7 @@
 					"itemId": "dirty-scrubbing-brush"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -269,8 +275,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "dirty-scissors",
 											"quantity": {
 												"min": 1,
@@ -294,7 +301,7 @@
 					"itemId": "flower-field"
 				},
 				"action": "use",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -302,8 +309,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "flowers",
 											"quantity": {
 												"min": 1,
@@ -326,7 +334,7 @@
 					"itemId": "goose"
 				},
 				"action": "use",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -334,8 +342,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "feather",
 											"quantity": {
 												"min": 1,
@@ -358,7 +367,7 @@
 					"itemId": "chicken"
 				},
 				"action": "use",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -366,8 +375,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "feather",
 											"quantity": {
 												"min": 1,
@@ -390,7 +400,7 @@
 					"itemId": "tree"
 				},
 				"action": "use",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -398,8 +408,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "leafs",
 											"quantity": {
 												"min": 2,

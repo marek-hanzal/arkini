@@ -94,7 +94,7 @@ describe("mergeItemsFx atomicity", () => {
 				},
 				action: "consume",
 				effect: "keep",
-				output: guaranteedMergeOutput({
+				outcome: guaranteedMergeOutput({
 					quantity: 2,
 				}),
 			},
@@ -132,7 +132,7 @@ describe("mergeItemsFx atomicity", () => {
 				},
 				action: "consume",
 				effect: "keep",
-				output: weightedMergeOutput(),
+				outcome: weightedMergeOutput(),
 			},
 		});
 		const afterRetry = Effect.runSync(

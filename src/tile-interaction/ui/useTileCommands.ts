@@ -1,14 +1,9 @@
-import { Effect } from "effect";
 import { useMemo } from "react";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { PlayableGame } from "~/playable-game/type/PlayableGame";
 import type { DropItemCommand } from "~/item-interaction/type/DropItemCommand";
 import { dropItemFx } from "~/item-interaction/fx/dropItemFx";
-import {
-	activateItemActionWithTransitionFx,
-	type activateItemActionFx,
-} from "~/item-action/fx/activateItemActionFx";
 
 /**
  * Binds gestures to one exact Game with an independent Promise for every submission.
@@ -20,15 +15,6 @@ export const useTileCommands = (game: PlayableGame) =>
 		() => ({
 			runDropFn: (command: DropItemCommand) =>
 				RendererRuntime.runPromise(game.runFx(dropItemFx(command))),
-			runItemActionFn: (command: activateItemActionFx.Props) =>
-				RendererRuntime.runPromise(
-					game.runFx(activateItemActionWithTransitionFx(command)).pipe(
-						Effect.map(({ transition }) => ({
-							transition,
-						})),
-						Effect.catch(() => Effect.succeed(null)),
-					),
-				),
 		}),
 		[
 			game,

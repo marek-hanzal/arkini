@@ -37,6 +37,44 @@ const readFormValues = (item: ItemSchema.Type): FormValues => ({
 });
 
 describe("createFormSchema", () => {
+	it("rejects ambiguous receiver transport definitions at the second action", () => {
+		const source = createSimpleItem("portal");
+		const project = {
+			config: {
+				items: {
+					[source.id]: source,
+				},
+			} as GameConfigSchema.Type,
+		};
+		const form = readFormValues(source);
+		const result = createFormSchema(project, source.uid).safeParse({
+			...form,
+			merge: [
+				{
+					action: "space",
+					space: 1,
+					effect: "keep",
+				},
+				{
+					action: "space",
+					space: 2,
+					effect: "keep",
+				},
+			],
+		});
+		expect(result.success).toBe(false);
+		if (!result.success)
+			expect(result.error.issues).toContainEqual(
+				expect.objectContaining({
+					path: [
+						"merge",
+						1,
+						"action",
+					],
+				}),
+			);
+	});
+
 	it("rejects a Spend merge action after Units are disabled on its source", () => {
 		const target = createSimpleItem("target");
 		const source = {
@@ -368,66 +406,6 @@ describe("createFormSchema", () => {
 						itemId: "final-owner",
 					}),
 				}),
-			}),
-		);
-	});
-	it("binds nested action Self inputs to the renamed owner and reports disabled Units at the action field", () => {
-		const owner = {
-			...createSimpleItem("draft-owner"),
-			units: {
-				amount: 2,
-			},
-			action: {
-				type: "space" as const,
-				space: 3,
-				input: [
-					{
-						...createTargetPaidInput(""),
-						units: {
-							cost: 1,
-							from: "self" as const,
-						},
-					},
-				],
-				rules: [],
-			},
-		};
-		const project = {
-			config: {
-				items: {},
-			} as GameConfigSchema.Type,
-		};
-		const schema = createFormSchema(project, owner.uid);
-		const form = {
-			...readFormValues(owner),
-			id: "final-owner",
-		};
-		const accepted = schema.safeParse(form);
-		expect(accepted.success).toBe(true);
-		if (!accepted.success) throw new Error("Expected Common action.");
-		expect(accepted.data.action?.input[0]).toMatchObject({
-			query: {
-				distance: "self",
-				selector: {
-					itemId: "final-owner",
-				},
-			},
-		});
-		const rejected = schema.safeParse({
-			...form,
-			units: undefined,
-		});
-		expect(rejected.success).toBe(false);
-		if (rejected.success) throw new Error("Expected invalid owner Units.");
-		expect(rejected.error.issues).toContainEqual(
-			expect.objectContaining({
-				path: [
-					"action",
-					"input",
-					0,
-					"units",
-					"from",
-				],
 			}),
 		);
 	});

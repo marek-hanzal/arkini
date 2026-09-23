@@ -9,7 +9,7 @@ import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { ButtonLink } from "~/ui/ui/Button";
 import { DetailFact, DetailFacts } from "~/item-authoring/ui/DetailDefinition";
-import { OutputDetail } from "~/item-authoring/ui/OutputDetail";
+import { OutcomeDetail } from "~/item-authoring/ui/OutcomeDetail";
 import { SelectorDetail } from "~/item-authoring/ui/SelectorDetail";
 import { DetailReference } from "~/item-authoring/ui/DetailReference";
 import { Mx } from "~/translation/ui/Mx";
@@ -52,12 +52,12 @@ export const UnitsDetail = ({
 					value={item.units.amount}
 				/>
 			</EditorRootCard>
-			<EditorRootCard dataUi="EditorItemDepletionOutputCard">
-				<OutputDetail
-					emptyLabel={translator.textFn("No depletion output configured.")}
-					output={item.units.output}
-					description={<Mx label="Authored Units depletion output summary help" />}
-					title={translator.textFn("Depletion output")}
+			<EditorRootCard dataUi="EditorItemDepletionOutcomeCard">
+				<OutcomeDetail
+					emptyLabel={translator.textFn("No depletion outcome configured.")}
+					outcome={item.units.outcome}
+					description={<Mx label="Authored Units depletion outcome summary help" />}
+					title={translator.textFn("Depletion outcome")}
 				/>
 			</EditorRootCard>
 		</div>
@@ -99,17 +99,25 @@ export const MergeDetail = ({
 				<DetailFact
 					label={translator.textFn("Target")}
 					description={<Mx label="Authored merge target summary help" />}
-					value={<SelectorDetail selector={merge.target} />}
+					value={
+						merge.action === "space" ? (
+							`${translator.textFn("Space")} ${merge.space}`
+						) : (
+							<SelectorDetail selector={merge.target} />
+						)
+					}
 				/>
 				<DetailFact
 					label={translator.textFn("Source action")}
 					description={<Mx label="Authored merge source action summary help" />}
 					value={translator.textFn(
-						merge.action === "spend"
-							? "Spend"
-							: merge.action === "use"
-								? "Use"
-								: "Consume",
+						merge.action === "space"
+							? "Space"
+							: merge.action === "spend"
+								? "Spend"
+								: merge.action === "use"
+									? "Use"
+									: "Consume",
 					)}
 				/>
 				{"result" in merge ? (
@@ -132,11 +140,11 @@ export const MergeDetail = ({
 					)}
 				/>
 			</DetailFacts>
-			<OutputDetail
-				emptyLabel={translator.textFn("No extra output configured.")}
-				output={merge.output}
-				title={translator.textFn("Extra output")}
-				description={<Mx label="Authored merge output summary help" />}
+			<OutcomeDetail
+				emptyLabel={translator.textFn("No extra outcome configured.")}
+				outcome={merge.outcome}
+				title={translator.textFn("Extra outcome")}
+				description={<Mx label="Authored merge outcome summary help" />}
 			/>
 		</EditorRootCard>
 	);

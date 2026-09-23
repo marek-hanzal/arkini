@@ -47,13 +47,13 @@ it("counts only each line's pending requests and keeps the active state ahead of
 			active: [
 				{
 					...queue.active[0]!,
-					status: "awaiting-output",
+					status: "awaiting-outcome",
 				},
 			],
 		})[0],
 	).toEqual({
 		lineId: "a",
-		state: "awaiting-output",
+		state: "awaiting-outcome",
 		jobId: "job",
 		queued: 2,
 		requestId: "request:0",

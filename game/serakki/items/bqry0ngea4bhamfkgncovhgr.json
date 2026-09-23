@@ -19,7 +19,7 @@
 					"itemId": "beer-barrel"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -27,8 +27,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "clay-bowl-with-beer",
 											"quantity": {
 												"min": 1,
@@ -51,7 +52,7 @@
 					"itemId": "cow"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -59,8 +60,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "clay-bowl-with-milk",
 											"quantity": {
 												"min": 1,

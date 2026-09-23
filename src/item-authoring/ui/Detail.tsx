@@ -26,7 +26,6 @@ const showSectionHeadingFn = (sectionId: SectionId) => {
 		case "merges":
 		case "units":
 		case "clock":
-		case "action":
 		case "chain":
 		case "connections":
 		case "notes":

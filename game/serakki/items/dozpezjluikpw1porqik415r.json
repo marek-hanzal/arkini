@@ -12,13 +12,52 @@
 				"forest-portal"
 			]
 		},
-		"action": {
-			"input": [],
-			"rules": [],
-			"type": "space",
-			"space": 833
-		},
+		"merge": [
+			{
+				"action": "space",
+				"space": 2,
+				"effect": "keep"
+			}
+		],
 		"maxQueueSize": 1,
-		"lines": []
+		"lines": [
+			{
+				"id": "travel",
+				"title": "Travel",
+				"description": "Travel to the destination space.",
+				"clock": false,
+				"clockWeight": 1,
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"outcome": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"outcome": [
+										{
+											"type": "space",
+											"space": 2,
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
 	}
 }

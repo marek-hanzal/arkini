@@ -25,8 +25,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "empty-pumpkin-field",
 										"quantity": {
 											"min": 1,

@@ -28,7 +28,7 @@
 					"itemId": "beehive"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -36,8 +36,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "bear-chased-by-bees",
 											"quantity": {
 												"min": 1,
@@ -77,8 +78,9 @@
 							{
 								"type": "chance",
 								"chance": 0.75,
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "bio-waste",
 										"quantity": {
 											"min": 2,

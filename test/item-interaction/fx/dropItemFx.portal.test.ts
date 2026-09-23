@@ -1,13 +1,10 @@
-import { RuntimeStoreFx } from "~/game-runtime/context/RuntimeStoreFx";
-import { readGameAudioCuesFn } from "~/game-audio/fn/readGameAudioCuesFn";
-import { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { Effect } from "effect";
-import { describe, expect, it } from "vitest";
+import { expect, it } from "vitest";
 
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { dropItemFx } from "~/item-interaction/fx/dropItemFx";
-import { DropItemRejectedReason, DropItemResultKind } from "~/item-interaction/type/DropItemResult";
+import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { configInput, run } from "../support/dropItemFixture";
 
@@ -48,10 +45,41 @@ const portalConfig = GameConfigSchema.parse({
 			id: "portal",
 			title: "Portal",
 			description: "Portal",
-			action: {
-				type: "space",
-				space: 7,
-			},
+			lines: [
+				{
+					id: "travel",
+					title: "Travel",
+					description: "Travel",
+					default: true,
+					runtimeMs: 0,
+					input: [
+						{
+							type: "simple",
+						},
+					],
+					rules: [],
+					outcome: {
+						set: [
+							{
+								weight: 1,
+								rules: [],
+								roll: [
+									{
+										type: "guaranteed",
+										outcome: [
+											{
+												type: "space",
+												space: 7,
+												rules: [],
+											},
+										],
+									},
+								],
+							},
+						],
+					},
+				},
+			],
 			merge: [
 				{
 					target: {
@@ -99,164 +127,48 @@ const dropOntoFx = Effect.fn("dropOntoFx")(function* ({
 	});
 });
 
-describe("dropItemFx / portal direction", () => {
-	it("moves the source identity to the first free cell on the portal Board before merge", () => {
-		const result = run(
+// A destination outcome must not hijack the occupied target's ordinary drop semantics.
+it.each([
+	{
+		itemId: "water",
+		kind: DropItemResultKind.Merge,
+	},
+	{
+		itemId: "stone",
+		kind: DropItemResultKind.Swap,
+	},
+])(
+	"uses ordinary $kind when dropping $itemId onto a Space-producing owner",
+	async ({ itemId, kind }) => {
+		const result = await run(
 			Effect.gen(function* () {
 				const source = yield* spawnItemFx({
-					id: "runtime:water",
-					itemId: "water",
-					location: board(0, 0, 0),
-				});
-				const portal = yield* spawnItemFx({
-					id: "runtime:portal",
-					itemId: "portal",
-					location: board(1, 0, 0),
-				});
-				const outcome = yield* dropOntoFx({
-					sourceId: source.id,
-					targetId: portal.id,
-				});
-				const store = yield* RuntimeStoreFx;
-				return {
-					transition: yield* store.read,
-					outcome,
-					runtime: yield* readRuntimeFx(),
-					portal,
-					source,
-				};
-			}),
-			portalConfig,
-		);
-
-		expect(result.outcome).toMatchObject({
-			kind: DropItemResultKind.Move,
-			itemId: result.source.id,
-			previousLocation: board(0, 0, 0),
-			location: board(0, 0, 7),
-		});
-		expect(result.transition.events).toEqual([
-			{
-				type: "item:portal-transferred",
-				itemId: result.source.id,
-				canonicalItemId: "water",
-				portalItemId: result.portal.id,
-				previousLocation: board(0, 0, 0),
-				location: board(0, 0, 7),
-			},
-		]);
-		expect(GameEventSchema.safeParse(result.transition.events[0]).success).toBe(true);
-		expect(
-			readGameAudioCuesFn(
-				{
-					events: result.transition.events,
-				},
-				{},
-			),
-		).toEqual([
-			{
-				event: "item:portal-transferred",
-				strength: 1,
-			},
-		]);
-
-		expect(result.runtime.currentSpace).toBe(0);
-		expect(result.runtime.items).toHaveLength(2);
-		expect(result.runtime.items.find((item) => item.id === result.source.id)).toMatchObject({
-			id: result.source.id,
-			item: {
-				id: "water",
-			},
-			location: board(0, 0, 7),
-		});
-		expect(result.runtime.items.find((item) => item.id === result.portal.id)).toEqual(
-			result.portal,
-		);
-	});
-
-	it("keeps portal-as-source drops directional and resolves the portal merge", () => {
-		const result = run(
-			Effect.gen(function* () {
-				const portal = yield* spawnItemFx({
-					id: "runtime:portal",
-					itemId: "portal",
+					id: "source",
+					itemId,
 					location: board(0, 0, 0),
 				});
 				const target = yield* spawnItemFx({
-					id: "runtime:stone",
-					itemId: "stone",
-					location: board(1, 0, 0),
-				});
-				return yield* dropOntoFx({
-					sourceId: portal.id,
-					targetId: target.id,
-				});
-			}),
-			portalConfig,
-		);
-
-		expect(result).toMatchObject({
-			kind: DropItemResultKind.Merge,
-			source: {
-				itemId: "runtime:portal",
-				current: null,
-			},
-			target: {
-				itemId: "runtime:stone",
-				current: {
-					itemId: "runtime:stone",
-				},
-			},
-		});
-	});
-
-	it("rejects atomically when the destination Board has no free cell", () => {
-		const result = run(
-			Effect.gen(function* () {
-				const source = yield* spawnItemFx({
-					id: "runtime:water",
-					itemId: "water",
-					location: board(0, 0, 0),
-				});
-				const portal = yield* spawnItemFx({
-					id: "runtime:portal",
+					id: "destination",
 					itemId: "portal",
 					location: board(1, 0, 0),
 				});
-				for (let y = 0; y < 2; y += 1) {
-					for (let x = 0; x < 3; x += 1) {
-						yield* spawnItemFx({
-							id: `runtime:blocker:${x}:${y}`,
-							itemId: "stone",
-							location: board(x, y, 7),
-						});
-					}
-				}
-				const before = yield* readRuntimeFx();
-				const store = yield* RuntimeStoreFx;
-				const beforeTransition = yield* store.read;
 				const outcome = yield* dropOntoFx({
 					sourceId: source.id,
-					targetId: portal.id,
+					targetId: target.id,
 				});
 				return {
-					before,
-					beforeTransition,
-					afterTransition: yield* store.read,
 					outcome,
 					runtime: yield* readRuntimeFx(),
 				};
 			}),
 			portalConfig,
 		);
-
-		expect(result.outcome).toEqual({
-			kind: DropItemResultKind.Reject,
-			reason: DropItemRejectedReason.Blocked,
-			itemId: "runtime:water",
-			targetItemId: "runtime:portal",
-		});
-		expect(result.runtime).toEqual(result.before);
-		expect(result.afterTransition).toBe(result.beforeTransition);
-	});
-});
+		expect(result.outcome.kind).toBe(kind);
+		expect(result.runtime.currentSpace).toBe(0);
+		expect(
+			result.runtime.items.every(
+				(item) => item.location.scope !== "board" || item.location.space === 0,
+			),
+		).toBe(true);
+	},
+);

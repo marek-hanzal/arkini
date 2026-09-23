@@ -9,7 +9,7 @@ import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { advanceRuntimeStepFx } from "~/game-tick/fx/advanceRuntimeStepFx";
 import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
 
-it("preserves the full lifetime of temporary depletion output created by queue dispatch", () => {
+it("preserves the full lifetime of temporary depletion outcome created by queue dispatch", () => {
 	const base = createTemporaryLifetimeTestConfig();
 	const producer = base.items.producer;
 	const config = GameConfigSchema.parse({
@@ -20,7 +20,7 @@ it("preserves the full lifetime of temporary depletion output created by queue d
 				...base.items.blocker,
 				units: {
 					amount: 1,
-					output: producer.lines[0].output,
+					outcome: producer.lines[0].outcome,
 				},
 			},
 			producer: {
@@ -28,7 +28,7 @@ it("preserves the full lifetime of temporary depletion output created by queue d
 				lines: [
 					{
 						...producer.lines[0],
-						output: undefined,
+						outcome: undefined,
 						input: [
 							{
 								type: "units",

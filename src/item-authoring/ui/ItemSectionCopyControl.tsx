@@ -90,9 +90,6 @@ export const ItemSectionCopyControl = ({ sectionId }: { readonly sectionId: Sect
 								{sectionId === "clock" && source.clock !== undefined ? (
 									<Mx label="Copy Clock section help" />
 								) : null}
-								{sectionId === "action" && source.action !== undefined ? (
-									<Mx label="Copy action section help" />
-								) : null}
 								<div className="flex items-center justify-between gap-4">
 									<LinkButton
 										className="inline-flex items-center gap-2 whitespace-nowrap"

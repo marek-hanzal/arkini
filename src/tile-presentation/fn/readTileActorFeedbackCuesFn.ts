@@ -118,6 +118,7 @@ export const readTileActorFeedbackCuesFn = (
 						.with(
 							{
 								action: P.union(
+									SourceActionSchema.enum.Space,
 									SourceActionSchema.enum.Use,
 									SourceActionSchema.enum.Spend,
 								),

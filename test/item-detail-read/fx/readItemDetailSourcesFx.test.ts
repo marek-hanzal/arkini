@@ -15,7 +15,7 @@ const target = {
 } as const;
 
 describe("readItemDetailSourcesFx", () => {
-	it("returns exact owned Sources in deterministic Board order with output facts", () => {
+	it("returns exact owned Sources in deterministic Board order with outcome facts", () => {
 		const result = available(readSources(target));
 
 		expect(result.source.map(({ ownerItemId }) => ownerItemId)).toEqual([
@@ -28,7 +28,7 @@ describe("readItemDetailSourcesFx", () => {
 			"line:alpha:first",
 			"line:alpha:second",
 		]);
-		expect(result.source[1]?.line[0]?.output).toEqual([
+		expect(result.source[1]?.line[0]?.outcome).toEqual([
 			{
 				kind: "guaranteed",
 				quantity: {

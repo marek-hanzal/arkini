@@ -106,7 +106,7 @@ describe("GameLoopLayerFx", () => {
 		),
 	);
 
-	it.effect("commits one producer output on the exact fixed-step completion boundary", () =>
+	it.effect("commits one producer outcome on the exact fixed-step completion boundary", () =>
 		Effect.gen(function* () {
 			const owner = yield* spawnItemFx({
 				id: "runtime:loop-forge",

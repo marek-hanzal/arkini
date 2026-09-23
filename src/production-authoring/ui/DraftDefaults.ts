@@ -1,12 +1,13 @@
 import type { QuerySchema } from "~/item-query/schema/QuerySchema";
 import type { InputSchema as LineInputSchema } from "~/production-input/schema/InputSchema";
-import type { DropSchema } from "~/production-output/schema/DropSchema";
-import type { OutputSchema } from "~/production-output/schema/OutputSchema";
-import type { RollSchema } from "~/production-output/schema/RollSchema";
-import type { RollSetSchema } from "~/production-output/schema/RollSetSchema";
+import type { OutcomeSchema } from "~/outcome/schema/OutcomeSchema";
+import type { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
+import type { RollSchema } from "~/outcome/schema/RollSchema";
+import type { RollSetSchema } from "~/outcome/schema/RollSetSchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 
-const drop = {
+const itemOutcome = {
+	type: "item",
 	itemId: "",
 	quantity: {
 		min: 1,
@@ -14,22 +15,22 @@ const drop = {
 	},
 	placement: "drop",
 	rules: [],
-} satisfies DropSchema.Type;
+} satisfies OutcomeSchema.Type;
 
 const drops = [] as unknown as [
-	DropSchema.Type,
-	...DropSchema.Type[],
+	OutcomeSchema.Type,
+	...OutcomeSchema.Type[],
 ];
 
 const rolls = {
 	guaranteed: {
 		type: "guaranteed",
-		drop: drops,
+		outcome: drops,
 	},
 	chance: {
 		type: "chance",
 		chance: 0.5,
-		drop: drops,
+		outcome: drops,
 	},
 } satisfies Record<RollSchema.Type["type"], RollSchema.Type>;
 
@@ -75,10 +76,10 @@ export const DraftDefaults = {
 			},
 		},
 	} satisfies Record<LineInputSchema.Type["type"], LineInputSchema.Type>,
-	drop,
+	itemOutcome,
 	roll,
 	rolls,
-	output: {
+	outcome: {
 		set: [
 			{
 				weight: 1,
@@ -88,7 +89,7 @@ export const DraftDefaults = {
 		] as [
 			RollSetSchema.Type,
 		],
-	} satisfies OutputSchema.Type,
+	} satisfies OutcomeTableSchema.Type,
 	// Condition type is a deliberate authoring choice. Keeping the query in the
 	// incomplete draft lets type changes preserve the shared selector and scope.
 	when: {

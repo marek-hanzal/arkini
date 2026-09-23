@@ -104,7 +104,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -112,8 +112,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "townhall-t1",
 											"quantity": {
 												"min": 1,
@@ -123,6 +124,7 @@
 											"rules": []
 										},
 										{
+											"type": "item",
 											"itemId": "townhall-t1-supply-chest",
 											"quantity": {
 												"min": 1,

@@ -24,8 +24,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "corrupted-beagle-puppy",
 										"quantity": {
 											"min": 1,
@@ -35,6 +36,7 @@
 										"rules": []
 									},
 									{
+										"type": "item",
 										"itemId": "spoiled-raw-game-meat",
 										"quantity": {
 											"min": 1,

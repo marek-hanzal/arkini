@@ -27,6 +27,7 @@ export const spawnCheatItemFx = Effect.fn("spawnCheatItemFx")(function* ({
 		itemId,
 	});
 	const drop = {
+		type: "item" as const,
 		itemId,
 		placement: PlacementSchema.enum.Drop,
 		quantity: 1 as const,

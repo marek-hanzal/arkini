@@ -44,7 +44,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -52,8 +52,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "construction-set-t1",
 											"quantity": {
 												"min": 1,
@@ -63,6 +64,7 @@
 											"rules": []
 										},
 										{
+											"type": "item",
 											"itemId": "grain",
 											"quantity": {
 												"min": 1,
@@ -72,6 +74,7 @@
 											"rules": []
 										},
 										{
+											"type": "item",
 											"itemId": "book-t1",
 											"quantity": {
 												"min": 1,
@@ -81,6 +84,7 @@
 											"rules": []
 										},
 										{
+											"type": "item",
 											"itemId": "knowledge-t1",
 											"quantity": {
 												"min": 1,
@@ -90,6 +94,7 @@
 											"rules": []
 										},
 										{
+											"type": "item",
 											"itemId": "labor-t1",
 											"quantity": {
 												"min": 1,
@@ -99,6 +104,7 @@
 											"rules": []
 										},
 										{
+											"type": "item",
 											"itemId": "empty-cauldron",
 											"quantity": {
 												"min": 1,

@@ -1,15 +1,15 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
-import { outputFx } from "~/production-output/fx/outputFx";
-import type { OutputSchema } from "~/production-output/schema/OutputSchema";
-import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
+import { resolveOutcomeTableFx } from "~/outcome/fx/resolveOutcomeTableFx";
+import type { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
+import { applyOutcomeTableFx } from "~/outcome/fx/applyOutcomeTableFx";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import { readBoardRuntimeItemByIdFx } from "~/game-runtime/fx/readBoardRuntimeItemByIdFx";
 
 interface PlaceOutputForTestProps {
 	readonly originItemId: IdSchema.Type;
-	readonly output: OutputSchema.Type;
+	readonly output: OutcomeTableSchema.Type;
 }
 
 /**
@@ -25,14 +25,14 @@ export const placeOutputForTestFx = Effect.fn("placeOutputForTestFx")(function* 
 				itemId: originItemId,
 				runtime,
 			});
-			const resolved = yield* outputFx({
+			const resolved = yield* resolveOutcomeTableFx({
+				ownerItemId: originItemId,
 				origin: origin.location,
-				output,
+				outcome: output,
 			});
 
-			return yield* applyOutputPlacementFx({
-				origin: origin.location,
-				output: resolved,
+			return yield* applyOutcomeTableFx({
+				outcome: resolved,
 				runtime,
 			});
 		});

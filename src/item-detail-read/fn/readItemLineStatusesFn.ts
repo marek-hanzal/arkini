@@ -10,7 +10,7 @@ export namespace readItemLineStatusesFn {
 			| "waiting-start"
 			| "running"
 			| "paused"
-			| "awaiting-output"
+			| "awaiting-outcome"
 			| "queued";
 		readonly queued: number;
 		readonly jobId?: IdSchema.Type;

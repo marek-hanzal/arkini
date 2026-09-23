@@ -63,7 +63,7 @@
 					"itemId": "empty-cotton-field"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -71,8 +71,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "cotton",
 											"quantity": {
 												"min": 1,

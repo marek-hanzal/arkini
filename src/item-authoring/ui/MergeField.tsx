@@ -4,15 +4,15 @@ import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { SectionEnd } from "~/ui/ui/SectionEnd";
 import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
-import { EditorChoiceControl } from "~/editor-control/ui/EditorValueControls";
-import { OutputControl } from "~/production-authoring/ui/OutputControl";
+import { EditorNumberControl, EditorChoiceControl } from "~/editor-control/ui/EditorValueControls";
+import { OutcomeControl } from "~/production-authoring/ui/OutcomeControl";
 import { SelectorControl } from "~/production-authoring/ui/SelectorControl";
 import { EditorItemReferenceControl } from "~/authoring-form/ui/EditorItemAutocompleteField";
 import { useFormValidationIssues } from "~/item-authoring/ui/useFormValidationIssues";
 import { readEditorFormValidationErrorFn } from "~/editor-control/fn/readEditorFormValidationErrorFn";
 import { Mx } from "~/translation/ui/Mx";
 
-/** Edits the target, effects, replacement, and optional output of one merge definition. */
+/** Edits the target, effects, replacement, and optional outcome of one merge definition. */
 export const MergeField = ({
 	merge,
 	onChangeFn,
@@ -61,26 +61,73 @@ export const MergeField = ({
 								label: translator.textFn("Spend"),
 								value: "spend",
 							},
+							{
+								description: <Mx label="Merge source space help" />,
+								label: translator.textFn("Space"),
+								value: "space",
+							},
 						]}
-						onChangeFn={(action) =>
-							onChangeFn({
-								...merge,
-								action,
-							})
-						}
+						onChangeFn={(action) => {
+							if (action === merge.action) return;
+							const effect =
+								merge.effect === "replace"
+									? {
+											effect: merge.effect,
+											result: merge.result,
+										}
+									: {
+											effect: merge.effect,
+										};
+							onChangeFn(
+								action === "space"
+									? {
+											...effect,
+											action,
+											space: 0,
+											outcome: merge.outcome,
+										}
+									: {
+											...effect,
+											action,
+											target:
+												merge.action === "space"
+													? {
+															type: "item",
+															itemId: "",
+														}
+													: merge.target,
+											outcome: merge.outcome,
+										},
+							);
+						}}
 					/>
-					<SelectorControl
-						description={<Mx label="Merge with help" />}
-						error={readEditorFormValidationErrorFn(validationIssues, "target")}
-						label={translator.textFn("Merge with")}
-						value={merge.target}
-						onChangeFn={(target) =>
-							onChangeFn({
-								...merge,
-								target,
-							})
-						}
-					/>
+					{merge.action === "space" ? (
+						<EditorNumberControl
+							error={readEditorFormValidationErrorFn(validationIssues, "space")}
+							label={translator.textFn("Target space")}
+							min={0}
+							value={merge.space}
+							onChangeFn={(space) =>
+								onChangeFn({
+									...merge,
+									space,
+								})
+							}
+						/>
+					) : (
+						<SelectorControl
+							description={<Mx label="Merge with help" />}
+							error={readEditorFormValidationErrorFn(validationIssues, "target")}
+							label={translator.textFn("Merge with")}
+							value={merge.target}
+							onChangeFn={(target) =>
+								onChangeFn({
+									...merge,
+									target,
+								})
+							}
+						/>
+					)}
 					<EditorChoiceControl
 						error={
 							targetError !== undefined &&
@@ -125,10 +172,17 @@ export const MergeField = ({
 											result: merge.effect === "replace" ? merge.result : "",
 										}
 									: {
-											action: merge.action,
+											...(merge.action === "space"
+												? {
+														action: merge.action,
+														space: merge.space,
+													}
+												: {
+														action: merge.action,
+														target: merge.target,
+													}),
 											effect,
-											output: merge.output,
-											target: merge.target,
+											outcome: merge.outcome,
 										},
 							)
 						}
@@ -151,16 +205,16 @@ export const MergeField = ({
 				<SectionEnd />
 			</EditorFormCard>
 			<EditorFormSection
-				description={<Mx label="Merge output help" />}
-				title={translator.textFn("Merge output")}
+				description={<Mx label="Merge outcome help" />}
+				title={translator.textFn("Merge outcome")}
 			>
 				<EditorFormCard>
-					<OutputControl
-						value={merge.output}
-						onChangeFn={(output) =>
+					<OutcomeControl
+						value={merge.outcome}
+						onChangeFn={(outcome) =>
 							onChangeFn({
 								...merge,
-								output,
+								outcome,
 							})
 						}
 					/>

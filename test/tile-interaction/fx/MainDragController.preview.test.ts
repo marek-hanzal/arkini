@@ -94,7 +94,7 @@ describe("manual drop target feedback", () => {
 				revision: revised.revision,
 			},
 		});
-		previewState.actorKinds.set(target.id, "store-input");
+		previewState.actorKinds.set(target.id, "merge");
 		Effect.runSync(mounted.controller.requestRefreshFx);
 		mounted.flushFrame();
 		expect(mounted.animations.filter(({ channel }) => channel === "drop-target")).toMatchObject(

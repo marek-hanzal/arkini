@@ -2,28 +2,28 @@ import { Effect } from "effect";
 
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
-import { readOutputPlacementItemEventsFx } from "~/game-event/fx/readOutputPlacementItemEventsFx";
+import { readOutcomePlacementItemEventsFx } from "~/game-event/fx/readOutcomePlacementItemEventsFx";
 import { releaseOwnerInputsFx } from "~/production-input/fx/releaseOwnerInputsFx";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
 import type { BoardRuntimeItemSchema } from "~/game-runtime/schema/BoardRuntimeItemSchema";
 import type { ReservedRuntimeItemSchema } from "~/game-runtime/schema/ReservedRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import type { OutputSchema } from "~/production-output/schema/OutputSchema";
+import type { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
 import { makeUnitDepletionRandomFx } from "~/production-job/fx/makeUnitDepletionRandomFx";
-import { outputFx } from "~/production-output/fx/outputFx";
-import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
+import { resolveOutcomeTableFx } from "~/outcome/fx/resolveOutcomeTableFx";
+import { applyOutcomeTableFx } from "~/outcome/fx/applyOutcomeTableFx";
 import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItemIdentityFx";
 import { releaseJobReservationsFx } from "./releaseJobReservationsFx";
 
-const emptyOutput = {
-	drop: [],
-} satisfies outputFx.Result;
+const emptyOutcome = {
+	roll: [],
+} satisfies resolveOutcomeTableFx.Result;
 
 export namespace settleJobRuntimeFx {
 	export interface Props {
 		readonly job: JobSchema.Type;
 		readonly owner: BoardRuntimeItemSchema.Type;
-		readonly lineOutput?: OutputSchema.Type;
+		readonly lineOutcome?: OutcomeTableSchema.Type;
 		readonly reservations: readonly ReservedRuntimeItemSchema.Type[];
 		readonly overflow?: "discard";
 		readonly runtime: RuntimeSchema.Type;
@@ -36,8 +36,8 @@ export namespace settleJobRuntimeFx {
 
 /**
  * Settles completion or material abort after the job and consumed roots are detached.
- * A depleted owner's cell is freed before output and returns; abort supplies no line output.
- * Output conditions read the caller-provided input snapshot, never this partial draft.
+ * A depleted owner's cell is freed before outcome and returns; abort supplies no line outcome.
+ * Outcome conditions read the caller-provided input snapshot, never this partial draft.
  */
 export const settleJobRuntimeFx = Effect.fn("settleJobRuntimeFx")(function* (
 	context: settleJobRuntimeFx.Props,
@@ -66,45 +66,45 @@ export const settleJobRuntimeFx = Effect.fn("settleJobRuntimeFx")(function* (
 		});
 	}
 
-	const lineOutput =
-		context.lineOutput === undefined
-			? emptyOutput
-			: yield* outputFx({
+	const lineOutcome =
+		context.lineOutcome === undefined
+			? emptyOutcome
+			: yield* resolveOutcomeTableFx({
+					ownerItemId: context.owner.id,
 					origin: context.owner.location,
-					output: context.lineOutput,
+					outcome: context.lineOutcome,
 				});
-	if (lineOutput.drop.length > 0) {
-		const [placement, withLineOutput] = yield* applyOutputPlacementFx({
-			origin: context.owner.location,
-			output: lineOutput,
+	if (lineOutcome.roll.length > 0) {
+		const [placement, withLineOutcome] = yield* applyOutcomeTableFx({
+			outcome: lineOutcome,
 			runtime: draft,
 		});
 		events.push(
-			...(yield* readOutputPlacementItemEventsFx({
+			...(yield* readOutcomePlacementItemEventsFx({
 				originItemId: context.owner.id,
 				placement,
 			})),
 		);
-		draft = withLineOutput;
+		draft = withLineOutcome;
 	}
 
-	if (depleted && context.owner.item.units?.output !== undefined) {
-		const depletionOutput = yield* makeUnitDepletionRandomFx({
+	if (depleted && context.owner.item.units?.outcome !== undefined) {
+		const depletionOutcome = yield* makeUnitDepletionRandomFx({
 			itemId: context.owner.id,
 			job: context.job,
-			program: outputFx({
+			program: resolveOutcomeTableFx({
+				ownerItemId: context.owner.id,
 				origin: context.owner.location,
-				output: context.owner.item.units.output,
+				outcome: context.owner.item.units.outcome,
 			}),
 		});
-		if (depletionOutput.drop.length > 0) {
-			const [placement, withDepletionOutput] = yield* applyOutputPlacementFx({
-				origin: context.owner.location,
-				output: depletionOutput,
+		if (depletionOutcome.roll.length > 0) {
+			const [placement, withDepletionOutcome] = yield* applyOutcomeTableFx({
+				outcome: depletionOutcome,
 				overflow: context.overflow,
 				runtime: draft,
 			});
-			const placementEvents = yield* readOutputPlacementItemEventsFx({
+			const placementEvents = yield* readOutcomePlacementItemEventsFx({
 				originItemId: context.owner.id,
 				placement,
 			});
@@ -116,13 +116,13 @@ export const settleJobRuntimeFx = Effect.fn("settleJobRuntimeFx")(function* (
 						ownerItemId: context.owner.id,
 						canonicalItemId: loss.itemId,
 						quantity: loss.quantity,
-						source: "depletion-output",
+						source: "depletion-outcome",
 						reason: loss.reason,
 					}),
 				),
 			);
 			depletionReplacementPlaced = placementEvents.length > 0;
-			draft = withDepletionOutput;
+			draft = withDepletionOutcome;
 		}
 	}
 

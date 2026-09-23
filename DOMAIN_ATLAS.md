@@ -17,7 +17,7 @@ The densest islands have local maps:
 | Island | Domains | Map |
 | --- | --- | --- |
 | Runtime and session | Runtime, events, Tick, persistence, playable and installed Game | [`src/game-runtime/README.md`](src/game-runtime/README.md) |
-| Production | Action, condition, input, line, job, delivery and output | [`src/production-line/README.md`](src/production-line/README.md) |
+| Production | Condition, input, line, job, delivery and outcomes | [`src/production-line/README.md`](src/production-line/README.md) |
 | Retained scene | Game Scene, Tile Presentation, Rendering, Motion and Interaction | [`src/game-scene/README.md`](src/game-scene/README.md) |
 | Authored config | Foundational values, completed Config, source, resources, diagnostics, validation and compiler | [`src/game-config/README.md`](src/game-config/README.md) |
 | Acquisition and Estimate | Shared acquisition graph and optimistic analysis | [`src/estimate/README.md`](src/estimate/README.md) |
@@ -66,7 +66,6 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 | `item-placement` | Single-item Board spawn and exact-identity return | [`src/item-placement/fx/planBoardPlacementFx.ts`](src/item-placement/fx/planBoardPlacementFx.ts) |
 | `item-merge` | Directional merge admission and atomic lifecycle | [`src/item-merge/fx/mergeItemsFx.ts`](src/item-merge/fx/mergeItemsFx.ts) |
 | `item-interaction` | Drop preview/commit, release, removal and click policy | [`src/item-interaction/fx/dropItemFx.ts`](src/item-interaction/fx/dropItemFx.ts) |
-| `item-action` | Immediate space action admission and unit settlement | [`src/item-action/fx/activateItemActionFx.ts`](src/item-action/fx/activateItemActionFx.ts) |
 
 [`GAME.MD`](GAME.MD) owns gameplay meaning. The Runtime map owns state and lifecycle navigation.
 
@@ -75,7 +74,7 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 | Domain | Role | First read |
 | --- | --- | --- |
 | `production-condition` | Authored runtime condition evaluation | [`src/production-condition/fx/whenFx.ts`](src/production-condition/fx/whenFx.ts) |
-| `production-output` | Output/drop/roll contracts and resolution | [`src/production-output/fx/outputFx.ts`](src/production-output/fx/outputFx.ts) |
+| `outcome` | Typed Item/Space outcome contracts, roll resolution and ordered application | [`src/outcome/fx/resolveOutcomeTableFx.ts`](src/outcome/fx/resolveOutcomeTableFx.ts) |
 | `production-action` | Immediate action admission, inputs and unit settlement | [`src/production-action/fx/resolveActionRuleFx.ts`](src/production-action/fx/resolveActionRuleFx.ts) |
 | `production-input` | Material planning, buffers, autofill and withdrawal | [`src/production-input/fx/resolveInputRunFx.ts`](src/production-input/fx/resolveInputRunFx.ts) |
 | `production-line` | Line definitions, rules, reads and run planning | [`src/production-line/README.md`](src/production-line/README.md) |

@@ -155,7 +155,7 @@ describe("temporary item lifetime", () => {
 		]);
 	});
 
-	it("reports disappearance when configured expiry output resolves to nothing", () => {
+	it("reports disappearance when configured expiry outcome resolves to nothing", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const temporary = yield* spawnTemporaryFx({
@@ -308,10 +308,10 @@ describe("temporary item lifetime", () => {
 				const fourth = yield* advanceRuntimeStepFx(third.runtime);
 				const fifth = yield* advanceRuntimeStepFx(fourth.runtime);
 				const sixth = yield* advanceRuntimeStepFx(fifth.runtime);
-				const output = sixth.runtime.items.find((item) => item.item.id === "result");
-				if (output === undefined) throw new Error("Expected expiry output.");
+				const outcome = sixth.runtime.items.find((item) => item.item.id === "result");
+				if (outcome === undefined) throw new Error("Expected expiry outcome.");
 				return {
-					output,
+					outcome,
 					temporary,
 					expiry: sixth,
 				};
@@ -341,10 +341,10 @@ describe("temporary item lifetime", () => {
 			},
 			{
 				type: GameEventEnumSchema.enum.ItemSpawned,
-				itemId: result.output.id,
+				itemId: result.outcome.id,
 				canonicalItemId: "result",
 				originItemId: result.temporary.id,
-				location: result.output.location,
+				location: result.outcome.location,
 			},
 		]);
 		expect(
@@ -352,11 +352,11 @@ describe("temporary item lifetime", () => {
 				(event) => event.type === GameEventEnumSchema.enum.ItemDisappeared,
 			),
 		).toBe(false);
-		expect(result.output.location).toEqual(result.temporary.location);
-		expect(result.output.id).not.toBe(result.temporary.id);
+		expect(result.outcome.location).toEqual(result.temporary.location);
+		expect(result.outcome.id).not.toBe(result.temporary.id);
 	});
 
-	it("atomically removes the temporary item and places its expiry output from the released origin", () => {
+	it("atomically removes the temporary item and places its expiry outcome from the released origin", () => {
 		const runtime = Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnTemporaryFx({

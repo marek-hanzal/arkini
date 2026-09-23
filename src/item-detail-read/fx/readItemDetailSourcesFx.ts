@@ -9,10 +9,10 @@ import { resolveLineShowFn } from "~/production-line/fn/resolveLineShowFn";
 import { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
 import { RuleTypeSchema as LineRuleTypeSchema } from "~/production-line/schema/RuleTypeSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
-import type { DropSchema } from "~/production-output/schema/DropSchema";
-import type { OutputSchema } from "~/production-output/schema/OutputSchema";
+import type { OutcomeSchema } from "~/outcome/schema/OutcomeSchema";
+import type { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
 import type { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
-import { RollTypeSchema } from "~/production-output/schema/RollTypeSchema";
+import { RollTypeSchema } from "~/outcome/schema/RollTypeSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace readItemDetailSourcesFx {
@@ -34,7 +34,7 @@ export namespace readItemDetailSourcesFx {
 		readonly max: number;
 	}
 
-	export type OutputFact =
+	export type OutcomeFact =
 		| {
 				readonly kind: "guaranteed";
 				readonly quantity: QuantityBounds;
@@ -52,7 +52,7 @@ export namespace readItemDetailSourcesFx {
 	export interface Line {
 		readonly lineId: IdSchema.Type;
 		readonly title: string;
-		readonly output: readonly OutputFact[];
+		readonly outcome: readonly OutcomeFact[];
 	}
 
 	export interface Source {
@@ -82,17 +82,17 @@ const quantityBoundsFn = (quantity: QuantitySchema.Type): readItemDetailSourcesF
 	quantity;
 
 const targetQuantityFn = ({
-	drop,
+	outcome,
 	targetDefinitionItemId,
 }: {
-	readonly drop: readonly DropSchema.Type[];
+	readonly outcome: readonly OutcomeSchema.Type[];
 	readonly targetDefinitionItemId: IdSchema.Type;
 }): readItemDetailSourcesFx.QuantityBounds | undefined => {
 	let min = 0;
 	let max = 0;
 	let found = false;
-	for (const candidate of drop) {
-		if (candidate.itemId !== targetDefinitionItemId) continue;
+	for (const candidate of outcome) {
+		if (candidate.type !== "item" || candidate.itemId !== targetDefinitionItemId) continue;
 		const bounds = quantityBoundsFn(candidate.quantity);
 		min += bounds.min;
 		max += bounds.max;
@@ -107,17 +107,17 @@ const targetQuantityFn = ({
 };
 
 const readMatchingFactsFn = ({
-	output,
+	outcome,
 	targetDefinitionItemId,
 }: {
-	readonly output: OutputSchema.Type | undefined;
+	readonly outcome: OutcomeTableSchema.Type | undefined;
 	readonly targetDefinitionItemId: IdSchema.Type;
-}): readonly readItemDetailSourcesFx.OutputFact[] => {
-	if (output === undefined) return [];
-	const totalSetWeight = output.set.reduce((total, set) => total + set.weight, 0);
-	const facts: readItemDetailSourcesFx.OutputFact[] = [];
+}): readonly readItemDetailSourcesFx.OutcomeFact[] => {
+	if (outcome === undefined) return [];
+	const totalSetWeight = outcome.set.reduce((total, set) => total + set.weight, 0);
+	const facts: readItemDetailSourcesFx.OutcomeFact[] = [];
 
-	for (const set of output.set) {
+	for (const set of outcome.set) {
 		const setWeight = set.weight;
 		for (const roll of set.roll) {
 			match(roll)
@@ -125,9 +125,9 @@ const readMatchingFactsFn = ({
 					{
 						type: RollTypeSchema.enum.Guaranteed,
 					},
-					({ drop }) => {
+					({ outcome }) => {
 						const quantity = targetQuantityFn({
-							drop,
+							outcome,
 							targetDefinitionItemId,
 						});
 						if (quantity === undefined) return;
@@ -143,9 +143,9 @@ const readMatchingFactsFn = ({
 					{
 						type: RollTypeSchema.enum.Chance,
 					},
-					({ chance, drop }) => {
+					({ chance, outcome }) => {
 						const quantity = targetQuantityFn({
-							drop,
+							outcome,
 							targetDefinitionItemId,
 						});
 						if (quantity === undefined) return;
@@ -188,11 +188,11 @@ const readOwnedSourcesFx = Effect.fn("readOwnedItemDetailSourcesFx")(function* (
 		const lines = ownerItem.lines;
 		const matchingLines: readItemDetailSourcesFx.Line[] = [];
 		for (const line of lines) {
-			const output = readMatchingFactsFn({
-				output: line.output,
+			const outcome = readMatchingFactsFn({
+				outcome: line.outcome,
 				targetDefinitionItemId,
 			});
-			if (output.length === 0) continue;
+			if (outcome.length === 0) continue;
 			if (boardLocation !== undefined) {
 				const visibilityRules = line.rules.filter(
 					(rule) =>
@@ -220,7 +220,7 @@ const readOwnedSourcesFx = Effect.fn("readOwnedItemDetailSourcesFx")(function* (
 			matchingLines.push({
 				lineId: line.id,
 				title: line.title,
-				output,
+				outcome,
 			});
 		}
 		if (matchingLines.length === 0) continue;
@@ -290,7 +290,7 @@ export const readItemDetailSourcesFx = Effect.fn("readItemDetailSourcesFx")(func
 				!lines.some(
 					(line) =>
 						readMatchingFactsFn({
-							output: line.output,
+							outcome: line.outcome,
 							targetDefinitionItemId: requestedDefinitionItemId,
 						}).length > 0,
 				)

@@ -18,8 +18,8 @@ vi.mock("~/authoring-form/ui/EditorItemAutocompleteField", () => ({
 	EditorItemReferenceControl: () => createElement("span"),
 }));
 
-vi.mock("~/production-authoring/ui/OutputControl", () => ({
-	OutputControl: () => createElement("span"),
+vi.mock("~/production-authoring/ui/OutcomeControl", () => ({
+	OutcomeControl: () => createElement("span"),
 }));
 
 import { MergeField } from "~/item-authoring/ui/MergeField";
@@ -55,6 +55,47 @@ const merge = {
 } satisfies MergeSchema.Type;
 
 describe("MergeField", () => {
+	it("preserves transport destination on reselect and target replacement while changing action", async () => {
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		const onChangeFn = vi.fn();
+		const transport = {
+			action: "space",
+			space: 17,
+			effect: "replace",
+			result: "replacement",
+		} satisfies MergeSchema.Type;
+		await act(async () =>
+			root.render(
+				<MergeField
+					merge={transport}
+					onChangeFn={onChangeFn}
+					sourceUnitsEnabled={false}
+					targetUnitsEnabled={false}
+				/>,
+			),
+		);
+		await act(async () =>
+			container.querySelector<HTMLButtonElement>('button[data-ui-value="space"]')!.click(),
+		);
+		expect(onChangeFn).not.toHaveBeenCalled();
+		await act(async () =>
+			container.querySelector<HTMLButtonElement>('button[data-ui-value="consume"]')!.click(),
+		);
+		expect(onChangeFn).toHaveBeenCalledWith({
+			action: "consume",
+			target: {
+				type: "item",
+				itemId: "",
+			},
+			effect: "replace",
+			result: "replacement",
+			outcome: undefined,
+		});
+	});
+
 	it("enables Spend only when the source item has Units", async () => {
 		const container = document.createElement("div");
 		document.body.append(container);

@@ -1,7 +1,7 @@
 import type { z } from "zod";
 
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { OutputSchema } from "~/production-output/schema/OutputSchema";
+import { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
 import { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
@@ -27,12 +27,12 @@ const simpleItem = ({ id }: { id: string }) =>
 const blueprintItem = ({
 	id,
 	lineId,
-	output,
+	outcome,
 	reserveTool = false,
 }: {
 	id: string;
 	lineId: string;
-	output?: z.input<typeof OutputSchema>;
+	outcome?: z.input<typeof OutcomeTableSchema>;
 	reserveTool?: boolean;
 }) =>
 	ItemSchema.parse({
@@ -89,7 +89,7 @@ const blueprintItem = ({
 								},
 							},
 						],
-				output,
+				outcome,
 				rules: [],
 			},
 		],
@@ -102,14 +102,15 @@ const guaranteedOutput = (
 		placement?: "drop";
 	}>,
 ) =>
-	OutputSchema.parse({
+	OutcomeTableSchema.parse({
 		set: [
 			{
 				rules: [],
 				roll: [
 					{
 						type: "guaranteed" as const,
-						drop: drops.map(({ itemId, quantity, placement = "drop" }) => ({
+						outcome: drops.map(({ itemId, quantity, placement = "drop" }) => ({
+							type: "item" as const,
 							itemId,
 							quantity,
 							placement,
@@ -159,12 +160,12 @@ export const blueprintConfig = GameConfigSchema.parse({
 		"blueprint:plain": blueprintItem({
 			id: "blueprint:plain",
 			lineId: "line:blueprint:plain",
-			output: blueprintOutput("item:target"),
+			outcome: blueprintOutput("item:target"),
 		}),
-		"blueprint:output": blueprintItem({
-			id: "blueprint:output",
-			lineId: "line:blueprint:output",
-			output: blueprintOutput("item:target-unlimited", [
+		"blueprint:outcome": blueprintItem({
+			id: "blueprint:outcome",
+			lineId: "line:blueprint:outcome",
+			outcome: blueprintOutput("item:target-unlimited", [
 				{
 					itemId: "item:byproduct",
 					quantity: {
@@ -177,7 +178,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 		"blueprint:reserve": blueprintItem({
 			id: "blueprint:reserve",
 			lineId: "line:blueprint:reserve",
-			output: blueprintOutput("item:target-unlimited", [
+			outcome: blueprintOutput("item:target-unlimited", [
 				{
 					itemId: "item:byproduct",
 					quantity: {
@@ -191,7 +192,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 		"blueprint:range": blueprintItem({
 			id: "blueprint:range",
 			lineId: "line:blueprint:range",
-			output: blueprintOutput("item:target-unlimited", [
+			outcome: blueprintOutput("item:target-unlimited", [
 				{
 					itemId: "item:limited",
 					quantity: {
@@ -205,36 +206,36 @@ export const blueprintConfig = GameConfigSchema.parse({
 			...blueprintItem({
 				id: "blueprint:depletion-capped",
 				lineId: "line:blueprint:depletion-capped",
-				output: blueprintOutput("item:target-unlimited"),
+				outcome: blueprintOutput("item:target-unlimited"),
 				reserveTool: true,
 			}),
 			units: {
 				amount: 1,
-				output: blueprintOutput("item:depletion-product"),
+				outcome: blueprintOutput("item:depletion-product"),
 			},
 		},
 		"blueprint:depletion-self": {
 			...blueprintItem({
 				id: "blueprint:depletion-self",
 				lineId: "line:blueprint:depletion-self",
-				output: blueprintOutput("item:target-unlimited"),
+				outcome: blueprintOutput("item:target-unlimited"),
 				reserveTool: true,
 			}),
 			units: {
 				amount: 1,
-				output: blueprintOutput("blueprint:depletion-self"),
+				outcome: blueprintOutput("blueprint:depletion-self"),
 			},
 		},
 		"blueprint:depletion-random": {
 			...blueprintItem({
 				id: "blueprint:depletion-random",
 				lineId: "line:blueprint:depletion-random",
-				output: blueprintOutput("item:target-unlimited"),
+				outcome: blueprintOutput("item:target-unlimited"),
 				reserveTool: true,
 			}),
 			units: {
 				amount: 1,
-				output: {
+				outcome: {
 					set: [
 						...blueprintOutput("item:target-unlimited").set,
 						...blueprintOutput("item:depletion-product").set,
@@ -242,11 +243,11 @@ export const blueprintConfig = GameConfigSchema.parse({
 				},
 			},
 		},
-		"blueprint:depletion-self-no-output": {
+		"blueprint:depletion-self-no-outcome": {
 			...blueprintItem({
-				id: "blueprint:depletion-self-no-output",
-				lineId: "line:blueprint:depletion-self-no-output",
-				output: blueprintOutput("blueprint:depletion-self-no-output"),
+				id: "blueprint:depletion-self-no-outcome",
+				lineId: "line:blueprint:depletion-self-no-outcome",
+				outcome: blueprintOutput("blueprint:depletion-self-no-outcome"),
 				reserveTool: true,
 			}),
 		},
@@ -282,7 +283,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 			id: "producer:limited",
 
 			title: "Limited producer",
-			description: "Produces one singleton output.",
+			description: "Produces one singleton outcome.",
 			artwork: {
 				scale: 0.8,
 				default: [
@@ -302,7 +303,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 							type: "simple",
 						},
 					],
-					output: guaranteedOutput([
+					outcome: guaranteedOutput([
 						{
 							itemId: "item:queue-product",
 							quantity: {
@@ -340,7 +341,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 							type: "simple",
 						},
 					],
-					output: blueprintOutput("blueprint:plain"),
+					outcome: blueprintOutput("blueprint:plain"),
 					rules: [],
 				},
 			],
@@ -370,7 +371,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 							type: "simple",
 						},
 					],
-					output: blueprintOutput("item:shared"),
+					outcome: blueprintOutput("item:shared"),
 					rules: [],
 				},
 			],
@@ -451,7 +452,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 							},
 						},
 					],
-					output: blueprintOutput("item:target"),
+					outcome: blueprintOutput("item:target"),
 					rules: [],
 				},
 			],
@@ -488,7 +489,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 							},
 						},
 					],
-					output: blueprintOutput("producer:depleted-owner"),
+					outcome: blueprintOutput("producer:depleted-owner"),
 					rules: [],
 				},
 			],

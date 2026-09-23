@@ -3,8 +3,6 @@ import { match } from "ts-pattern";
 
 import { commitMergeDropFx } from "~/item-interaction/fx/commitMergeDropFx";
 import { commitMoveDropFx } from "~/item-interaction/fx/commitMoveDropFx";
-import { commitPortalDropFx } from "~/item-interaction/fx/commitPortalDropFx";
-import { commitStoreInputDropFx } from "~/item-interaction/fx/commitStoreInputDropFx";
 import { commitSwapDropFx } from "~/item-interaction/fx/commitSwapDropFx";
 import { readDropItemPreviewFx } from "~/item-interaction/fx/readDropItemPreviewFx";
 import type { DropItemCommand } from "~/item-interaction/type/DropItemCommand";
@@ -89,22 +87,6 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 		)
 		.with(
 			{
-				kind: DropItemResultKind.StoreInput,
-			},
-			(storeInput) =>
-				commitStoreInputDropFx({
-					sourceItemId,
-					sourceRevision,
-					sourceLocation,
-					targetItemId,
-					targetRevision,
-					targetLocation,
-					lineId: storeInput.lineId,
-					inputIndex: storeInput.inputIndex,
-				}),
-		)
-		.with(
-			{
 				kind: DropItemResultKind.Swap,
 			},
 			() =>
@@ -121,15 +103,7 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 			{
 				kind: DropItemResultKind.Move,
 			},
-			() =>
-				commitPortalDropFx({
-					sourceItemId,
-					sourceRevision,
-					sourceLocation,
-					targetItemId,
-					targetRevision,
-					targetLocation,
-				}),
+			() => Effect.die(new Error("Occupied-slot drop cannot resolve as move.")),
 		)
 		.exhaustive();
 });

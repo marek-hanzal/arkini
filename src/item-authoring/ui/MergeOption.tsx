@@ -8,13 +8,14 @@ import { useTranslator } from "~/translation/ui/useTranslator";
 export const MergeOption = ({
 	label,
 	merge,
-	target,
+	items,
 }: {
 	readonly label: string;
 	readonly merge: MergeSchema.Type;
-	readonly target: ItemSchema.Type | undefined;
+	readonly items: Readonly<Record<string, ItemSchema.Type>>;
 }) => {
 	const translator = useTranslator();
+	const target = merge.action === "space" ? undefined : items[merge.target.itemId];
 	const effects = {
 		keep: translator.textFn("Keep"),
 		remove: translator.textFn("Remove"),
@@ -22,6 +23,7 @@ export const MergeOption = ({
 		replace: translator.textFn("Replace"),
 	};
 	const actions = {
+		space: translator.textFn("Space"),
 		use: translator.textFn("Use"),
 		consume: translator.textFn("Consume"),
 		spend: translator.textFn("Spend"),

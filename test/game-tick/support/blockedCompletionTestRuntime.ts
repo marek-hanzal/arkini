@@ -34,7 +34,7 @@ export const createBlockedCompletionTestConfig = () => {
 				uid: "ingot",
 				id: "ingot",
 				title: "Ingot",
-				description: "Blocked forge output.",
+				description: "Blocked forge outcome.",
 			},
 			blockedForge: {
 				...forge,
@@ -46,15 +46,16 @@ export const createBlockedCompletionTestConfig = () => {
 					{
 						...line,
 						id: "line:blocked-forge:run",
-						output: {
+						outcome: {
 							set: [
 								{
 									rules: [],
 									roll: [
 										{
 											type: "guaranteed",
-											drop: [
+											outcome: [
 												{
+													type: "item" as const,
 													itemId: "ingot",
 													quantity: {
 														min: 1,
@@ -87,7 +88,7 @@ export const createBlockedCompletionTestConfig = () => {
 								type: "simple",
 							},
 						],
-						output: undefined,
+						outcome: undefined,
 					},
 				],
 			},

@@ -29,8 +29,8 @@ vi.mock("~/item-authoring/ui/SelectorDetail", () => ({
 	SelectorDetail: () => createElement("span"),
 }));
 
-vi.mock("~/item-authoring/ui/OutputDetail", () => ({
-	OutputDetail: () => createElement("span"),
+vi.mock("~/item-authoring/ui/OutcomeDetail", () => ({
+	OutcomeDetail: () => createElement("span"),
 }));
 
 vi.mock("~/ui/ui/Button", () => ({

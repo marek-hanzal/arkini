@@ -177,7 +177,7 @@ describe("temporary material lifecycle", () => {
 		).toBe(false);
 	});
 
-	it("keeps committed expiry atomic when its output has no Board capacity", () => {
+	it("keeps committed expiry atomic when its outcome has no Board capacity", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnOwnerFx();

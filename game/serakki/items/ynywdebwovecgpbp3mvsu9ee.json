@@ -25,8 +25,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "empty-well",
 										"quantity": {
 											"min": 1,
@@ -59,7 +60,7 @@
 						"type": "simple"
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -67,8 +68,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "clay-mug-with-coffee",
 											"quantity": {
 												"min": 1,
@@ -87,8 +89,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "roasted-coffee-bag",
 											"quantity": {
 												"min": 1,
@@ -107,8 +110,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "cauldron-with-coffee",
 											"quantity": {
 												"min": 1,
@@ -127,8 +131,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "roasted-coffee-beans",
 											"quantity": {
 												"min": 1,
@@ -147,8 +152,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "coffee-tankard",
 											"quantity": {
 												"min": 1,

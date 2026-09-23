@@ -7,6 +7,7 @@ import {
 	createRootSource,
 	createSimpleItem,
 	createItemBase,
+	createLine,
 } from "~test/game-config-validation/support/gameValidationTestSource";
 import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticCodeEnumSchema";
 import { InvalidInputUnitsReasonEnumSchema } from "~/game-config-diagnostic/schema/InvalidInputUnitsReasonEnumSchema";
@@ -211,19 +212,40 @@ describe("validateInputUnitsFn", () => {
 		const portal = {
 			...createItemBase("space:cumulative"),
 
-			action: {
-				type: "space" as const,
-				space: 1,
-				input: [
-					{
-						type: "simple" as const,
-						units: {
-							from: "self" as const,
-							cost: 2,
+			lines: [
+				createLine({
+					default: true,
+					input: [
+						{
+							type: "simple" as const,
+							units: {
+								from: "self" as const,
+								cost: 2,
+							},
 						},
+					],
+					outcome: {
+						set: [
+							{
+								weight: 1,
+								rules: [],
+								roll: [
+									{
+										type: "guaranteed",
+										outcome: [
+											{
+												type: "space",
+												space: 1,
+												rules: [],
+											},
+										],
+									},
+								],
+							},
+						],
 					},
-				],
-			},
+				}),
+			],
 
 			units: {
 				amount: 2,
@@ -302,15 +324,36 @@ describe("validateInputUnitsFn", () => {
 		const portal = {
 			...createItemBase("space:owner-paid"),
 
-			action: {
-				type: "space" as const,
-				space: 1,
-				input: [
-					unitsInput("payer", {
-						from: "self",
-					}),
-				],
-			},
+			lines: [
+				createLine({
+					default: true,
+					input: [
+						unitsInput("payer", {
+							from: "self",
+						}),
+					],
+					outcome: {
+						set: [
+							{
+								weight: 1,
+								rules: [],
+								roll: [
+									{
+										type: "guaranteed",
+										outcome: [
+											{
+												type: "space",
+												space: 1,
+												rules: [],
+											},
+										],
+									},
+								],
+							},
+						],
+					},
+				}),
+			],
 
 			units: {
 				amount: 2,

@@ -55,7 +55,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -63,8 +63,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "raw-game-meat",
 											"quantity": {
 												"min": 2,
@@ -74,6 +75,7 @@
 											"rules": []
 										},
 										{
+											"type": "item",
 											"itemId": "cutting-board-with-animal-fat",
 											"quantity": {
 												"min": 1,
@@ -116,7 +118,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -124,8 +126,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "sausage",
 											"quantity": {
 												"min": 4,

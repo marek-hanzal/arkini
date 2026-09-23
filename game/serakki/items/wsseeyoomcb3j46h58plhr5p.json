@@ -19,7 +19,7 @@
 					"itemId": "cutting-board"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -27,8 +27,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "empty-crate",
 											"quantity": {
 												"min": 1,
@@ -52,7 +53,7 @@
 					"itemId": "pig"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -60,8 +61,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "empty-crate",
 											"quantity": {
 												"min": 1,
@@ -85,7 +87,7 @@
 					"itemId": "hungry-pig"
 				},
 				"action": "consume",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -93,8 +95,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "empty-crate",
 											"quantity": {
 												"min": 1,
@@ -125,8 +128,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "spoiled-vegetable-crate",
 										"quantity": {
 											"min": 1,

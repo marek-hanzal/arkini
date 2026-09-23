@@ -43,7 +43,7 @@ const createClockGraph = async ({
 								id: "default",
 								default: false,
 								clock: true,
-								output: createOutput([
+								outcome: createOutput([
 									{
 										itemId: "target",
 									},
@@ -54,7 +54,7 @@ const createClockGraph = async ({
 						createLine({
 							id: "manual",
 							default: true,
-							output: createOutput([
+							outcome: createOutput([
 								{
 									itemId: "other",
 								},
@@ -293,7 +293,7 @@ describe("Clock authored acquisition boundaries", () => {
 					...createLine({
 						id: "competing",
 						clock: true,
-						output: createOutput([
+						outcome: createOutput([
 							{
 								itemId,
 							},

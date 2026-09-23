@@ -39,17 +39,7 @@ export const validateInputUnitsFn = ({ config, provenance }: validateInputUnitsF
 			input: line.input,
 			path,
 		}));
-		if (item.action !== undefined) {
-			actions.push({
-				id: item.id,
-				input: item.action.input,
-				path: [
-					"items",
-					itemId,
-					"action",
-				],
-			});
-		}
+
 		for (const { id: actionId, input: inputs, path } of actions) {
 			let selfCost = 0;
 			for (const [inputIndex, input] of inputs.entries()) {

@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-import type { ActionSchema } from "~/item-action/schema/ActionSchema";
 import type { ItemScheduleSchema } from "~/item-schedule/schema/ItemScheduleSchema";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
@@ -21,7 +20,6 @@ export type FormValues = Omit<
 	};
 	readonly description: string;
 	readonly clock?: ItemScheduleSchema.Type;
-	readonly action?: ActionSchema.Type;
 	readonly lines?: LineSchema.Type[];
 	readonly maxQueueSize?: number;
 	readonly merge?: MergeSchema.Type[];
@@ -68,14 +66,6 @@ const bindSelfPaidInputsToOwnerFn = <Inputs extends ReadonlyArray<LineInputSchem
 
 const bindSelfPaidUnitsInputsToOwnerFn = (candidate: FormValues): FormValues => ({
 	...candidate,
-	...(candidate.action === undefined
-		? {}
-		: {
-				action: {
-					...candidate.action,
-					input: bindSelfPaidInputsToOwnerFn(candidate.action.input, candidate.id),
-				},
-			}),
 	...(candidate.lines === undefined
 		? {}
 		: {

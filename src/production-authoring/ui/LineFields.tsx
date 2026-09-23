@@ -11,7 +11,7 @@ import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { Mx } from "~/translation/ui/Mx";
 import { InputsControl } from "~/production-authoring/ui/InputsControl";
-import { OutputControl } from "~/production-authoring/ui/OutputControl";
+import { OutcomeControl } from "~/production-authoring/ui/OutcomeControl";
 import { RulesControl } from "~/production-authoring/ui/RulesControl";
 import { EditorBooleanToggleGroup } from "~/editor-control/ui/EditorBooleanToggleGroup";
 import { ResourceReferenceControl } from "~/authoring-form/ui/ResourceAutocompleteField";
@@ -45,7 +45,7 @@ export const LineFields = withFieldGroupFn({
 	},
 	render: ({ group, label, onMarkerChangeFn }) => {
 		const translator = useTranslator();
-		const { ruleIndex, whenIndex, outputDropIndex } = useFormSession();
+		const { ruleIndex, whenIndex, outcomeIndex } = useFormSession();
 		return (
 			<div className="grid gap-[var(--ak-viewport-gap)]">
 				<EditorFormCard>
@@ -209,10 +209,10 @@ export const LineFields = withFieldGroupFn({
 						{(rules) => (
 							<RulesControl
 								initialRuleIndex={
-									outputDropIndex === undefined ? ruleIndex : undefined
+									outcomeIndex === undefined ? ruleIndex : undefined
 								}
 								initialWhenIndex={
-									outputDropIndex === undefined ? whenIndex : undefined
+									outcomeIndex === undefined ? whenIndex : undefined
 								}
 								rules={rules}
 								target="line"
@@ -255,17 +255,17 @@ export const LineFields = withFieldGroupFn({
 						</group.Subscribe>
 					</div>
 					<div className="min-w-0">
-						<group.Subscribe selector={(state) => state.values.output}>
-							{(output) => (
+						<group.Subscribe selector={(state) => state.values.outcome}>
+							{(outcome) => (
 								<section className="grid min-w-0 content-start gap-3">
 									<EditorFormSectionDivider
-										description={<Mx label="Production output help" />}
-										title={translator.textFn("Outputs")}
+										description={<Mx label="Production outcome help" />}
+										title={translator.textFn("Outcomes")}
 										variant="secondary"
 									/>
-									<OutputControl
-										value={output}
-										onChangeFn={(next) => group.setFieldValue("output", next)}
+									<OutcomeControl
+										value={outcome}
+										onChangeFn={(next) => group.setFieldValue("outcome", next)}
 									/>
 								</section>
 							)}

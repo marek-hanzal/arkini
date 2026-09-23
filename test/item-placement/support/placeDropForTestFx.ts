@@ -1,12 +1,12 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
-import type { DropSchema } from "~/production-output/schema/DropSchema";
-import type { OutputSchema } from "~/production-output/schema/OutputSchema";
+import type { OutcomeSchema } from "~/outcome/schema/OutcomeSchema";
+import type { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
 import { placeOutputForTestFx } from "~test/item-placement/support/placeOutputForTestFx";
 
 interface PlaceDropForTestProps {
-	readonly drop: DropSchema.Type;
+	readonly drop: OutcomeSchema.Type;
 	readonly originItemId: IdSchema.Type;
 }
 
@@ -26,7 +26,7 @@ export const placeDropForTestFx = Effect.fn("placeDropForTestFx")(function* ({
 					rules: [],
 					roll: [
 						{
-							drop: [
+							outcome: [
 								drop,
 							],
 							type: "guaranteed",
@@ -34,7 +34,7 @@ export const placeDropForTestFx = Effect.fn("placeDropForTestFx")(function* ({
 					],
 				},
 			],
-		} satisfies OutputSchema.Type,
+		} satisfies OutcomeTableSchema.Type,
 	});
-	return output.drop[0];
+	return output.item[0];
 });

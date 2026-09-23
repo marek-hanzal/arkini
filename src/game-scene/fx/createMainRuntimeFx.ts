@@ -26,7 +26,7 @@ import { createSubscriptionReplayGateFx } from "~/game-scene/fx/createSubscripti
 import { createBoardCameraFx } from "~/game-scene/fx/createBoardCameraFx";
 import { readMainLayoutFn } from "~/game-scene/fn/readMainLayoutFn";
 import { createMainSurfaceFx } from "~/game-scene/fx/createMainSurfaceFx";
-import { createSpaceActionPresenterFx } from "~/game-scene/fx/createSpaceActionPresenterFx";
+import { createSpaceTransitionPresenterFx } from "~/game-scene/fx/createSpaceTransitionPresenterFx";
 import type { MainRuntime } from "~/game-scene/service/MainRuntime";
 import { createDragOriginGhostsFx } from "~/tile-interaction/fx/createDragOriginGhostsFx";
 
@@ -222,7 +222,7 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 					: reconciler.reconcileFx(transition),
 			);
 		};
-		const transitionPresenter = yield* createSpaceActionPresenterFx({
+		const transitionPresenter = yield* createSpaceTransitionPresenterFx({
 			applyTransitionFn,
 			initialSequence: latestTransition.sequence,
 			scheduleAfterRenderFn: (workFn) =>

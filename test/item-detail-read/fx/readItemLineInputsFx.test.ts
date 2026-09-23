@@ -555,8 +555,8 @@ it("reads the soonest running lifetime only from physical roots in this slot", (
 		lineId: line.id,
 		durationMs: 1000,
 		remainingMs: 500,
-		output: {
-			drop: [],
+		outcome: {
+			outcome: [],
 		},
 	};
 	const active = {

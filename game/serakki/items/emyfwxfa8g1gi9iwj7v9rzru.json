@@ -42,7 +42,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -50,8 +50,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "tree",
 											"quantity": {
 												"min": 1,
@@ -113,7 +114,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -121,8 +122,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "tree",
 											"quantity": {
 												"min": 1,
@@ -132,6 +134,7 @@
 											"rules": []
 										},
 										{
+											"type": "item",
 											"itemId": "empty-sack",
 											"quantity": {
 												"min": 1,
@@ -181,7 +184,7 @@
 						"type": "simple"
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -190,8 +193,9 @@
 								{
 									"type": "chance",
 									"chance": 0.25,
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "tree-seed",
 											"quantity": {
 												"min": 1,
@@ -253,7 +257,7 @@
 						}
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -261,8 +265,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "forest",
 											"quantity": {
 												"min": 1,

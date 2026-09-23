@@ -26,7 +26,7 @@ Read the smallest entry point needed for the task:
 | Zone | Owns | Navigate from |
 | --- | --- | --- |
 | Gameplay state and execution | Runtime, Item/space commands, Tick, save and live Game lifecycle | [`src/game-runtime/README.md`](src/game-runtime/README.md) |
-| Production | Conditions, actions, inputs, lines, jobs, delivery and output | [`src/production-line/README.md`](src/production-line/README.md) |
+| Production | Conditions, inputs, lines, jobs, delivery and outcomes | [`src/production-line/README.md`](src/production-line/README.md) |
 | Retained gameplay presentation | Tile projection/rendering/motion/interaction and concrete scenes | [`src/game-scene/README.md`](src/game-scene/README.md) |
 | Authored source | Foundational values, completed Config, source files, resources, diagnostics, validation and compiler | [`src/game-config/README.md`](src/game-config/README.md) |
 | Artifacts and compatibility | Serapack admission/artifact/catalog, saves and release provenance | [`VERSION.md`](VERSION.md) |

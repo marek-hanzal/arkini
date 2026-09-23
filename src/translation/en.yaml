@@ -1,7 +1,5 @@
 About avatars:
   value: About avatars
-Action:
-  value: Action
 Action disable rule help:
   value: |
     **Disable** blocks the action whenever all its conditions match.
@@ -25,24 +23,19 @@ Action inputs help:
     **Every requirement must be ready when the action is used.**
 
     **Simple** needs nothing. **Units** spends Units from this item or a matching Board item. Actions cannot collect delivered Materials.
-Action rules help:
-  value: |
-    Rules decide whether players can use this action.
-
-    Every **Enable** rule must pass. Any matching **Disable** rule blocks it. Costs are paid only after the rules pass.
 Add a game:
   value: Add a game
 Add at least one condition.:
   value: Add at least one condition.
-Add at least one drop.:
-  value: Add at least one drop.
 Add at least one input.:
   value: Add at least one input.
 Add at least one item.:
   value: Add at least one item.
   dynamic: true
-Add at least one output set.:
-  value: Add at least one output set.
+Add at least one outcome set.:
+  value: Add at least one outcome set.
+Add at least one outcome.:
+  value: Add at least one outcome.
 Add at least one roll.:
   value: Add at least one roll.
 Add at least {minimum} items.:
@@ -102,11 +95,8 @@ Assigned:
   value: Assigned
 Audio not found:
   value: Audio not found
-Authored Clock expiry output summary help:
-  value: |
-    Runs once when **Lifetime** reaches zero.
-
-    It uses the same sets, rolls, drops and placement rules as any other output.
+Authored Clock expiry outcome summary help:
+  value: Authored Clock expiry outcome summary help
 Authored Clock interval summary help:
   value: |
     How often the Clock selects one eligible weighted production line.
@@ -141,31 +131,23 @@ Authored Units amount summary help:
     Units stored inside each new item.
 
     Each item keeps its own supply.
-Authored Units depletion output summary help:
-  value: |
-    Runs when an item's Units reach zero.
-
-    Leave it empty to remove the depleted item without creating anything.
+Authored Units depletion outcome summary help:
+  value: Authored Units depletion outcome summary help
 Authored Units summary help:
   value: |
     Units are a spendable supply inside each item.
 
     Spending Units affects only that item.
-Authored action summary help:
-  value: |
-    Runs when the player uses this item.
-
-    It checks **Rules**, pays every **Requirement**, then enters the chosen Space.
 Authored artwork summary help:
   value: |
     Combines a base image and optional overlay at one shared scale.
 
     Artwork changes only appearance, never placement or gameplay.
-Authored merge output summary help:
+Authored merge outcome summary help:
   value: |
-    Extra output created after both sides of the merge are updated.
+    Extra results this merge can create after it changes the dragged and target items.
 
-    Leave it empty when the merge should only change its two items.
+    For example, opening a chest can remove the chest and drop treasure. If there is no extra outcome, the changes to the two items are the whole result.
 Authored merge source action summary help:
   value: |
     What happens to the item you drag:
@@ -173,6 +155,7 @@ Authored merge source action summary help:
     - **Use:** keep it.
     - **Consume:** remove one item.
     - **Spend:** remove one Unit.
+    - **Space:** receive any dragged item and send that same instance to the configured space.
 Authored merge target effect summary help:
   value: |
     What happens to the item receiving the drop:
@@ -188,14 +171,11 @@ Authored merge target summary help:
     Direction matters: A onto B is different from B onto A.
 Authored merges summary help:
   value: |
-    Starts when you drop this item onto its selected target.
+    Use, Consume and Spend start when you drop this item onto its selected target. Space starts when another item is dropped onto this one, unless that item owns an explicit merge for this target.
 
-    It updates the dragged item, updates the target, then creates any extra output.
-Authored output summary help:
-  value: |
-    One available output set is picked by weight, then every group inside it runs.
-
-    A group can be **Guaranteed** or share one **Chance** check. Set rules decide which sets may be picked; drop rules decide which items may be created.
+    It updates or transports the dragged item, updates the receiving item, then applies any extra outcome.
+Authored outcome summary help:
+  value: Authored outcome summary help
 Authored production Clock marker help:
   value: |
     This line participates in weighted selection at each Clock interval, after its availability rules pass.
@@ -220,16 +200,10 @@ Authored production inputs summary help:
     - **Reserved materials** return afterward.
     - **Self Units** come from this item.
     - **Target Units** come from a matching Board item.
-Authored production line output summary help:
-  value: |
-    Optional items created when the line finishes.
-
-    The output may choose between sets, run several rolls and apply rules to each drop.
-Authored production output summary help:
-  value: |
-    Runs when this production line finishes.
-
-    One available set is picked by weight, then every Guaranteed or Chance group inside it runs independently.
+Authored production line outcome summary help:
+  value: Authored production line outcome summary help
+Authored production outcome summary help:
+  value: Authored production outcome summary help
 Authored production runtime summary help:
   value: |
     How long one run normally takes.
@@ -373,11 +347,8 @@ Clock:
   value: Clock
 Clock expiry:
   value: Clock expiry
-Clock expiry output help:
-  value: |
-    Runs once when **Lifetime** reaches zero.
-
-    With **Wait for output**, the item stays until this output fits. With **Stop immediately**, anything that cannot fit is lost.
+Clock expiry outcome help:
+  value: Clock expiry outcome help
 Clock interval:
   value: Clock interval
 Clock interval help:
@@ -465,9 +436,6 @@ Copy Clock section help:
     Copying a Clock removes the destination Action.
 Copy URL:
   value: Copy URL
-Copy action section help:
-  value: |
-    Copying an Action removes the destination Production and Clock because they cannot run together.
 Copy from:
   value: Copy from
 Copy from…:
@@ -544,13 +512,10 @@ Depends on conditions:
   value: Depends on conditions
 Depleted:
   value: Depleted
-Depletion output:
-  value: Depletion output
-Depletion output help:
-  value: |
-    Optional output created after the final Unit is spent.
-
-    The empty item disappears after its current production finishes.
+Depletion outcome:
+  value: Depletion outcome
+Depletion outcome help:
+  value: Depletion outcome help
 Depth limit:
   value: More steps follow
   dynamic: true
@@ -574,11 +539,6 @@ Disable Units help:
     Removes this item's Units and depletion output.
 
     Inputs or merges that spend those Units may then become invalid. Nothing changes until **Save**.
-Disable action help:
-  value: |
-    Removes the Action, its rules and requirements.
-
-    It does not restore old Production or Clock settings. **Discard** restores the saved item.
 Disable merges help:
   value: |
     Removes every merge started by this item, including extra outputs.
@@ -616,30 +576,6 @@ Draft:
   value: Draft
 Drop:
   value: Drop
-Drop disable rule help:
-  value: |
-    Blocks only this drop while all conditions match.
-
-    The line, set, roll and other drops keep going.
-Drop enable rule help:
-  value: |
-    Adds a required check for this drop.
-
-    Every Enable rule must pass. Any matching Disable rule blocks only this drop.
-Drop rules help:
-  value: |
-    These rules apply only to this drop.
-
-    Every **Enable** must pass. Any matching **Disable** blocks it. Other drops and the production line continue.
-Dropped item:
-  value: Dropped item
-Drops:
-  value: Drops
-Drops help:
-  value: |
-    The items created by this roll.
-
-    Each drop chooses an item, quantity, placement and optional rules. One roll may create several drops.
 Edit:
   value: Edit
 Edit artwork:
@@ -740,12 +676,12 @@ Exit:
   value: Exit
 Expiry mode:
   value: When time runs out
-Expiry output:
-  value: Expiry output
+Expiry outcome:
+  value: Expiry outcome
 Export:
   value: Export
-Extra output:
-  value: Extra output
+Extra outcome:
+  value: Extra outcome
 Far:
   value: Far
   dynamic: true
@@ -871,17 +807,6 @@ Item ID help:
     Renaming it updates project links when you **Save**. Keep it short, for example `healing-kit`. Text outside Serakki cannot be updated.
 Item UID:
   value: Item UID
-Item action empty title:
-  value: Let a click move to another space.
-Item action help:
-  value: |
-    Action runs when the player uses this item.
-
-    - **Space** enters a chosen Board Space.
-    - Every Enable rule must pass; any matching Disable rule blocks the action.
-    - Unit costs are paid only after the rules pass.
-
-    Action cannot coexist with Production or Clock. Enabling it removes both from this draft.
 Item artwork help:
   value: |
     Artwork combines a base image with an optional overlay.
@@ -1186,18 +1111,25 @@ Maximum count:
   value: Maximum count
 Merge:
   value: Merge
-Merge output:
-  value: Merge output
-Merge output help:
+Merge outcome:
+  value: Merge outcome
+Merge outcome help:
   value: |
-    Optional extra items created after the merge changes both sides.
+    Choose what else happens after the dragged item and receiver are handled. For example, using a key on a chest can remove the chest and drop treasure. Leave this empty if changing the two items is the whole result.
 
-    This is separate from **Replace by**. It uses normal sets, rolls, quantities and placement.
+    Add outcome sets for different possible results. Rules decide which sets are available; if several qualify, their weights choose one. Every roll in the chosen set is then checked; chance and individual rules can still prevent some results. If there is no eligible set, the merge creates nothing extra.
 Merge source consume help:
   value: |
     **Consume** removes one dragged item, not one Unit.
 
     Example: **Match + Unlit Candle → Candle** consumes one Match.
+Merge source space help:
+  value: |
+    **Space** sends any item dropped onto this item to the target space, preserving its identity and state. An explicit merge on the dragged item takes priority.
+
+    **Target item** controls this receiving item. Extra outcomes use this receiver's original Board position. Transport does not switch the player's space; a Space outcome can do that separately.
+
+    A full destination or failed effect cancels the whole interaction. Each item can define one Space merge.
 Merge source spend help:
   value: |
     **Spend** removes one Unit from the dragged item and keeps it in place.
@@ -1230,9 +1162,13 @@ Merge with:
   value: Merge with
 Merge with help:
   value: |
-    Choose the item you will drop this item **onto**.
+    Choose which item this one can be dropped **onto**. This merge rule belongs to the item you are editing: dragging it onto the chosen item triggers the rule.
 
-    This item is always the source. Direction matters.
+    This item is the dragged item. **Source action** decides whether it stays, disappears, or spends a Unit. **Target effect** decides what happens to the item receiving it.
+
+    Extra **Merge outcome** rules use the dragged item's Board position, and local results appear near it. If the target runs out of Units, its separate depletion outcome uses the target's own position.
+
+    Dragging the chosen item back onto this one does not trigger the same rule. That direction needs its own merge rule on the other item.
 Merges:
   value: Merges
 Minimum:
@@ -1281,8 +1217,6 @@ No Clock configured:
   value: No Clock configured
 No Units configured:
   value: No Units configured
-No action configured:
-  value: No action configured
 No artwork matches this search.:
   value: No artwork matches this search.
 No assigned slots:
@@ -1302,12 +1236,12 @@ No chains for this item:
   value: No chains for this item
 No configured Space matches this search.:
   value: No configured Space matches this search.
-No depletion output configured.:
-  value: No depletion output configured.
-No expiry output configured.:
-  value: No expiry output configured.
-No extra output configured.:
-  value: No extra output configured.
+No depletion outcome configured.:
+  value: No depletion outcome configured.
+No expiry outcome configured.:
+  value: No expiry outcome configured.
+No extra outcome configured.:
+  value: No extra outcome configured.
 No finite lifetime:
   value: No time limit
 No image selected:
@@ -1347,12 +1281,12 @@ No other authored item outputs this item through production, expiry, units, or m
   dynamic: true
 No other item matches this search.:
   value: No other item matches this search.
-No output:
-  value: No output
-No output configured.:
-  value: No output configured.
-No outputs:
-  value: No outputs
+No outcome:
+  value: No outcome
+No outcome configured.:
+  value: No outcome configured.
+No outcomes:
+  value: No outcomes
 No resources match this search.:
   value: No resources match this search.
 No rules:
@@ -1419,32 +1353,34 @@ Optional explanation shown while this rule applies:
 Other:
   value: Other
   dynamic: true
+Outcome:
+  value: Outcome
+Outcome disable rule help:
+  value: Outcome disable rule help
+Outcome enable rule help:
+  value: Outcome enable rule help
+Outcome rules help:
+  value: Outcome rules help
+Outcome set:
+  value: Outcome set
+Outcome set disable rule help:
+  value: Outcome set disable rule help
+Outcome set enable rule help:
+  value: Outcome set enable rule help
+Outcome set rules help:
+  value: Outcome set rules help
+Outcome set weight help:
+  value: Outcome set weight help
+Outcome sets:
+  value: Outcome sets
+Outcome type:
+  value: Outcome type
+Outcomes:
+  value: Outcomes
+Outcomes help:
+  value: Outcomes help
 Output set:
   value: Output set
-Output set disable rule help:
-  value: |
-    Removes this set from the selection pool while all conditions match.
-
-    Its weight is not counted. One of the remaining available sets is selected normally.
-Output set enable rule help:
-  value: |
-    Adds a required check before this set enters the selection pool.
-
-    Every Enable rule must pass. Any matching Disable rule removes this set.
-Output set rules help:
-  value: |
-    These rules decide whether the complete output set joins the selection pool.
-
-    Every **Enable** must pass. Any matching **Disable** removes the set before weights are calculated. If no set is available, this output creates nothing.
-Output set weight help:
-  value: |
-    Exactly **one available set** is picked each time this output runs.
-
-    Weights are ratios. With weights **3** and **1**, the sets have **75%** and **25%** chances. Rules first remove unavailable sets. After a set wins, every Guaranteed or Chance group inside it runs.
-Output sets:
-  value: Output sets
-Outputs:
-  value: Outputs
 Overlay artwork:
   value: Overlay artwork
 Owner units:
@@ -1557,15 +1493,8 @@ Production line visibility help:
     Whether players see this line at the start.
 
     Show and Hide rules may change it. Visibility does not decide whether the line may run.
-Production output help:
-  value: |
-    Items created when this production job finishes.
-
-    1. Set rules filter availability, then one **output set** is picked by weight.
-    2. Every **roll** in that set runs.
-    3. Each **drop** checks its rules, quantity and placement.
-
-    Equal weights among available sets are equally likely. If none is available, no output is created.
+Production outcome help:
+  value: Production outcome help
 Production queue capacity help:
   value: |
     Maximum work accepted across all lines on this item.
@@ -1655,10 +1584,8 @@ Remote MCP:
   value: Remote MCP
 Remove:
   value: Remove
-Remove action input:
-  value: Remove action input
-Remove action rule:
-  value: Remove action rule
+Remove Clock rule:
+  value: Remove Clock rule
 Remove folder project help:
   value: |
     Removes the project from Recents.
@@ -1681,10 +1608,10 @@ Remove project:
   value: Remove project
 Remove project?:
   value: Remove project?
-Remove the expiry output from:
-  value: Remove the expiry output from
-Remove the unit depletion output from:
-  value: Remove the unit depletion output from
+Remove the expiry outcome from:
+  value: Remove the expiry outcome from
+Remove the unit depletion outcome from:
+  value: Remove the unit depletion outcome from
 Rename:
   value: Rename
 Rename project:
@@ -1723,8 +1650,6 @@ Required item:
   value: Required item
 Required units:
   value: Required units
-Requirements:
-  value: Requirements
 Reserve:
   value: Reserve
 Reserve material mode help:
@@ -1871,18 +1796,6 @@ Source action:
   value: Dragged item
 Space:
   value: Space
-Space action:
-  value: Space action
-Space action help:
-  value: |
-    After rules pass and Unit costs are paid, using the item enters the chosen Space.
-
-    The item stays where it is. Dropping another item onto this portal sends that item to the target Board without moving the player.
-Space action summary help:
-  value: |
-    Enters the chosen Space after every rule and requirement passes.
-
-    The number names a Board Space, not another item.
 Space changed:
   value: Space changed
   dynamic: true
@@ -2183,6 +2096,8 @@ self:
   value: self
 simple:
   value: simple
+space:
+  value: space
 spend:
   value: spend
 starting:

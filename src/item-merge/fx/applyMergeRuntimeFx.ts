@@ -1,7 +1,8 @@
+import { relocateBoardItemFx } from "~/item-placement/fx/relocateBoardItemFx";
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import { readOutputPlacementItemEventsFx } from "~/game-event/fx/readOutputPlacementItemEventsFx";
+import { readOutcomePlacementItemEventsFx } from "~/game-event/fx/readOutcomePlacementItemEventsFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { ItemStatefulError } from "~/game-runtime/error/ItemStatefulError";
@@ -12,9 +13,9 @@ import { SourceActionSchema } from "~/item-merge/schema/SourceActionSchema";
 import { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
 import { assertOwnerIdleFx } from "~/production-job/fx/assertOwnerIdleFx";
 import { spendActionUnitsFx } from "~/production-action/fx/spendActionUnitsFx";
-import { outputFx } from "~/production-output/fx/outputFx";
+import { resolveOutcomeTableFx } from "~/outcome/fx/resolveOutcomeTableFx";
 import { readBoardRuntimeItemByIdFx } from "~/game-runtime/fx/readBoardRuntimeItemByIdFx";
-import { applyOutputPlacementFx } from "~/item-placement/fx/applyOutputPlacementFx";
+import { applyOutcomeTableFx } from "~/outcome/fx/applyOutcomeTableFx";
 import { createRuntimeItemFx } from "~/game-runtime/fx/createRuntimeItemFx";
 import { discardRuntimeItemOwnedStateFx } from "~/game-runtime/fx/discardRuntimeItemOwnedStateFx";
 import { removeRuntimeItemFx } from "~/game-runtime/fx/removeRuntimeItemFx";
@@ -61,7 +62,7 @@ const applyMergeSourceActionFx = Effect.fn("applyMergeSourceActionFx")(function*
 	runtime,
 	source,
 }: {
-	readonly action: SourceActionSchema.Type;
+	readonly action: Exclude<SourceActionSchema.Type, "space">;
 	readonly actionId: string;
 	readonly runtime: RuntimeSchema.Type;
 	readonly source: BoardRuntimeItemSchema.Type;
@@ -305,20 +306,31 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 	source,
 	target,
 }: ApplyMergeRuntimeProps) {
-	const sourceAction = yield* applyMergeSourceActionFx({
-		action: rule.action,
-		actionId: `merge:${ruleIndex}:${source.mergeSequence ?? 0}`,
-		runtime,
-		source,
-	});
+	const owner = rule.action === "space" ? target : source;
+	const sourceAction = yield* rule.action === "space"
+		? relocateBoardItemFx({
+				itemId: source.id,
+				originItemId: owner.id,
+				runtime,
+				origin: {
+					...owner.location,
+					space: rule.space,
+				},
+			})
+		: applyMergeSourceActionFx({
+				action: rule.action,
+				actionId: `merge:${ruleIndex}:${owner.mergeSequence ?? 0}`,
+				runtime,
+				source,
+			});
 	// Resolve the target against the draft after source side effects.
 	const currentTarget = yield* readBoardRuntimeItemByIdFx({
 		itemId: target.id,
 		runtime: sourceAction.runtime,
 	});
 	const targetEffect = yield* applyMergeTargetEffectFx({
-		actionId: `merge:${ruleIndex}:target:${source.mergeSequence ?? 0}`,
-		ownerItemId: source.id,
+		actionId: `merge:${ruleIndex}:target:${owner.mergeSequence ?? 0}`,
+		ownerItemId: owner.id,
 		rule,
 		runtime: sourceAction.runtime,
 		target: currentTarget,
@@ -330,7 +342,7 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 	];
 	const targetDisappeared = rule.effect === TargetEffectSchema.enum.Remove;
 
-	if (rule.output === undefined) {
+	if (rule.outcome === undefined) {
 		if (targetDisappeared) {
 			events.push({
 				type: GameEventEnumSchema.enum.ItemDisappeared,
@@ -344,17 +356,17 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 			runtime: draft,
 		} satisfies ApplyMergeRuntimeResult;
 	}
-	const output = yield* outputFx({
-		origin: target.location,
-		output: rule.output,
+	const outcome = yield* resolveOutcomeTableFx({
+		ownerItemId: owner.id,
+		origin: owner.location,
+		outcome: rule.outcome,
 	});
-	const [placement, withOutput] = yield* applyOutputPlacementFx({
-		origin: target.location,
-		output,
+	const [placement, withOutcome] = yield* applyOutcomeTableFx({
+		outcome,
 		runtime: draft,
 	});
-	const placementEvents = yield* readOutputPlacementItemEventsFx({
-		originItemId: target.id,
+	const placementEvents = yield* readOutcomePlacementItemEventsFx({
+		originItemId: owner.id,
 		placement,
 	});
 	events.push(...placementEvents);
@@ -366,7 +378,7 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 			location: target.location,
 		});
 	}
-	draft = withOutput;
+	draft = withOutcome;
 	return {
 		events,
 		runtime: draft,

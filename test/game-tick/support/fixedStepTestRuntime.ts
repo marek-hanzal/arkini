@@ -40,15 +40,16 @@ export const createFixedStepTestConfig = () => {
 								type: "simple",
 							},
 						],
-						output: {
+						outcome: {
 							set: [
 								{
 									rules: [],
 									roll: [
 										{
 											type: "guaranteed",
-											drop: [
+											outcome: [
 												{
+													type: "item" as const,
 													itemId: "permit",
 													quantity: {
 														min: 1,

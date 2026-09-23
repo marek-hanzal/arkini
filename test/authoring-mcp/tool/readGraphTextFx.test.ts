@@ -36,8 +36,8 @@ describe("editor MCP graph tool text", () => {
 			"    - water [water] -> forge [forge]",
 			"    - forge [forge] -> mill [Mill]",
 		]);
-		expect(inputText).toContain("Inputs:\n    - tool");
-		expect(inputText).toContain("Outputs:\n    - ingot");
+		expect(inputText).toContain("Inputs: water [water] @far x3 consume");
+		expect(inputText).toContain("Item acquisition witnesses:\n    - ingot");
 		expect(outputText.match(/^- Level \d+:.*$/gm)).toEqual([
 			'- Level 1: line "Ingot Run"',
 			'- Level 2: line "Run"',
@@ -60,17 +60,17 @@ describe("editor MCP graph tool text", () => {
 				forge: {
 					...forge,
 					lines: forge.lines.map((line) => {
-						if (line.output === undefined)
+						if (line.outcome === undefined)
 							throw new Error("Expected authored line output.");
 						return {
 							...line,
-							output: {
-								...line.output,
-								set: line.output.set.map((set) => ({
+							outcome: {
+								...line.outcome,
+								set: line.outcome.set.map((set) => ({
 									...set,
 									roll: set.roll.map((roll) => ({
 										...roll,
-										drop: roll.drop.map((drop) => ({
+										outcome: roll.outcome.map((drop) => ({
 											...drop,
 											rules: [
 												{
@@ -141,4 +141,28 @@ describe("editor MCP graph tool text", () => {
 			);
 		}
 	});
+});
+
+it.each([
+	"summary",
+	"full",
+] as const)("retains Space outcomes beside item acquisition in %s relations", (detail) => {
+	const project = createRelationTraversalProject();
+	const outcome = project.config.items.forge.lines[0]?.outcome?.set[0]?.roll[0]?.outcome;
+	if (outcome === undefined) throw new Error("Missing fixture outcomes.");
+	outcome.push({
+		type: "space",
+		space: 7,
+		rules: [],
+	});
+	const text = Effect.runSync(
+		readItemRelationTextFx(project, {
+			itemId: "water",
+			level: 1,
+			role: "input",
+			detail,
+		}),
+	);
+	expect(text).toContain("Space 7");
+	expect(text).toContain("Ingot [ingot] x1; Space 7");
 });

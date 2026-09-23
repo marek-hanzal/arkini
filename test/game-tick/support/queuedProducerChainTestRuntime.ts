@@ -25,15 +25,16 @@ const simpleItem = (id: string) => ({
 	},
 });
 
-const output = (itemId: string) => ({
+const outcome = (itemId: string) => ({
 	set: [
 		{
 			rules: [],
 			roll: [
 				{
 					type: "guaranteed" as const,
-					drop: [
+					outcome: [
 						{
+							type: "item" as const,
 							itemId,
 							quantity: {
 								min: 1,
@@ -104,7 +105,7 @@ const producer = ({
 					: [
 							input,
 						],
-			output: output(outputItemId),
+			outcome: outcome(outputItemId),
 			rules: [],
 		},
 	],

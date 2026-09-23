@@ -3,7 +3,7 @@ import { z } from "zod";
 import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 
 /**
- * Inclusive positive bounds resolved by one input or output drop.
+ * Inclusive positive bounds resolved by one input or outcome drop.
  */
 export const QuantitySchema = z
 	.object({

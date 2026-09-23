@@ -113,61 +113,58 @@ describe("editor MCP optional item capabilities", {
 		});
 		expect(saved).not.toHaveProperty("clock.intervalMs");
 	});
-	it("rejects conflicting action production and preserves or clears the optional action explicitly", async () => {
-		const action = {
-			type: "space",
-			space: 4,
-			input: [],
-			rules: [],
-		};
-		const edit = (patch: Record<string, unknown>) =>
-			client.callTool({
-				name: "edit_item",
-				arguments: jsonToolInputFn({
-					itemId: itemId,
-					patch,
-				}),
-			});
-		const before = await Effect.runPromise(repository.readProjectFx(projectId));
-		const conflict = await edit({
-			action,
-			lines: productionLines,
+	it("preserves authored Space outcomes when changing unrelated item capabilities", async () => {
+		const lines = [
+			createLine({
+				default: true,
+				outcome: {
+					set: [
+						{
+							weight: 1,
+							rules: [],
+							roll: [
+								{
+									type: "guaranteed",
+									outcome: [
+										{
+											type: "space",
+											space: 4,
+											rules: [],
+										},
+									],
+								},
+							],
+						},
+					],
+				},
+			}),
+		];
+		const edited = await client.callTool({
+			name: "edit_item",
+			arguments: jsonToolInputFn({
+				itemId,
+				patch: {
+					lines,
+				},
+			}),
 		});
-		expect(conflict.isError).toBe(true);
-		expect((await Effect.runPromise(repository.readProjectFx(projectId)))?.revision).toBe(
-			before?.revision,
-		);
-		expect(
-			(
-				await edit({
-					action,
-					clock: null,
-					lines: [],
-				})
-			).isError,
-		).not.toBe(true);
-		expect(
-			(
-				await edit({
-					title: "Action owner",
-				})
-			).isError,
-		).not.toBe(true);
-		expect(
-			(await Effect.runPromise(repository.readProjectFx(projectId)))?.config.items[itemId],
-		).toMatchObject({
-			action,
-			lines: [],
+		expect(edited.isError).not.toBe(true);
+		const changed = await client.callTool({
+			name: "edit_item",
+			arguments: jsonToolInputFn({
+				itemId,
+				patch: {
+					title: "Portal workshop",
+				},
+			}),
 		});
-		expect(
-			(
-				await edit({
-					action: null,
-				})
-			).isError,
-		).not.toBe(true);
-		expect(
-			(await Effect.runPromise(repository.readProjectFx(projectId)))?.config.items[itemId],
-		).not.toHaveProperty("action");
+		expect(changed.isError).not.toBe(true);
+		const saved = (await Effect.runPromise(repository.readProjectFx(projectId)))?.config.items[
+			itemId
+		];
+		expect(saved?.lines).toEqual(lines);
+		expect(saved?.clock).toMatchObject({
+			durationMs: 2000,
+		});
 	});
 });

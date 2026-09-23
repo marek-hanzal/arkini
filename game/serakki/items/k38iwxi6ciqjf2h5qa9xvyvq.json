@@ -25,8 +25,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "spoiled-raw-game-meat",
 										"quantity": {
 											"min": 4,
@@ -36,6 +37,7 @@
 										"rules": []
 									},
 									{
+										"type": "item",
 										"itemId": "spoiled-animal-bones",
 										"quantity": {
 											"min": 1,
@@ -86,7 +88,7 @@
 						"type": "simple"
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -94,8 +96,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "disease",
 											"quantity": {
 												"min": 1,

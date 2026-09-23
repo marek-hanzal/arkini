@@ -12,7 +12,7 @@ import {
 } from "../support/readItemDetailLinesFxFixture";
 
 describe("readItemDetailLinesFx / drops and stale identities", () => {
-	it("groups duplicate drops without flattening guaranteed and chance rolls", () => {
+	it("preserves ordered outcomes without flattening guaranteed and chance rolls", () => {
 		const config = GameConfigSchema.parse({
 			resources: {
 				hero: "hero",
@@ -64,7 +64,7 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 								},
 							],
 							rules: [],
-							output: {
+							outcome: {
 								set: [
 									{
 										rules: [
@@ -88,8 +88,9 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 										roll: [
 											{
 												type: "guaranteed",
-												drop: [
+												outcome: [
 													{
+														type: "item",
 														itemId: "wood",
 														quantity: {
 															min: 2,
@@ -116,6 +117,7 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 														],
 													},
 													{
+														type: "item",
 														itemId: "wood",
 														quantity: {
 															min: 1,
@@ -128,8 +130,9 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 											{
 												type: "chance",
 												chance: 0.25,
-												drop: [
+												outcome: [
 													{
+														type: "item",
 														itemId: "gem",
 														quantity: {
 															min: 1,
@@ -192,19 +195,29 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 		const lines = readLines(runtime, ownerId, config);
 		expect(lines.kind).toBe("available");
 		if (lines.kind !== "available") throw new Error("Expected available lines.");
-		expect(lines.line[0]?.output).toEqual([
+		expect(lines.line[0]?.outcome).toEqual([
 			{
 				weight: 1,
 				activeRuleHints: [],
 				roll: [
 					{
 						kind: "guaranteed",
-						item: [
+						outcome: [
 							{
+								type: "item",
 								itemId: "wood",
 								quantity: {
-									min: 3,
-									max: 5,
+									min: 2,
+									max: 2,
+								},
+								activeRuleHints: [],
+							},
+							{
+								type: "item",
+								itemId: "wood",
+								quantity: {
+									min: 1,
+									max: 3,
 								},
 								activeRuleHints: [],
 							},
@@ -213,8 +226,9 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 					{
 						kind: "chance",
 						chance: 0.25,
-						item: [
+						outcome: [
 							{
+								type: "item",
 								itemId: "gem",
 								quantity: {
 									min: 1,

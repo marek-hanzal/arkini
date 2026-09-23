@@ -47,39 +47,6 @@ export const config = GameConfigSchema.parse({
 
 			...base("second"),
 		},
-		blocked: {
-			...base("blocked"),
-
-			action: {
-				type: "space" as const,
-				space: 2,
-				rules: [
-					{
-						type: "enable",
-						when: [
-							{
-								type: "exists",
-								query: {
-									distance: "universe",
-									selector: {
-										type: "item",
-										itemId: "permit",
-									},
-								},
-							},
-						],
-					},
-				],
-			},
-		},
-		ready: {
-			...base("ready"),
-
-			action: {
-				type: "space" as const,
-				space: 7,
-			},
-		},
 		permit: {
 			maxQueueSize: 1,
 			lines: [],

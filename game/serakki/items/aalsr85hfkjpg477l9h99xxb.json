@@ -36,8 +36,9 @@
 							{
 								"type": "chance",
 								"chance": 0.35,
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "bio-waste",
 										"quantity": {
 											"min": 1,

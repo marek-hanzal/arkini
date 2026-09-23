@@ -20,7 +20,7 @@
 					"itemId": "cow-pen"
 				},
 				"action": "use",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -28,8 +28,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "cow",
 											"quantity": {
 												"min": 1,
@@ -52,7 +53,7 @@
 					"itemId": "pig-pen"
 				},
 				"action": "use",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -60,8 +61,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "pig",
 											"quantity": {
 												"min": 1,
@@ -84,7 +86,7 @@
 					"itemId": "sheep-pen"
 				},
 				"action": "use",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -92,8 +94,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "sheep",
 											"quantity": {
 												"min": 1,
@@ -116,7 +119,7 @@
 					"itemId": "chicken-coop"
 				},
 				"action": "use",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -124,8 +127,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "chicken",
 											"quantity": {
 												"min": 1,
@@ -148,7 +152,7 @@
 					"itemId": "goose-pen"
 				},
 				"action": "use",
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -156,8 +160,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "goose",
 											"quantity": {
 												"min": 1,

@@ -15,12 +15,13 @@ interface ResolveMergeRuleResult {
 	readonly rule: MergeSchema.Type;
 }
 
-/** Resolves the first authored source-owned rule matching one selected target. */
+/** Selects a source-owned match first, then the receiving item’s Space variant. Admission failures never retry another rule. */
 export const resolveMergeRuleFx = Effect.fn("resolveMergeRuleFx")(function* ({
 	source,
 	target,
 }: ResolveMergeRuleProps) {
 	for (const [index, rule] of (source.item.merge ?? []).entries()) {
+		if (rule.action === "space") continue;
 		const matches = selectItemsFn({
 			items: [
 				target.item,
@@ -33,6 +34,14 @@ export const resolveMergeRuleFx = Effect.fn("resolveMergeRuleFx")(function* ({
 				rule,
 			} satisfies ResolveMergeRuleResult;
 		}
+	}
+
+	for (const [index, rule] of (target.item.merge ?? []).entries()) {
+		if (rule.action === "space")
+			return {
+				index,
+				rule,
+			} satisfies ResolveMergeRuleResult;
 	}
 
 	return yield* Effect.fail(

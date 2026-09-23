@@ -1,6 +1,5 @@
 import { ArtworkDetail } from "~/item-authoring/ui/ArtworkDetail";
 import { ClockDetail } from "~/item-authoring/ui/ClockDetail";
-import { ActionDetail } from "~/item-authoring/ui/ActionDetail";
 import { UnitsDetail } from "~/item-authoring/ui/CapabilityDetails";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { ItemChain } from "~/item-chain/ui/ItemChain";
@@ -82,8 +81,6 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/d
 				return <UnitsDetail item={item} />;
 			case "clock":
 				return <ClockDetail item={item} />;
-			case "action":
-				return <ActionDetail item={item} />;
 			case "production":
 				return <ProductionDetail item={item} />;
 			case "merges":

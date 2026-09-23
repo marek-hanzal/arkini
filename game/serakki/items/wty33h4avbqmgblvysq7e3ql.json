@@ -35,8 +35,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "spoiled-flowers",
 										"quantity": {
 											"min": 1,

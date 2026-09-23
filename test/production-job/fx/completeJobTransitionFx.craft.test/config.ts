@@ -1,12 +1,13 @@
 import type { z } from "zod";
 
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { OutputSchema } from "~/production-output/schema/OutputSchema";
+import { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
-type OutputInput = z.input<typeof OutputSchema>;
+type OutputInput = z.input<typeof OutcomeTableSchema>;
 
 const fixedDrop = (itemId: string, quantity = 1) => ({
+	type: "item" as const,
 	itemId,
 	placement: "drop" as const,
 	quantity: {
@@ -17,13 +18,13 @@ const fixedDrop = (itemId: string, quantity = 1) => ({
 });
 
 const guaranteedOutput = (...itemIds: ReadonlyArray<string>): OutputInput =>
-	OutputSchema.parse({
+	OutcomeTableSchema.parse({
 		set: [
 			{
 				rules: [],
 				roll: [
 					{
-						drop: itemIds.map((itemId) => fixedDrop(itemId)),
+						outcome: itemIds.map((itemId) => fixedDrop(itemId)),
 						type: "guaranteed",
 					},
 				],
@@ -32,12 +33,12 @@ const guaranteedOutput = (...itemIds: ReadonlyArray<string>): OutputInput =>
 	});
 
 const randomOutput = (...itemIds: ReadonlyArray<string>): OutputInput =>
-	OutputSchema.parse({
+	OutcomeTableSchema.parse({
 		set: itemIds.map((itemId) => ({
 			rules: [],
 			roll: [
 				{
-					drop: [
+					outcome: [
 						fixedDrop(itemId, 2),
 					],
 					type: "guaranteed" as const,
@@ -50,11 +51,11 @@ const randomOutput = (...itemIds: ReadonlyArray<string>): OutputInput =>
 const craftItem = ({
 	id,
 	inputItemId,
-	output,
+	outcome,
 }: {
 	readonly id: string;
 	readonly inputItemId?: string;
-	readonly output?: OutputInput;
+	readonly outcome?: OutputInput;
 }) =>
 	({
 		maxQueueSize: 1,
@@ -107,7 +108,7 @@ const craftItem = ({
 									type: "materials",
 								},
 							],
-				output,
+				outcome,
 				rules: [],
 				runtimeMs: 200,
 				title: `line:${id}`,
@@ -145,21 +146,21 @@ export const craftCompletionConfig = GameConfigSchema.parse({
 		"craft:drop": craftItem({
 			id: "craft:drop",
 
-			output: guaranteedOutput("item:product"),
+			outcome: guaranteedOutput("item:product"),
 		}),
-		"craft:ordered-output": craftItem({
-			id: "craft:ordered-output",
+		"craft:ordered-outcome": craftItem({
+			id: "craft:ordered-outcome",
 
-			output: guaranteedOutput("item:bonus", "item:result"),
+			outcome: guaranteedOutput("item:bonus", "item:result"),
 		}),
 		"craft:random": craftItem({
 			id: "craft:random",
-			output: randomOutput("item:random-a", "item:random-b"),
+			outcome: randomOutput("item:random-a", "item:random-b"),
 		}),
 		"craft:reserve": craftItem({
 			id: "craft:reserve",
 			inputItemId: "item:tool",
-			output: guaranteedOutput("item:product"),
+			outcome: guaranteedOutput("item:product"),
 		}),
 		"craft:sink": craftItem({
 			id: "craft:sink",

@@ -14,7 +14,7 @@
 		},
 		"units": {
 			"amount": 8,
-			"output": {
+			"outcome": {
 				"set": [
 					{
 						"weight": 1,
@@ -23,8 +23,9 @@
 							{
 								"type": "chance",
 								"chance": 0.5,
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "corruption",
 										"quantity": {
 											"min": 1,

@@ -25,8 +25,9 @@
 						"roll": [
 							{
 								"type": "guaranteed",
-								"drop": [
+								"outcome": [
 									{
+										"type": "item",
 										"itemId": "beagle-puppy",
 										"quantity": {
 											"min": 1,
@@ -59,7 +60,7 @@
 						"type": "simple"
 					}
 				],
-				"output": {
+				"outcome": {
 					"set": [
 						{
 							"weight": 1,
@@ -67,8 +68,9 @@
 							"roll": [
 								{
 									"type": "guaranteed",
-									"drop": [
+									"outcome": [
 										{
+											"type": "item",
 											"itemId": "cotton-wool",
 											"quantity": {
 												"min": 1,
@@ -78,6 +80,7 @@
 											"rules": []
 										},
 										{
+											"type": "item",
 											"itemId": "cotton-fabric",
 											"quantity": {
 												"min": 1,

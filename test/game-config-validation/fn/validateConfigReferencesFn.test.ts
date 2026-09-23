@@ -84,7 +84,7 @@ describe("completed config reference validation", () => {
 						mode: "consume" as const,
 					},
 				],
-				output: createOutput([
+				outcome: createOutput([
 					{
 						itemId: "item:missing-output",
 					},
@@ -133,30 +133,50 @@ describe("completed config reference validation", () => {
 		const portal = {
 			...createItemBase("item:portal"),
 
-			action: {
-				type: "space" as const,
-				space: 1,
-				input: [
-					unitsInput("item:missing-units"),
-				],
-				rules: [
-					{
-						type: "enable" as const,
-						when: [
+			lines: [
+				createLine({
+					default: true,
+					input: [
+						unitsInput("item:missing-units"),
+					],
+					outcome: {
+						set: [
 							{
-								type: "exists" as const,
-								query: {
-									distance: "universe",
-									selector: {
-										type: "item" as const,
-										itemId: "item:missing-rule",
+								weight: 1,
+								rules: [],
+								roll: [
+									{
+										type: "guaranteed",
+										outcome: [
+											{
+												type: "space",
+												space: 1,
+												rules: [
+													{
+														type: "enable" as const,
+														when: [
+															{
+																type: "exists" as const,
+																query: {
+																	distance: "universe",
+																	selector: {
+																		type: "item" as const,
+																		itemId: "item:missing-rule",
+																	},
+																},
+															},
+														],
+													},
+												],
+											},
+										],
 									},
-								},
+								],
 							},
 						],
 					},
-				],
-			},
+				}),
+			],
 		};
 		const result = await compileItems({
 			[portal.id]: portal,
@@ -247,7 +267,7 @@ describe("completed config reference validation", () => {
 			lines: [
 				{
 					...createLine({}),
-					output: {
+					outcome: {
 						set: [
 							{
 								weight: 1,
@@ -271,8 +291,9 @@ describe("completed config reference validation", () => {
 								roll: [
 									{
 										type: "guaranteed",
-										drop: [
+										outcome: [
 											{
+												type: "item",
 												itemId: "item:producer",
 												quantity: {
 													min: 1,
@@ -301,7 +322,7 @@ describe("completed config reference validation", () => {
 					producer.id,
 					"lines",
 					0,
-					"output",
+					"outcome",
 					"set",
 					0,
 					"rules",

@@ -31,7 +31,7 @@ interface CompleteScheduledItemExpiryTransitionResult {
 	readonly runtime: RuntimeSchema.Type;
 }
 
-/** Removes one ready scheduled item and returns exact expiry and output facts. */
+/** Removes one ready scheduled item and returns exact expiry and outcome facts. */
 const completeScheduledItemExpiryTransitionFx = Effect.fn(
 	"completeScheduledItemExpiryTransitionFx",
 )(function* ({ itemId, runtime }: AttemptScheduledItemExpiryProps) {
@@ -52,7 +52,7 @@ const completeScheduledItemExpiryTransitionFx = Effect.fn(
 		removalMode: force ? "kill-switch" : undefined,
 		item,
 		origin: context.origin,
-		output: schedule.onExpire,
+		outcome: schedule.onExpire,
 		randomSeed: [
 			"serakki:scheduled-expiry",
 			"v1",

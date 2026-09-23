@@ -11,6 +11,7 @@ import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import { readActorCursorFn } from "~/tile-rendering/fn/readActorCursorFn";
 import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
 import { settleDraggedActorFx } from "~/tile-interaction/fx/settleDraggedActorFx";
+import { isSameTileActorLocationFn } from "~/tile-rendering/fn/isSameTileActorLocationFn";
 import type { CursorGrabMotion } from "~/tile-interaction/fx/createCursorGrabMotionFx";
 import type { DropPresentation } from "~/tile-interaction/fx/createDropPresentationFx";
 import type { MainInteractionSurface } from "~/tile-interaction/type/MainInteractionSurface";
@@ -138,7 +139,15 @@ export const createDropSubmissionFx = Effect.fn("createDropSubmissionFx")(functi
 							}
 							if (
 								result.kind !== DropItemResultKind.Reject &&
-								result.kind !== DropItemResultKind.Ignored
+								result.kind !== DropItemResultKind.Ignored &&
+								!(
+									result.kind === DropItemResultKind.Merge &&
+									result.source.current !== null &&
+									isSameTileActorLocationFn(
+										result.source.current.location,
+										sourceItem.location,
+									)
+								)
 							) {
 								onSettledDropFn();
 								return;

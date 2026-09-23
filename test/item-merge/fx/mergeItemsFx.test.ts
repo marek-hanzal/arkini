@@ -159,7 +159,16 @@ describe("mergeItemsFx", () => {
 				runMergeFx().pipe(
 					useGameFx({
 						config,
-						state: makeState(),
+						state: makeState({
+							targetLocation: {
+								scope: "board",
+								space: 0,
+								position: {
+									x: 3,
+									y: 1,
+								},
+							},
+						}),
 					}),
 				),
 			);
@@ -173,7 +182,28 @@ describe("mergeItemsFx", () => {
 					(item) => item.id === "runtime:source",
 				);
 				const sourceAfter = result.after.items.find((item) => item.id === "runtime:source");
-				expect(sourceAfter?.location).toEqual(sourceBefore?.location);
+				expect(sourceAfter?.location).toEqual({
+					scope: "board",
+					space: 0,
+					position:
+						effect === "remove"
+							? {
+									x: 3,
+									y: 1,
+								}
+							: {
+									x: 3,
+									y: 0,
+								},
+				});
+				expect(result.transition.events).toContainEqual({
+					type: GameEventEnumSchema.enum.ItemPlaced,
+					itemId: "runtime:source",
+					itemUid: "source",
+					originItemId: "runtime:target",
+					previousLocation: sourceBefore?.location,
+					location: sourceAfter?.location,
+				});
 				expect(sourceAfter?.revision).not.toBe(sourceBefore?.revision);
 			}
 
@@ -192,7 +222,11 @@ describe("mergeItemsFx", () => {
 				effect,
 				resultItemUid: effect === "replace" ? "result" : undefined,
 			});
-			expect(result.transition.events.map((event) => event.type)).toEqual(
+			expect(
+				result.transition.events
+					.filter((event) => event.type !== GameEventEnumSchema.enum.ItemPlaced)
+					.map((event) => event.type),
+			).toEqual(
 				effect === "remove"
 					? [
 							GameEventEnumSchema.enum.ItemMerged,
@@ -215,6 +249,42 @@ describe("mergeItemsFx", () => {
 			);
 		});
 	}
+
+	it("reuses the tool's own cell when a use drop has no closer free cell on a full board", () => {
+		const result = Effect.runSync(
+			runMergeFx().pipe(
+				useGameFx({
+					config: createMergeTestConfig({
+						board: {
+							width: 2,
+							height: 1,
+						},
+						rule: {
+							action: "use",
+							effect: "keep",
+							target: {
+								type: "item",
+								itemUid: "target",
+							},
+						},
+					}),
+					state: makeState(),
+				}),
+			),
+		);
+		const sourceBefore = result.before.items.find((item) => item.id === "runtime:source");
+		const sourceAfter = result.after.items.find((item) => item.id === "runtime:source");
+		expect(sourceAfter?.location).toEqual(sourceBefore?.location);
+		expect(result.after.items).toHaveLength(2);
+		expect(result.transition.events).toContainEqual(
+			expect.objectContaining({
+				type: GameEventEnumSchema.enum.ItemPlaced,
+				itemId: "runtime:source",
+				originItemId: "runtime:target",
+				location: sourceBefore?.location,
+			}),
+		);
+	});
 
 	it("treats placed merge output as the removed target's replacement", () => {
 		const result = Effect.runSync(

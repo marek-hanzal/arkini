@@ -146,7 +146,7 @@ Authored merge source action summary help:
   value: |
     What happens to the item you drag:
 
-    - **Use:** keep it.
+    - **Use:** keep it and drop it near the target.
     - **Consume:** remove one item.
     - **Spend:** remove one Unit.
     - **Space:** receive any dragged item and send that same instance to the configured space.
@@ -1127,7 +1127,7 @@ Merge source spend help:
     At zero Units, that item depletes and may create its depletion output.
 Merge source use help:
   value: |
-    **Use** keeps the dragged item in its original cell.
+    **Use** keeps the dragged item and drops it into the nearest free cell around the target after the interaction.
 
     Items with Units, Clock state, stored inputs or production work cannot be reused this way. A plain reusable tool works well.
 Merge target keep help:

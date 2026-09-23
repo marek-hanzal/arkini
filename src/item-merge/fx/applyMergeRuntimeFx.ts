@@ -387,6 +387,20 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 			replacementItemIds: mergeReplacementItemIds,
 		});
 	}
+	// Relocate only a surviving tool; a Template outcome must never resurrect the old source.
+	if (
+		rule.action === SourceActionSchema.enum.Use &&
+		draft.items.some((item) => item.id === source.id)
+	) {
+		const dropped = yield* relocateBoardItemFx({
+			itemId: source.id,
+			origin: target.location,
+			originItemId: target.id,
+			runtime: draft,
+		});
+		draft = dropped.runtime;
+		facts.push(...dropped.events);
+	}
 	return {
 		facts,
 		runtime: draft,

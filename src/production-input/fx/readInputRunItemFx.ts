@@ -11,7 +11,7 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 export namespace readInputRunItemFx {
 	export interface Props {
 		ownerItemId: IdSchema.Type;
-		lineId: IdSchema.Type;
+		lineUid: IdSchema.Type;
 		inputIndex: NonNegativeIntegerSchema.Type;
 		itemId: IdSchema.Type;
 		runtime: RuntimeSchema.Type;
@@ -21,7 +21,7 @@ export namespace readInputRunItemFx {
 /** Reads one exact buffered item allocation from a line-run plan. */
 export const readInputRunItemFx = Effect.fn("readInputRunItemFx")(function* ({
 	ownerItemId,
-	lineId,
+	lineUid,
 	inputIndex,
 	itemId,
 	runtime,
@@ -34,13 +34,13 @@ export const readInputRunItemFx = Effect.fn("readInputRunItemFx")(function* ({
 	const validLocation =
 		item !== undefined &&
 		item.location.ownerItemId === ownerItemId &&
-		item.location.lineId === lineId &&
+		item.location.lineUid === lineUid &&
 		item.location.inputIndex === inputIndex;
 	if (!validLocation || item === undefined) {
 		return yield* Effect.fail(
 			new InputRunPlanInvalidError({
 				ownerItemId,
-				lineId,
+				lineUid,
 				inputIndex,
 				itemId,
 			}),

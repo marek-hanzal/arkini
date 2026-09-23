@@ -66,7 +66,7 @@ export const abortJobRuntimeFx = Effect.fn("abortJobRuntimeFx")(function* ({
 			jobId: job.id,
 			ownerItemId: owner.id,
 			itemUid: owner.item.uid,
-			lineId: job.lineId,
+			lineUid: job.lineUid,
 			reason,
 		},
 	];

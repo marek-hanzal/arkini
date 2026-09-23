@@ -54,14 +54,14 @@ it("keeps line clearing separate from exact active job cancellation across stale
 			{
 				id: "first",
 				ownerItemId: "owner:a",
-				lineId: "line:a",
+				lineUid: "line:a",
 			},
 		],
 	};
 	const pending = {
 		id: "pending",
 		ownerItemId: "owner:a",
-		lineId: "line:a",
+		lineUid: "line:a",
 	};
 	const transition = Atom.make({
 		runtime: {
@@ -81,7 +81,7 @@ it("keeps line clearing separate from exact active job cancellation across stale
 	const Probe = ({ jobId, disabled }: { jobId: string; disabled: boolean }) => {
 		output = useItemLineWorkController({
 			ownerItemId: "owner:a",
-			lineId: "line:a",
+			lineUid: "line:a",
 			jobId,
 			disabled,
 		});
@@ -104,7 +104,7 @@ it("keeps line clearing separate from exact active job cancellation across stale
 		await act(async () => output!.clearFn());
 		expect(state.clearFx).toHaveBeenLastCalledWith({
 			ownerItemId: "owner:a",
-			lineId: "line:a",
+			lineUid: "line:a",
 		});
 
 		await act(async () => output!.cancelJobFn());
@@ -123,7 +123,7 @@ it("keeps line clearing separate from exact active job cancellation across stale
 						{
 							id: "next",
 							ownerItemId: "owner:a",
-							lineId: "line:a",
+							lineUid: "line:a",
 						},
 					],
 				},
@@ -153,13 +153,13 @@ it("keeps line clearing separate from exact active job cancellation across stale
 						{
 							id: "next",
 							ownerItemId: "owner:a",
-							lineId: "other",
+							lineUid: "other",
 						},
 					],
 					jobQueue: [
 						{
 							...pending,
-							lineId: "other",
+							lineUid: "other",
 						},
 					],
 				},

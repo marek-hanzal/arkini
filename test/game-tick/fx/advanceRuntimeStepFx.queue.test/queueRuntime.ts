@@ -17,7 +17,7 @@ export const queueConfig = GameConfigSchema.parse({
 			...forge,
 			lines: [
 				{
-					id: "line:older",
+					uid: "line:older",
 					title: "Older",
 					description: "Wait for two tools.",
 					runtimeMs: 1_000,
@@ -41,7 +41,7 @@ export const queueConfig = GameConfigSchema.parse({
 					rules: [],
 				},
 				{
-					id: "line:later",
+					uid: "line:later",
 					title: "Later",
 					description: "Run without materials.",
 					runtimeMs: 1_000,
@@ -53,7 +53,7 @@ export const queueConfig = GameConfigSchema.parse({
 					rules: [],
 				},
 				{
-					id: "line:water",
+					uid: "line:water",
 					title: "Water",
 					description: "Compete for the shared water.",
 					runtimeMs: 1_000,
@@ -97,7 +97,7 @@ export const createContendedQueueConfigFn = () => {
 			forge: {
 				...producer,
 				lines: producer.lines.map((line) =>
-					line.id !== "line:later"
+					line.uid !== "line:later"
 						? line
 						: {
 								...line,
@@ -126,12 +126,12 @@ export const createContendedQueueConfigFn = () => {
 
 export const requestFn = (
 	id: string,
-	lineId: string,
+	lineUid: string,
 	ownerItemId = "owner:a",
 ): JobQueueRequestSchema.Type => ({
 	id,
 	ownerItemId,
-	lineId,
+	lineUid,
 });
 
 export const itemFn = (
@@ -159,7 +159,7 @@ export const bufferFn = (id = "buffer:older") =>
 	itemFn(id, "tool", {
 		scope: "input",
 		ownerItemId: "owner:a",
-		lineId: "line:older",
+		lineUid: "line:older",
 		inputIndex: 0,
 	});
 

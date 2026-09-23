@@ -40,7 +40,7 @@ describe("runtime purity invariants", () => {
 					location: {
 						scope: "input" as const,
 						ownerItemId: "runtime:craft",
-						lineId: "line:craft",
+						lineUid: "line:craft",
 						inputIndex: 0,
 					},
 
@@ -51,7 +51,7 @@ describe("runtime purity invariants", () => {
 				{
 					id: "job:craft",
 					ownerItemId: "runtime:craft",
-					lineId: "line:craft",
+					lineUid: "line:craft",
 					durationMs: 1_000,
 					remainingMs: 1_000,
 				},
@@ -74,7 +74,7 @@ describe("runtime purity invariants", () => {
 		expect(result.issues).toEqual([
 			{
 				ownerItemId: "runtime:craft",
-				lineId: "line:craft",
+				lineUid: "line:craft",
 				inputIndex: 0,
 				itemIds: [
 					"runtime:material",

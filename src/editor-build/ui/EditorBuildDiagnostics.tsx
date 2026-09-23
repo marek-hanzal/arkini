@@ -44,7 +44,7 @@ const readDiagnosticItemUidsFn = (diagnostic: GameDiagnosticSchema.Type): Readon
 	switch (diagnostic.code) {
 		case "input:units-invalid":
 		case "merge:invalid":
-		case "line:duplicate-id":
+		case "line:duplicate-uid":
 		case "line:multiple-selections":
 			return [
 				diagnostic.ownerItemUid,
@@ -76,7 +76,7 @@ const readOwnedItemSectionFn = (diagnostic: GameDiagnosticSchema.Type): SectionI
 			return "merges";
 		case "input:units-invalid":
 		case "input:acceptance-cycle":
-		case "line:duplicate-id":
+		case "line:duplicate-uid":
 		case "line:multiple-selections":
 			return "production";
 		case "units:stochastic-renewal":

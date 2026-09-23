@@ -14,7 +14,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "plant-tree",
+				"uid": "ca84ye5yxo1vyfkmwad44gpz",
 				"title": "Plant Tree",
 				"artwork": "v8g54zmhycj9vahfol4yragc",
 				"description": "Use a loose Tree Seed while working beside an established Forest. The Forester plants the new tree somewhere suitable on the board.",
@@ -86,7 +86,7 @@
 				]
 			},
 			{
-				"id": "plant-tree-stored",
+				"uid": "kwwc6uaubagpn3oe75xgn44g",
 				"title": "Plant Tree From Sack",
 				"artwork": "v8g54zmhycj9vahfol4yragc",
 				"description": "Use stored Tree Seed while working beside an established Forest. The sack survives the indignity and comes back empty.",
@@ -168,7 +168,7 @@
 				]
 			},
 			{
-				"id": "search-tree-seed",
+				"uid": "k4cambehkk02wsnl2wkqoxpj",
 				"title": "Search For Tree Seed",
 				"artwork": "vh26v4kb2y915z79r4x5rlqs",
 				"description": "Search a nearby Forest for viable seed. Each trip has a 25% chance to find one.",
@@ -229,7 +229,7 @@
 				]
 			},
 			{
-				"id": "establish-forest",
+				"uid": "ynxfuk0zy9k2pc3cmbrddnuc",
 				"title": "Establish Forest",
 				"artwork": "vh26v4kb2y915z79r4x5rlqs",
 				"description": "Turn three existing trees into a permanent Forest. It is less magic than admitting that three trees have become somebody's management problem.",

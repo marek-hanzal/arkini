@@ -14,7 +14,7 @@
 		"maxQueueSize": 4,
 		"lines": [
 			{
-				"id": "cow",
+				"uid": "ghznip8tv7x716i0zkbq0jqu",
 				"title": "Cow",
 				"artwork": "cu5g8wg1z1z5egmgcf3x02jb",
 				"description": "Feed and water a cow before releasing it from a nearby populated pen.",
@@ -107,7 +107,7 @@
 				"rules": []
 			},
 			{
-				"id": "empty-cow-pen",
+				"uid": "soygn8wufnaljlr54wwfc8wt",
 				"title": "Prepare Cow Pen",
 				"artwork": "gb89ubbwj3xq884llit16hyw",
 				"description": "Prepare a new empty enclosure using 3 planks.",
@@ -161,7 +161,7 @@
 				"rules": []
 			},
 			{
-				"id": "blueprint",
+				"uid": "wq0w56utjfvalft2qdoaazk7",
 				"title": "Cow Farm Blueprint",
 				"artwork": "so7r094glj6wfe6yoveiclrg",
 				"description": "Sketch plans for another Cow Farm.",

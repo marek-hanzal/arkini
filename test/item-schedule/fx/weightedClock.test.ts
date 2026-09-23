@@ -15,7 +15,7 @@ import { createClockConfig, spawnClockItemFx } from "./clockSchedule.test/fixtur
 const weightedLines = [
 	{
 		...createLine({
-			id: "light",
+			uid: "light",
 			clock: true,
 		}),
 		clockWeight: 1,
@@ -23,7 +23,7 @@ const weightedLines = [
 	},
 	{
 		...createLine({
-			id: "heavy",
+			uid: "heavy",
 			clock: true,
 		}),
 		clockWeight: 9,
@@ -49,7 +49,7 @@ describe("weighted Clock admission", () => {
 									pulseSequence,
 								},
 							},
-						}))?.id,
+						}))?.uid,
 					);
 				}
 				return ids;
@@ -59,7 +59,7 @@ describe("weighted Clock admission", () => {
 						lines: [
 							{
 								...weightedLines[0],
-								id: "gated",
+								uid: "gated",
 								clockWeight: 999,
 								rules: [
 									{
@@ -72,7 +72,7 @@ describe("weighted Clock admission", () => {
 							},
 							{
 								...weightedLines[0],
-								id: "vetoed",
+								uid: "vetoed",
 								clockWeight: 999,
 								rules: [
 									{
@@ -91,7 +91,7 @@ describe("weighted Clock admission", () => {
 							},
 							{
 								...weightedLines[0],
-								id: "hidden",
+								uid: "hidden",
 								show: false,
 								enable: false,
 								rules: [
@@ -138,7 +138,7 @@ describe("weighted Clock admission", () => {
 							},
 						},
 					});
-					if (line !== undefined) draws.push(line.id);
+					if (line !== undefined) draws.push(line.uid);
 				}
 				const first = yield* replayRuntimeStepsFx({
 					runtime,
@@ -177,8 +177,8 @@ describe("weighted Clock admission", () => {
 		// Fixed owner/cursor seeds make this a repeatable distribution regression, not a probabilistic test.
 		expect(result.draws.filter((id) => id === "heavy").length).toBeGreaterThan(240);
 		expect(result.draws).toContain("light");
-		expect(result.resumed.jobQueue.map((request) => request.lineId)).toEqual(
-			result.uninterrupted.jobQueue.map((request) => request.lineId),
+		expect(result.resumed.jobQueue.map((request) => request.lineUid)).toEqual(
+			result.uninterrupted.jobQueue.map((request) => request.lineUid),
 		);
 		expect(result.resumed.items[0].schedule).toEqual(result.uninterrupted.items[0].schedule);
 		expect(result.resumed.items[0].schedule?.pulseSequence).toBe(20);
@@ -203,7 +203,7 @@ describe("weighted Clock admission", () => {
 							item: {
 								...owner.item,
 								lines: owner.item.lines.map((line) =>
-									line.id === selected.id
+									line.uid === selected.uid
 										? {
 												...line,
 												input: [

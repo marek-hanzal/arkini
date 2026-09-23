@@ -14,7 +14,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "line:new-item:default",
+				"uid": "k2tsy9dwbmpwwj0u8egw98ek",
 				"title": "New producer line",
 				"description": "Describe what this producer line consumes and produces.",
 				"default": true,

@@ -30,7 +30,7 @@ export type EngineFact =
 			readonly type: "autofill:admitted";
 			readonly ownerItemId: IdSchema.Type;
 			readonly itemUid: IdSchema.Type;
-			readonly lineId: IdSchema.Type;
+			readonly lineUid: IdSchema.Type;
 			readonly deliveries: readonly {
 				readonly id: IdSchema.Type;
 				readonly revision: RevisionSchema.Type;
@@ -41,5 +41,5 @@ export type EngineFact =
 			readonly jobId: IdSchema.Type;
 			readonly ownerItemId: IdSchema.Type;
 			readonly itemUid: IdSchema.Type;
-			readonly lineId: IdSchema.Type;
+			readonly lineUid: IdSchema.Type;
 	  };

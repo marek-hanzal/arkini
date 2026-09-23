@@ -22,13 +22,13 @@ const inputItem = ({
 	id = "runtime:water",
 	inputIndex = 0,
 	itemId = "water",
-	lineId = "line:workshop:build",
+	lineUid = "line:workshop:build",
 	ownerItemId = "runtime:workshop",
 }: {
 	id?: string;
 	inputIndex?: number;
 	itemId?: "stone" | "water";
-	lineId?: string;
+	lineUid?: string;
 	ownerItemId?: string;
 }) => {
 	return {
@@ -37,7 +37,7 @@ const inputItem = ({
 		location: {
 			scope: "input" as const,
 			ownerItemId,
-			lineId,
+			lineUid,
 			inputIndex,
 		},
 
@@ -74,7 +74,7 @@ describe("checkRuntimeInputLocationsFn", () => {
 					}),
 					inputItem({
 						id: "runtime:missing-line",
-						lineId: "line:missing",
+						lineUid: "line:missing",
 					}),
 					inputItem({
 						id: "runtime:invalid-slot",

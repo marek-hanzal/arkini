@@ -8,7 +8,7 @@ export const JobSchema = z
 	.object({
 		id: IdSchema.describe("The stable identity of this active product-line run."),
 		ownerItemId: IdSchema.describe("The runtime item that owns this product-line run."),
-		lineId: IdSchema.describe("The configured product line executed by this run."),
+		lineUid: IdSchema.describe("The configured product line executed by this run."),
 		durationMs: TimeSchema.describe("The duration captured when this job started."),
 		remainingMs: TimeSchema.describe("The real work time still required by this job."),
 	})

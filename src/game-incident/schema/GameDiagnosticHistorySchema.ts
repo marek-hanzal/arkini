@@ -12,8 +12,8 @@ import {
 const GameDiagnosticDefaultLineChangeSchema = z
 	.object({
 		owner: GameDiagnosticItemReferenceSchema,
-		previousLineId: IdSchema.nullable(),
-		lineId: IdSchema.nullable(),
+		previousLineUid: IdSchema.nullable(),
+		lineUid: IdSchema.nullable(),
 	})
 	.strict();
 

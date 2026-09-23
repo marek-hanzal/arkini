@@ -55,7 +55,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "idle",
+				"uid": "g8qx9c438ag10b7zws7iteve",
 				"title": "Idle",
 				"description": "The sick animal rests and does nothing this time.",
 				"clock": true,
@@ -72,7 +72,7 @@
 				"rules": []
 			},
 			{
-				"id": "spread-disease",
+				"uid": "ucesjxt18s16zwdg7gcmgfmt",
 				"title": "Spread Disease",
 				"artwork": "fnom9s6mxxkza9m7iahgp5k9",
 				"description": "The sick animal may contaminate its immediate surroundings.",

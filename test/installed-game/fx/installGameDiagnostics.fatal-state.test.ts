@@ -81,7 +81,7 @@ describe("Game fatal-state diagnostics", () => {
 					itemUid: ownerDefinition.uid,
 					jobId: "job:last",
 					ownerItemId,
-					lineId: "line:finite:work",
+					lineUid: "line:finite:work",
 				},
 			],
 			runtime: {
@@ -113,7 +113,7 @@ describe("Game fatal-state diagnostics", () => {
 					{
 						id: "job:last",
 						ownerItemId,
-						lineId: "line:finite:work",
+						lineUid: "line:finite:work",
 						durationMs: 5_000,
 						remainingMs: 100,
 					},
@@ -121,7 +121,7 @@ describe("Game fatal-state diagnostics", () => {
 				jobQueue: requestIds.map((id) => ({
 					id,
 					ownerItemId,
-					lineId: "line:finite:work",
+					lineUid: "line:finite:work",
 				})),
 				defaultLineByOwnerItemId: {
 					[ownerItemId]: "line:finite:work",

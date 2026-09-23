@@ -15,13 +15,13 @@ export namespace checkRuntimeDefaultLinesFn {
 /** Reports stale or foreign default-line identities retained by one runtime snapshot. */
 export const checkRuntimeDefaultLinesFn = ({ runtime }: checkRuntimeDefaultLinesFn.Props) => {
 	const issues: DefaultLineIssueSchema.Type[] = [];
-	for (const [ownerItemId, lineId] of Object.entries(runtime.defaultLineByOwnerItemId)) {
+	for (const [ownerItemId, lineUid] of Object.entries(runtime.defaultLineByOwnerItemId)) {
 		const owner = runtime.items.find((item) => item.id === ownerItemId);
 		if (owner === undefined) {
 			issues.push({
 				type: RuntimeCheckIssueEnumSchema.enum.DefaultLine,
 				ownerItemId,
-				lineId,
+				lineUid,
 				reason: DefaultLineIssueReasonEnumSchema.enum.OwnerMissing,
 			});
 			continue;
@@ -31,18 +31,18 @@ export const checkRuntimeDefaultLinesFn = ({ runtime }: checkRuntimeDefaultLines
 			issues.push({
 				type: RuntimeCheckIssueEnumSchema.enum.DefaultLine,
 				ownerItemId,
-				lineId,
+				lineUid,
 				reason: DefaultLineIssueReasonEnumSchema.enum.OwnerUnsupported,
 			});
 			continue;
 		}
-		if (lineId === null) continue;
+		if (lineUid === null) continue;
 		const lines = ownerItem.lines;
-		if (!lines.some((line) => line.id === lineId)) {
+		if (!lines.some((line) => line.uid === lineUid)) {
 			issues.push({
 				type: RuntimeCheckIssueEnumSchema.enum.DefaultLine,
 				ownerItemId,
-				lineId,
+				lineUid,
 				reason: DefaultLineIssueReasonEnumSchema.enum.LineMissing,
 			});
 		}

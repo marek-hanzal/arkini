@@ -31,9 +31,9 @@ const fuelItemId = "item:fuel";
 const workerOwnerItemId = "runtime:worker";
 const upgradeOwnerItemId = "runtime:upgrade";
 const fuelRuntimeItemId = "runtime:fuel";
-const workerRunLineId = "line:worker:run";
-const workerFuelLineId = "line:worker:fuel";
-const upgradeLineId = "line:upgrade:construct";
+const workerRunLineUid = "line:worker:run";
+const workerFuelLineUid = "line:worker:fuel";
+const upgradeLineUid = "line:upgrade:construct";
 const workerRunRequestId = "job:worker:run";
 const upgradeRequestId = "job:upgrade";
 
@@ -60,7 +60,7 @@ const config = GameConfigSchema.parse({
 
 			lines: [
 				{
-					id: workerRunLineId,
+					uid: workerRunLineUid,
 					title: "Run",
 					description: "Run without material.",
 					runtimeMs: 1_000,
@@ -72,7 +72,7 @@ const config = GameConfigSchema.parse({
 					rules: [],
 				},
 				{
-					id: workerFuelLineId,
+					uid: workerFuelLineUid,
 					title: "Fuel",
 					description: "Wait for fuel.",
 					runtimeMs: 1_000,
@@ -102,7 +102,7 @@ const config = GameConfigSchema.parse({
 
 			lines: [
 				{
-					id: upgradeLineId,
+					uid: upgradeLineUid,
 					title: "Construct",
 					description: "Consume one idle worker.",
 					runtimeMs: 1_000,
@@ -178,23 +178,23 @@ const state = ({
 		jobQueue,
 	}) satisfies StateSchema.Type;
 
-const queueRequest = (id: string, ownerItemId: string, lineId: string) => ({
+const queueRequest = (id: string, ownerItemId: string, lineUid: string) => ({
 	id,
 	ownerItemId,
-	lineId,
+	lineUid,
 });
 
 describe("line input source ownership", () => {
 	it("keeps an active owner out of autofill", () => {
 		const activeState = state({
 			jobQueue: [
-				queueRequest(upgradeRequestId, upgradeOwnerItemId, upgradeLineId),
+				queueRequest(upgradeRequestId, upgradeOwnerItemId, upgradeLineUid),
 			],
 			jobs: [
 				{
 					id: workerRunRequestId,
 					ownerItemId: workerOwnerItemId,
-					lineId: workerRunLineId,
+					lineUid: workerRunLineUid,
 					durationMs: 1_000,
 					remainingMs: 900,
 				},
@@ -205,7 +205,7 @@ describe("line input source ownership", () => {
 				const before = yield* readRuntimeFx();
 				const autofill = yield* autofillLineInputsFx({
 					ownerItemId: upgradeOwnerItemId,
-					lineId: upgradeLineId,
+					lineUid: upgradeLineUid,
 				});
 				return {
 					after: yield* readRuntimeFx(),
@@ -239,8 +239,8 @@ describe("line input source ownership", () => {
 					config,
 					state: state({
 						jobQueue: [
-							queueRequest(workerRunRequestId, workerOwnerItemId, workerRunLineId),
-							queueRequest(upgradeRequestId, upgradeOwnerItemId, upgradeLineId),
+							queueRequest(workerRunRequestId, workerOwnerItemId, workerRunLineUid),
+							queueRequest(upgradeRequestId, upgradeOwnerItemId, upgradeLineUid),
 						],
 					}),
 				}),
@@ -259,12 +259,12 @@ describe("line input source ownership", () => {
 		expect(issues.issues).toEqual([]);
 		expect(runtime.jobs).toEqual([
 			expect.objectContaining({
-				lineId: workerRunLineId,
+				lineUid: workerRunLineUid,
 				ownerItemId: workerOwnerItemId,
 			}),
 		]);
 		expect(runtime.jobQueue).toEqual([
-			queueRequest(upgradeRequestId, upgradeOwnerItemId, upgradeLineId),
+			queueRequest(upgradeRequestId, upgradeOwnerItemId, upgradeLineUid),
 		]);
 		expect(runtime.items.find(({ id }) => id === workerOwnerItemId)?.location.scope).toBe(
 			"board",
@@ -276,13 +276,13 @@ describe("line input source ownership", () => {
 			Effect.gen(function* () {
 				yield* autofillLineInputsFx({
 					ownerItemId: upgradeOwnerItemId,
-					lineId: upgradeLineId,
+					lineUid: upgradeLineUid,
 				});
 				const beforeEnqueue = yield* readRuntimeFx();
 				const enqueue = yield* Effect.result(
 					enqueueLineFx({
 						ownerItemId: workerOwnerItemId,
-						lineId: workerRunLineId,
+						lineUid: workerRunLineUid,
 					}),
 				);
 				return {

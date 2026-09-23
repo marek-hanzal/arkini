@@ -26,7 +26,7 @@ const owner = {
 const job = (id: string, overrides: Partial<RuntimeSchema.Type["jobs"][number]> = {}) => ({
 	id,
 	ownerItemId: owner.id,
-	lineId: "line:forge:run",
+	lineUid: "line:forge:run",
 	durationMs: 1_000,
 	remainingMs: 1_000,
 	revision: `revision:${id}`,
@@ -40,7 +40,7 @@ describe("checkRuntimeJobsFn", () => {
 			location: {
 				scope: "input",
 				ownerItemId: owner.id,
-				lineId: "line:forge:run",
+				lineUid: "line:forge:run",
 				inputIndex: 0,
 			},
 		} satisfies RuntimeItemSchema.Type;
@@ -85,7 +85,7 @@ describe("checkRuntimeJobsFn", () => {
 					ownerItemId: "runtime:missing",
 				}),
 				job("job:missing-line", {
-					lineId: "line:missing",
+					lineUid: "line:missing",
 				}),
 				job("job:invalid-time", {
 					durationMs: 1_000,
@@ -138,7 +138,7 @@ describe("checkRuntimeJobsFn", () => {
 				{
 					id: "job:queued",
 					ownerItemId: owner.id,
-					lineId: "line:forge:run",
+					lineUid: "line:forge:run",
 				},
 			],
 
@@ -185,7 +185,7 @@ it("reports owned runtime state beneath one consumed job material root", () => {
 				location: {
 					scope: "input",
 					ownerItemId: consumedRoot.id,
-					lineId: "line:forge:run",
+					lineUid: "line:forge:run",
 					inputIndex: 0,
 				},
 

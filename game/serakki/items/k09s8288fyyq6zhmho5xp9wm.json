@@ -15,7 +15,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "well-blueprint",
+				"uid": "xv82p6rl5xyv6c7vx65i22tf",
 				"title": "Well Blueprint",
 				"artwork": "hki2ifgb69fb84zyd2ct3ied",
 				"description": "Water is highly needed resource, believe me",
@@ -115,7 +115,7 @@
 				]
 			},
 			{
-				"id": "sawmill-blueprint",
+				"uid": "s21ektx9ks9ps8yziynozevl",
 				"title": "Sawmill Blueprint",
 				"artwork": "oo4txpzczam6kt5jue7vhf1a",
 				"description": "Sawmill blueprint",
@@ -215,7 +215,7 @@
 				]
 			},
 			{
-				"id": "stoneworks-blueprint",
+				"uid": "ae200749d7cn9yqvp8e8q3dj",
 				"title": "Stoneworks Blueprint",
 				"artwork": "fz36qa41hs9xro6g0jp08592",
 				"description": "Draw plans for a workshop that turns rough stone into proper building blocks.",
@@ -315,7 +315,7 @@
 				]
 			},
 			{
-				"id": "carpenter-blueprint",
+				"uid": "exgl6k2fufge6rm8zhhzewrl",
 				"title": "Carpenter Blueprint",
 				"artwork": "xu2pifv4mgpkrm75kej8c6sb",
 				"description": "Draw plans for a workshop that turns processed wood into practical tools, containers, and papermaking gear.",
@@ -440,7 +440,7 @@
 				]
 			},
 			{
-				"id": "charcoal-kiln-blueprint",
+				"uid": "ztq4jjcnu2p8vigbukxwv0zs",
 				"title": "Charcoal Kiln Blueprint",
 				"artwork": "f5k76d90k3ibro2tzlio4znd",
 				"description": "Draw plans for a kiln that turns Firewood into the first proper industrial fuel.",
@@ -565,7 +565,7 @@
 				]
 			},
 			{
-				"id": "waste-incinerator-blueprint",
+				"uid": "irgx8z55povf50ssfv0m4mv9",
 				"title": "Waste Incinerator Blueprint",
 				"artwork": "mo6y7oa1ipuwt7pycm9s521t",
 				"description": "Draw plans for a facility that burns accumulated Waste using Charcoal. Cleaner ground, dirtier air.",
@@ -680,7 +680,7 @@
 				]
 			},
 			{
-				"id": "school-t1-blueprint",
+				"uid": "fn1jdvbd3bry9fig31k3w8td",
 				"title": "School - Tier 1 Blueprint",
 				"artwork": "e8h5l2j4tq4tu8uskz5aqd8e",
 				"description": "Draw plans for the settlement's first school. Education is the final step before the settlement can seriously consider another Townhall upgrade.",
@@ -855,7 +855,7 @@
 				]
 			},
 			{
-				"id": "townhall-t2-blueprint",
+				"uid": "n2zb8q444o2yvhawanosgbk0",
 				"title": "Townhall II Blueprint",
 				"artwork": "dtuzdkf4lo7h6azmdgpv059f",
 				"description": "The next civic upgrade is already visible on the horizon. Finish the settlement's first era before trying to draw it.",

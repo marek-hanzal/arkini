@@ -89,7 +89,7 @@ const producer = ({
 	maxQueueSize: 4,
 	lines: [
 		{
-			id: `line:${id}:run`,
+			uid: `line:${id}:run`,
 			title: "Run",
 			description: "Run",
 			runtimeMs: 100,
@@ -150,15 +150,15 @@ const config = GameConfigSchema.parse({
 export const owners = {
 	A: {
 		ownerItemId: "runtime:producer:A",
-		lineId: "line:producerA:run",
+		lineUid: "line:producerA:run",
 	},
 	B: {
 		ownerItemId: "runtime:producer:B",
-		lineId: "line:producerB:run",
+		lineUid: "line:producerB:run",
 	},
 	C: {
 		ownerItemId: "runtime:producer:C",
-		lineId: "line:producerC:run",
+		lineUid: "line:producerC:run",
 	},
 } as const;
 

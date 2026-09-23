@@ -33,7 +33,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "idle",
+				"uid": "ga90ailyq6dnpunicx8hnac8",
 				"title": "Idle",
 				"description": "The pig is busy doing very little.",
 				"clock": true,
@@ -50,7 +50,7 @@
 				"rules": []
 			},
 			{
-				"id": "wander",
+				"uid": "ydp0quo254lk2isuli6rctrl",
 				"title": "Wander",
 				"artwork": "hklguucs52jngeyhf2cmmz0b",
 				"description": "Wanders somewhere else.",
@@ -104,7 +104,7 @@
 				"rules": []
 			},
 			{
-				"id": "get-hungry",
+				"uid": "qgig6s8lfrdj0o987k1y9hdj",
 				"title": "Get Hungry",
 				"description": "The pig gets hungry.",
 				"clock": true,
@@ -157,7 +157,7 @@
 				"rules": []
 			},
 			{
-				"id": "get-sick",
+				"uid": "rttrk2hr8bohzsuuugheesps",
 				"title": "Get Sick",
 				"description": "The pig may become sick.",
 				"clock": true,
@@ -210,7 +210,7 @@
 				"rules": []
 			},
 			{
-				"id": "disease-exposure",
+				"uid": "bb8gf1oe14qstnc2o8jqw8sd",
 				"title": "Disease Exposure",
 				"artwork": "fnom9s6mxxkza9m7iahgp5k9",
 				"description": "Nearby disease increases the chance of illness.",
@@ -280,7 +280,7 @@
 				]
 			},
 			{
-				"id": "plague-exposure",
+				"uid": "wn1bj1u1h8k52syg1cbvj0th",
 				"title": "Plague Exposure",
 				"artwork": "j23vl46e91a44u0vt6qlcojt",
 				"description": "Nearby plague increases the chance of illness.",

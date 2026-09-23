@@ -177,7 +177,7 @@ it("shows a running job's paid requirement as committed", () => {
 			{
 				id: "active",
 				ownerItemId: owner.id,
-				lineId: line.id,
+				lineUid: line.uid,
 				durationMs: 1000,
 				remainingMs: 500,
 			},

@@ -20,7 +20,7 @@ const configFn = (mode: "kill-switch" | "loose-kill", runtimeMs = 100) => {
 		lines: [
 			{
 				...createLine({
-					id: "a",
+					uid: "a",
 					clock: true,
 					default: true,
 					outcome: createOutput([
@@ -101,7 +101,7 @@ describe("Clock kill switch", () => {
 				yield* spawnClockItemFx();
 				yield* startLineFx({
 					ownerItemId: "runtime:clock",
-					lineId: "a",
+					lineUid: "a",
 				});
 				yield* fillBoardFx();
 				const before = yield* readRuntimeFx();
@@ -125,7 +125,7 @@ describe("Clock kill switch", () => {
 				expect.objectContaining({
 					type: "job:queued",
 					ownerItemId: "runtime:clock",
-					lineId: "a",
+					lineUid: "a",
 				}),
 			]);
 		} else {
@@ -169,7 +169,7 @@ describe("Clock kill switch", () => {
 				yield* spawnClockItemFx();
 				yield* startLineFx({
 					ownerItemId: "runtime:clock",
-					lineId: "a",
+					lineUid: "a",
 				});
 				const before = yield* readRuntimeFx();
 				const previousRuntime = {
@@ -178,7 +178,7 @@ describe("Clock kill switch", () => {
 						{
 							id: "queued",
 							ownerItemId: "runtime:clock",
-							lineId: "a",
+							lineUid: "a",
 						},
 					],
 				};
@@ -206,7 +206,7 @@ describe("Clock kill switch", () => {
 				yield* spawnClockItemFx();
 				yield* startLineFx({
 					ownerItemId: "runtime:clock",
-					lineId: "a",
+					lineUid: "a",
 				});
 				return yield* advanceWithEventsFx(yield* readRuntimeFx());
 			}).pipe(
@@ -226,7 +226,7 @@ describe("Clock kill switch", () => {
 				const owner = yield* spawnClockItemFx();
 				yield* startLineFx({
 					ownerItemId: owner.id,
-					lineId: "a",
+					lineUid: "a",
 				});
 				const before = yield* readRuntimeFx();
 				const attempt = yield* Effect.result(

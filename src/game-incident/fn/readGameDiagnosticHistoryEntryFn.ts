@@ -130,7 +130,7 @@ const readJobsFn = (
 ) =>
 	runtime.jobs.map((job) => ({
 		jobId: job.id,
-		lineId: job.lineId,
+		lineUid: job.lineUid,
 		owner: readGameDiagnosticItemReferenceFn({
 			config,
 			runtimeItemId: job.ownerItemId,
@@ -145,7 +145,7 @@ const readQueueFn = (
 ) =>
 	runtime.jobQueue.map((request) => ({
 		requestId: request.id,
-		lineId: request.lineId,
+		lineUid: request.lineUid,
 		owner: readGameDiagnosticItemReferenceFn({
 			config,
 			runtimeItemId: request.ownerItemId,
@@ -171,9 +171,9 @@ export const readGameDiagnosticTransitionSignatureFn = (transition: GameTransiti
 					]
 				: [],
 		),
-		jobs: transition.runtime.jobs.map(({ id, lineId, ownerItemId }) => ({
+		jobs: transition.runtime.jobs.map(({ id, lineUid, ownerItemId }) => ({
 			id,
-			lineId,
+			lineUid,
 			ownerItemId,
 		})),
 		queue: transition.runtime.jobQueue,
@@ -235,9 +235,9 @@ export const readGameDiagnosticHistoryEntryFn = ({
 	const defaultLinesChanged = (previous === null ? [] : Array.from(defaultLineOwnerIds))
 		.sort((left, right) => left.localeCompare(right))
 		.flatMap((runtimeItemId) => {
-			const previousLineId = previousDefaultLines[runtimeItemId] ?? null;
-			const lineId = transition.runtime.defaultLineByOwnerItemId[runtimeItemId] ?? null;
-			return previousLineId === lineId
+			const previousLineUid = previousDefaultLines[runtimeItemId] ?? null;
+			const lineUid = transition.runtime.defaultLineByOwnerItemId[runtimeItemId] ?? null;
+			return previousLineUid === lineUid
 				? []
 				: [
 						{
@@ -246,8 +246,8 @@ export const readGameDiagnosticHistoryEntryFn = ({
 								runtimeItemId,
 								runtimes,
 							}),
-							previousLineId,
-							lineId,
+							previousLineUid,
+							lineUid,
 						},
 					];
 		});

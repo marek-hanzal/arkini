@@ -18,7 +18,7 @@
 		"maxQueueSize": 4,
 		"lines": [
 			{
-				"id": "iron-ore",
+				"uid": "wxu700l5aycpvygvxnkq4jot",
 				"title": "Iron Ore",
 				"description": "Get the ore",
 				"default": true,

@@ -77,7 +77,7 @@ const ItemConfigInputSchema = z
 const ItemLineConfigInputSchema = z
 	.object({
 		itemUid: IdSchema.describe("The exact item UID returned by item_collection."),
-		lineId: IdSchema.describe("The exact line ID returned by item_lines or item_config."),
+		lineUid: IdSchema.describe("The exact line UID returned by item_lines or item_config."),
 	})
 	.strict()
 	.meta({
@@ -99,13 +99,13 @@ const ItemLinesInputSchema = z
 
 interface ItemLineReference {
 	readonly itemUid: string;
-	readonly lineId: string;
+	readonly lineUid: string;
 }
 
-const lineReferenceKeyFn = ({ itemUid, lineId }: ItemLineReference) =>
+const lineReferenceKeyFn = ({ itemUid, lineUid }: ItemLineReference) =>
 	JSON.stringify([
 		itemUid,
-		lineId,
+		lineUid,
 	]);
 
 const ItemLineConfigsInputSchema = z
@@ -286,25 +286,19 @@ const readItemConfigTextFx = Effect.fn("readItemConfigTextFx")(
 );
 
 const readItemLineConfigTextFx = Effect.fn("readItemLineConfigTextFx")(
-	(project: Project, itemUid: string, lineId: string) =>
+	(project: Project, itemUid: string, lineUid: string) =>
 		Effect.gen(function* () {
 			const item = yield* readItemFx(project, itemUid);
-			const matchingLines = item.lines.filter(({ id }) => id === lineId);
-			if (matchingLines.length === 0)
+			const line = item.lines.find(({ uid }) => uid === lineUid);
+			if (line === undefined)
 				return yield* Effect.fail(
-					new Error(`Line ${lineId} does not exist on item ${itemUid}.`),
-				);
-			if (matchingLines.length > 1)
-				return yield* Effect.fail(
-					new Error(
-						`Line ${lineId} is ambiguous on item ${itemUid}; fix its duplicate line IDs before reading it.`,
-					),
+					new Error(`Line ${lineUid} does not exist on item ${itemUid}.`),
 				);
 			return JSON.stringify(
 				{
 					revision: project.revision,
 					itemUid,
-					line: matchingLines[0],
+					line,
 				},
 				null,
 				2,
@@ -320,8 +314,8 @@ const readItemLinesTextFx = Effect.fn("readItemLinesTextFx")((project: Project, 
 				revision: project.revision,
 				itemUid,
 				lines: item.lines.map(
-					({ id, title, default: isDefault, clock, clockWeight, show, enable }) => ({
-						id,
+					({ uid, title, default: isDefault, clock, clockWeight, show, enable }) => ({
+						uid,
 						title,
 						default: isDefault,
 						clock: clock === true,
@@ -348,7 +342,7 @@ const readItemLineConfigsTextFn = (
 	}> = [];
 	const issues: Array<
 		ItemLineReference & {
-			reason: "item-not-found" | "line-not-found" | "ambiguous-line";
+			reason: "item-not-found" | "line-not-found";
 		}
 	> = [];
 	for (const reference of references) {
@@ -365,17 +359,17 @@ const readItemLineConfigsTextFn = (
 			});
 			continue;
 		}
-		const matches = item.lines.filter(({ id }) => id === reference.lineId);
-		if (matches.length !== 1) {
+		const line = item.lines.find(({ uid }) => uid === reference.lineUid);
+		if (line === undefined) {
 			issues.push({
 				...reference,
-				reason: matches.length === 0 ? "line-not-found" : "ambiguous-line",
+				reason: "line-not-found",
 			});
 			continue;
 		}
 		lines.push({
 			itemUid: reference.itemUid,
-			line: matches[0]!,
+			line,
 		});
 	}
 	return JSON.stringify(
@@ -494,7 +488,7 @@ const createServerFn = (
 		server.registerTool(
 			"create_item",
 			{
-				description: `Create and persist one item in the open project. Pass input as a serialized JSON object matching schema ${JSON.stringify(schemaId)}; retrieve it and each returned $ref through schema_detail. Omitted fields use the same defaults as a new item form in the Editor UI.`,
+				description: `Create and persist one item in the open project with generated item and line UIDs. Supplied lines omit uid. Pass input as a serialized JSON object matching schema ${JSON.stringify(schemaId)}; retrieve it and each returned $ref through schema_detail. Omitted fields use the same defaults as a new item form in the Editor UI.`,
 				inputSchema: JsonToolInputSchema,
 			},
 			async ({ input }) =>
@@ -548,7 +542,7 @@ const createServerFn = (
 			name: "create_item_line",
 			schema: CreateItemLineInputSchema,
 			description:
-				"Append one complete production line without resending the item's other lines. Read item_detail or item_lines first and copy its project revision. Supply the complete line according to the input schema. An existing line ID is rejected.",
+				"Append one complete production line without resending the item's other lines. Read item_detail or item_lines first and copy its project revision. Supply the complete line according to the input schema. A fresh immutable UID is generated; omit uid in the authoring value.",
 			decodeFx: (input: string) =>
 				parseToolInputJsonFx(input, CreateItemLineInputSchema).pipe(
 					Effect.map((decoded) => ({
@@ -561,7 +555,7 @@ const createServerFn = (
 			name: "replace_item_line",
 			schema: ReplaceItemLineInputSchema,
 			description:
-				"Replace one existing production line without resending the item's other lines. Read item_line_config first and copy its revision. Supply the complete line according to the input schema; omitted optional values are removed, and the line ID must match the target. Its position is preserved.",
+				"Replace one existing production line without resending the item's other lines. Read item_line_config first and copy its revision. Supply the complete line according to the input schema; omitted optional values are removed, and the target line UID is retained. Omit uid in the authoring value. Its position is preserved.",
 			decodeFx: (input: string) =>
 				parseToolInputJsonFx(input, ReplaceItemLineInputSchema).pipe(
 					Effect.map((decoded) => ({
@@ -574,7 +568,7 @@ const createServerFn = (
 			name: "delete_item_line",
 			schema: DeleteItemLineInputSchema,
 			description:
-				"Delete exactly one production line. Read item_line_config first and copy its revision. Missing or ambiguous line IDs are rejected; all other item values and line order are preserved.",
+				"Delete exactly one production line. Read item_line_config first and copy its revision. Missing line UIDs are rejected; all other item values and line order are preserved.",
 			decodeFx: (input: string) =>
 				parseToolInputJsonFx(input, DeleteItemLineInputSchema).pipe(
 					Effect.map((decoded) => ({
@@ -616,7 +610,7 @@ const createServerFn = (
 	server.registerTool(
 		"edit_item_lines",
 		{
-			description: `Apply 1–20 create, replace or delete line operations across items with one project revision. Each item/line pair may appear once. Create appends; replace preserves position and requires a matching line ID; delete removes exactly one line. Complete replacements use the same schema as replace_item_line. All operations and resulting items are validated before one best-effort repository commit; invalid input or stale revision writes nothing. Returns a new revision and an operation summary. Pass input as serialized JSON matching schema ${JSON.stringify(resolveSchemaId(EditItemLinesInputSchema))}; retrieve it and each $ref through schema_detail.`,
+			description: `Apply 1–20 create, replace or delete line operations across items with one project revision. Each item/line pair may appear once. Create appends a line with a generated UID; supplied create/replace line objects omit uid. Replace preserves position and the addressed line UID; delete removes exactly one line. Complete replacements use the same schema as replace_item_line. All operations and resulting items are validated before one best-effort repository commit; invalid input or stale revision writes nothing. Returns a new revision and an operation summary. Pass input as serialized JSON matching schema ${JSON.stringify(resolveSchemaId(EditItemLinesInputSchema))}; retrieve it and each $ref through schema_detail.`,
 			inputSchema: JsonToolInputSchema,
 		},
 		async ({ input }) =>
@@ -624,7 +618,7 @@ const createServerFn = (
 				Effect.gen(function* () {
 					const decoded = yield* parseToolInputJsonFx(input, EditItemLinesInputSchema);
 					const project = yield* readProjectFx();
-					const commit = yield* editLinesFx({
+					const { commit, operations } = yield* editLinesFx({
 						...decoded,
 						project,
 						repository,
@@ -633,9 +627,9 @@ const createServerFn = (
 					return [
 						`Edited ${decoded.operations.length} item lines.`,
 						`Revision: ${commit.revision}`,
-						...decoded.operations.map(
+						...operations.map(
 							(operation, index) =>
-								`${index + 1}. ${operation.operation}: ${operation.itemUid} / ${operation.operation === "create" ? operation.line.id : operation.lineId}`,
+								`${index + 1}. ${operation.operation}: ${operation.itemUid} / ${operation.operation === "create" ? operation.line.uid : operation.lineUid}`,
 						),
 					].join("\n");
 				}),
@@ -646,7 +640,7 @@ const createServerFn = (
 		"item_line_order",
 		{
 			description:
-				"Reorder an item's existing production lines. Supply every line ID exactly once in the desired order and the revision from item_config or item_configs. Missing, unknown or duplicate IDs are rejected without changing the project. Only order changes; line values and all other item fields are preserved.",
+				"Reorder an item's existing production lines. Supply every line UID exactly once in the desired order and the revision from item_config or item_configs. Missing, unknown or duplicate IDs are rejected without changing the project. Only order changes; line values and all other item fields are preserved.",
 			inputSchema: ItemLineOrderInputSchema,
 		},
 		async (input) =>
@@ -662,7 +656,7 @@ const createServerFn = (
 					return [
 						"Reordered item lines.",
 						`Item UID: ${input.itemUid}`,
-						`Line IDs: ${input.lineIds.join(", ")}`,
+						`Line UIDs: ${input.lineUids.join(", ")}`,
 						`Revision: ${commit.revision}`,
 					].join("\n");
 				}),
@@ -784,7 +778,7 @@ const createServerFn = (
 		"item_lines",
 		{
 			description:
-				"Read a compact JSON list of an item's lines in authored order with the project revision. Includes ID, title, default, clock, clockWeight, show and enable; these are authored values, not evaluated gameplay availability. Use item_line_configs to fetch selected complete lines.",
+				"Read a compact JSON list of an item's lines in authored order with the project revision. Includes UID, title, default, clock, clockWeight, show and enable; these are authored values, not evaluated gameplay availability. Use item_line_configs to fetch selected complete lines.",
 			inputSchema: ItemLinesInputSchema,
 			annotations: {
 				readOnlyHint: true,
@@ -801,7 +795,7 @@ const createServerFn = (
 		"item_line_configs",
 		{
 			description:
-				"Read complete canonical JSON configurations for up to 50 unique item and line pairs from one snapshot. Returns revision, lines in first-request order, and issues with item-not-found, line-not-found or ambiguous-line reasons. Duplicate pairs appear once. Copy revision into subsequent write requests.",
+				"Read complete canonical JSON configurations for up to 50 unique item and line pairs from one snapshot. Returns revision, lines in first-request order, and issues with item-not-found or line-not-found reasons. Duplicate pairs appear once. Copy revision into subsequent write requests.",
 			inputSchema: ItemLineConfigsInputSchema,
 			annotations: {
 				readOnlyHint: true,
@@ -818,13 +812,15 @@ const createServerFn = (
 		"item_line_config",
 		{
 			description:
-				"Read the complete canonical JSON configuration of one production line and its project revision. Use this immediately before replace_item_line and copy the revision and every unchanged line value into the replacement request.",
+				"Read the complete canonical JSON configuration of one production line and its project revision. Use this immediately before replace_item_line and copy the revision and every unchanged authoring value into the replacement request, omitting the immutable uid from the line object.",
 			inputSchema: ItemLineConfigInputSchema,
 		},
-		async ({ itemUid, lineId }) =>
+		async ({ itemUid, lineUid }) =>
 			runToolFn(
 				readProjectFx().pipe(
-					Effect.flatMap((project) => readItemLineConfigTextFx(project, itemUid, lineId)),
+					Effect.flatMap((project) =>
+						readItemLineConfigTextFx(project, itemUid, lineUid),
+					),
 				),
 			),
 	);

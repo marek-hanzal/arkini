@@ -29,7 +29,7 @@ describe("input state", () => {
 				});
 				yield* bufferInputMaterialForTestFx({
 					ownerItemId: "runtime:workshop",
-					lineId: "line:workshop:build",
+					lineUid: "line:workshop:build",
 					inputIndex: 0,
 					sourceItemId: "runtime:water",
 					sourceItemRevision: source.revision,
@@ -70,7 +70,7 @@ describe("input state", () => {
 		expect(result.state.items[1]?.location).toEqual({
 			scope: "input",
 			ownerItemId: "runtime:workshop",
-			lineId: "line:workshop:build",
+			lineUid: "line:workshop:build",
 			inputIndex: 0,
 		});
 	});

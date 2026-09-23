@@ -17,7 +17,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "split",
+				"uid": "sjk9ixohdaibu9sx7aphs4vp",
 				"title": "Split",
 				"description": "Tier 2 is good enough",
 				"clockWeight": 1,

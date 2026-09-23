@@ -63,7 +63,7 @@ export const createTemporaryMaterialLifecycleTestConfig = (runtimeMs = 1_000) =>
 				maxQueueSize: 2,
 				lines: [
 					{
-						id: "line:owner",
+						uid: "line:owner",
 						title: "Temporary material",
 						description: "Consumes one or two temporary materials.",
 						runtimeMs,

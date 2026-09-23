@@ -229,8 +229,7 @@ const render = async (
 	defaultDraft?: boolean,
 	enableCapability?: OptionalCapability,
 	productionLine?: {
-		readonly id: string;
-		readonly index: number;
+		readonly uid: string;
 	},
 ) => {
 	const container = document.createElement("div");
@@ -250,8 +249,7 @@ const render = async (
 						: {})}
 					sectionId={sectionId}
 					enableCapability={enableCapability}
-					productionLineId={productionLine?.id}
-					productionLineIndex={productionLine?.index}
+					productionLineUid={productionLine?.uid}
 					uid={item.uid}
 				>
 					{section}
@@ -893,10 +891,10 @@ describe("item section form session", () => {
 				},
 				lines: [
 					createLine({
-						id: "line:first",
+						uid: "line:first",
 					}),
 					createLine({
-						id: "line:second",
+						uid: "line:second",
 					}),
 				],
 				merge: [
@@ -1042,20 +1040,20 @@ describe("item section form session", () => {
 		).not.toHaveProperty("artwork");
 	});
 
-	it("opens the exact graph line occurrence when two authored lines share an ID", async () => {
+	it("opens the exact graph line by immutable UID independently of its siblings", async () => {
 		const common = {
 			...createProducerItem({
 				id: item.uid,
 				lines: [
 					{
 						...createLine({
-							id: "shared",
+							uid: "first-line",
 						}),
 						title: "First",
 					},
 					{
 						...createLine({
-							id: "shared",
+							uid: "second-line",
 						}),
 						title: "Second",
 					},
@@ -1066,8 +1064,7 @@ describe("item section form session", () => {
 		state.persisted = common;
 		(state.project as Project).config.items[item.uid] = common;
 		const { container } = await render(<ProductionSection />, false, undefined, undefined, {
-			id: "shared",
-			index: 1,
+			uid: "second-line",
 		});
 		expect(
 			container.querySelector<HTMLInputElement>('input[name="lines[1].title"]')?.value,
@@ -1075,9 +1072,9 @@ describe("item section form session", () => {
 		expect(container.querySelector('input[name="lines[0].title"]')).toBeNull();
 	});
 
-	it("regenerates only the edited line ID from title while allowing independent ID edits", async () => {
+	it("preserves the immutable line UID when its title changes", async () => {
 		const sibling = createLine({
-			id: "line:second",
+			uid: "line:second",
 		});
 		const common = {
 			...createProducerItem({
@@ -1085,7 +1082,7 @@ describe("item section form session", () => {
 				lines: [
 					{
 						...createLine({
-							id: "custom-id",
+							uid: "custom-id",
 						}),
 						title: "Original Title",
 					},
@@ -1098,15 +1095,8 @@ describe("item section form session", () => {
 		(state.project as Project).config.items[item.uid] = common;
 		const { container } = await render(<ProductionSection />);
 		const title = container.querySelector<HTMLInputElement>('input[name="lines[0].title"]');
-		const id = container.querySelector<HTMLInputElement>('input[name="lines[0].id"]');
-		if (title === null || id === null) throw new Error("Missing line identity fields.");
-		expect(id.value).toBe("custom-id");
-		await changeInput(title, "Foo   Bar");
-		expect(id.value).toBe("foo-bar");
-		await changeInput(id, "manual-id");
-		expect(title.value).toBe("Foo   Bar");
+		if (title === null) throw new Error("Missing line title field.");
 		await changeInput(title, "Next Title");
-		expect(id.value).toBe("next-title");
 		await act(async () => {
 			await state.unsavedSession?.saveFn();
 		});
@@ -1114,7 +1104,6 @@ describe("item section form session", () => {
 			{
 				...common.lines[0],
 				title: "Next Title",
-				id: "next-title",
 			},
 			sibling,
 		]);
@@ -1133,11 +1122,11 @@ describe("item section form session", () => {
 			uid: item.uid,
 			lines: [
 				createLine({
-					id: "line:first",
+					uid: "line:first",
 					default: false,
 				}),
 				createLine({
-					id: "line:second",
+					uid: "line:second",
 					default: true,
 					clock: true,
 				}),
@@ -1558,4 +1547,54 @@ it("keeps copied sections in the draft until Save and lets Discard restore the d
 		}),
 	);
 	expect(session?.isDirty).toBe(false);
+});
+
+it("generates fresh UIDs for every duplicate and Production copy while retaining source identities", async () => {
+	let session: ReturnType<typeof useFormSession> | undefined;
+	const Probe = () => {
+		session = useFormSession();
+		return <ProductionSection />;
+	};
+	const source = createProducerItem({
+		id: "source",
+		lines: [
+			createLine({
+				uid: "line:source",
+			}),
+		],
+	});
+	const configured = createProducerItem({
+		id: item.uid,
+		lines: [
+			createLine({
+				uid: "line:original",
+			}),
+		],
+	});
+	state.persisted = configured;
+	(state.project as Project).config.items[item.uid] = configured;
+	(state.project as Project).config.items[source.uid] = source;
+	const { container } = await render(<Probe />);
+	const duplicate = container.querySelector<HTMLButtonElement>(
+		'[data-ui="EditorProductionLinesCollection"] [data-ui="EditorCollectionDuplicate"]',
+	);
+	if (duplicate === null) throw new Error("Missing duplicate line control.");
+	await act(async () => duplicate.click());
+	const duplicateUid = session?.form.state.values.lines?.[1].uid;
+	expect(duplicateUid).toBeTruthy();
+	expect(duplicateUid).not.toBe("line:original");
+	expect(session?.form.state.values.lines?.[0].uid).toBe("line:original");
+	await act(async () => session?.copySectionFn(source, "production"));
+	const copiedUid = session?.form.state.values.lines?.[0].uid;
+	expect(copiedUid).toBeTruthy();
+	expect(copiedUid).not.toBe("line:source");
+	expect(copiedUid).not.toBe(duplicateUid);
+	await act(async () => session?.copySectionFn(source, "production"));
+	expect(session?.form.state.values.lines?.[0].uid).not.toBe(copiedUid);
+	expect(source.lines[0].uid).toBe("line:source");
+	const savedUid = session?.form.state.values.lines?.[0].uid;
+	await act(async () => {
+		expect(await session?.saveFn()).toBe(true);
+	});
+	expect(state.saveItem.mock.lastCall?.[0].item.lines[0].uid).toBe(savedUid);
 });

@@ -20,8 +20,7 @@ export const mutateItemLineFx = Effect.fn("mutateItemLineFx")(function* ({
 	readonly project: Project;
 	readonly repository: ProjectRepositoryService;
 }) {
-	const lineId = input.operation === "create" ? input.line.id : input.lineId;
-	const commit = yield* editLinesFx({
+	const { commit, operations } = yield* editLinesFx({
 		project,
 		revision: input.revision,
 		operations: [
@@ -30,11 +29,13 @@ export const mutateItemLineFx = Effect.fn("mutateItemLineFx")(function* ({
 		repository,
 	});
 
+	const operation = operations[0]!;
+	const lineUid = operation.operation === "create" ? operation.line.uid : operation.lineUid;
 	yield* notifyProjectChangedFx(notifyProjectChangedFn, project.projectId);
 	return [
 		`${input.operation === "create" ? "Created" : input.operation === "delete" ? "Deleted" : "Replaced"} item line.`,
 		`Item UID: ${input.itemUid}`,
-		`Line ID: ${lineId}`,
+		`Line UID: ${lineUid}`,
 		`Revision: ${commit.revision}`,
 	].join("\n");
 });

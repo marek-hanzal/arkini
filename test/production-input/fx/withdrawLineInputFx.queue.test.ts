@@ -7,7 +7,7 @@ import { readItemDetailQueueFx } from "~/item-detail-read/fx/readItemDetailQueue
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import {
-	lineId,
+	lineUid,
 	ownerItemId,
 	prepareQueuedBufferedLineFx,
 	queuedInputTestConfig,
@@ -54,7 +54,7 @@ describe("line input withdrawal queue contract", () => {
 				const before = yield* readRuntimeFx();
 				yield* withdrawLineInputFx({
 					inputIndex: 0,
-					lineId,
+					lineUid,
 					ownerItemId,
 				});
 				const after = yield* readRuntimeFx();

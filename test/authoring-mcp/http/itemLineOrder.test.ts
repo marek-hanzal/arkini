@@ -18,7 +18,7 @@ it("publishes an ordered commit through MCP and protects a snapshot overtaken by
 	const first = config.items.forge.lines[0]!;
 	const second = {
 		...first,
-		id: "second",
+		uid: "second",
 		default: false,
 	};
 	const projectId = "line-order";
@@ -57,9 +57,9 @@ it("publishes an ordered commit through MCP and protects a snapshot overtaken by
 		name: "item_line_order",
 		arguments: {
 			itemUid: "forge",
-			lineIds: [
-				second.id,
-				first.id,
+			lineUids: [
+				second.uid,
+				first.uid,
 			],
 			revision: snapshot.revision,
 		},
@@ -83,8 +83,8 @@ it("publishes an ordered commit through MCP and protects a snapshot overtaken by
 		name: "item_line_order",
 		arguments: {
 			itemUid: "forge",
-			lineIds: [
-				first.id,
+			lineUids: [
+				first.uid,
 			],
 			revision: saved.revision,
 		},
@@ -96,9 +96,9 @@ it("publishes an ordered commit through MCP and protects a snapshot overtaken by
 			project: snapshot,
 			repository,
 			itemUid: "forge",
-			lineIds: [
-				first.id,
-				second.id,
+			lineUids: [
+				first.uid,
+				second.uid,
 			],
 			revision: snapshot.revision,
 		}).pipe(Effect.result),

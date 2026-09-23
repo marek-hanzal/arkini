@@ -14,7 +14,7 @@
 		"maxQueueSize": 4,
 		"lines": [
 			{
-				"id": "harvest",
+				"uid": "pritp5btvt1i28xe6s2ndoja",
 				"title": "Grain",
 				"description": "Harvest loose grain from a nearby planted field. Supply one bucket of water; the empty bucket is returned.",
 				"clockWeight": 1,
@@ -108,7 +108,7 @@
 				]
 			},
 			{
-				"id": "field",
+				"uid": "nlo6m3tqzriaf5eiredv2mmz",
 				"title": "Prepare Grain Field",
 				"artwork": "girikse517drxyctwhbe7lvf",
 				"description": "Prepare a new grain field for planting.",
@@ -150,7 +150,7 @@
 				"rules": []
 			},
 			{
-				"id": "blueprint",
+				"uid": "l3jab836p9wuwte4z6qsylsx",
 				"title": "Grain Farm Blueprint",
 				"artwork": "so7r094glj6wfe6yoveiclrg",
 				"description": "Sketch plans for another Grain Farm.",

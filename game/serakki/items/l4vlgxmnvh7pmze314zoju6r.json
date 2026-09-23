@@ -15,7 +15,7 @@
 		"maxQueueSize": 6,
 		"lines": [
 			{
-				"id": "gardener-blueprint",
+				"uid": "mtln07clzlsj8swd3tmbqqr4",
 				"title": "Gardener Blueprint",
 				"artwork": "e66c5l38fesf2qr41s7335ux",
 				"description": "Draw plans for Gardener.",
@@ -130,7 +130,7 @@
 				]
 			},
 			{
-				"id": "grain-farm-blueprint",
+				"uid": "d6m8q0echg67880izryhzuo4",
 				"title": "Grain Farm Blueprint",
 				"artwork": "s1txn4siry26ofn0zzn82hkm",
 				"description": "Draw plans for Grain Farm.",
@@ -245,7 +245,7 @@
 				]
 			},
 			{
-				"id": "grass-farm-blueprint",
+				"uid": "aj2gq5ffti97afeyscdwweq4",
 				"title": "Grass Farm Blueprint",
 				"artwork": "wrmhxvug81bpye6nu2z29v92",
 				"description": "Draw plans for Grass Farm.",
@@ -360,7 +360,7 @@
 				]
 			},
 			{
-				"id": "corn-farm-blueprint",
+				"uid": "gaqtqehpz6ohxpcus4eljplz",
 				"title": "Corn Farm Blueprint",
 				"artwork": "owlqcko1fyi8058syhln3d4h",
 				"description": "Draw plans for Corn Farm.",
@@ -475,7 +475,7 @@
 				]
 			},
 			{
-				"id": "vegetable-farm-blueprint",
+				"uid": "pq11x42dx57qjocdp2joqbcn",
 				"title": "Vegetable Farm Blueprint",
 				"artwork": "fabzgtg8buny4mcp46jrvdli",
 				"description": "Draw plans for Vegetable Farm.",
@@ -590,7 +590,7 @@
 				]
 			},
 			{
-				"id": "fruit-farm-blueprint",
+				"uid": "kbo1hxpmw8x2deg1wh25rfof",
 				"title": "Fruit Farm Blueprint",
 				"artwork": "pwz8m2ffgyrsrfopn2bmm8w1",
 				"description": "Draw plans for Fruit Farm.",
@@ -705,7 +705,7 @@
 				]
 			},
 			{
-				"id": "farmers-market-blueprint",
+				"uid": "jjac9vs1w9v32g1st5bj7imz",
 				"title": "Farmers Market Blueprint",
 				"artwork": "ffbzxdufwade6ssq81so5b9z",
 				"description": "Draw plans for a Farmers Market once basic grain farming is established.",
@@ -835,7 +835,7 @@
 				]
 			},
 			{
-				"id": "herbalist-blueprint",
+				"uid": "wzrngaoqaquibznagcl6oz4c",
 				"title": "Herbalist Blueprint",
 				"artwork": "t8fcvhnkshehi1vumbhhxdu7",
 				"description": "Draw plans for Herbalist.",
@@ -965,7 +965,7 @@
 				]
 			},
 			{
-				"id": "flower-farm-blueprint",
+				"uid": "gu602ogdqf76xx6o501ypig0",
 				"title": "Flower Farm Blueprint",
 				"artwork": "l90rt6qrg0fvv2g7qak9uamt",
 				"description": "Draw plans for Flower Farm.",
@@ -1095,7 +1095,7 @@
 				]
 			},
 			{
-				"id": "pumpkin-farm-blueprint",
+				"uid": "bsptb8r5zeiskn0fe4jfrkqd",
 				"title": "Pumpkin Farm Blueprint",
 				"artwork": "dvv4barhd6clyqk27xta73dv",
 				"description": "Draw plans for Pumpkin Farm.",
@@ -1225,7 +1225,7 @@
 				]
 			},
 			{
-				"id": "flax-farm-blueprint",
+				"uid": "wxepmk9qpb7wui08q5v25nk7",
 				"title": "Flax Farm Blueprint",
 				"artwork": "hp4vey6cbxfktd47m1seu0k4",
 				"description": "Draw plans for Flax Farm.",
@@ -1355,7 +1355,7 @@
 				]
 			},
 			{
-				"id": "cotton-farm-blueprint",
+				"uid": "dzcdcxdqoj23jptq6fa0r6z7",
 				"title": "Cotton Farm Blueprint",
 				"artwork": "g68kq5f65zhx8bdaj9ln5dti",
 				"description": "Draw plans for Cotton Farm.",
@@ -1485,7 +1485,7 @@
 				]
 			},
 			{
-				"id": "rapeseed-farm-blueprint",
+				"uid": "dqekqvo57a2sxs5dtox3gmj5",
 				"title": "Rapeseed Farm Blueprint",
 				"artwork": "w9p7m4v0s8q3pjmbvpc7xda4",
 				"description": "Draw plans for Rapeseed Farm.",
@@ -1615,7 +1615,7 @@
 				]
 			},
 			{
-				"id": "sunflower-farm-blueprint",
+				"uid": "oe00rf5d4s26p08c4sb0wxr6",
 				"title": "Sunflower Farm Blueprint",
 				"artwork": "wxqantahcsz9emd1y1g3tmu6",
 				"description": "Draw plans for Sunflower Farm.",
@@ -1745,7 +1745,7 @@
 				]
 			},
 			{
-				"id": "grape-farm-blueprint",
+				"uid": "u1fd5uhs7mnain3fv40r6v5q",
 				"title": "Grape Farm Blueprint",
 				"artwork": "oj4vj063lzhz7k878dy7w0wk",
 				"description": "Draw plans for Grape Farm.",
@@ -1920,7 +1920,7 @@
 				]
 			},
 			{
-				"id": "hop-farm-blueprint",
+				"uid": "n8zewsvkuik0e9hr1pnhtdkp",
 				"title": "Hop Farm Blueprint",
 				"artwork": "fs5g5vup2as9dpzqlmghj1os",
 				"description": "Draw plans for Hop Farm.",
@@ -2095,7 +2095,7 @@
 				]
 			},
 			{
-				"id": "sugar-beet-farm-blueprint",
+				"uid": "zxytydurg4t8akvbaqhqjnl5",
 				"title": "Sugar Beet Farm Blueprint",
 				"artwork": "hckjdd3x6d7e8j879cgupn5l",
 				"description": "Draw plans for Sugar Beet Farm.",
@@ -2270,7 +2270,7 @@
 				]
 			},
 			{
-				"id": "sugar-cane-farm-blueprint",
+				"uid": "ul55b7p8c6eiqs9i9obwp0sx",
 				"title": "Sugar Cane Farm Blueprint",
 				"artwork": "qpfdqjecb4rrkyaxjxcdo3hc",
 				"description": "Draw plans for Sugar Cane Farm.",
@@ -2445,7 +2445,7 @@
 				]
 			},
 			{
-				"id": "coffee-farm-blueprint",
+				"uid": "igsxfwmcy74dcjxqe9a56eu8",
 				"title": "Coffee Farm Blueprint",
 				"artwork": "susgla9mmb7vqgeq375aa6r2",
 				"description": "Draw plans for Coffee Farm.",
@@ -2620,7 +2620,7 @@
 				]
 			},
 			{
-				"id": "cacao-farm-blueprint",
+				"uid": "b64ekdegv79zhn010utf9ds9",
 				"title": "Cacao Farm Blueprint",
 				"artwork": "bi1znl2l2getwrkalhxji2ao",
 				"description": "Draw plans for Cacao Farm.",
@@ -2795,7 +2795,7 @@
 				]
 			},
 			{
-				"id": "dye-farm-blueprint",
+				"uid": "dov4iav6w4kcwubaacrv0s7x",
 				"title": "Dye Farm Blueprint",
 				"artwork": "wd9pts2jmrb76pkx47xjq499",
 				"description": "Draw plans for Dye Farm.",

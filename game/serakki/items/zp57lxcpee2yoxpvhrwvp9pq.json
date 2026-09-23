@@ -14,7 +14,7 @@
 		"maxQueueSize": 12,
 		"lines": [
 			{
-				"id": "purify-air",
+				"uid": "v5w55b8l1zh6scx0n4li3hyc",
 				"title": "Purify Air",
 				"description": "Takes ugly air-pollution and make the air clean again",
 				"default": true,

@@ -100,7 +100,7 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 				},
 				lines: [
 					{
-						id: "blocked",
+						uid: "blocked",
 						title: "Blocked",
 						description: "Blocked work",
 						runtimeMs: 1_000,
@@ -165,7 +165,7 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 								: [],
 					},
 					{
-						id: "ready",
+						uid: "ready",
 						title: "Ready",
 						description: "Ready work",
 						runtimeMs: 1_000,
@@ -191,7 +191,7 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 	const request = {
 		id: "request:blocked",
 		ownerItemId: "owner",
-		lineId: "blocked",
+		lineUid: "blocked",
 	};
 	const runtime: RuntimeSchema.Type = {
 		cheats: {
@@ -208,7 +208,7 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 			{
 				...request,
 				id: "request:ready",
-				lineId: "ready",
+				lineUid: "ready",
 			},
 		],
 		items: [
@@ -234,7 +234,7 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 				location: {
 					scope: "input",
 					ownerItemId: "owner",
-					lineId: "blocked",
+					lineUid: "blocked",
 					inputIndex: 0,
 				},
 			},
@@ -255,7 +255,7 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 			location: {
 				scope: "input",
 				ownerItemId: "owner",
-				lineId: "blocked",
+				lineUid: "blocked",
 				inputIndex: 1,
 			},
 		});

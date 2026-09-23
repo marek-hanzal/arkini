@@ -19,7 +19,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "explorer",
+				"uid": "f8zn5mcwlmcjelnsst9mqzku",
 				"title": "Build Explorer",
 				"artwork": "u79x20w1h96ptfjkdcyv8ojp",
 				"description": "Build an explorer's camp from wood and stone.",

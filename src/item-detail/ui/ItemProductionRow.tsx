@@ -43,7 +43,7 @@ export const ItemProductionRow = ({
 					return;
 				activateFn?.();
 			}}
-			data-line-id={line.id}
+			data-line-uid={line.uid}
 		>
 			<div className="relative isolate grid min-h-[17.6rem] grid-rows-[minmax(3.5rem,1fr)_auto_minmax(3.5rem,1fr)] py-3 transition-opacity duration-300 group-data-[ui-rule-disabled=true]/production-row:opacity-45">
 				{backdrop}

@@ -91,7 +91,7 @@ it("returns locally admitted deliveries after their transported owner is erased 
 				});
 			yield* autofillLineInputFx({
 				ownerItemId: "owner",
-				lineId: "line:workshop:build",
+				lineUid: "line:workshop:build",
 				inputIndex: 0,
 			});
 			const admitted = yield* readRuntimeFx();

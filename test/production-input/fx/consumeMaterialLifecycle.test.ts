@@ -41,7 +41,7 @@ const materialInput = (itemId: string) => ({
 });
 
 const line = (id: string, itemId: string, outputItemId?: string) => ({
-	id,
+	uid: id,
 	title: id,
 	description: id,
 	runtimeMs: 200,
@@ -169,25 +169,25 @@ const prepareNestedConsumeFx = Effect.fn("prepareNestedConsumeFx")(function* () 
 	yield* setLineSelectionFx({
 		selection: "default",
 		ownerItemId: inner.id,
-		lineId: "line:inner:load",
+		lineUid: "line:inner:load",
 	});
 	yield* bufferInputMaterialForTestFx({
 		ownerItemId: middle.id,
-		lineId: "line:middle:load",
+		lineUid: "line:middle:load",
 		inputIndex: 0,
 		sourceItemId: payload.id,
 		sourceItemRevision: payload.revision,
 	});
 	yield* bufferInputMaterialForTestFx({
 		ownerItemId: inner.id,
-		lineId: "line:inner:load",
+		lineUid: "line:inner:load",
 		inputIndex: 0,
 		sourceItemId: middle.id,
 		sourceItemRevision: middle.revision,
 	});
 	yield* bufferInputMaterialForTestFx({
 		ownerItemId: converter.id,
-		lineId: "line:converter:run",
+		lineUid: "line:converter:run",
 		inputIndex: 0,
 		sourceItemId: inner.id,
 		sourceItemRevision: inner.revision,
@@ -204,7 +204,7 @@ describe("consume material lifecycle", () => {
 				const stored = yield* readRuntimeFx();
 				const started = yield* startLineFx({
 					ownerItemId: converter.id,
-					lineId: "line:converter:run",
+					lineUid: "line:converter:run",
 				});
 				if (started.type !== "started") {
 					return yield* Effect.die(new Error("Expected the converter job to start."));

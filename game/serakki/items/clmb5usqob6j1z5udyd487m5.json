@@ -14,7 +14,7 @@
 		"maxQueueSize": 8,
 		"lines": [
 			{
-				"id": "stone",
+				"uid": "j8ixmrcbitjtryqpa777vdcp",
 				"title": "Stone",
 				"artwork": "rdgbwmk5ornk307ygh9vpjsi",
 				"description": "Get the stone from stone deposit.",

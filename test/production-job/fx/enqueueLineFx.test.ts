@@ -16,7 +16,7 @@ import { setCheatEnabledFx } from "~/game-cheat/fx/setCheatEnabledFx";
 
 const props = {
 	ownerItemId: "runtime:forge",
-	lineId: "line:forge:run",
+	lineUid: "line:forge:run",
 };
 
 const createDisabledJobConfig = () => {
@@ -131,7 +131,7 @@ describe("enqueueLineFx", () => {
 			requestId: result.request.id,
 			itemUid: "forge",
 			ownerItemId: props.ownerItemId,
-			lineId: props.lineId,
+			lineUid: props.lineUid,
 		});
 	});
 
@@ -164,15 +164,15 @@ describe("enqueueLineFx", () => {
 
 				const first = yield* enqueueLineFx({
 					ownerItemId: "runtime:forge:a",
-					lineId: props.lineId,
+					lineUid: props.lineUid,
 				});
 				const second = yield* enqueueLineFx({
 					ownerItemId: "runtime:forge:b",
-					lineId: props.lineId,
+					lineUid: props.lineUid,
 				});
 				const third = yield* enqueueLineFx({
 					ownerItemId: "runtime:forge:a",
-					lineId: props.lineId,
+					lineUid: props.lineUid,
 				});
 
 				return {
@@ -310,7 +310,7 @@ describe("enqueueLineFx", () => {
 		expect(result.runtime.jobQueue).toEqual([]);
 		expect(result.runtime.jobs).toEqual([
 			expect.objectContaining({
-				lineId: props.lineId,
+				lineUid: props.lineUid,
 				ownerItemId: props.ownerItemId,
 				remainingMs: 900,
 			}),
@@ -339,7 +339,7 @@ describe("enqueueLineFx", () => {
 			expect(result.attempt.failure).toMatchObject({
 				_tag: "LineRunUnavailableError",
 				ownerItemId: props.ownerItemId,
-				lineId: props.lineId,
+				lineUid: props.lineUid,
 			});
 		}
 		expect(result.runtime.jobs).toEqual([]);
@@ -374,7 +374,7 @@ describe("enqueueLineFx", () => {
 			expect(result.failure).toMatchObject({
 				_tag: "LineRunUnavailableError",
 				ownerItemId: props.ownerItemId,
-				lineId: props.lineId,
+				lineUid: props.lineUid,
 			});
 		}
 	});

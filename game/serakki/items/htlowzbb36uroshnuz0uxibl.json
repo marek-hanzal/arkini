@@ -14,7 +14,7 @@
 		"maxQueueSize": 6,
 		"lines": [
 			{
-				"id": "glass",
+				"uid": "svqcypqqzhcfkrfgfr6daqxx",
 				"title": "Glass",
 				"description": "Glass",
 				"default": false,
@@ -82,7 +82,7 @@
 				"rules": []
 			},
 			{
-				"id": "colored-glass",
+				"uid": "v52iw5qd2n02sj75vb22byvd",
 				"title": "Colored Glass",
 				"description": "Glass. With color",
 				"default": false,

@@ -77,7 +77,7 @@ const lifecycleConfig = GameConfigSchema.parse({
 			maxQueueSize: 1,
 			lines: [
 				{
-					id: "line:trader:trade",
+					uid: "line:trader:trade",
 					title: "Trade",
 					description: "Trade once.",
 					runtimeMs: 200,
@@ -105,7 +105,7 @@ const lifecycleConfig = GameConfigSchema.parse({
 					rules: [],
 				},
 				{
-					id: "line:trader:stored",
+					uid: "line:trader:stored",
 					title: "Stored material",
 					description: "Hold material for another trade.",
 					runtimeMs: 200,
@@ -138,7 +138,7 @@ const lifecycleConfig = GameConfigSchema.parse({
 			maxQueueSize: 1,
 			lines: [
 				{
-					id: "line:phoenix:renew",
+					uid: "line:phoenix:renew",
 					title: "Renew",
 					description: "Consume this owner and create a fresh identity.",
 					runtimeMs: 200,
@@ -188,7 +188,7 @@ const lifecycleConfig = GameConfigSchema.parse({
 			maxQueueSize: 3,
 			lines: [
 				{
-					id: "line:finite-queue:work",
+					uid: "line:finite-queue:work",
 					title: "Finite queue work",
 					description: "Runs only while the owner has units.",
 					runtimeMs: 200,
@@ -214,7 +214,7 @@ const lifecycleConfig = GameConfigSchema.parse({
 			},
 			lines: [
 				{
-					id: "line:blueprint:empty",
+					uid: "line:blueprint:empty",
 					title: "Build nothing",
 					description: "Completes without outcome.",
 					runtimeMs: 200,
@@ -238,7 +238,7 @@ const lifecycleConfig = GameConfigSchema.parse({
 
 			lines: [
 				{
-					id: "line:craft:repeatable",
+					uid: "line:craft:repeatable",
 					title: "Repeat",
 					description: "Repeat without consuming the owner.",
 					runtimeMs: 200,
@@ -311,12 +311,12 @@ describe("job completion unit lifecycle", () => {
 				for (let index = 0; index < 3; index += 1) {
 					yield* enqueueLineFx({
 						ownerItemId: owner.id,
-						lineId: "line:finite-queue:work",
+						lineUid: "line:finite-queue:work",
 					});
 				}
 				const blockedRequest = yield* enqueueLineFx({
 					ownerItemId: blockedOwner.id,
-					lineId: "line:trader:trade",
+					lineUid: "line:trader:trade",
 				});
 				yield* runTickRuntimeByFx({
 					elapsedMs: 400,
@@ -367,7 +367,7 @@ describe("job completion unit lifecycle", () => {
 				});
 				yield* bufferInputMaterialForTestFx({
 					ownerItemId: owner.id,
-					lineId: "line:trader:trade",
+					lineUid: "line:trader:trade",
 					inputIndex: 0,
 					sourceItemId: material.id,
 					sourceItemRevision: material.revision,
@@ -387,7 +387,7 @@ describe("job completion unit lifecycle", () => {
 
 				yield* startLineFx({
 					ownerItemId: owner.id,
-					lineId: "line:trader:trade",
+					lineUid: "line:trader:trade",
 				});
 				yield* runTickRuntimeByFx({
 					elapsedMs: 200,
@@ -459,7 +459,7 @@ describe("job completion unit lifecycle", () => {
 					location: {
 						scope: "input",
 						ownerItemId: "runtime:trader",
-						lineId: "line:trader:stored",
+						lineUid: "line:trader:stored",
 						inputIndex: 0,
 					},
 					remainingUnits: 1,
@@ -470,7 +470,7 @@ describe("job completion unit lifecycle", () => {
 				{
 					id: "job:trader",
 					ownerItemId: "runtime:trader",
-					lineId: "line:trader:trade",
+					lineUid: "line:trader:trade",
 					durationMs: 200,
 					remainingMs: 200,
 				},
@@ -533,7 +533,7 @@ describe("job completion unit lifecycle", () => {
 				});
 				yield* startLineFx({
 					ownerItemId: owner.id,
-					lineId: "line:blueprint:empty",
+					lineUid: "line:blueprint:empty",
 				});
 				yield* runTickRuntimeByFx({
 					elapsedMs: 200,
@@ -563,14 +563,14 @@ describe("job completion unit lifecycle", () => {
 				});
 				yield* startLineFx({
 					ownerItemId: owner.id,
-					lineId: "line:craft:repeatable",
+					lineUid: "line:craft:repeatable",
 				});
 				yield* runTickRuntimeByFx({
 					elapsedMs: 200,
 				});
 				const restarted = yield* startLineFx({
 					ownerItemId: owner.id,
-					lineId: "line:craft:repeatable",
+					lineUid: "line:craft:repeatable",
 				});
 				return {
 					restarted,

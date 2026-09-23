@@ -19,7 +19,7 @@
 		"maxQueueSize": 8,
 		"lines": [
 			{
-				"id": "milk",
+				"uid": "xg36dsreka2xdm574fqlmzdt",
 				"title": "Milk",
 				"description": "Milk",
 				"clock": true,

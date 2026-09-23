@@ -20,6 +20,8 @@ Every runtime item represents one instance. Each start entry creates one identit
 
 ## Lines, intent, and delivery
 
+An authored line has one immutable project-unique `uid`. Its title is presentation only. Editor creation and copying assign fresh UIDs; editing and reordering retain them. Runtime production references the line UID together with the owning runtime Item instance.
+
 Item production lines share one lifecycle. Each item owns zero or more `lines`; without lines it is passive. Production uses `maxQueueSize` (default `1`). A default line selects the click action; it does not schedule work automatically. Input filling is passive and never starts work. Each material input stores at most its authored `quantity.max`; there is no extra input capacity. Enqueue is the player-facing execution command: it appends explicit intent after validating the owner, line, rules, non-material requirements, units and queue capacity. Missing concrete material may wait.
 
 A queued request is not a job. It owns no time, material, unit, or reservation. The persisted global queue retains accepted intent order. Each queue pass traverses that array in order against the latest Runtime draft and selects the earliest actionable request for each idle Board owner. A request makes progress by a successful start settlement or by scheduling useful canonical Autofill delivery while its rules, non-material requirements, units hold. A start may settle its depletion Template outcome and remove its new Job before publication; that terminal settlement still counts as progress for this pass. Only progress marks its owner as handled for that pass; blocked requests may be overtaken. Other owners compete for shared resources in the same global traversal order.

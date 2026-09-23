@@ -31,7 +31,7 @@ export const ProductionDetail = ({ item }: { readonly item: ItemSchema.Type }) =
 						/>
 					)}
 					itemSearchTermsFn={(index) => [
-						item.lines[index].id,
+						item.lines[index].uid,
 						item.lines[index].description,
 					]}
 					itemRelatedSearchTermsFn={(index) =>

@@ -12,7 +12,7 @@ import { spawnItemFx } from "~test/support/spawnItemFx";
 import { SimulationStepMs } from "~/simulation-time/constant/SimulationStepMs";
 import { advanceRuntimeElapsedFx } from "~/game-tick/fx/advanceRuntimeElapsedFx";
 
-const lineId = "line:forge:run";
+const lineUid = "line:forge:run";
 
 const prepareOwnerFx = Effect.fn("prepareOwnerFx")(function* ({
 	id,
@@ -48,7 +48,7 @@ const prepareOwnerFx = Effect.fn("prepareOwnerFx")(function* ({
 		});
 		yield* bufferInputMaterialForTestFx({
 			ownerItemId: owner.id,
-			lineId,
+			lineUid,
 			inputIndex: 0,
 			sourceItemId: water.id,
 			sourceItemRevision: water.revision,
@@ -68,7 +68,7 @@ const prepareOwnerFx = Effect.fn("prepareOwnerFx")(function* ({
 	});
 	yield* bufferInputMaterialForTestFx({
 		ownerItemId: owner.id,
-		lineId,
+		lineUid,
 		inputIndex: 1,
 		sourceItemId: tool.id,
 		sourceItemRevision: tool.revision,
@@ -111,13 +111,13 @@ describe("GameSession Speed up admission", () => {
 				session.runFn(
 					startLineFx({
 						ownerItemId: first.id,
-						lineId,
+						lineUid,
 					}),
 				),
 				session.runFn(
 					startLineFx({
 						ownerItemId: second.id,
-						lineId,
+						lineUid,
 					}),
 				),
 			]);
@@ -201,7 +201,7 @@ describe("GameSession Speed up admission", () => {
 						session.runFn(
 							enqueueLineFx({
 								ownerItemId,
-								lineId,
+								lineUid,
 							}),
 						),
 				),

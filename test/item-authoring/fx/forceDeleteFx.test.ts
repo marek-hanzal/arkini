@@ -152,11 +152,11 @@ describe("forceDeleteFx", () => {
 					id: "producer",
 					lines: [
 						createLine({
-							id: "water-line",
+							uid: "water-line",
 							outcome: waterOutput,
 						}),
 						createLine({
-							id: "oil-line",
+							uid: "oil-line",
 							outcome: createOutput([
 								{
 									itemUid: "oil",
@@ -187,7 +187,7 @@ describe("forceDeleteFx", () => {
 		expect(result.config.items.producer).toMatchObject({
 			lines: [
 				{
-					id: "oil-line",
+					uid: "oil-line",
 				},
 			],
 		});
@@ -207,7 +207,7 @@ describe("forceDeleteFx", () => {
 			removedLines: [
 				{
 					ownerItemUid: "producer",
-					lineId: "water-line",
+					lineUid: "water-line",
 					title: "water-line",
 				},
 			],

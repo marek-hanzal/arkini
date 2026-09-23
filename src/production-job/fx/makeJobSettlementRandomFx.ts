@@ -18,7 +18,7 @@ export const makeJobSettlementRandomFx = Effect.fn("makeJobSettlementRandomFx")(
 >({ job, program }: { job: JobSchema.Type; program: Effect.Effect<Result, Error, Requirements> }) {
 	return yield* program.pipe(
 		Random.withSeed(
-			`serakki:job-completion:v${JobCompletionRandomVersion}:${job.id}:${job.ownerItemId}:${job.lineId}`,
+			`serakki:job-completion:v${JobCompletionRandomVersion}:${job.id}:${job.ownerItemId}:${job.lineUid}`,
 		),
 	);
 });

@@ -1,3 +1,4 @@
+import { readLineAuthoringFn } from "./support/readLineAuthoringFn";
 import { Effect } from "effect";
 import { afterEach, expect, it, vi } from "vitest";
 
@@ -38,7 +39,7 @@ const setup = async () => {
 						lines: [
 							{
 								...line,
-								id: "last",
+								uid: "last",
 								clock: true,
 								clockWeight: 7,
 								show: false,
@@ -46,15 +47,7 @@ const setup = async () => {
 							},
 							{
 								...line,
-								id: "first",
-							},
-							{
-								...line,
-								id: "ambiguous",
-							},
-							{
-								...line,
-								id: "ambiguous",
+								uid: "first",
 							},
 						],
 					},
@@ -77,37 +70,33 @@ const setup = async () => {
 	};
 };
 
-it("reads canonical line pairs once from one snapshot, retaining request order and explicit missing or ambiguous targets", async () => {
+it("reads canonical line pairs once from one snapshot, retaining request order and explicit missing targets", async () => {
 	const { client, repository, snapshot, projectId } = await setup();
 	const readSpy = vi.spyOn(repository, "readProjectFx");
 	const references = [
 		{
 			itemUid: "forge",
-			lineId: "first",
+			lineUid: "first",
 		},
 		{
 			itemUid: "absent",
-			lineId: "first",
+			lineUid: "first",
 		},
 		{
 			itemUid: "forge",
-			lineId: "missing",
+			lineUid: "missing",
 		},
 		{
 			itemUid: "forge",
-			lineId: "last",
+			lineUid: "last",
 		},
 		{
 			itemUid: "forge",
-			lineId: "ambiguous",
-		},
-		{
-			itemUid: "forge",
-			lineId: "first",
+			lineUid: "first",
 		},
 		{
 			itemUid: "absent",
-			lineId: "first",
+			lineUid: "first",
 		},
 	];
 	const response = await client.callTool({
@@ -136,18 +125,13 @@ it("reads canonical line pairs once from one snapshot, retaining request order a
 					issues: [
 						{
 							itemUid: "absent",
-							lineId: "first",
+							lineUid: "first",
 							reason: "item-not-found",
 						},
 						{
 							itemUid: "forge",
-							lineId: "missing",
+							lineUid: "missing",
 							reason: "line-not-found",
-						},
-						{
-							itemUid: "forge",
-							lineId: "ambiguous",
-							reason: "ambiguous-line",
 						},
 					],
 				},
@@ -164,7 +148,7 @@ it("reads canonical line pairs once from one snapshot, retaining request order a
 		},
 		(_, index) => ({
 			itemUid: "forge",
-			lineId: `missing-${index}`,
+			lineUid: `missing-${index}`,
 		}),
 	);
 	readSpy.mockClear();
@@ -187,7 +171,7 @@ it("reads canonical line pairs once from one snapshot, retaining request order a
 				...fiftyPairs,
 				{
 					itemUid: "other",
-					lineId: "missing-0",
+					lineUid: "missing-0",
 				},
 			],
 		},
@@ -213,7 +197,7 @@ it("discovers authored lines in order and accepts a lightweight detail revision 
 					revision: snapshot.revision,
 					itemUid: "forge",
 					lines: snapshot.config.items.forge!.lines.map((entry) => ({
-						id: entry.id,
+						uid: entry.uid,
 						title: entry.title,
 						default: entry.default,
 						clock: entry.clock === true,
@@ -243,14 +227,17 @@ it("discovers authored lines in order and accepts a lightweight detail revision 
 			itemUid: "tool",
 			revision,
 			line: {
-				...line,
-				id: "new-line",
+				...readLineAuthoringFn(line),
+				title: "New line",
 			},
 		}),
 	});
 	expect(created.isError).not.toBe(true);
 	const updated = await Effect.runPromise(repository.readProjectFx(projectId));
-	expect(updated?.config.items.tool!.lines.map(({ id }) => id)).toEqual([
-		"new-line",
-	]);
+	const saved = updated!.config.items.tool!.lines[0]!;
+	expect(saved.title).toBe("New line");
+	expect(saved.uid).not.toBe(line.uid);
+	expect(created.content[0]).toMatchObject({
+		text: expect.stringContaining(`Line UID: ${saved.uid}`),
+	});
 });

@@ -14,7 +14,7 @@
 		"maxQueueSize": 8,
 		"lines": [
 			{
-				"id": "wood",
+				"uid": "tk2ihw9gom3t46i6k9gwmuj3",
 				"title": "Chop the wood from a tree",
 				"artwork": "rxcve60bw1u5hkgyysvq2ryy",
 				"description": "Get the wood from a tree. Find the tree. No tree, no wood. Really.",
@@ -84,7 +84,7 @@
 				]
 			},
 			{
-				"id": "firewood",
+				"uid": "zropniwivlfm1chpjsual34l",
 				"title": "Firewood",
 				"artwork": "fzrsaj4d5tqdwwv0gg6b02mg",
 				"description": "Split wood into firewood.",
@@ -138,7 +138,7 @@
 				"rules": []
 			},
 			{
-				"id": "wooden-sticks",
+				"uid": "kuid951fvonx46mgoqpdpc5n",
 				"title": "Wooden Sticks",
 				"artwork": "sph5etm2s4wtaq97o9zpzcvr",
 				"description": "Roughly split fresh wood into simple straight sticks. Cheap, crude, and good enough for arrow shafts.",

@@ -16,7 +16,7 @@ import {
 } from "~test/production-input/support/inputRuntimeTestConfig";
 
 const ownerItemId = "runtime:workshop";
-const lineId = "line:workshop:build";
+const lineUid = "line:workshop:build";
 const inputTestWorkshop = inputRuntimeTestConfig.items.workshop;
 
 const twoInputTestConfig = GameConfigSchema.parse({
@@ -176,7 +176,7 @@ describe("Item Detail line input actions", () => {
 
 				const autofilled = yield* autofillLineInputsFx({
 					ownerItemId,
-					lineId,
+					lineUid,
 				});
 				return {
 					autofilled,
@@ -211,7 +211,7 @@ describe("Item Detail line input actions", () => {
 
 				const autofilled = yield* autofillLineInputsFx({
 					ownerItemId,
-					lineId,
+					lineUid,
 				});
 				return {
 					autofilled,
@@ -251,7 +251,7 @@ describe("Item Detail line input actions", () => {
 
 				const autofilled = yield* autofillLineInputsFx({
 					ownerItemId,
-					lineId,
+					lineUid,
 				});
 				return {
 					autofilled,
@@ -301,7 +301,7 @@ describe("Item Detail line input actions", () => {
 						});
 						yield* bufferInputMaterialForTestFx({
 							ownerItemId,
-							lineId,
+							lineUid,
 							inputIndex,
 							sourceItemId: item.id,
 							sourceItemRevision: item.revision,
@@ -311,20 +311,20 @@ describe("Item Detail line input actions", () => {
 
 				const withdrawn = yield* withdrawLineInputFx({
 					ownerItemId,
-					lineId,
+					lineUid,
 					inputIndex: 0,
 				});
 				const runtime = yield* readRuntimeFx();
 				const stale = yield* Effect.exit(
 					withdrawLineInputFx({
 						ownerItemId,
-						lineId,
+						lineUid,
 						inputIndex: 0,
 					}),
 				);
 				const withdrawnSibling = yield* withdrawLineInputFx({
 					ownerItemId,
-					lineId,
+					lineUid,
 					inputIndex: 1,
 				});
 
@@ -351,7 +351,7 @@ describe("Item Detail line input actions", () => {
 				location: {
 					scope: "input",
 					ownerItemId,
-					lineId,
+					lineUid,
 					inputIndex: 1,
 				},
 			}),
@@ -383,7 +383,7 @@ it("rolls back every withdrawn identity and its queue when a later placement fai
 				});
 				yield* bufferInputMaterialForTestFx({
 					ownerItemId,
-					lineId,
+					lineUid,
 					inputIndex: 0,
 					sourceItemId: water.id,
 					sourceItemRevision: water.revision,
@@ -392,13 +392,13 @@ it("rolls back every withdrawn identity and its queue when a later placement fai
 			// The owner leaves one cell: the first return fits, the second must roll it back.
 			yield* enqueueLineFx({
 				ownerItemId,
-				lineId,
+				lineUid,
 			});
 			const before = yield* readRuntimeFx();
 			const withdrawal = yield* Effect.exit(
 				withdrawLineInputFx({
 					ownerItemId,
-					lineId,
+					lineUid,
 					inputIndex: 0,
 				}),
 			);

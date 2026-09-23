@@ -15,7 +15,7 @@ import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 
 export namespace enqueueLineRuntimeFx {
 	export interface Props {
-		readonly lineId: IdSchema.Type;
+		readonly lineUid: IdSchema.Type;
 		readonly ownerItemId: IdSchema.Type;
 		readonly runtime: RuntimeSchema.Type;
 	}
@@ -34,7 +34,7 @@ export namespace enqueueLineRuntimeFx {
  * and queue capacity remain authoritative hard admission boundaries.
  */
 export const enqueueLineRuntimeFx = Effect.fn("enqueueLineRuntimeFx")(function* ({
-	lineId,
+	lineUid,
 	ownerItemId,
 	runtime,
 }: enqueueLineRuntimeFx.Props) {
@@ -46,12 +46,12 @@ export const enqueueLineRuntimeFx = Effect.fn("enqueueLineRuntimeFx")(function* 
 		return yield* Effect.fail(
 			new LineRunUnavailableError({
 				ownerItemId,
-				lineId,
+				lineUid,
 			}),
 		);
 	const resolution = yield* resolveLineStartFx({
 		ownerItemId,
-		lineId,
+		lineUid,
 		runtime,
 	});
 	if (!resolution.queue.available) {
@@ -71,7 +71,7 @@ export const enqueueLineRuntimeFx = Effect.fn("enqueueLineRuntimeFx")(function* 
 	const request = {
 		id: yield* createJobIdFx(),
 		ownerItemId,
-		lineId,
+		lineUid,
 	} satisfies JobQueueRequestSchema.Type;
 
 	return {
@@ -81,7 +81,7 @@ export const enqueueLineRuntimeFx = Effect.fn("enqueueLineRuntimeFx")(function* 
 				requestId: request.id,
 				ownerItemId,
 				itemUid: owner.item.uid,
-				lineId,
+				lineUid,
 			},
 		],
 		request,

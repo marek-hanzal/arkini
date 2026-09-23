@@ -121,7 +121,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "complete",
+				"uid": "szcrmcdove0ooocfg5hj1bjm",
 				"title": "Complete Contract",
 				"artwork": "vmdthjji13y50ytd2sfxqkfk",
 				"description": "Deliver the requested goods. The contract is consumed when the trade is completed.",

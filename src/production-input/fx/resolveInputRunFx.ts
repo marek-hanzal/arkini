@@ -16,7 +16,7 @@ export namespace resolveInputRunFx {
 	export interface Props {
 		input: InputSchema.Type;
 		inputIndex: NonNegativeIntegerSchema.Type;
-		lineId: IdSchema.Type;
+		lineUid: IdSchema.Type;
 		ownerItemId: IdSchema.Type;
 		reservedUnits: ReadonlyMap<IdSchema.Type, number>;
 		runtime: RuntimeSchema.Type;
@@ -29,7 +29,7 @@ export namespace resolveInputRunFx {
 export const resolveInputRunFx = Effect.fn("resolveInputRunFx")(function* ({
 	input,
 	inputIndex,
-	lineId,
+	lineUid,
 	ownerItemId,
 	reservedUnits,
 	runtime,
@@ -57,7 +57,7 @@ export const resolveInputRunFx = Effect.fn("resolveInputRunFx")(function* ({
 					(item): item is InputRuntimeItemSchema.Type =>
 						item.location.scope === LocationScopeEnumSchema.enum.Input &&
 						item.location.ownerItemId === ownerItemId &&
-						item.location.lineId === lineId &&
+						item.location.lineUid === lineUid &&
 						item.location.inputIndex === inputIndex &&
 						item.schedule?.remainingDurationMs !== 0,
 				);

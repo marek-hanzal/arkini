@@ -14,7 +14,7 @@
 		"maxQueueSize": 8,
 		"lines": [
 			{
-				"id": "grain-seed",
+				"uid": "dkgfp6xfgb03a82eg4v47lvj",
 				"title": "Grain Seed",
 				"artwork": "d1ayn11ywpibe3taadsm2o1w",
 				"description": "Buy loose grain planting seed.",
@@ -84,7 +84,7 @@
 				]
 			},
 			{
-				"id": "corn-seed",
+				"uid": "j1wayaxdzxdaeh3gmwdxlj75",
 				"title": "Corn Kernels",
 				"artwork": "l0e5uz9pxz3hcwkpvwsimnr8",
 				"description": "Buy loose corn planting seed.",
@@ -154,7 +154,7 @@
 				]
 			},
 			{
-				"id": "vegetable-seed",
+				"uid": "fu4rltzmwm8idj4llwch29u9",
 				"title": "Vegetable Seed",
 				"artwork": "ieee04h4dknay2rzmaxauq36",
 				"description": "Buy loose vegetable planting seed.",
@@ -224,7 +224,7 @@
 				]
 			},
 			{
-				"id": "fruit-seed",
+				"uid": "ekap2wti9f9hkaoq5a1necjt",
 				"title": "Fruit Seed",
 				"artwork": "ipf75brkivgc4iuzcxe2cp3j",
 				"description": "Buy loose fruit planting seed.",
@@ -294,7 +294,7 @@
 				]
 			},
 			{
-				"id": "cotton-seed",
+				"uid": "acjvpu1fv7vlu7sbbsij9agn",
 				"title": "Cotton Seed",
 				"artwork": "fq3wkjg0iop3t862f63rctgw",
 				"description": "Buy loose cotton planting seed.",
@@ -364,7 +364,7 @@
 				]
 			},
 			{
-				"id": "flax-seed",
+				"uid": "momtdctuh3o54vn1xp48s3l6",
 				"title": "Flax Seed",
 				"artwork": "pvnig6yhiafdqvz5wzetyu90",
 				"description": "Buy loose flax planting seed.",
@@ -434,7 +434,7 @@
 				]
 			},
 			{
-				"id": "grass-seed",
+				"uid": "dmny3lbf0afyq2sueonixvwm",
 				"title": "Grass Seed",
 				"artwork": "cicup6s227nl6jn9tfbbi646",
 				"description": "Buy loose grass planting seed.",
@@ -504,7 +504,7 @@
 				]
 			},
 			{
-				"id": "herb-seed",
+				"uid": "uquekh5gsdauv5xa1yigkbyn",
 				"title": "Herb Seed",
 				"artwork": "q6qyc5ap9tfcluhe71xv35k0",
 				"description": "Buy loose herb planting seed.",
@@ -574,7 +574,7 @@
 				]
 			},
 			{
-				"id": "flower-seed",
+				"uid": "kz1i3v7an5uh8ljwhptww3dl",
 				"title": "Flower Seed",
 				"artwork": "wt86q7jnjcydsa6g2m5hjkyz",
 				"description": "Buy loose flower planting seed.",
@@ -644,7 +644,7 @@
 				]
 			},
 			{
-				"id": "pumpkin-seed",
+				"uid": "lniagjewghph6f495jfwkcqw",
 				"title": "Pumpkin Seed",
 				"artwork": "qf9z8jyll2gr7i9rycs20vu2",
 				"description": "Buy loose pumpkin planting seed.",
@@ -714,7 +714,7 @@
 				]
 			},
 			{
-				"id": "grape-seed",
+				"uid": "ru7azcadt3kwzsmssdel99zo",
 				"title": "Grape Seed",
 				"artwork": "nubw6c3qa38035b8frx5d6tz",
 				"description": "Buy loose grape planting seed.",
@@ -784,7 +784,7 @@
 				]
 			},
 			{
-				"id": "hop-seed",
+				"uid": "knc8kh9z17r4s9b1h92heoam",
 				"title": "Hop Seed",
 				"artwork": "n40ohyaajnc7wz9vqm844jmj",
 				"description": "Buy loose hop planting seed.",
@@ -854,7 +854,7 @@
 				]
 			},
 			{
-				"id": "rapeseed-seed",
+				"uid": "m0gchasuxfxbrsxbolwt0gx0",
 				"title": "Rapeseed Seed",
 				"artwork": "sy8j1ma0406rcd4jcsfq5fi6",
 				"description": "Buy loose rapeseed planting seed.",
@@ -924,7 +924,7 @@
 				]
 			},
 			{
-				"id": "sunflower-seed",
+				"uid": "j99wwuc1e2rw74vy4r6nnm8f",
 				"title": "Sunflower Seed",
 				"artwork": "qalzit0de3z3qrn3oilifzvn",
 				"description": "Buy loose sunflower planting seed.",
@@ -994,7 +994,7 @@
 				]
 			},
 			{
-				"id": "sugar-beet-seed",
+				"uid": "mmp1z67vwh3rvqv54kr1orlm",
 				"title": "Sugar Beet Seed",
 				"artwork": "skvrd04nekh91j5w9s1poksv",
 				"description": "Buy loose sugar beet planting seed.",
@@ -1064,7 +1064,7 @@
 				]
 			},
 			{
-				"id": "sugar-cane-seed",
+				"uid": "j4524padodp2u33tul3uv2ik",
 				"title": "Sugar Cane Seed",
 				"artwork": "s25xwr30i2cssto6upbr3j2u",
 				"description": "Buy loose sugar cane planting seed.",
@@ -1134,7 +1134,7 @@
 				]
 			},
 			{
-				"id": "coffee-seed",
+				"uid": "otoklad4vdyumncvmkopr4sg",
 				"title": "Coffee Seed",
 				"artwork": "dbb4lzwit1iojmegwsj95vf8",
 				"description": "Buy loose coffee planting seed.",
@@ -1204,7 +1204,7 @@
 				]
 			},
 			{
-				"id": "cacao-seed",
+				"uid": "eusyhjjmznp0nd8brt3dilk2",
 				"title": "Cacao Seed",
 				"artwork": "fhk5h5usbsy71iejhlrzkicb",
 				"description": "Buy loose cacao planting seed.",
@@ -1274,7 +1274,7 @@
 				]
 			},
 			{
-				"id": "dye-seed",
+				"uid": "pne3tln4wr1pxqycyp6uvxow",
 				"title": "Dye Plant Seed",
 				"artwork": "mqv8mdh47m0cztboppkud762",
 				"description": "Buy loose dye plant planting seed.",
@@ -1344,7 +1344,7 @@
 				]
 			},
 			{
-				"id": "blueprint",
+				"uid": "oxgx364mjwi0d2800cd57d67",
 				"title": "Gardener Blueprint",
 				"artwork": "so7r094glj6wfe6yoveiclrg",
 				"description": "Sketch plans for another Gardener.",

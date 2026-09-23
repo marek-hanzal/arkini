@@ -144,7 +144,7 @@ export const prepareRandomCompletionRuntimeFx = Effect.fn("prepareRandomCompleti
 		}
 		yield* startLineFx({
 			ownerItemId: "runtime:random-forge",
-			lineId: "line:forge:run",
+			lineUid: "line:forge:run",
 		});
 		const runtime = yield* readRuntimeFx();
 		const liveJob = runtime.jobs[0];

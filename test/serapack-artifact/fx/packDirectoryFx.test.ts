@@ -274,7 +274,7 @@ describe("packDirectoryFx game-project contract", () => {
 			expect(payload.config.items.portal).toMatchObject({
 				lines: [
 					{
-						id: "travel",
+						uid: "travel",
 						title: "Travel",
 						description: "Travel",
 						default: true,

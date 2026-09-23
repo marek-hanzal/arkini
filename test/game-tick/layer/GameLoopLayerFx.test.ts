@@ -79,7 +79,7 @@ describe("GameLoopLayerFx", () => {
 			});
 			yield* startLineFx({
 				ownerItemId: "runtime:loop-forge",
-				lineId: "line:forge:run",
+				lineUid: "line:forge:run",
 			});
 			yield* Effect.gen(function* () {
 				yield* TestClock.adjust(9);
@@ -122,7 +122,7 @@ describe("GameLoopLayerFx", () => {
 			});
 			yield* startLineFx({
 				ownerItemId: owner.id,
-				lineId: "line:forge:run",
+				lineUid: "line:forge:run",
 			});
 			yield* Effect.yieldNow;
 

@@ -79,17 +79,17 @@ describe("Serakki save codec", () => {
 				{
 					id: "job:queue:first",
 					ownerItemId: "runtime:forge:b",
-					lineId: "line:forge:run",
+					lineUid: "line:forge:run",
 				},
 				{
 					id: "job:queue:second",
 					ownerItemId: "runtime:forge:a",
-					lineId: "line:forge:run",
+					lineUid: "line:forge:run",
 				},
 				{
 					id: "job:queue:third",
 					ownerItemId: "runtime:forge:b",
-					lineId: "line:forge:run",
+					lineUid: "line:forge:run",
 				},
 			],
 		};

@@ -11,7 +11,7 @@ import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";
 
 const ownerItemId = "runtime:forge";
-const lineId = "line:forge:run";
+const lineUid = "line:forge:run";
 
 const createConfig = () => {
 	const base = createJobTestConfig(2);
@@ -134,7 +134,7 @@ const prepareTravelFx = Effect.fn("prepareTravelFx")(function* () {
 	});
 	yield* startLineFx({
 		ownerItemId,
-		lineId,
+		lineUid,
 	});
 	yield* runTickRuntimeByFx({
 		elapsedMs: 400,

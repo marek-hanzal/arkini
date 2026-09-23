@@ -13,7 +13,7 @@ import { returnBufferedLineItemsFx } from "./returnBufferedLineItemsFx";
 export namespace withdrawLineInputFx {
 	export interface Props {
 		readonly ownerItemId: IdSchema.Type;
-		readonly lineId: IdSchema.Type;
+		readonly lineUid: IdSchema.Type;
 		readonly inputIndex: NonNegativeIntegerSchema.Type;
 		readonly amount?: "one" | "all";
 	}
@@ -26,7 +26,7 @@ export namespace withdrawLineInputFx {
 /** Returns one input's buffered roots while preserving its owner's pending queue intent. */
 export const withdrawLineInputFx = Effect.fn("withdrawLineInputFx")(function* ({
 	ownerItemId,
-	lineId,
+	lineUid,
 	inputIndex,
 	amount = "all",
 }: withdrawLineInputFx.Props) {
@@ -38,26 +38,26 @@ export const withdrawLineInputFx = Effect.fn("withdrawLineInputFx")(function* ({
 			});
 			const { owner } = yield* readBoardItemLineFx({
 				ownerItemId,
-				lineId,
+				lineUid,
 				runtime,
 			});
 			yield* readItemMaterialInputFx({
 				inputIndex,
 				item: owner.item,
-				lineId,
+				lineUid,
 				ownerItemId,
 			});
 			const bufferedItems = filterInputSlotItemsFn({
 				inputIndex,
 				items: runtime.items,
-				lineId,
+				lineUid,
 				ownerItemId,
 			});
 			if (bufferedItems.length === 0) {
 				return yield* Effect.fail(
 					new LineInputEmptyError({
 						ownerItemId,
-						lineId,
+						lineUid,
 						inputIndex,
 					}),
 				);

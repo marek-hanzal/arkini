@@ -4,10 +4,10 @@ import { IdSchema } from "~/game-value/schema/IdSchema";
 export const ItemLineOrderInputSchema = z
 	.object({
 		itemUid: IdSchema.describe("The exact ID of the item whose lines should be reordered."),
-		lineIds: z
+		lineUids: z
 			.array(IdSchema)
 			.describe(
-				"Every existing line ID exactly once, in the requested order. Empty only when the item has no lines.",
+				"Every existing line UID exactly once, in the requested order. Empty only when the item has no lines.",
 			),
 		revision: z
 			.number()

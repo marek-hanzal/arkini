@@ -24,7 +24,7 @@ const materialInput = (quantity: number) => ({
 });
 
 const productionLine = (id: string, input: ReadonlyArray<ReturnType<typeof materialInput>>) => ({
-	id: `line:${id}`,
+	uid: `line:${id}`,
 	title: id,
 	description: id,
 	runtimeMs: 1_000,
@@ -177,7 +177,7 @@ export const createTileActorRuntime = ({
 					{
 						id: "job:owner",
 						ownerItemId: "runtime:owner",
-						lineId: ownerLine.id,
+						lineUid: ownerLine.uid,
 						durationMs: 1_000,
 						remainingMs: 500,
 					},
@@ -190,7 +190,7 @@ export const createTileActorRuntime = ({
 			(_, index) => ({
 				id: `job:queue:${index}`,
 				ownerItemId: "runtime:owner",
-				lineId: ownerLine.id,
+				lineUid: ownerLine.uid,
 			}),
 		),
 		defaultLineByOwnerItemId: {},

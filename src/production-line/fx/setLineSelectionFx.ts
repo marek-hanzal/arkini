@@ -16,11 +16,11 @@ export namespace setLineSelectionFx {
 	} & (
 		| {
 				readonly selection: "default";
-				readonly lineId: IdSchema.Type | null;
+				readonly lineUid: IdSchema.Type | null;
 		  }
 		| {
 				readonly selection: "clock";
-				readonly lineIds: readonly IdSchema.Type[];
+				readonly lineUids: readonly IdSchema.Type[];
 		  }
 	);
 }
@@ -30,13 +30,13 @@ export const setLineSelectionFx = Effect.fn("setLineSelectionFx")(function* (
 	props: setLineSelectionFx.Props,
 ) {
 	const { ownerItemId, selection } = props;
-	const lineIds =
+	const lineUids =
 		props.selection === "clock"
 			? [
-					...new Set(props.lineIds),
+					...new Set(props.lineUids),
 				]
 			: [];
-	const lineId = props.selection === "default" ? props.lineId : null;
+	const lineUid = props.selection === "default" ? props.lineUid : null;
 	return yield* modifyRuntimeFx((runtime) =>
 		Effect.gen(function* () {
 			yield* assertItemProductionPlayerControlFx({
@@ -52,27 +52,27 @@ export const setLineSelectionFx = Effect.fn("setLineSelectionFx")(function* (
 				);
 			}
 			const ownerItem = Option.getOrUndefined(narrowLineOwnerItemFn(owner.item));
-			if (ownerItem === undefined && lineId === null && selection === "default")
+			if (ownerItem === undefined && lineUid === null && selection === "default")
 				return yield* Effect.fail(
 					new ItemNotFoundError({
 						itemId: ownerItemId,
 					}),
 				);
 			const lines = ownerItem === undefined ? undefined : ownerItem.lines;
-			const invalidLineId = (
+			const invalidLineUid = (
 				selection === "clock"
-					? lineIds
-					: lineId === null
+					? lineUids
+					: lineUid === null
 						? []
 						: [
-								lineId,
+								lineUid,
 							]
-			).find((id) => lines?.some((line) => line.id === id) !== true);
-			if (invalidLineId !== undefined) {
+			).find((id) => lines?.some((line) => line.uid === id) !== true);
+			if (invalidLineUid !== undefined) {
 				return yield* Effect.fail(
 					new LineNotFoundError({
 						itemId: ownerItemId,
-						lineId: invalidLineId,
+						lineUid: invalidLineUid,
 					}),
 				);
 			}
@@ -93,13 +93,13 @@ export const setLineSelectionFx = Effect.fn("setLineSelectionFx")(function* (
 					? Object.hasOwn(runtime.defaultLineByOwnerItemId, ownerItemId)
 						? runtime.defaultLineByOwnerItemId[ownerItemId]
 						: undefined
-					: schedule?.lineIds;
+					: schedule?.lineUids;
 			if (
 				selection === "default"
-					? current === lineId
+					? current === lineUid
 					: Array.isArray(current) &&
-						current.length === lineIds.length &&
-						current.every((id, index) => id === lineIds[index])
+						current.length === lineUids.length &&
+						current.every((id, index) => id === lineUids[index])
 			)
 				return [
 					props,
@@ -112,7 +112,7 @@ export const setLineSelectionFx = Effect.fn("setLineSelectionFx")(function* (
 					selection === "default"
 						? {
 								...runtime.defaultLineByOwnerItemId,
-								[ownerItemId]: lineId,
+								[ownerItemId]: lineUid,
 							}
 						: runtime.defaultLineByOwnerItemId,
 				items:
@@ -124,7 +124,7 @@ export const setLineSelectionFx = Effect.fn("setLineSelectionFx")(function* (
 											revision,
 											schedule: {
 												...schedule,
-												lineIds,
+												lineUids,
 											},
 										}
 									: item,

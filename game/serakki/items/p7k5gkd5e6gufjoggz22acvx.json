@@ -14,7 +14,7 @@
 		"maxQueueSize": 6,
 		"lines": [
 			{
-				"id": "toxic-waste",
+				"uid": "tl3rnoi24qsr3l5wfze6nt36",
 				"title": "Process Toxic Waste",
 				"description": "You should get rid of that ugly thing",
 				"default": true,

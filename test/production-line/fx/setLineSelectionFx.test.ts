@@ -15,7 +15,7 @@ import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckI
 import { DefaultLineIssueReasonEnumSchema } from "~/production-line/schema/DefaultLineIssueReasonEnumSchema";
 
 const line = (id: string, title: string, isDefault = false) => ({
-	id,
+	uid: id,
 	title,
 	description: `${title} description.`,
 	default: isDefault,
@@ -112,7 +112,7 @@ describe("setLineSelectionFx", () => {
 		);
 
 		expect(result.runtime.defaultLineByOwnerItemId).toEqual({});
-		expect(result.effectiveLine?.id).toBe("line:first");
+		expect(result.effectiveLine?.uid).toBe("line:first");
 	});
 
 	it("persists one exact default without reordering authored lines and makes the owner impure", () => {
@@ -124,7 +124,7 @@ describe("setLineSelectionFx", () => {
 				yield* setLineSelectionFx({
 					selection: "default",
 					ownerItemId: owner.id,
-					lineId: "line:second",
+					lineUid: "line:second",
 				});
 				const runtime = yield* readRuntimeFx();
 				const state = fromRuntimeFn({
@@ -167,10 +167,10 @@ describe("setLineSelectionFx", () => {
 				yield* setLineSelectionFx({
 					selection: "default",
 					ownerItemId: owner.id,
-					lineId: "line:second",
+					lineUid: "line:second",
 				});
 				yield* setLineSelectionFx({
-					lineId: null,
+					lineUid: null,
 					selection: "default",
 					ownerItemId: owner.id,
 				});
@@ -214,7 +214,7 @@ describe("setLineSelectionFx", () => {
 					setLineSelectionFx({
 						selection: "default",
 						ownerItemId: owner.id,
-						lineId: "line:missing",
+						lineUid: "line:missing",
 					}),
 				);
 				const checked = yield* checkRuntimeFx({
@@ -241,19 +241,19 @@ describe("setLineSelectionFx", () => {
 		if (Result.isFailure(result.rejected)) {
 			expect(result.rejected.failure).toMatchObject({
 				_tag: "LineNotFoundError",
-				lineId: "line:missing",
+				lineUid: "line:missing",
 			});
 		}
 		expect(result.checked.issues).toContainEqual({
 			type: RuntimeCheckIssueEnumSchema.enum.DefaultLine,
 			ownerItemId: expect.any(String),
-			lineId: "line:missing",
+			lineUid: "line:missing",
 			reason: DefaultLineIssueReasonEnumSchema.enum.LineMissing,
 		});
 		expect(result.checked.issues).toContainEqual({
 			type: RuntimeCheckIssueEnumSchema.enum.DefaultLine,
 			ownerItemId: "runtime:missing",
-			lineId: "line:first",
+			lineUid: "line:first",
 			reason: DefaultLineIssueReasonEnumSchema.enum.OwnerMissing,
 		});
 	});

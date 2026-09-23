@@ -15,7 +15,7 @@
 		"maxQueueSize": 4,
 		"lines": [
 			{
-				"id": "harvest",
+				"uid": "fuc9r95s3xalq9woeol6uwyr",
 				"title": "Cut Grass",
 				"description": "Harvest cut grass from a nearby planted field. Supply one bucket of water; the empty bucket is returned.",
 				"clockWeight": 1,
@@ -92,7 +92,7 @@
 				"rules": []
 			},
 			{
-				"id": "field",
+				"uid": "aem6lji88p1dkr3xpkyrjzis",
 				"title": "Prepare Grass Field",
 				"artwork": "funmgqm1p8wsfuol18cfy3xa",
 				"description": "Prepare a new grass field for planting.",
@@ -134,7 +134,7 @@
 				"rules": []
 			},
 			{
-				"id": "blueprint",
+				"uid": "ujmxqv47ygamb8381h3smxsb",
 				"title": "Grass Farm Blueprint",
 				"artwork": "so7r094glj6wfe6yoveiclrg",
 				"description": "Sketch plans for another Grass Farm.",

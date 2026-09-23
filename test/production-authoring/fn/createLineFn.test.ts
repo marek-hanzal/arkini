@@ -1,34 +1,19 @@
 import { describe, expect, it } from "vitest";
-
 import { createLineFn } from "~/production-authoring/fn/createLineFn";
 
 describe("createLineFn", () => {
-	it("derives a fresh line ID from its authored title", () => {
-		const line = createLineFn([], "New production line", "Description");
-
-		expect(line.id).toBe("new-production-line");
-		expect(line.title).toBe("New production line");
-	});
-
-	it("adds a numeric suffix when the title-derived ID is already used", () => {
-		const first = createLineFn([], "New production line", "Description");
+	it("keeps identical authored titles independent through supplied identities", () => {
+		const first = createLineFn([], "Same title", "Description", "line:first");
 		const second = createLineFn(
 			[
 				first,
 			],
-			"New production line",
+			"Same title",
 			"Description",
+			"line:second",
 		);
-		const third = createLineFn(
-			[
-				first,
-				second,
-			],
-			"New production line",
-			"Description",
-		);
-
-		expect(second.id).toBe("new-production-line-2");
-		expect(third.id).toBe("new-production-line-3");
+		expect(first.uid).toBe("line:first");
+		expect(second.uid).toBe("line:second");
+		expect(second.title).toBe(first.title);
 	});
 });

@@ -1,3 +1,4 @@
+import { createId } from "@paralleldrive/cuid2";
 import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 import { copyItemSectionFn } from "~/item-authoring/fn/copyItemSectionFn";
 import { createLineFn } from "~/production-authoring/fn/createLineFn";
@@ -171,7 +172,17 @@ export const useFormController = ({
 		(source: ItemSchema.Type, section: copyItemSectionFn.Section) => {
 			if (form.state.isSubmitting || source.uid === initialItem.uid) return;
 			const current = form.state.values;
-			const next = copyItemSectionFn(current, source, section);
+			const next = copyItemSectionFn(
+				current,
+				source,
+				section,
+				section === "production"
+					? source.lines.map((line) => ({
+							...line,
+							uid: createId(),
+						}))
+					: [],
+			);
 			if (current.title !== next.title) form.setFieldValue("title", next.title);
 			if (current.description !== next.description)
 				form.setFieldValue("description", next.description);
@@ -202,7 +213,7 @@ export const useFormController = ({
 	const enableProductionFn = useCallback(() => {
 		if ((form.state.values.lines ?? []).length > 0) return;
 		form.setFieldValue("lines", [
-			createLineFn([], "", ""),
+			createLineFn([], "", "", createId()),
 		]);
 	}, [
 		form,

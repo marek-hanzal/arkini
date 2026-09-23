@@ -40,7 +40,7 @@ const lineInputAutofillStartedEventSchema = z
 		]),
 		ownerItemId: IdSchema,
 		itemUid: IdSchema,
-		lineId: IdSchema,
+		lineUid: IdSchema,
 		scheduledQuantity: PositiveIntegerSchema,
 	})
 	.strict();
@@ -53,7 +53,7 @@ const jobQueuedEventSchema = z
 		requestId: IdSchema,
 		ownerItemId: IdSchema,
 		itemUid: IdSchema,
-		lineId: IdSchema,
+		lineUid: IdSchema,
 	})
 	.strict();
 
@@ -76,7 +76,7 @@ const jobStartedEventSchema = z
 		jobId: IdSchema,
 		ownerItemId: IdSchema,
 		itemUid: IdSchema,
-		lineId: IdSchema,
+		lineUid: IdSchema,
 	})
 	.strict();
 
@@ -88,7 +88,7 @@ const jobCompletedEventSchema = z
 		jobId: IdSchema,
 		ownerItemId: IdSchema,
 		itemUid: IdSchema,
-		lineId: IdSchema,
+		lineUid: IdSchema,
 	})
 	.strict();
 
@@ -100,7 +100,7 @@ const jobAbortedEventSchema = z
 		jobId: IdSchema,
 		ownerItemId: IdSchema,
 		itemUid: IdSchema,
-		lineId: IdSchema,
+		lineUid: IdSchema,
 		reason: z.enum([
 			"owner-removed",
 			"material-expired",
@@ -221,7 +221,7 @@ const itemInputStoredEventSchema = z
 		itemUid: IdSchema,
 		previousSourceLocation: BoardLocationSchema,
 		ownerItemId: IdSchema,
-		lineId: IdSchema,
+		lineUid: IdSchema,
 		inputIndex: z.number().int().nonnegative(),
 	})
 	.strict();

@@ -129,7 +129,7 @@ describe("createGameSessionFx / fail-stop", () => {
 			await session.runFn(
 				startLineFx({
 					ownerItemId: owner.id,
-					lineId: "line:forge:run",
+					lineUid: "line:forge:run",
 				}),
 			);
 			delete (config.items as Record<string, unknown>).completionOutput;

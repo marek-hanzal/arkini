@@ -9,7 +9,7 @@ it("counts only each line's pending requests and keeps the active state ahead of
 		active: [
 			{
 				jobId: "job",
-				lineId: "a",
+				lineUid: "a",
 				status: "running",
 			},
 		],
@@ -19,22 +19,22 @@ it("counts only each line's pending requests and keeps the active state ahead of
 			"a",
 			"b",
 			"b",
-		].map((lineId, index) => ({
+		].map((lineUid, index) => ({
 			requestId: `request:${index}`,
-			lineId,
+			lineUid,
 			status: "blocked-active" as const,
 		})),
 	} satisfies readItemDetailQueueFx.Result;
 	const expected = [
 		{
-			lineId: "a",
+			lineUid: "a",
 			state: "running",
 			jobId: "job",
 			queued: 2,
 			requestId: "request:0",
 		},
 		{
-			lineId: "b",
+			lineUid: "b",
 			state: "queued",
 			queued: 3,
 			requestId: "request:1",
@@ -52,7 +52,7 @@ it("counts only each line's pending requests and keeps the active state ahead of
 			],
 		})[0],
 	).toEqual({
-		lineId: "a",
+		lineUid: "a",
 		state: "awaiting-outcome",
 		jobId: "job",
 		queued: 2,
@@ -67,30 +67,30 @@ it("distinguishes missing input from other start blockers without claiming that 
 		request: [
 			{
 				requestId: "first",
-				lineId: "a",
+				lineUid: "a",
 				status: "waiting-inputs",
 			},
 			{
 				requestId: "second",
-				lineId: "a",
+				lineUid: "a",
 				status: "waiting-inputs",
 			},
 			{
 				requestId: "third",
-				lineId: "b",
+				lineUid: "b",
 				status: "blocked-condition",
 			},
 		],
 	} satisfies readItemDetailQueueFx.Result;
 	expect(readItemLineStatusesFn(queue)).toEqual([
 		{
-			lineId: "a",
+			lineUid: "a",
 			state: "waiting-inputs",
 			queued: 2,
 			requestId: "first",
 		},
 		{
-			lineId: "b",
+			lineUid: "b",
 			state: "waiting-start",
 			queued: 1,
 			requestId: "third",

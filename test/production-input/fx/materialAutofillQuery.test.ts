@@ -19,7 +19,7 @@ import { readItemLineInputsFx } from "~/item-detail-read/fx/readItemLineInputsFx
 
 const target = {
 	ownerItemId: "owner",
-	lineId: "build",
+	lineUid: "build",
 };
 const selector = {
 	type: "item",
@@ -35,7 +35,7 @@ const configFn = (queries: ReadonlyArray<QuerySchema.Type>) =>
 				lines: [
 					{
 						...inputRuntimeTestConfig.items.workshop.lines[0],
-						id: target.lineId,
+						uid: target.lineUid,
 						input: queries.map((query) => ({
 							type: "materials",
 							mode: "consume",

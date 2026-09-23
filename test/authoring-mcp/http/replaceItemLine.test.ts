@@ -1,3 +1,4 @@
+import { readLineAuthoringFn } from "./support/readLineAuthoringFn";
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -24,7 +25,7 @@ describe("editor MCP item line replacement", () => {
 		if (firstLine === undefined) throw new Error("Expected the job fixture line.");
 		const secondLine = {
 			...firstLine,
-			id: "line:forge:second",
+			uid: "line:forge:second",
 			title: "Second line",
 		};
 		const created = await Effect.runPromise(
@@ -61,7 +62,7 @@ describe("editor MCP item line replacement", () => {
 			name: "item_line_config",
 			arguments: {
 				itemUid: "forge",
-				lineId: firstLine.id,
+				lineUid: firstLine.uid,
 			},
 		});
 		const readContent = read.content[0];
@@ -76,10 +77,10 @@ describe("editor MCP item line replacement", () => {
 			name: "replace_item_line",
 			arguments: jsonToolInputFn({
 				itemUid: "forge",
-				lineId: firstLine.id,
+				lineUid: firstLine.uid,
 				revision: created.revision,
 				line: {
-					...firstLine,
+					...readLineAuthoringFn(firstLine),
 					enable: undefined,
 				},
 			}),
@@ -100,9 +101,9 @@ describe("editor MCP item line replacement", () => {
 			name: "replace_item_line",
 			arguments: jsonToolInputFn({
 				itemUid: "forge",
-				lineId: firstLine.id,
+				lineUid: firstLine.uid,
 				revision: created.revision,
-				line: replacement,
+				line: readLineAuthoringFn(replacement),
 			}),
 		});
 		const project = await Effect.runPromise(repository.readProjectFx("replace-line-project"));
@@ -113,7 +114,7 @@ describe("editor MCP item line replacement", () => {
 					text: [
 						"Replaced item line.",
 						"Item UID: forge",
-						`Line ID: ${firstLine.id}`,
+						`Line UID: ${firstLine.uid}`,
 						`Revision: ${project.revision}`,
 					].join("\n"),
 				},
@@ -128,27 +129,27 @@ describe("editor MCP item line replacement", () => {
 		for (const input of [
 			{
 				itemUid: "forge",
-				lineId: firstLine.id,
+				lineUid: firstLine.uid,
 				revision: project.revision,
 				line: {
-					...replacement,
-					id: "line:forge:wrong",
+					...readLineAuthoringFn(replacement),
+					uid: "line:forge:wrong",
 				},
 			},
 			{
 				itemUid: "forge",
-				lineId: "line:forge:missing",
+				lineUid: "line:forge:missing",
 				revision: project.revision,
 				line: {
-					...replacement,
-					id: "line:forge:missing",
+					...readLineAuthoringFn(replacement),
+					uid: "line:forge:missing",
 				},
 			},
 			{
 				itemUid: "forge",
-				lineId: firstLine.id,
+				lineUid: firstLine.uid,
 				revision: created.revision,
-				line: replacement,
+				line: readLineAuthoringFn(replacement),
 			},
 		]) {
 			const rejected = await client.callTool({
@@ -161,49 +162,5 @@ describe("editor MCP item line replacement", () => {
 		expect(
 			(await Effect.runPromise(repository.readProjectFx("replace-line-project")))?.revision,
 		).toBe(project.revision);
-
-		const ambiguousCommit = await Effect.runPromise(
-			repository.upsertItemFx({
-				projectId: project.projectId,
-				expectedRevision: project.revision,
-				item: {
-					...project.config.items.forge,
-					lines: [
-						replacement,
-						{
-							...secondLine,
-							id: replacement.id,
-						},
-					],
-				},
-			}),
-		);
-		for (const call of [
-			{
-				name: "item_line_config",
-				arguments: {
-					itemUid: "forge",
-					lineId: replacement.id,
-				},
-			},
-			{
-				name: "replace_item_line",
-				arguments: jsonToolInputFn({
-					itemUid: "forge",
-					lineId: replacement.id,
-					revision: ambiguousCommit.revision,
-					line: replacement,
-				}),
-			},
-		]) {
-			const ambiguous = await client.callTool(call);
-			expect(ambiguous.isError).toBe(true);
-			expect(ambiguous.content[0]).toMatchObject({
-				text: expect.stringContaining("is ambiguous"),
-			});
-		}
-		expect(
-			(await Effect.runPromise(repository.readProjectFx("replace-line-project")))?.revision,
-		).toBe(ambiguousCommit.revision);
 	});
 });

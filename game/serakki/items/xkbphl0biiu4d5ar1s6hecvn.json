@@ -84,7 +84,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "air-pollution",
+				"uid": "odggw9w5fi0fwmdwi7tvk9qb",
 				"title": "Air Pollution",
 				"description": "It's burning, bro",
 				"clock": true,

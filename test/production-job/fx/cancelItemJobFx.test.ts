@@ -21,14 +21,14 @@ it("cancels exact active work without refunding consumed material or cancelling 
 			const owner = yield* prepareJobLineFx();
 			yield* enqueueLineFx({
 				ownerItemId: owner.id,
-				lineId: "line:forge:run",
+				lineUid: "line:forge:run",
 			});
 			yield* runTickRuntimeByFx({
 				elapsedMs: 100,
 			});
 			yield* enqueueLineFx({
 				ownerItemId: owner.id,
-				lineId: "line:forge:run",
+				lineUid: "line:forge:run",
 			});
 			const before = yield* readRuntimeFx();
 			const job = before.jobs[0];
@@ -55,7 +55,7 @@ it("cancels exact active work without refunding consumed material or cancelling 
 				itemUid: owner.item.uid,
 				jobId: job.id,
 				ownerItemId: owner.id,
-				lineId: job.lineId,
+				lineUid: job.lineUid,
 				reason: "player-cancelled",
 			});
 			expect(transition.events.some((event) => event.type === "job:completed")).toBe(false);

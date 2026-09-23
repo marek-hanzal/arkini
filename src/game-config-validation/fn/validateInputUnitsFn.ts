@@ -35,7 +35,7 @@ export const validateInputUnitsFn = ({ config, provenance }: validateInputUnitsF
 			input: ReadonlyArray<InputSchema.Type>;
 			path: DiagnosticPathSchema.Type;
 		}> = lines.map(({ line, path }) => ({
-			id: line.id,
+			id: line.uid,
 			input: line.input,
 			path,
 		}));
@@ -57,7 +57,7 @@ export const validateInputUnitsFn = ({ config, provenance }: validateInputUnitsF
 						source: provenance.items[itemUid],
 						message: `Units input ${inputIndex} of action ${actionId} must author a target unit cost.`,
 						ownerItemUid: itemUid,
-						lineId: actionId,
+						lineUid: actionId,
 						inputIndex,
 						reason: InvalidInputUnitsReasonEnumSchema.enum.UnitsMissingTargetCost,
 					});
@@ -74,7 +74,7 @@ export const validateInputUnitsFn = ({ config, provenance }: validateInputUnitsF
 							source: provenance.items[itemUid],
 							message: `Action ${actionId} units owner ${itemUid}, but the item has no units.`,
 							ownerItemUid: itemUid,
-							lineId: actionId,
+							lineUid: actionId,
 							inputIndex,
 							reason: InvalidInputUnitsReasonEnumSchema.enum.SelfMissingUnits,
 						});
@@ -89,7 +89,7 @@ export const validateInputUnitsFn = ({ config, provenance }: validateInputUnitsF
 							source: provenance.items[itemUid],
 							message: `Action ${actionId} costs ${selfCost} total self units, but ${itemUid} has only ${item.units.amount}.`,
 							ownerItemUid: itemUid,
-							lineId: actionId,
+							lineUid: actionId,
 							inputIndex,
 							reason: InvalidInputUnitsReasonEnumSchema.enum.SelfInsufficientUnits,
 						});
@@ -105,7 +105,7 @@ export const validateInputUnitsFn = ({ config, provenance }: validateInputUnitsF
 						source: provenance.items[itemUid],
 						message: `Only units inputs may unit an external target; action ${actionId} input ${inputIndex} is ${input.type}.`,
 						ownerItemUid: itemUid,
-						lineId: actionId,
+						lineUid: actionId,
 						inputIndex,
 						reason: InvalidInputUnitsReasonEnumSchema.enum.TargetRequiresUnits,
 					});
@@ -135,7 +135,7 @@ export const validateInputUnitsFn = ({ config, provenance }: validateInputUnitsF
 						source: provenance.items[itemUid],
 						message: `Units input ${inputIndex} of action ${actionId} cannot match any item with at least ${input.units.cost} units.`,
 						ownerItemUid: itemUid,
-						lineId: actionId,
+						lineUid: actionId,
 						inputIndex,
 						reason: InvalidInputUnitsReasonEnumSchema.enum.TargetUnavailable,
 					});

@@ -15,7 +15,7 @@ export namespace clearItemJobQueueFx {
 	export interface Props {
 		ownerItemId: IdSchema.Type;
 		/** When provided, limits removal to pending requests for this production line. */
-		lineId?: IdSchema.Type;
+		lineUid?: IdSchema.Type;
 		/** When provided, removes only this exact pending request; a stale identity is a no-op. */
 		requestId?: IdSchema.Type;
 	}
@@ -24,7 +24,7 @@ export namespace clearItemJobQueueFx {
 /** Removes one owner's pending work and returns its unused line-input material atomically. */
 export const clearItemJobQueueFx = Effect.fn("clearItemJobQueueFx")(function* ({
 	ownerItemId,
-	lineId,
+	lineUid,
 	requestId,
 }: clearItemJobQueueFx.Props) {
 	return yield* modifyRuntimeFx((runtime) =>
@@ -41,7 +41,7 @@ export const clearItemJobQueueFx = Effect.fn("clearItemJobQueueFx")(function* ({
 			const clearedRequests = runtime.jobQueue.filter(
 				(request) =>
 					request.ownerItemId === ownerItemId &&
-					(lineId === undefined || request.lineId === lineId) &&
+					(lineUid === undefined || request.lineUid === lineUid) &&
 					(requestId === undefined || request.id === requestId),
 			);
 			if (clearedRequests.length === 0) {
@@ -56,17 +56,17 @@ export const clearItemJobQueueFx = Effect.fn("clearItemJobQueueFx")(function* ({
 				(request) => !clearedIds.has(request.id),
 			);
 			// Buffers belong to the line, so another pending request still needs them.
-			const clearedLineIds = new Set(
+			const clearedLineUids = new Set(
 				clearedRequests
 					.filter(
 						(request) =>
 							!remainingRequests.some(
 								(remaining) =>
 									remaining.ownerItemId === ownerItemId &&
-									remaining.lineId === request.lineId,
+									remaining.lineUid === request.lineUid,
 							),
 					)
-					.map((request) => request.lineId),
+					.map((request) => request.lineUid),
 			);
 			let nextRuntime = {
 				...runtime,
@@ -77,7 +77,7 @@ export const clearItemJobQueueFx = Effect.fn("clearItemJobQueueFx")(function* ({
 			).filter(
 				(item) =>
 					item.location.ownerItemId === ownerItemId &&
-					clearedLineIds.has(item.location.lineId),
+					clearedLineUids.has(item.location.lineUid),
 			);
 			const returned =
 				bufferedItems.length === 0
@@ -101,10 +101,10 @@ export const clearItemJobQueueFx = Effect.fn("clearItemJobQueueFx")(function* ({
 								}),
 						});
 			nextRuntime = yield* reconcileOutboundDeliveriesRuntimeFx({
-				returnLineIdsByOwnerItemId: new Map([
+				returnLineUidsByOwnerItemId: new Map([
 					[
 						ownerItemId,
-						clearedLineIds,
+						clearedLineUids,
 					],
 				]),
 				runtime: returned.runtime,

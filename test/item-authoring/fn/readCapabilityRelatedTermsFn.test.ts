@@ -19,7 +19,7 @@ const dropFn = (itemUid: string): OutcomeSchema.Type => ({
 
 it("finds inputs, rule dependencies and every authored outcome alternative without expanding their capabilities", () => {
 	const line: LineSchema.Type = {
-		...createLineFn([], "Line", "Description"),
+		...createLineFn([], "Line", "Description", "line:test"),
 		input: [
 			{
 				type: "materials",
@@ -140,7 +140,7 @@ it("finds inputs, rule dependencies and every authored outcome alternative witho
 		water: {
 			...editorTestConfig.items.water,
 			lines: [
-				createLineFn([], "Not searchable", "Not searchable"),
+				createLineFn([], "Not searchable", "Not searchable", "line:test"),
 			],
 		},
 	};

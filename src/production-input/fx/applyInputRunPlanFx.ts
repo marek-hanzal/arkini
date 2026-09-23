@@ -15,7 +15,7 @@ export namespace applyInputRunPlanFx {
 	export interface Props {
 		jobId: IdSchema.Type;
 		ownerItemId: IdSchema.Type;
-		lineId: IdSchema.Type;
+		lineUid: IdSchema.Type;
 		inputIndex: NonNegativeIntegerSchema.Type;
 		plan: InputRun.Plan;
 		runtime: RuntimeSchema.Type;
@@ -31,7 +31,7 @@ export namespace applyInputRunPlanFx {
 export const applyInputRunPlanFx = Effect.fn("applyInputRunPlanFx")(function* ({
 	jobId,
 	ownerItemId,
-	lineId,
+	lineUid,
 	inputIndex,
 	plan,
 	runtime,
@@ -56,7 +56,7 @@ export const applyInputRunPlanFx = Effect.fn("applyInputRunPlanFx")(function* ({
 				applyInputMaterialConsumeRunPlanFx({
 					jobId,
 					ownerItemId,
-					lineId,
+					lineUid,
 					inputIndex,
 					plan,
 					runtime,
@@ -71,7 +71,7 @@ export const applyInputRunPlanFx = Effect.fn("applyInputRunPlanFx")(function* ({
 				applyInputMaterialReserveRunPlanFx({
 					jobId,
 					ownerItemId,
-					lineId,
+					lineUid,
 					inputIndex,
 					plan,
 					runtime,

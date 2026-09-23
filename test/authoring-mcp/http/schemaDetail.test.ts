@@ -1,4 +1,5 @@
 import Ajv2020 from "ajv/dist/2020";
+import { readLineAuthoringFn } from "./support/readLineAuthoringFn";
 import { Effect } from "effect";
 import {
 	createLine,
@@ -99,7 +100,7 @@ describe("editor MCP authoring schema registry", () => {
 		const validateLine = ajv.getSchema(schemaUri("CompleteItemLineSchema"));
 		if (validateLine === undefined) throw new Error("Missing public line schema.");
 		const lineWithoutWeight = {
-			...createLine({}),
+			...readLineAuthoringFn(createLine({})),
 			clockWeight: undefined,
 		};
 		expect(validateLine(lineWithoutWeight), JSON.stringify(validateLine.errors)).toBe(true);
@@ -170,7 +171,7 @@ describe("editor MCP authoring schema registry", () => {
 		];
 		const input = {
 			title: "Portal",
-			lines,
+			lines: lines.map(readLineAuthoringFn),
 		};
 		expect(validateCreate(input), JSON.stringify(validateCreate.errors)).toBe(true);
 		expect(
@@ -235,7 +236,7 @@ describe("editor MCP authoring schema registry", () => {
 				intervalMs: 1000,
 			},
 			lines: [
-				createLine({}),
+				readLineAuthoringFn(createLine({})),
 			],
 		};
 		expect(validateCreate(scheduled), JSON.stringify(validateCreate.errors)).toBe(true);

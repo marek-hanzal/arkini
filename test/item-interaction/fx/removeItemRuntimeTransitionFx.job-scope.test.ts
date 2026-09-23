@@ -15,7 +15,7 @@ describe("removeItemRuntimeTransitionFx job scope", () => {
 				yield* prepareJobLineFx();
 				yield* startLineFx({
 					ownerItemId: "runtime:forge",
-					lineId: "line:forge:run",
+					lineUid: "line:forge:run",
 				});
 				const prepared = yield* readRuntimeFx();
 				const reserved = prepared.items.find((item) => item.location.scope === "reserved");

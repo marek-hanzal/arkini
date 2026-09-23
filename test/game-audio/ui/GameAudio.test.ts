@@ -105,7 +105,7 @@ const jobStartedBatch = {
 			itemUid: "producer",
 			jobId: "job:1",
 			ownerItemId: "runtime:producer",
-			lineId: "line:1",
+			lineUid: "line:1",
 		},
 	],
 } satisfies GameEventBatchSchema.Type;
@@ -117,7 +117,7 @@ const jobCompletedBatch = {
 			itemUid: "producer",
 			jobId: "job:2",
 			ownerItemId: "runtime:producer",
-			lineId: "line:1",
+			lineUid: "line:1",
 		},
 	],
 } satisfies GameEventBatchSchema.Type;

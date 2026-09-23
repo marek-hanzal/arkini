@@ -151,14 +151,14 @@ describe("committed material expiry settlement", () => {
 				});
 				yield* bufferInputMaterialForTestFx({
 					ownerItemId: "owner",
-					lineId: "line:owner",
+					lineUid: "line:owner",
 					inputIndex: 1,
 					sourceItemId: reserved.id,
 					sourceItemRevision: reserved.revision,
 				});
 				yield* startLineFx({
 					ownerItemId: "owner",
-					lineId: "line:owner",
+					lineUid: "line:owner",
 				});
 				for (const x of [
 					1,

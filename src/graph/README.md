@@ -20,7 +20,7 @@ Graph compilation reads the authored config directly. UI and MCP do not parse re
 
 Nodes use `item:<exact UID>`, `template:<exact UID>`, `space:<number>` and `start`. These namespaces distinguish an item from a template with the same UID. An absent referenced item/template remains a node marked `missing`; graph inspection works on unfinished authoring projects.
 
-Every edge is one occurrence. Parallel inputs, multiple rules and repeated outcomes remain separate, including self relationships and chance-zero outcomes. Exact `source` arrays address the current config, for example `['items', uid, 'lines', 0, 'input', 1, 'query', 'selector', 'itemUid']`. IDs are JSON tuples, so punctuation inside UIDs cannot collide with separators. Unique line IDs retain operation/group/edge identity when lines reorder; source paths follow the new positions. Schema-valid duplicate line IDs are distinguished by occurrence ordinal. Merges and array-only outcome slots use their authored positions; inserting/reordering these changes occurrence identities.
+Every edge is one occurrence. Parallel inputs, multiple rules and repeated outcomes remain separate, including self relationships and chance-zero outcomes. Exact `source` arrays address the current config, for example `['items', uid, 'lines', 0, 'input', 1, 'query', 'selector', 'itemUid']`. IDs are JSON tuples, so punctuation inside UIDs cannot collide with separators. Production line UIDs are immutable and unique across the project. Their operation/group/edge identities survive title changes and line reorder; source paths follow the new positions. Merges and array-only outcome slots use their authored positions; inserting/reordering these changes occurrence identities.
 
 Edges reference reified operation records. Full operation data preserves line inputs and flags, Clock scheduling, rules, unit costs, merge source actions, target effects and the entire set/roll/outcome hierarchy. A line or operation with no outgoing relationships is still discoverable through its owner's node lookup. Set and roll IDs on edges distinguish mutually exclusive sets from rolls that coexist within a selected set. Weights are authored weights, not normalized probabilities; chance is the authored roll probability, including zero.
 
@@ -50,6 +50,8 @@ Full responses explain every returned edge using its operation and exact provena
 
 For example, the single stored A → B `merge-target` edge answers both “what does A merge into?” (`out`) and “what merges into B?” (`in`). Editor exposes **Merges into** and **Accepts merge from** presets. A separately authored B → A merge is a different operation, never inferred from the first.
 
+Connections counts relationship occurrences in each category and shows the selected category's count in the search placeholder. Counts respect the selected counterpart and use the same directional presets as the displayed rows. A separate summary query counts up to 1,000 edges independently of the 100-row detail limit; incomplete counts use `≥`, while a complete selected-category query supplies an exact count.
+
 Examples:
 
 ```json
@@ -68,7 +70,9 @@ Cache lifetime follows the project session. Identical project identity/revision/
 
 ## Editor, MCP and compatibility
 
-Editor graph work runs in a project-owned worker. Relationship details render human-readable facts and linked authored locations, never raw config paths. Production links carry both line ID and occurrence index so duplicate IDs open the correct line; configured Space links select their Board, and template placements link to the template Board with coordinates. MCP owns a session-local graph capability and publishes `graph_schema` and `graph_query`; callers cannot submit EDN. The backend's fixed EDN queries/rules receive node IDs as data, never interpolated query source. Both surfaces return the canonical `GraphResult` for identical revisions, requests and limits.
+Editor graph work runs in a project-owned worker. Relationship details render human-readable facts and linked authored locations, never raw config paths. Production links carry the immutable line UID; configured Space links select their Board, and template placements link to the template Board with coordinates. MCP owns a session-local graph capability and publishes `graph_schema` and `graph_query`; callers cannot submit EDN. The backend's fixed EDN queries/rules receive node IDs as data, never interpolated query source. Both surfaces return the canonical `GraphResult` for identical revisions, requests and limits.
+
+Line tool references use `lineUid`/`lineUids`. Canonical reads include each line’s immutable UID; create/replace line authoring values omit it, creation generates it, and replacement retains the addressed UID. Item creation also gives every supplied line a fresh UID.
 
 `estimate` and `item_estimate` are removed, with no numeric replacement. MCP `item_input` now means outgoing line material/unit-use relationships; query incoming `merge-target` explicitly to find merges targeting an item. `item_outcome` finds incoming produced/replacement item relationships. Their `level` selects bounded depth. `item_chain` and Editor Chain use the same broader authored-consequence preset, including lines, merges, Clock, depletion, spaces and templates. The former specialized Chain parser and acquisition witness output are retired.
 

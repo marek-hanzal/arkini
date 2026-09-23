@@ -26,13 +26,13 @@ const config = GameConfigSchema.parse({
 			lines: [
 				{
 					...workshop.lines[0],
-					id: "manual",
+					uid: "manual",
 					default: true,
 					clock: false,
 				},
 				{
 					...workshop.lines[0],
-					id: "pulse",
+					uid: "pulse",
 					default: false,
 					clock: true,
 				},
@@ -64,16 +64,16 @@ describe("independent Clock line selection", () => {
 						ownerItemId: owner.id,
 						ownerItem: owner.item,
 						runtime: before,
-					})?.id,
+					})?.uid,
 					clock: readClockLinesFn({
 						item: owner.item,
 						schedule: owner.schedule,
-					}).map((line) => line.id),
+					}).map((line) => line.uid),
 				};
 				yield* setLineSelectionFx({
 					ownerItemId: owner.id,
 					selection: "clock",
-					lineIds: [
+					lineUids: [
 						"manual",
 						"pulse",
 					],
@@ -82,12 +82,12 @@ describe("independent Clock line selection", () => {
 				yield* setLineSelectionFx({
 					ownerItemId: owner.id,
 					selection: "default",
-					lineId: "pulse",
+					lineUid: "pulse",
 				});
 				yield* setLineSelectionFx({
 					ownerItemId: owner.id,
 					selection: "clock",
-					lineIds: [],
+					lineUids: [],
 				});
 				const cleared = yield* readRuntimeFx();
 				const restored = yield* fromStateFx({
@@ -122,7 +122,7 @@ describe("independent Clock line selection", () => {
 		});
 		expect(result.selected.items[0].schedule).toEqual({
 			...result.before.items[0].schedule,
-			lineIds: [
+			lineUids: [
 				"manual",
 				"pulse",
 			],
@@ -133,7 +133,7 @@ describe("independent Clock line selection", () => {
 		});
 		expect(result.restored.items[0].schedule).toEqual({
 			...result.before.items[0].schedule,
-			lineIds: [],
+			lineUids: [],
 		});
 		expect(result.clock).toEqual([]);
 	});
@@ -146,7 +146,7 @@ describe("independent Clock line selection", () => {
 				const rejected = yield* setLineSelectionFx({
 					ownerItemId: "owner",
 					selection: "clock",
-					lineIds: [
+					lineUids: [
 						"foreign",
 					],
 				}).pipe(Effect.result);

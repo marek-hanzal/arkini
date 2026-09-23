@@ -22,7 +22,7 @@ export namespace forceDeleteFx {
 		readonly removedExpiryOutcomeOwnerIds: ReadonlyArray<string>;
 		readonly removedLines: ReadonlyArray<{
 			readonly ownerItemUid: string;
-			readonly lineId: string;
+			readonly lineUid: string;
 			readonly title: string;
 		}>;
 		readonly removedMergeRules: ReadonlyArray<{
@@ -107,7 +107,7 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 	const removedExpiryOutcomeOwnerIds: string[] = [];
 	const removedLines: Array<{
 		ownerItemUid: string;
-		lineId: string;
+		lineUid: string;
 		title: string;
 	}> = [];
 	const removedMergeRules: Array<{
@@ -159,7 +159,7 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 				if (line !== undefined)
 					removedLines.push({
 						ownerItemUid,
-						lineId: line.id,
+						lineUid: line.uid,
 						title: line.title,
 					});
 			}

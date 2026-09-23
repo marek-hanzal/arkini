@@ -63,7 +63,7 @@ const config = GameConfigSchema.parse({
 			maxQueueSize: 1,
 			lines: [
 				{
-					id: "line:outer",
+					uid: "line:outer",
 					title: "Outer",
 					description: "Outer",
 					runtimeMs: 1_000,
@@ -93,7 +93,7 @@ const config = GameConfigSchema.parse({
 			maxQueueSize: 1,
 			lines: [
 				{
-					id: "line:worker",
+					uid: "line:worker",
 					title: "Worker",
 					description: "Worker",
 					runtimeMs: 1_000,
@@ -162,7 +162,7 @@ const inputItem = ({
 	location: {
 		scope: "input" as const,
 		ownerItemId,
-		lineId: ownerItemId === boardOwner.id ? "line:outer" : "line:worker",
+		lineUid: ownerItemId === boardOwner.id ? "line:outer" : "line:worker",
 		inputIndex,
 	},
 
@@ -321,7 +321,7 @@ it("preserves one impure buffered root and its passive subtree", () => {
 			previousLocation: {
 				scope: "input",
 				ownerItemId: boardOwner.id,
-				lineId: "line:outer",
+				lineUid: "line:outer",
 				inputIndex: 0,
 			},
 			location: {

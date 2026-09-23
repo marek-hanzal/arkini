@@ -101,7 +101,7 @@ describe("createGameSessionFx / final save lifecycle", () => {
 			await session.runFn(
 				startLineFx({
 					ownerItemId: owner.id,
-					lineId: "line:forge:run",
+					lineUid: "line:forge:run",
 				}),
 			);
 			await waitFor(() => session.getSnapshotFn().jobs.length === 0);

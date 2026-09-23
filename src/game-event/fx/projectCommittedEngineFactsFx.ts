@@ -77,7 +77,7 @@ export const projectCommittedEngineFactsFx = Effect.fn("projectCommittedEngineFa
 					item.location.phase === "outbound" &&
 					item.location.target.kind === "line-input" &&
 					item.location.target.ownerItemId === fact.ownerItemId &&
-					item.location.target.lineId === fact.lineId
+					item.location.target.lineUid === fact.lineUid
 				);
 			}).length;
 			if (quantity > 0)
@@ -85,7 +85,7 @@ export const projectCommittedEngineFactsFx = Effect.fn("projectCommittedEngineFa
 					type: GameEventEnumSchema.enum.LineInputAutofillStarted,
 					ownerItemId: fact.ownerItemId,
 					itemUid: fact.itemUid,
-					lineId: fact.lineId,
+					lineUid: fact.lineUid,
 					scheduledQuantity: quantity,
 				});
 			continue;
@@ -96,7 +96,7 @@ export const projectCommittedEngineFactsFx = Effect.fn("projectCommittedEngineFa
 				jobId: fact.jobId,
 				ownerItemId: fact.ownerItemId,
 				itemUid: fact.itemUid,
-				lineId: fact.lineId,
+				lineUid: fact.lineUid,
 			});
 			continue;
 		}

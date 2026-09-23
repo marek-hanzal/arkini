@@ -44,12 +44,12 @@ const run = (path: OutputPath, steps: readonly number[], markerDuration = 500) =
 			if (path !== "expiry")
 				yield* startLineFx({
 					ownerItemId: "runtime:1",
-					lineId: "line:producer:temporary",
+					lineUid: "line:producer:temporary",
 				});
 			if (path === "immediate-depletion")
 				yield* enqueueLineFx({
 					ownerItemId: "runtime:1",
-					lineId: "spend",
+					lineUid: "spend",
 				});
 			for (const elapsedMs of steps)
 				yield* runTickRuntimeByFx({

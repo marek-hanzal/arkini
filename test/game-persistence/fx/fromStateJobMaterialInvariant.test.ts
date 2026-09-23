@@ -11,7 +11,7 @@ const config = createJobTestConfig();
 const job = {
 	id: "job:outer",
 	ownerItemId: "runtime:owner",
-	lineId: "line:forge:run",
+	lineUid: "line:forge:run",
 	durationMs: 1_000,
 	remainingMs: 500,
 };
@@ -89,7 +89,7 @@ describe("fromStateFx job material invariants", () => {
 					location: {
 						scope: "input" as const,
 						ownerItemId: consumedRoot.id,
-						lineId: "line:forge:run",
+						lineUid: "line:forge:run",
 						inputIndex: 0,
 					},
 				},
@@ -144,7 +144,7 @@ describe("fromStateFx job material invariants", () => {
 					location: {
 						scope: "input" as const,
 						ownerItemId: consumedRoot.id,
-						lineId: "line:forge:run",
+						lineUid: "line:forge:run",
 						inputIndex: 1,
 					},
 				},
@@ -154,7 +154,7 @@ describe("fromStateFx job material invariants", () => {
 					location: {
 						scope: "input" as const,
 						ownerItemId: "runtime:nested-owner",
-						lineId: "line:forge:run",
+						lineUid: "line:forge:run",
 						inputIndex: 0,
 					},
 				},
@@ -200,7 +200,7 @@ describe("fromStateFx job material invariants", () => {
 		const childJob = {
 			id: "job:nested",
 			ownerItemId: "runtime:nested-owner",
-			lineId: "line:forge:run",
+			lineUid: "line:forge:run",
 			durationMs: 1_000,
 			remainingMs: 500,
 		};
@@ -221,7 +221,7 @@ describe("fromStateFx job material invariants", () => {
 					location: {
 						scope: "input" as const,
 						ownerItemId: consumedRoot.id,
-						lineId: "line:forge:run",
+						lineUid: "line:forge:run",
 						inputIndex: 1,
 					},
 				},
@@ -311,7 +311,7 @@ it("hydrates one stateful reserved instance with its passive owned subtree intac
 				location: {
 					scope: "input" as const,
 					ownerItemId: "runtime:reserved-worker",
-					lineId: "line:forge:run",
+					lineUid: "line:forge:run",
 					inputIndex: 0,
 				},
 			},

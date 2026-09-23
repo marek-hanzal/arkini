@@ -8,7 +8,7 @@ export const LineInputDeliveryTargetSchema = z
 	.object({
 		kind: z.literal("line-input"),
 		ownerItemId: IdSchema.describe("The live runtime item that owns the target line."),
-		lineId: IdSchema.describe("The stable target line ID."),
+		lineUid: IdSchema.describe("The stable target line UID."),
 		inputIndex: NonNegativeIntegerSchema.describe(
 			"The exact material-input slot claimed by this item.",
 		),

@@ -28,7 +28,7 @@ export namespace GameDiagnosticItemReferenceSchema {
 export const GameDiagnosticJobReferenceSchema = z
 	.object({
 		jobId: IdSchema,
-		lineId: IdSchema,
+		lineUid: IdSchema,
 		owner: GameDiagnosticItemReferenceSchema,
 	})
 	.strict();
@@ -40,7 +40,7 @@ export namespace GameDiagnosticJobReferenceSchema {
 export const GameDiagnosticQueueReferenceSchema = z
 	.object({
 		requestId: IdSchema,
-		lineId: IdSchema,
+		lineUid: IdSchema,
 		owner: GameDiagnosticItemReferenceSchema,
 	})
 	.strict();

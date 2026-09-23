@@ -40,7 +40,7 @@ export const createClockConfig = (
 					lines: [
 						{
 							...createLine({
-								id: "a",
+								uid: "a",
 								default: true,
 								clock: true,
 								outcome: createOutput([
@@ -53,7 +53,7 @@ export const createClockConfig = (
 						},
 						{
 							...createLine({
-								id: "b",
+								uid: "b",
 								outcome: createOutput([
 									{
 										itemUid: "result",

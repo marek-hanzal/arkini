@@ -45,15 +45,15 @@ export {
 export type { RuntimeSchema };
 
 export const readLineRunFx = ({
-	lineId,
+	lineUid,
 	ownerItemId,
 }: {
-	readonly lineId: string;
+	readonly lineUid: string;
 	readonly ownerItemId: string;
 }) =>
 	Effect.gen(function* () {
 		return yield* resolveLineRunFx({
-			lineId,
+			lineUid,
 			ownerItemId,
 			runtime: yield* readRuntimeFx(),
 		});
@@ -144,7 +144,7 @@ export const unitsConfig = GameConfigSchema.parse({
 			maxQueueSize: 2,
 			lines: [
 				{
-					id: "line:shrine:pray",
+					uid: "line:shrine:pray",
 					title: "Pray",
 					description: "Use one shrine unit.",
 					runtimeMs: 200,
@@ -170,7 +170,7 @@ export const unitsConfig = GameConfigSchema.parse({
 			maxQueueSize: 1,
 			lines: [
 				{
-					id: "line:double-target:work",
+					uid: "line:double-target:work",
 					title: "Double work",
 					description: "Spend two target costs.",
 					runtimeMs: 200,
@@ -181,7 +181,7 @@ export const unitsConfig = GameConfigSchema.parse({
 					rules: [],
 				},
 				{
-					id: "line:double-target:saplings",
+					uid: "line:double-target:saplings",
 					title: "Double sapling work",
 					description: "Spend two sapling target costs.",
 					runtimeMs: 200,
@@ -204,7 +204,7 @@ export const unitsConfig = GameConfigSchema.parse({
 			maxQueueSize: 1,
 			lines: [
 				{
-					id: "line:mixed-unit:work",
+					uid: "line:mixed-unit:work",
 					title: "Mixed unit",
 					description: "Spend self and target units.",
 					runtimeMs: 200,
@@ -246,7 +246,7 @@ export const unitsConfig = GameConfigSchema.parse({
 			maxQueueSize: 1,
 			lines: [
 				{
-					id: "line:overdrawn:work",
+					uid: "line:overdrawn:work",
 					title: "Overdrawn",
 					description: "Costs two units but owns one.",
 					runtimeMs: 200,
@@ -278,7 +278,7 @@ export const unitsConfig = GameConfigSchema.parse({
 			maxQueueSize: 1,
 			lines: [
 				{
-					id: "line:lumberjack:work",
+					uid: "line:lumberjack:work",
 					title: "Work",
 					description: "Spend one nearby target unit.",
 					runtimeMs: 200,
@@ -289,7 +289,7 @@ export const unitsConfig = GameConfigSchema.parse({
 					rules: [],
 				},
 				{
-					id: "line:lumberjack:sapling",
+					uid: "line:lumberjack:sapling",
 					title: "Sapling work",
 					description: "Spend one nearby sapling unit.",
 					runtimeMs: 200,
@@ -300,7 +300,7 @@ export const unitsConfig = GameConfigSchema.parse({
 					rules: [],
 				},
 				{
-					id: "line:lumberjack:messy",
+					uid: "line:lumberjack:messy",
 					title: "Messy work",
 					description: "Spend one nearby messy units unit.",
 					runtimeMs: 200,
@@ -323,7 +323,7 @@ export const unitsConfig = GameConfigSchema.parse({
 			maxQueueSize: 1,
 			lines: [
 				{
-					id: "line:self-well:water",
+					uid: "line:self-well:water",
 					title: "Water",
 					description: "Spend one unit from this well.",
 					runtimeMs: 200,

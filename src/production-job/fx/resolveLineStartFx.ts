@@ -12,13 +12,13 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 export namespace resolveLineStartFx {
 	export interface Props {
 		ownerItemId: IdSchema.Type;
-		lineId: IdSchema.Type;
+		lineUid: IdSchema.Type;
 		runtime: RuntimeSchema.Type;
 	}
 
 	export interface Result {
 		readonly ownerItemId: IdSchema.Type;
-		readonly lineId: IdSchema.Type;
+		readonly lineUid: IdSchema.Type;
 		readonly run: LineRun.Resolution;
 		readonly queue: JobQueueResolutionSchema.Type;
 		readonly ready: boolean;
@@ -28,12 +28,12 @@ export namespace resolveLineStartFx {
 /** Resolves all current state required to decide whether one explicit line start is possible. */
 export const resolveLineStartFx = Effect.fn("resolveLineStartFx")(function* ({
 	ownerItemId,
-	lineId,
+	lineUid,
 	runtime,
 }: resolveLineStartFx.Props) {
 	const run = yield* resolveLineRunFx({
 		ownerItemId,
-		lineId,
+		lineUid,
 		runtime,
 	});
 	const owner = yield* readRuntimeItemByIdFx({
@@ -46,13 +46,13 @@ export const resolveLineStartFx = Effect.fn("resolveLineStartFx")(function* ({
 	});
 	const deliveryClaims = readLineInputDeliveryClaimsFn({
 		ownerItemId,
-		lineId,
+		lineUid,
 		runtime,
 	});
 
 	return {
 		ownerItemId,
-		lineId,
+		lineUid,
 		run,
 		queue,
 		ready: run.ready && queue.available && deliveryClaims.length === 0,

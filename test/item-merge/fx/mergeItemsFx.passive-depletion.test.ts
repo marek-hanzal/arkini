@@ -48,7 +48,7 @@ const runDepletion = (blockReturn = false) => {
 				...base.items.source,
 				lines: [
 					{
-						id: "line",
+						uid: "line",
 						title: "Line",
 						description: "Buffered material",
 						runtimeMs: 1000,
@@ -109,7 +109,7 @@ const runDepletion = (blockReturn = false) => {
 				location: {
 					scope: "input",
 					ownerItemId: "source",
-					lineId: "line",
+					lineUid: "line",
 					inputIndex: 0,
 				},
 			},
@@ -125,7 +125,7 @@ const runDepletion = (blockReturn = false) => {
 			location: {
 				scope: "input",
 				ownerItemId: "source",
-				lineId: "line",
+				lineUid: "line",
 				inputIndex: 1,
 			},
 		});

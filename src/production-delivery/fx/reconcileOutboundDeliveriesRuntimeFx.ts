@@ -15,7 +15,7 @@ import { matchesItemSelectorFn } from "~/item-definition/fn/matchesItemSelectorF
 
 export namespace reconcileOutboundDeliveriesRuntimeFx {
 	export interface Props {
-		readonly returnLineIdsByOwnerItemId?: ReadonlyMap<
+		readonly returnLineUidsByOwnerItemId?: ReadonlyMap<
 			IdSchema.Type,
 			ReadonlySet<IdSchema.Type>
 		>;
@@ -36,7 +36,7 @@ export const reconcileOutboundDeliveriesRuntimeFx = Effect.fn(
 	"reconcileOutboundDeliveriesRuntimeFx",
 )(function* ({
 	returnFromByOwnerItemId,
-	returnLineIdsByOwnerItemId,
+	returnLineUidsByOwnerItemId,
 	runtime,
 }: reconcileOutboundDeliveriesRuntimeFx.Props) {
 	const remainingTargetBySlot = new Map<string, number>();
@@ -55,11 +55,11 @@ export const reconcileOutboundDeliveriesRuntimeFx = Effect.fn(
 				? undefined
 				: readItemLineFn({
 						item: owner.item,
-						lineId: target.lineId,
+						lineUid: target.lineUid,
 					});
 		let retained = false;
 		const returnRequested =
-			returnLineIdsByOwnerItemId?.get(target.ownerItemId)?.has(target.lineId) === true;
+			returnLineUidsByOwnerItemId?.get(target.ownerItemId)?.has(target.lineUid) === true;
 
 		if (
 			!returnRequested &&
@@ -76,13 +76,13 @@ export const reconcileOutboundDeliveriesRuntimeFx = Effect.fn(
 				}) &&
 				!isLineInputClosedFn({
 					ownerItemId: owner.id,
-					lineId: line.id,
+					lineUid: line.uid,
 					runtime: nextRuntime,
 				})
 			) {
 				const key = JSON.stringify([
 					owner.id,
-					line.id,
+					line.uid,
 					target.inputIndex,
 				]);
 				let remainingTarget = remainingTargetBySlot.get(key);
@@ -90,7 +90,7 @@ export const reconcileOutboundDeliveriesRuntimeFx = Effect.fn(
 					const storedQuantity = nextRuntime.items.reduce((total, candidate) => {
 						return candidate.location.scope === LocationScopeEnumSchema.enum.Input &&
 							candidate.location.ownerItemId === owner.id &&
-							candidate.location.lineId === line.id &&
+							candidate.location.lineUid === line.uid &&
 							candidate.location.inputIndex === target.inputIndex
 							? total + 1
 							: total;

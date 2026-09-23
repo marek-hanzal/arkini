@@ -18,7 +18,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "stock",
+				"uid": "t9br3r8xjv09owvcoc3mo7i2",
 				"title": "Stock Chicken Coop",
 				"artwork": "aha604t1wuq6u9ntedhp6cw0",
 				"description": "Provide starter feed and water so the enclosure can be stocked with animals.",

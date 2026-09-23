@@ -22,7 +22,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "idle",
+				"uid": "hr3hxreipezecig4d6jo8ao5",
 				"title": "Idle",
 				"description": "The cat rests with a full belly.",
 				"clock": true,
@@ -39,7 +39,7 @@
 				"rules": []
 			},
 			{
-				"id": "wander",
+				"uid": "djltdtm8ehgxw0u6tjxqkt64",
 				"title": "Wander",
 				"artwork": "lz69u404ex3hqn8ti3lsz01w",
 				"description": "Wanders somewhere else.",
@@ -93,7 +93,7 @@
 				"rules": []
 			},
 			{
-				"id": "digest",
+				"uid": "crm6kwaugjzjg1g432t3k22h",
 				"title": "Digest",
 				"description": "Eventually the meal is processed.",
 				"clock": true,
@@ -156,7 +156,7 @@
 				"rules": []
 			},
 			{
-				"id": "get-sick",
+				"uid": "xvjbnl2aiyibtm98xntuoal1",
 				"title": "Get Sick",
 				"description": "The cat may become sick.",
 				"clock": true,
@@ -209,7 +209,7 @@
 				"rules": []
 			},
 			{
-				"id": "disease-exposure",
+				"uid": "j8otph8myg5rs1sof0gxqiin",
 				"title": "Disease Exposure",
 				"artwork": "fnom9s6mxxkza9m7iahgp5k9",
 				"description": "Nearby disease increases the chance of illness.",
@@ -279,7 +279,7 @@
 				]
 			},
 			{
-				"id": "plague-exposure",
+				"uid": "dvtqbsd9ejd5e1dd6bpp65ek",
 				"title": "Plague Exposure",
 				"artwork": "j23vl46e91a44u0vt6qlcojt",
 				"description": "Nearby plague increases the chance of illness.",

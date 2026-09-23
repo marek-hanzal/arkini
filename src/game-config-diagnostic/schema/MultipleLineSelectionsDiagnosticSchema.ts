@@ -18,7 +18,7 @@ export const MultipleLineSelectionsDiagnosticSchema = z
 		]),
 		ownerItemUid: IdSchema,
 		selection: z.literal("default"),
-		lineIds: z.tuple([
+		lineUids: z.tuple([
 			IdSchema,
 			IdSchema,
 		]),

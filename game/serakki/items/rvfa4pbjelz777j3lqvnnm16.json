@@ -14,7 +14,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "pancake",
+				"uid": "vb4ej7dljo099x97osptwhur",
 				"title": "Pancake",
 				"description": "You may like it",
 				"default": true,

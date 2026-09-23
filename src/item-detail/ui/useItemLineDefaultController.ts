@@ -16,7 +16,7 @@ import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErr
 export namespace useItemLineDefaultController {
 	export interface Props {
 		readonly ownerItemId?: IdSchema.Type;
-		readonly lineId: IdSchema.Type;
+		readonly lineUid: IdSchema.Type;
 		readonly authoredDefault: boolean;
 		readonly disabled: boolean;
 	}
@@ -30,7 +30,7 @@ export namespace useItemLineDefaultController {
 /** Toggles the exact owner's default role, independently of queue capacity and Clock selection. */
 export const useItemLineDefaultController = ({
 	ownerItemId,
-	lineId,
+	lineUid,
 	authoredDefault,
 	disabled,
 }: useItemLineDefaultController.Props): useItemLineDefaultController.Output => {
@@ -49,7 +49,7 @@ export const useItemLineDefaultController = ({
 						ownerItemId: owner.id,
 						ownerItem: owner.item,
 						runtime,
-					})?.id === lineId,
+					})?.uid === lineUid,
 				controllable:
 					owner.location.scope === "board" && canControlItemProductionFn(owner.item),
 			};
@@ -57,7 +57,7 @@ export const useItemLineDefaultController = ({
 		[
 			game,
 			ownerItemId,
-			lineId,
+			lineUid,
 			authoredDefault,
 		],
 	);
@@ -67,7 +67,7 @@ export const useItemLineDefaultController = ({
 		[
 			game,
 			ownerItemId,
-			lineId,
+			lineUid,
 		],
 	);
 	const [result, selectFn] = useAtom(commandAtom);
@@ -80,7 +80,7 @@ export const useItemLineDefaultController = ({
 			if (unavailable || ownerItemId === undefined) return;
 			selectFn({
 				ownerItemId,
-				lineId: state.selected ? null : lineId,
+				lineUid: state.selected ? null : lineUid,
 				selection: "default",
 			});
 		},

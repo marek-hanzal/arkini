@@ -46,11 +46,11 @@ it("toggles the exact owner's effective default independently of a full queue an
 					maxQueueSize: 1,
 					lines: [
 						{
-							id: "line:a",
+							uid: "line:a",
 							default: true,
 						},
 						{
-							id: "line:b",
+							uid: "line:b",
 							default: false,
 						},
 					],
@@ -61,7 +61,7 @@ it("toggles the exact owner's effective default independently of a full queue an
 		jobQueue: [
 			{
 				ownerItemId: "owner:a",
-				lineId: "line:a",
+				lineUid: "line:a",
 				id: "full",
 			},
 		],
@@ -81,14 +81,14 @@ it("toggles the exact owner's effective default independently of a full queue an
 		return null;
 	};
 	const root = createRoot(document.createElement("div"));
-	const renderFn = (lineId: string, disabled = false, ownerItemId = "owner:a") =>
+	const renderFn = (lineUid: string, disabled = false, ownerItemId = "owner:a") =>
 		act(async () =>
 			root.render(
 				<RegistryContext.Provider value={registry}>
 					<Probe
 						ownerItemId={ownerItemId}
-						lineId={lineId}
-						authoredDefault={lineId === "line:a"}
+						lineUid={lineUid}
+						authoredDefault={lineUid === "line:a"}
 						disabled={disabled}
 					/>
 				</RegistryContext.Provider>,
@@ -101,7 +101,7 @@ it("toggles the exact owner's effective default independently of a full queue an
 		await act(async () => output!.toggleFn());
 		expect(state.selectFx).toHaveBeenLastCalledWith({
 			ownerItemId: "owner:a",
-			lineId: null,
+			lineUid: null,
 			selection: "default",
 		});
 		await act(async () =>
@@ -119,7 +119,7 @@ it("toggles the exact owner's effective default independently of a full queue an
 		await act(async () => output!.toggleFn());
 		expect(state.selectFx).toHaveBeenLastCalledWith({
 			ownerItemId: "owner:a",
-			lineId: "line:b",
+			lineUid: "line:b",
 			selection: "default",
 		});
 		await act(async () =>

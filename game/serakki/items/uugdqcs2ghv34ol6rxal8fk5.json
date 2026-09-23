@@ -17,7 +17,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "stone-deposit",
+				"uid": "pvjhrdn252tdhtmt9go4t4py",
 				"title": "Search Stone Deposit",
 				"description": "Describe what this producer line consumes and produces.",
 				"default": true,

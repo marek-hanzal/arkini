@@ -41,7 +41,7 @@ export const clearItemJobQueueState = {
 		{
 			id: "job:active",
 			ownerItemId: "runtime:forge:primary",
-			lineId: "line:forge:run",
+			lineUid: "line:forge:run",
 			durationMs: 1_000,
 			remainingMs: 800,
 		},
@@ -50,22 +50,22 @@ export const clearItemJobQueueState = {
 		{
 			id: "job:queued:first",
 			ownerItemId: "runtime:forge:primary",
-			lineId: "line:forge:run",
+			lineUid: "line:forge:run",
 		},
 		{
 			id: "job:queued:other:first",
 			ownerItemId: "runtime:forge:other",
-			lineId: "line:forge:run",
+			lineUid: "line:forge:run",
 		},
 		{
 			id: "job:queued:second",
 			ownerItemId: "runtime:forge:primary",
-			lineId: "line:forge:run",
+			lineUid: "line:forge:run",
 		},
 		{
 			id: "job:queued:other:second",
 			ownerItemId: "runtime:forge:other",
-			lineId: "line:forge:run",
+			lineUid: "line:forge:run",
 		},
 	],
 } satisfies StateSchema.Type;

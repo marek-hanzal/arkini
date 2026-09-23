@@ -16,9 +16,11 @@ import { RuleSchema } from "./RuleSchema";
 export const LineSchema = z
 	.object({
 		/**
-		 * Stable ID of this product line within its owning item.
+		 * Immutable generated identity, unique among all product lines in the project.
 		 */
-		id: IdSchema.describe("The stable ID of this product line within its owning item."),
+		uid: IdSchema.describe(
+			"The immutable generated UID of this product line, unique across the project.",
+		),
 		/**
 		 * Human-readable title of this product line.
 		 */

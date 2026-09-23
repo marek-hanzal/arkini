@@ -15,7 +15,7 @@
 		"maxQueueSize": 4,
 		"lines": [
 			{
-				"id": "harvest",
+				"uid": "hae0k15x74ylm0zub19aosmt",
 				"title": "Dye",
 				"description": "Harvest dye from a nearby planted field. Supply one bucket of water; the empty bucket is returned.",
 				"clockWeight": 1,
@@ -92,7 +92,7 @@
 				"rules": []
 			},
 			{
-				"id": "field",
+				"uid": "wqou16iyw4k4q0if69pbdxbx",
 				"title": "Prepare Dye Field",
 				"artwork": "p44npmtdzw2xjxl2ce2assca",
 				"description": "Prepare a new dye field for planting.",
@@ -134,7 +134,7 @@
 				"rules": []
 			},
 			{
-				"id": "blueprint",
+				"uid": "rtbk685dhy7z18s1bniya0cg",
 				"title": "Dye Farm Blueprint",
 				"artwork": "so7r094glj6wfe6yoveiclrg",
 				"description": "Sketch plans for another Dye Farm.",

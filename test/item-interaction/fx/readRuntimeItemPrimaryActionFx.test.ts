@@ -65,7 +65,7 @@ const config = GameConfigSchema.parse({
 			maxQueueSize: 1,
 			lines: [
 				{
-					id: "line:produce",
+					uid: "line:produce",
 					title: "Produce",
 					description: "Produce one resource.",
 					default: true,
@@ -157,7 +157,7 @@ describe("readRuntimeItemPrimaryActionFx", () => {
 			if (active) {
 				expect(result.action).toEqual({
 					kind: "enqueue-default-line",
-					lineId: "line:produce",
+					lineUid: "line:produce",
 					queue: {
 						available: true,
 						capacity: 1,
@@ -195,7 +195,7 @@ describe("readRuntimeItemPrimaryActionFx", () => {
 			),
 		).toEqual({
 			kind: "enqueue-default-line",
-			lineId: "line:produce",
+			lineUid: "line:produce",
 			queue: {
 				available: true,
 				capacity: 1,
@@ -244,7 +244,7 @@ describe("readRuntimeItemPrimaryActionFx", () => {
 						jobQueue: [
 							{
 								id: "queue:producer",
-								lineId: "line:produce",
+								lineUid: "line:produce",
 								ownerItemId: producer.id,
 							},
 						],
@@ -253,7 +253,7 @@ describe("readRuntimeItemPrimaryActionFx", () => {
 			),
 		).toEqual({
 			kind: "enqueue-default-line",
-			lineId: "line:produce",
+			lineUid: "line:produce",
 			queue: {
 				available: false,
 				capacity: 1,

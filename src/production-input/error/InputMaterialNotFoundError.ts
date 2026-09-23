@@ -8,6 +8,6 @@ import type { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIn
  */
 export class InputMaterialNotFoundError extends Data.TaggedError("InputMaterialNotFoundError")<{
 	ownerItemId: IdSchema.Type;
-	lineId: IdSchema.Type;
+	lineUid: IdSchema.Type;
 	inputIndex: NonNegativeIntegerSchema.Type;
 }> {}

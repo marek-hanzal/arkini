@@ -78,7 +78,7 @@ it("separates obtainable material from the exact slot's stored fill and does not
 			...water.location,
 			scope: "input",
 			ownerItemId: "other",
-			lineId: line.id,
+			lineUid: line.uid,
 			inputIndex: 0,
 		},
 	} satisfies RuntimeItemSchema.Type;
@@ -88,7 +88,7 @@ it("separates obtainable material from the exact slot's stored fill and does not
 		location: {
 			...anotherOwner.location,
 			ownerItemId: owner.id,
-			lineId: "other-line",
+			lineUid: "other-line",
 		},
 	} satisfies RuntimeItemSchema.Type;
 	expect(
@@ -146,7 +146,7 @@ it("keeps travelling material available but unfilled until canonical input settl
 			target: {
 				kind: "line-input",
 				ownerItemId: owner.id,
-				lineId: line.id,
+				lineUid: line.uid,
 				inputIndex: 0,
 			},
 		},
@@ -201,7 +201,7 @@ it.each([
 		const job = {
 			id: "active-job",
 			ownerItemId: owner.id,
-			lineId: line.id,
+			lineUid: line.uid,
 			durationMs: 1000,
 			remainingMs: 500,
 		};
@@ -439,7 +439,7 @@ it("reads the soonest running lifetime only from physical roots in this slot", (
 	const job = {
 		id: "timed-job",
 		ownerItemId: owner.id,
-		lineId: line.id,
+		lineUid: line.uid,
 		durationMs: 1000,
 		remainingMs: 500,
 		outcome: {
@@ -604,7 +604,7 @@ it("reports the selected external target's remaining units, including during an 
 								{
 									id: "job",
 									ownerItemId: owner.id,
-									lineId: line.id,
+									lineUid: line.uid,
 									durationMs: 1000,
 									remainingMs: 500,
 								},

@@ -266,32 +266,16 @@ export const compileGraphFactsFn = (config: GameConfigSchema.Type): GraphFacts =
 			"items",
 			key,
 		];
-		const lineCounts = new Map<string, number>();
-		const lineOccurrences = new Map<string, number>();
-		for (const line of item.lines) lineCounts.set(line.id, (lineCounts.get(line.id) ?? 0) + 1);
 		for (const [lineIndex, line] of item.lines.entries()) {
 			const source = [
 				...base,
 				"lines",
 				lineIndex,
 			];
-			const occurrence = lineOccurrences.get(line.id) ?? 0;
-			lineOccurrences.set(line.id, occurrence + 1);
-			// In-progress schema-valid projects can contain duplicate IDs; never merge their groups.
-			const id = JSON.stringify(
-				lineCounts.get(line.id) === 1
-					? [
-							owner,
-							"line",
-							line.id,
-						]
-					: [
-							owner,
-							"line",
-							line.id,
-							occurrence,
-						],
-			);
+			const id = JSON.stringify([
+				"line",
+				line.uid,
+			]);
 			operationFn({
 				id,
 				owner,

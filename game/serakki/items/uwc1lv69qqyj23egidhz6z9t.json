@@ -14,7 +14,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "line:treasure-chest-t2:default",
+				"uid": "a7l4i7wr4rvts106vwnsrtmq",
 				"title": "New stash line",
 				"description": "Describe what this stash line consumes and produces.",
 				"default": true,

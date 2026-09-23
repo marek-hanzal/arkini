@@ -59,7 +59,7 @@ it("rolls back the whole start when depletion outcome cannot be placed", () => {
 			const attempt = yield* Effect.result(
 				startLineFx({
 					ownerItemId: owner.id,
-					lineId: "line:lumberjack:messy",
+					lineUid: "line:lumberjack:messy",
 				}),
 			);
 			return {
@@ -121,7 +121,7 @@ it("resolves idle depletion while preserving the exact owner with remaining unit
 			}
 			yield* startLineFx({
 				ownerItemId: owner.id,
-				lineId: "line:mixed-unit:work",
+				lineUid: "line:mixed-unit:work",
 			});
 			return {
 				owner,

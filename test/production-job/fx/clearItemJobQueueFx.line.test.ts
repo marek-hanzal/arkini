@@ -13,8 +13,8 @@ import {
 } from "./clearItemJobQueueFx.test/fixture";
 
 const ownerItemId = "runtime:forge:primary";
-const lineId = "line:forge:run";
-const otherLineId = "line:forge:other";
+const lineUid = "line:forge:run";
+const otherLineUid = "line:forge:other";
 const config = GameConfigSchema.parse({
 	...clearItemJobQueueConfig,
 	items: {
@@ -26,11 +26,11 @@ const config = GameConfigSchema.parse({
 				...clearItemJobQueueConfig.items.forge!.lines,
 				{
 					...clearItemJobQueueConfig.items.forge!.lines[0],
-					id: otherLineId,
+					uid: otherLineUid,
 				},
 				{
 					...clearItemJobQueueConfig.items.forge!.lines[0],
-					id: "line:active",
+					uid: "line:active",
 				},
 			],
 		},
@@ -40,14 +40,14 @@ const state: StateSchema.Type = {
 	...clearItemJobQueueState,
 	jobs: clearItemJobQueueState.jobs.map((job) => ({
 		...job,
-		lineId: "line:active",
+		lineUid: "line:active",
 	})),
 	jobQueue: [
 		...clearItemJobQueueState.jobQueue,
 		{
 			id: "queued:other-line",
 			ownerItemId,
-			lineId: otherLineId,
+			lineUid: otherLineUid,
 		},
 	],
 	items: [
@@ -69,7 +69,7 @@ const state: StateSchema.Type = {
 			location: {
 				scope: "input",
 				ownerItemId,
-				lineId,
+				lineUid,
 				inputIndex: 1,
 			},
 		},
@@ -80,7 +80,7 @@ const state: StateSchema.Type = {
 			location: {
 				scope: "input",
 				ownerItemId,
-				lineId: otherLineId,
+				lineUid: otherLineUid,
 				inputIndex: 1,
 			},
 		},
@@ -94,19 +94,19 @@ it("clears one owner's selected line atomically while retaining other lines, own
 			const previousSequence = (yield* (yield* CommittedTransitionsFx).read).sequence;
 			const cleared = yield* clearItemJobQueueFx({
 				ownerItemId,
-				lineId,
+				lineUid,
 			});
 			const after = yield* readRuntimeFx();
 			const transition = yield* (yield* CommittedTransitionsFx).read;
 			// A stale click and a request belonging to another line are exact no-ops.
 			yield* clearItemJobQueueFx({
 				ownerItemId,
-				lineId,
+				lineUid,
 				requestId: "job:queued:first",
 			});
 			yield* clearItemJobQueueFx({
 				ownerItemId,
-				lineId,
+				lineUid,
 				requestId: "queued:other-line",
 			});
 			return {
@@ -130,7 +130,7 @@ it("clears one owner's selected line atomically while retaining other lines, own
 	]);
 	expect(result.after.jobQueue).toEqual(
 		result.before.jobQueue.filter(
-			(request) => request.ownerItemId !== ownerItemId || request.lineId !== lineId,
+			(request) => request.ownerItemId !== ownerItemId || request.lineUid !== lineUid,
 		),
 	);
 	expect(result.after.jobs).toEqual(result.before.jobs);
@@ -181,7 +181,7 @@ it("rolls back the selected line clear when its buffered material cannot return"
 			const attempt = yield* Effect.result(
 				clearItemJobQueueFx({
 					ownerItemId,
-					lineId,
+					lineUid,
 				}),
 			);
 			return {

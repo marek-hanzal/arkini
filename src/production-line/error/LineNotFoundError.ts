@@ -7,5 +7,5 @@ import type { IdSchema } from "~/game-value/schema/IdSchema";
  */
 export class LineNotFoundError extends Data.TaggedError("LineNotFoundError")<{
 	itemId: IdSchema.Type;
-	lineId: IdSchema.Type;
+	lineUid: IdSchema.Type;
 }> {}

@@ -14,7 +14,7 @@ export namespace applyInputMaterialReserveRunPlanFx {
 	export interface Props {
 		jobId: IdSchema.Type;
 		ownerItemId: IdSchema.Type;
-		lineId: IdSchema.Type;
+		lineUid: IdSchema.Type;
 		inputIndex: NonNegativeIntegerSchema.Type;
 		plan: InputRun.MaterialPlan;
 		runtime: RuntimeSchema.Type;
@@ -26,7 +26,7 @@ export const applyInputMaterialReserveRunPlanFx = Effect.fn("applyInputMaterialR
 	function* ({
 		jobId,
 		ownerItemId,
-		lineId,
+		lineUid,
 		inputIndex,
 		plan,
 		runtime,
@@ -38,7 +38,7 @@ export const applyInputMaterialReserveRunPlanFx = Effect.fn("applyInputMaterialR
 				return Effect.gen(function* () {
 					const item = yield* readInputRunItemFx({
 						ownerItemId,
-						lineId,
+						lineUid,
 						inputIndex,
 						itemId: allocation.itemId,
 						runtime: draft,

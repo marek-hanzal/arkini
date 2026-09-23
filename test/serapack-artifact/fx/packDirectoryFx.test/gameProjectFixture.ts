@@ -71,7 +71,7 @@ const config = GameConfigSchema.parse({
 
 			lines: [
 				{
-					id: "travel",
+					uid: "travel",
 					title: "Travel",
 					description: "Travel",
 					default: true,

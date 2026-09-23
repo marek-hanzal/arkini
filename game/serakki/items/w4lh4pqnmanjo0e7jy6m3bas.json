@@ -45,7 +45,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "coin",
+				"uid": "cjjbb84p35c546wpmtekd3ns",
 				"title": "Coin",
 				"description": "Coin",
 				"clock": true,

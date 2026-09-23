@@ -21,7 +21,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "travel",
+				"uid": "c4t66ds9dnou1j450qeseg1w",
 				"title": "Travel",
 				"description": "Travel to the destination space.",
 				"default": true,

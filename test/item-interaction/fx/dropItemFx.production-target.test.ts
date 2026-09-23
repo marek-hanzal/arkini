@@ -16,7 +16,7 @@ import {
 	workshopLocation,
 } from "~test/production-input/support/inputRuntimeTestConfig";
 
-const lineId = "line:workshop:build";
+const lineUid = "line:workshop:build";
 
 const mergeBeforeInputConfig = GameConfigSchema.parse({
 	...inputRuntimeTestConfig,
@@ -92,7 +92,7 @@ const setupFx = () =>
 		yield* setLineSelectionFx({
 			selection: "default",
 			ownerItemId: "runtime:workshop",
-			lineId,
+			lineUid,
 		});
 		const runtime = yield* readRuntimeFx();
 		const owner = runtime.items.find((item) => item.id === "runtime:workshop");

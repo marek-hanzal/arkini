@@ -35,7 +35,7 @@ describe("autofillLineInputsFx transition", () => {
 				if (mode === "queue")
 					yield* enqueueLineFx({
 						ownerItemId: "runtime:workshop",
-						lineId: "line:workshop:build",
+						lineUid: "line:workshop:build",
 					});
 				const transitions = yield* CommittedTransitionsFx;
 				const replaySeen = yield* Deferred.make<void>();
@@ -51,7 +51,7 @@ describe("autofillLineInputsFx transition", () => {
 					yield* autofillLineInputFx({
 						inputIndex: 0,
 						ownerItemId: "runtime:workshop",
-						lineId: "line:workshop:build",
+						lineUid: "line:workshop:build",
 					});
 				else
 					yield* runTickRuntimeByFx({
@@ -65,7 +65,7 @@ describe("autofillLineInputsFx transition", () => {
 						type: "line-input:autofill-started",
 						itemUid: "workshop",
 						ownerItemId: "runtime:workshop",
-						lineId: "line:workshop:build",
+						lineUid: "line:workshop:build",
 						scheduledQuantity: 3,
 					},
 				]);
@@ -80,7 +80,7 @@ describe("autofillLineInputsFx transition", () => {
 					expect(
 						yield* autofillLineInputFx({
 							ownerItemId: "runtime:workshop",
-							lineId: "line:workshop:build",
+							lineUid: "line:workshop:build",
 							inputIndex: 0,
 						}),
 					).toBe(0);

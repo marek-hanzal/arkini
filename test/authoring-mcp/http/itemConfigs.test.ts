@@ -140,7 +140,7 @@ it("returns ordered canonical batch configs and missing IDs from one revision, w
 			lines: [
 				{
 					itemUid: "toString",
-					lineId: "missing",
+					lineUid: "missing",
 				},
 			],
 		},

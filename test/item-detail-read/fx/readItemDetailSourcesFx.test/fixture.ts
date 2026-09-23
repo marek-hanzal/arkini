@@ -97,7 +97,7 @@ const targetLine = ({
 	readonly show?: boolean;
 	readonly showWhen?: string;
 }) => ({
-	id,
+	uid: id,
 	title: id,
 	description: id,
 	show,
@@ -138,7 +138,7 @@ const producer = (id: string, title: string, lines: readonly object[]) => ({
 });
 
 const acquisitionLine = (id: string, outputItemId: string) => ({
-	id,
+	uid: id,
 	title: id,
 	description: id,
 	runtimeMs: 1_000,
@@ -300,7 +300,7 @@ export const runtime = {
 			location: {
 				scope: "input",
 				ownerItemId: "runtime:beta:current",
-				lineId: "line:beta",
+				lineUid: "line:beta",
 				inputIndex: 0,
 			},
 		}),

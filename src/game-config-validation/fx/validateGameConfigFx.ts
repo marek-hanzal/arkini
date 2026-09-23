@@ -9,7 +9,7 @@ import { DiagnosticSeverityEnumSchema } from "~/game-config-diagnostic/schema/Di
 import { validateConfigReferencesFn } from "../fn/validateConfigReferencesFn";
 import { validateInputAcceptanceCyclesFn } from "../fn/validateInputAcceptanceCyclesFn";
 import { validateInputUnitsFn } from "../fn/validateInputUnitsFn";
-import { validateItemLineIdsFn } from "../fn/validateItemLineIdsFn";
+import { validateItemLineUidsFn } from "../fn/validateItemLineUidsFn";
 import { validateUnitRenewalFn } from "../fn/validateUnitRenewalFn";
 import { validateMergeViabilityFn } from "../fn/validateMergeViabilityFn";
 import { validateStartStateFx } from "./validateStartStateFx";
@@ -69,7 +69,7 @@ export const validateGameConfigFx = Effect.fn("validateGameConfigFx")(function* 
 			config,
 			provenance,
 		}),
-		validateItemLineIdsFn({
+		validateItemLineUidsFn({
 			config,
 			provenance,
 		}),

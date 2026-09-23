@@ -7,21 +7,21 @@ import type { GameDiagnosticsSchema } from "~/game-config-diagnostic/schema/Game
 import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticCodeEnumSchema";
 import { DiagnosticSeverityEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticSeverityEnumSchema";
 
-export namespace validateItemLineIdsFn {
+export namespace validateItemLineUidsFn {
 	export interface Props {
 		config: GameConfigSchema.Type;
 		provenance: GameSourceProvenanceSchema.Type;
 	}
 }
 
-/** Enforces owner-local line identity and one authored Default. */
-export const validateItemLineIdsFn = ({ config, provenance }: validateItemLineIdsFn.Props) => {
+/** Line UIDs are project-wide identities; the authored Default remains owner-local. */
+export const validateItemLineUidsFn = ({ config, provenance }: validateItemLineUidsFn.Props) => {
 	const diagnostics: GameDiagnosticsSchema.Type = [];
+	const firstByUid = new Map<IdSchema.Type, DiagnosticPathSchema.Type>();
 	for (const [ownerItemUid, item] of Object.entries(config.items)) {
-		const firstById = new Map<IdSchema.Type, DiagnosticPathSchema.Type>();
 		let firstDefault:
 			| {
-					lineId: IdSchema.Type;
+					lineUid: IdSchema.Type;
 					path: DiagnosticPathSchema.Type;
 			  }
 			| undefined;
@@ -30,9 +30,9 @@ export const validateItemLineIdsFn = ({ config, provenance }: validateItemLineId
 			item,
 		});
 		for (const entry of entries) {
-			const lineIdPath = [
+			const lineUidPath = [
 				...entry.path,
-				"id",
+				"uid",
 			] satisfies DiagnosticPathSchema.Type;
 			if (entry.line.default) {
 				const path = [
@@ -42,7 +42,7 @@ export const validateItemLineIdsFn = ({ config, provenance }: validateItemLineId
 				const first = firstDefault;
 				if (first === undefined)
 					firstDefault = {
-						lineId: entry.line.id,
+						lineUid: entry.line.uid,
 						path,
 					};
 				else
@@ -52,11 +52,11 @@ export const validateItemLineIdsFn = ({ config, provenance }: validateItemLineId
 						path,
 						source: provenance.items[ownerItemUid],
 						selection: "default",
-						message: `Item ${ownerItemUid} marks both ${first.lineId} and ${entry.line.id} as authored default lines.`,
+						message: `Item ${ownerItemUid} marks both ${first.lineUid} and ${entry.line.uid} as authored default lines.`,
 						ownerItemUid,
-						lineIds: [
-							first.lineId,
-							entry.line.id,
+						lineUids: [
+							first.lineUid,
+							entry.line.uid,
 						],
 						paths: [
 							first.path,
@@ -64,24 +64,24 @@ export const validateItemLineIdsFn = ({ config, provenance }: validateItemLineId
 						],
 					});
 			}
-			const previousPath = firstById.get(entry.line.id);
+			const previousPath = firstByUid.get(entry.line.uid);
 			if (previousPath !== undefined) {
 				diagnostics.push({
-					code: DiagnosticCodeEnumSchema.enum.LineDuplicateId,
+					code: DiagnosticCodeEnumSchema.enum.LineDuplicateUid,
 					severity: DiagnosticSeverityEnumSchema.enum.Error,
-					path: lineIdPath,
+					path: lineUidPath,
 					source: provenance.items[ownerItemUid],
-					message: `Item ${ownerItemUid} owns more than one line with ID ${entry.line.id}.`,
+					message: `Line UID ${entry.line.uid} is duplicated at ${JSON.stringify(previousPath)} and ${JSON.stringify(lineUidPath)}. Line UIDs must be unique across the project.`,
 					ownerItemUid,
-					lineId: entry.line.id,
+					lineUid: entry.line.uid,
 					paths: [
 						previousPath,
-						lineIdPath,
+						lineUidPath,
 					],
 				});
 				continue;
 			}
-			firstById.set(entry.line.id, lineIdPath);
+			firstByUid.set(entry.line.uid, lineUidPath);
 		}
 	}
 	return diagnostics;

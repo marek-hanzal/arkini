@@ -42,7 +42,7 @@
 		"maxQueueSize": 8,
 		"lines": [
 			{
-				"id": "emerald",
+				"uid": "knd8ryn9lxktkn16yk6q3a51",
 				"title": "Emerald",
 				"description": "Try find some emeralds",
 				"default": true,

@@ -16,7 +16,7 @@ import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErr
 export namespace useItemLineWorkController {
 	export interface Props {
 		readonly ownerItemId?: IdSchema.Type;
-		readonly lineId: IdSchema.Type;
+		readonly lineUid: IdSchema.Type;
 		readonly jobId?: IdSchema.Type;
 		readonly disabled: boolean;
 	}
@@ -31,7 +31,7 @@ export namespace useItemLineWorkController {
 /** Clears one line's pending work and cancels only the displayed active job identity. */
 export const useItemLineWorkController = ({
 	ownerItemId,
-	lineId,
+	lineUid,
 	jobId,
 	disabled,
 }: useItemLineWorkController.Props): useItemLineWorkController.Output => {
@@ -41,13 +41,13 @@ export const useItemLineWorkController = ({
 			const owner = runtime.items.find((item) => item.id === ownerItemId);
 			return {
 				queued: runtime.jobQueue.some(
-					(request) => request.ownerItemId === ownerItemId && request.lineId === lineId,
+					(request) => request.ownerItemId === ownerItemId && request.lineUid === lineUid,
 				),
 				present: runtime.jobs.some(
 					(job) =>
 						job.id === jobId &&
 						job.ownerItemId === ownerItemId &&
-						job.lineId === lineId,
+						job.lineUid === lineUid,
 				),
 				controllable:
 					owner !== undefined &&
@@ -57,7 +57,7 @@ export const useItemLineWorkController = ({
 		},
 		[
 			ownerItemId,
-			lineId,
+			lineUid,
 			jobId,
 		],
 	);
@@ -67,7 +67,7 @@ export const useItemLineWorkController = ({
 		[
 			game,
 			ownerItemId,
-			lineId,
+			lineUid,
 			jobId,
 		],
 	);
@@ -78,7 +78,7 @@ export const useItemLineWorkController = ({
 		[
 			game,
 			ownerItemId,
-			lineId,
+			lineUid,
 		],
 	);
 	const [clearResult, clearQueueFn] = useAtom(clearAtom);
@@ -93,7 +93,7 @@ export const useItemLineWorkController = ({
 			if (clearDisabled || ownerItemId === undefined) return;
 			clearQueueFn({
 				ownerItemId,
-				lineId,
+				lineUid,
 			});
 		},
 		cancelJobFn: () => {

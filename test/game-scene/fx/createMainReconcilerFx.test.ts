@@ -326,7 +326,7 @@ describe("main reconciliation / snapshot ownership", () => {
 						previousLocation: {
 							scope: "input",
 							ownerItemId: origin.id,
-							lineId: "line:input",
+							lineUid: "line:input",
 							inputIndex: 0,
 						},
 						location: destination,
@@ -421,7 +421,7 @@ describe("main reconciliation / snapshot ownership", () => {
 				target: {
 					kind: "line-input",
 					ownerItemId: owner.id,
-					lineId: "line:input",
+					lineUid: "line:input",
 					inputIndex: 0,
 				},
 			}),

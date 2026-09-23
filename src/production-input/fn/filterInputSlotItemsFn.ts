@@ -7,7 +7,7 @@ export namespace filterInputSlotItemsFn {
 	export interface Props {
 		readonly inputIndex: NonNegativeIntegerSchema.Type;
 		readonly items: RuntimeItemSchema.Type[];
-		readonly lineId: IdSchema.Type;
+		readonly lineUid: IdSchema.Type;
 		readonly ownerItemId: IdSchema.Type;
 	}
 }
@@ -16,14 +16,14 @@ export namespace filterInputSlotItemsFn {
 export const filterInputSlotItemsFn = ({
 	inputIndex,
 	items,
-	lineId,
+	lineUid,
 	ownerItemId,
 }: filterInputSlotItemsFn.Props) =>
 	items.filter((item) => {
 		return (
 			item.location.scope === LocationScopeEnumSchema.enum.Input &&
 			item.location.ownerItemId === ownerItemId &&
-			item.location.lineId === lineId &&
+			item.location.lineUid === lineUid &&
 			item.location.inputIndex === inputIndex
 		);
 	});

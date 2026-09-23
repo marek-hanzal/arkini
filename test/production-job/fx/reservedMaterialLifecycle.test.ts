@@ -64,7 +64,7 @@ const config = GameConfigSchema.parse({
 			maxQueueSize: 1,
 			lines: [
 				{
-					id: "line:employer:run",
+					uid: "line:employer:run",
 					title: "Run",
 					description: "Reserve one worker.",
 					runtimeMs: 200,
@@ -81,7 +81,7 @@ const config = GameConfigSchema.parse({
 			maxQueueSize: 1,
 			lines: [
 				{
-					id: "line:tool-user:run",
+					uid: "line:tool-user:run",
 					title: "Run",
 					description: "Reserve one pure tool.",
 					runtimeMs: 200,
@@ -101,7 +101,7 @@ const config = GameConfigSchema.parse({
 			maxQueueSize: 1,
 			lines: [
 				{
-					id: "line:worker:spend",
+					uid: "line:worker:spend",
 					title: "Spend",
 					description: "Spend one worker unit.",
 					runtimeMs: 200,
@@ -117,7 +117,7 @@ const config = GameConfigSchema.parse({
 					rules: [],
 				},
 				{
-					id: "line:worker:reserve",
+					uid: "line:worker:reserve",
 					title: "Reserve",
 					description: "Reserve one payload.",
 					runtimeMs: 200,
@@ -172,14 +172,14 @@ const reserveWorkerFx = Effect.fn("reserveWorkerFx")(function* ({
 	}
 	yield* bufferInputMaterialForTestFx({
 		ownerItemId: employerId,
-		lineId: "line:employer:run",
+		lineUid: "line:employer:run",
 		inputIndex: 0,
 		sourceItemId: worker.id,
 		sourceItemRevision: worker.revision,
 	});
 	const started = yield* startLineFx({
 		ownerItemId: employerId,
-		lineId: "line:employer:run",
+		lineUid: "line:employer:run",
 	});
 	if (started.type !== "started") return yield* Effect.die(new Error("Employer did not start."));
 	return started.job;
@@ -201,7 +201,7 @@ describe("reserved material lifecycle", () => {
 				});
 				yield* startLineFx({
 					ownerItemId: worker.id,
-					lineId: "line:worker:spend",
+					lineUid: "line:worker:spend",
 				});
 				yield* runTickRuntimeByFx({
 					elapsedMs: 200,
@@ -279,7 +279,7 @@ describe("reserved material lifecycle", () => {
 				});
 				yield* bufferInputMaterialForTestFx({
 					ownerItemId: worker.id,
-					lineId: "line:worker:reserve",
+					lineUid: "line:worker:reserve",
 					inputIndex: 0,
 					sourceItemId: payload.id,
 					sourceItemRevision: payload.revision,
@@ -352,7 +352,7 @@ it("keeps the whole completion blocked when an impure reservation has no exclusi
 			});
 			yield* bufferInputMaterialForTestFx({
 				ownerItemId: worker.id,
-				lineId: "line:worker:reserve",
+				lineUid: "line:worker:reserve",
 				inputIndex: 0,
 				sourceItemId: payload.id,
 				sourceItemRevision: payload.revision,

@@ -8,13 +8,24 @@ import type { GraphQuerySchema } from "~/graph/schema/GraphQuerySchema";
 const state = vi.hoisted(() => ({
 	result: undefined as unknown as GraphResult,
 	queries: [] as GraphQuerySchema.Type[],
+	countResult: undefined as GraphResult | undefined,
+	countStatus: "ready" as "ready" | "loading" | "error",
+	searchPlaceholder: "",
+	filterOptions: [] as {
+		value: string;
+		trailingLabel?: string;
+	}[],
 }));
 vi.mock("~/graph/ui/useEditorGraphQuery", () => ({
 	useEditorGraphQuery: (query: GraphQuerySchema.Type) => {
 		state.queries.push(query);
+		if (query.detail === "summary" && state.countStatus !== "ready")
+			return {
+				status: state.countStatus,
+			};
 		return {
 			status: "ready",
-			result: state.result,
+			result: query.detail === "summary" ? (state.countResult ?? state.result) : state.result,
 		};
 	},
 }));
@@ -36,24 +47,39 @@ vi.mock("~/item-authoring/ui/QueryDetail", () => ({
 	QueryDetail: () => null,
 }));
 vi.mock("~/editor-control/ui/EditorSearchCombobox", () => ({
-	EditorSearchCombobox: ({ onChangeFn }: { readonly onChangeFn: (id: string) => void }) =>
-		createElement("button", {
+	EditorSearchCombobox: ({
+		onChangeFn,
+		placeholder,
+	}: {
+		readonly onChangeFn: (id: string) => void;
+		readonly placeholder: string;
+	}) => {
+		state.searchPlaceholder = placeholder;
+		return createElement("button", {
 			"data-ui": "Counterpart",
 			onClick: () => onChangeFn("item:A"),
-		}),
+		});
+	},
 }));
 vi.mock("~/editor-control/ui/EditorSelect", () => ({
 	EditorSelect: ({
 		onChangeFn,
 		label,
+		options,
 	}: {
 		readonly onChangeFn: (value: string) => void;
 		readonly label: string;
-	}) =>
-		createElement("button", {
+		readonly options: {
+			value: string;
+			trailingLabel?: string;
+		}[];
+	}) => {
+		state.filterOptions = options;
+		return createElement("button", {
 			"data-ui": "Filter",
 			onClick: () => onChangeFn(label === "Depth" ? "2" : "merges-into"),
-		}),
+		});
+	},
 }));
 vi.mock("~/ui/ui/Button", () => ({
 	ButtonLink: ({ children, params, search, to, ...props }: Record<string, unknown>) =>
@@ -135,6 +161,8 @@ afterEach(async () => {
 	});
 	document.body.replaceChildren();
 	state.queries = [];
+	state.countResult = undefined;
+	state.countStatus = "ready";
 });
 const mountFn = async (content: ReactNode) => {
 	const container = document.createElement("div");
@@ -226,15 +254,96 @@ it("asks who merges into the current item and pins a selected counterpart withou
 		container.querySelector<HTMLButtonElement>('[data-ui="Counterpart"]')?.click(),
 	);
 	expect(state.queries.at(-1)?.to).toBe("item:A");
+	expect(state.queries.filter((query) => query.detail === "summary").at(-1)).toMatchObject({
+		from: "item:B",
+		to: "item:A",
+		direction: "both",
+		limit: 1000,
+	});
 	await act(async () =>
 		container.querySelector<HTMLButtonElement>('[data-ui="Filter"]')?.click(),
 	);
 	expect(onFilterChangeFn).toHaveBeenCalledWith("merges-into");
 });
 
+it("keeps category counts independent of the visible row cap and marks incomplete counts as lower bounds", async () => {
+	const edges: GraphEdge[] = Array.from(
+		{
+			length: 120,
+		},
+		(_, index) => ({
+			id: String(index),
+			from: "item:A",
+			to: "item:B",
+			kind: "merge-target",
+			source: [],
+			annotations: {},
+		}),
+	);
+	state.countResult = {
+		...emptyResultFn(),
+		edges,
+	};
+	state.result = {
+		...emptyResultFn(),
+		edges: edges.slice(0, 100),
+		truncated: true,
+		reasons: [
+			"limit",
+		],
+	};
+	const root = createRoot(document.createElement("div"));
+	roots.push(root);
+	const renderFn = async () =>
+		act(async () =>
+			root.render(
+				<ConnectionsSection
+					itemUid="B"
+					filter="accepts-merge"
+					onFilterChangeFn={() => undefined}
+				/>,
+			),
+		);
+	const countFn = (value: string) =>
+		state.filterOptions.find((option) => option.value === value)?.trailingLabel;
+	await renderFn();
+	expect(countFn("all")).toBe("120");
+	expect(countFn("accepts-merge")).toBe("120");
+	expect(countFn("merges-into")).toBe("0");
+	expect(state.searchPlaceholder).toContain("(120)");
+
+	state.countResult = {
+		...state.countResult,
+		truncated: true,
+		reasons: [
+			"limit",
+		],
+	};
+	await renderFn();
+	expect(countFn("all")).toBe("≥120");
+	expect(countFn("merges-into")).toBe("≥0");
+	expect(state.searchPlaceholder).toContain("(≥120)");
+
+	state.result = {
+		...emptyResultFn(),
+		edges,
+	};
+	await renderFn();
+	expect(countFn("accepts-merge")).toBe("120");
+	expect(state.searchPlaceholder).toContain("(120)");
+
+	state.countStatus = "loading";
+	await renderFn();
+	expect(countFn("all")).toBe("…");
+	expect(countFn("accepts-merge")).toBe("120");
+	state.countStatus = "error";
+	await renderFn();
+	expect(countFn("all")).toBe("—");
+});
+
 it("keeps operation edit identity and occurrence coordinates independent of the endpoints", async () => {
 	const line = LineSchema.parse({
-		id: "specific-line",
+		uid: "specific-line",
 		title: "Specific line",
 		description: "Specific",
 		runtimeMs: 1000,
@@ -299,8 +408,7 @@ it("keeps operation edit identity and occurrence coordinates independent of the 
 		sectionId: "production",
 	});
 	expect(JSON.parse(link?.dataset.search ?? "null")).toEqual({
-		lineId: "specific-line",
-		lineIndex: 1,
+		lineUid: "specific-line",
 		input: 1,
 		outcomeSet: 2,
 		outcomeRoll: 3,

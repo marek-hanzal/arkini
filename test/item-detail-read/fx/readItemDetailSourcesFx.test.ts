@@ -24,7 +24,7 @@ describe("readItemDetailSourcesFx", () => {
 			"runtime:alpha:space-3",
 			"runtime:alpha:stored",
 		]);
-		expect(result.source[1]?.line.map(({ lineId }) => lineId)).toEqual([
+		expect(result.source[1]?.line.map(({ lineUid }) => lineUid)).toEqual([
 			"line:alpha:first",
 			"line:alpha:second",
 		]);
@@ -49,7 +49,7 @@ describe("readItemDetailSourcesFx", () => {
 				totalSetWeight: 4,
 			},
 		]);
-		expect(result.source[3]?.line.map(({ lineId }) => lineId)).toEqual([
+		expect(result.source[3]?.line.map(({ lineUid }) => lineUid)).toEqual([
 			"line:hidden",
 			"line:alpha:first",
 			"line:alpha:second",
@@ -115,7 +115,7 @@ describe("readItemDetailSourcesFx", () => {
 			"runtime:alpha:board",
 			"runtime:alpha:stored",
 		]);
-		expect(result.source.map(({ line }) => line.map(({ lineId }) => lineId))).toEqual([
+		expect(result.source.map(({ line }) => line.map(({ lineUid }) => lineUid))).toEqual([
 			[
 				"line:alpha:first",
 				"line:alpha:second",
@@ -182,7 +182,7 @@ describe("readItemDetailSourcesFx", () => {
 						permit,
 					],
 				}),
-			).source[0]?.line.map(({ lineId }) => lineId),
+			).source[0]?.line.map(({ lineUid }) => lineUid),
 		).toEqual([
 			"line:hidden",
 		]);
@@ -196,7 +196,7 @@ describe("readItemDetailSourcesFx", () => {
 					{
 						id: "job:hidden",
 						ownerItemId: "runtime:alpha:space-0",
-						lineId: "line:hidden",
+						lineUid: "line:hidden",
 						durationMs: 1_000,
 						remainingMs: 400,
 					},
@@ -204,7 +204,7 @@ describe("readItemDetailSourcesFx", () => {
 			}),
 		);
 
-		expect(result.source[1]?.line.map(({ lineId }) => lineId)).toEqual([
+		expect(result.source[1]?.line.map(({ lineUid }) => lineUid)).toEqual([
 			"line:hidden",
 			"line:alpha:first",
 			"line:alpha:second",
@@ -262,7 +262,7 @@ describe("readItemDetailSourcesFx", () => {
 				ownerItemUid: "blueprint",
 				line: [
 					{
-						lineId: "line:blueprint",
+						lineUid: "line:blueprint",
 					},
 				],
 			},
@@ -307,7 +307,7 @@ describe("readItemDetailSourcesFx", () => {
 					ownerItemUid: "town-hall",
 					line: [
 						{
-							lineId: "line:town-hall:blueprint",
+							lineUid: "line:town-hall:blueprint",
 						},
 					],
 				},

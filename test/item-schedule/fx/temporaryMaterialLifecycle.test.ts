@@ -78,7 +78,7 @@ const storeTemporaryFx = Effect.fn("storeTemporaryMaterialTestItemFx")(function*
 }) {
 	yield* bufferInputMaterialForTestFx({
 		ownerItemId: "runtime:owner",
-		lineId: "line:owner",
+		lineUid: "line:owner",
 		inputIndex: 0,
 		sourceItemId: id,
 		sourceItemRevision: revision,
@@ -105,7 +105,7 @@ describe("temporary material lifecycle", () => {
 				yield* storeTemporaryFx(younger);
 				yield* startLineFx({
 					ownerItemId: "runtime:owner",
-					lineId: "line:owner",
+					lineUid: "line:owner",
 				});
 				const continued = yield* advanceStepsFx({
 					count: 4,
@@ -162,7 +162,7 @@ describe("temporary material lifecycle", () => {
 				yield* storeTemporaryFx(temporary);
 				yield* startLineFx({
 					ownerItemId: "runtime:owner",
-					lineId: "line:owner",
+					lineUid: "line:owner",
 				});
 				return yield* advanceStepsFx({
 					count: 4,
@@ -194,7 +194,7 @@ describe("temporary material lifecycle", () => {
 				yield* storeTemporaryFx(temporary);
 				yield* startLineFx({
 					ownerItemId: "runtime:owner",
-					lineId: "line:owner",
+					lineUid: "line:owner",
 				});
 				yield* spawnItemFx({
 					id: "runtime:blocker:one",

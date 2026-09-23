@@ -18,10 +18,10 @@ export const itemFn = (uid: string, fields: Record<string, unknown> = {}) => ({
 	},
 	...fields,
 });
-export const lineFn = (id: string, fields: Record<string, unknown> = {}) => ({
-	id,
-	title: id,
-	description: id,
+export const lineFn = (uid: string, fields: Record<string, unknown> = {}) => ({
+	uid,
+	title: uid,
+	description: uid,
 	runtimeMs: 0,
 	input: [
 		{
@@ -216,7 +216,7 @@ export const adversarialConfigFn = () => {
 					onExpire: outputFn("B"),
 				},
 				lines: [
-					lineFn("L", {
+					lineFn("A-L", {
 						clock: true,
 						clockWeight: 999,
 						default: true,
@@ -354,7 +354,7 @@ export const adversarialConfigFn = () => {
 					amount: 20,
 				},
 				lines: [
-					lineFn("L", {
+					lineFn("B-L", {
 						input: [
 							{
 								type: "materials",
@@ -370,7 +370,7 @@ export const adversarialConfigFn = () => {
 			}),
 			C: itemFn("C", {
 				lines: [
-					lineFn("L", {
+					lineFn("C-L", {
 						input: [
 							{
 								type: "materials",

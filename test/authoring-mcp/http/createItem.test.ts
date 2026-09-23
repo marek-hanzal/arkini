@@ -112,7 +112,6 @@ describe("editor MCP item creation", () => {
 				title: "Bag",
 				lines: [
 					{
-						id: "travel",
 						title: "Travel",
 						description: "Travel",
 						runtimeMs: 0,
@@ -226,4 +225,55 @@ describe("editor MCP item creation", () => {
 			expect.anything(),
 		);
 	});
+});
+
+it("generates fresh project-wide line UIDs when the same authoring lines create two items", async () => {
+	const { ownership, port, repository } = await createMcpHarness();
+	const project = await Effect.runPromise(
+		repository.createProjectFx({
+			...editorTestPayload,
+			version: {
+				major: 1,
+				minor: 0,
+			},
+		}),
+	);
+	ownership.setProjectContextFn(project.projectId);
+	await Effect.runPromise(ownership.startLocalFx);
+	const client = await connectMcpClient(port);
+	const input = {
+		title: "Copied producer",
+		lines: [
+			{
+				title: "Same line title",
+				description: "Copied authoring value",
+				runtimeMs: 0,
+				input: [
+					{
+						type: "simple",
+					},
+				],
+				rules: [],
+			},
+		],
+	};
+	const itemUids: string[] = [];
+	for (let index = 0; index < 2; index++) {
+		const response = await client.callTool({
+			name: "create_item",
+			arguments: jsonToolInputFn(input),
+		});
+		expect(response.isError).not.toBe(true);
+		const content = response.content[0];
+		if (content?.type !== "text") throw new Error("Missing create response.");
+		itemUids.push(content.text.match(/^UID: (.+)$/m)![1]!);
+	}
+	const saved = await Effect.runPromise(repository.readProjectFx(project.projectId));
+	const createdLines = itemUids.map((uid) => saved!.config.items[uid]!.lines[0]!);
+	expect(createdLines.map((line) => line.title)).toEqual([
+		"Same line title",
+		"Same line title",
+	]);
+	expect(new Set(createdLines.map((line) => line.uid)).size).toBe(2);
+	for (const line of createdLines) expect(line.uid).toMatch(/^[a-z][a-z0-9]{23}$/);
 });

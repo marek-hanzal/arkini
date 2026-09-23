@@ -18,7 +18,7 @@ const lineDiagnostics = async (items: Record<string, unknown>) =>
 				}),
 			]),
 		)
-	).diagnostics.filter(({ code }) => code === DiagnosticCodeEnumSchema.enum.LineDuplicateId);
+	).diagnostics.filter(({ code }) => code === DiagnosticCodeEnumSchema.enum.LineDuplicateUid);
 
 const selectionDiagnostics = async (items: Record<string, unknown>) =>
 	(
@@ -33,16 +33,16 @@ const selectionDiagnostics = async (items: Record<string, unknown>) =>
 		({ code }) => code === DiagnosticCodeEnumSchema.enum.LineMultipleSelections,
 	);
 
-describe("validateItemLineIdsFn", () => {
-	it("rejects duplicate line IDs within one owner", async () => {
+describe("validateItemLineUidsFn", () => {
+	it("rejects duplicate line UIDs within one owner", async () => {
 		const owner = createProducerItem({
 			id: "producer:sawmill",
 			lines: [
 				createLine({
-					id: "line:plank",
+					uid: "line:plank",
 				}),
 				createLine({
-					id: "line:plank",
+					uid: "line:plank",
 				}),
 			],
 		});
@@ -54,33 +54,33 @@ describe("validateItemLineIdsFn", () => {
 		).toEqual([
 			expect.objectContaining({
 				ownerItemUid: owner.uid,
-				lineId: "line:plank",
+				lineUid: "line:plank",
 				paths: [
 					[
 						"items",
 						owner.uid,
 						"lines",
 						0,
-						"id",
+						"uid",
 					],
 					[
 						"items",
 						owner.uid,
 						"lines",
 						1,
-						"id",
+						"uid",
 					],
 				],
 			}),
 		]);
 	});
 
-	it("allows the same stable line ID on different owners", async () => {
+	it("rejects the same line UID on different owners with both exact source paths", async () => {
 		const first = createProducerItem({
 			id: "producer:sawmill",
 			lines: [
 				createLine({
-					id: "line:plank",
+					uid: "line:plank",
 				}),
 			],
 		});
@@ -88,7 +88,7 @@ describe("validateItemLineIdsFn", () => {
 			id: "producer:advanced-sawmill",
 			lines: [
 				createLine({
-					id: "line:plank",
+					uid: "line:plank",
 				}),
 			],
 		});
@@ -98,7 +98,37 @@ describe("validateItemLineIdsFn", () => {
 				[first.uid]: first,
 				[second.uid]: second,
 			}),
-		).toEqual([]);
+		).toEqual([
+			expect.objectContaining({
+				code: "line:duplicate-uid",
+				severity: "error",
+				ownerItemUid: second.uid,
+				lineUid: "line:plank",
+				path: [
+					"items",
+					second.uid,
+					"lines",
+					0,
+					"uid",
+				],
+				paths: [
+					[
+						"items",
+						first.uid,
+						"lines",
+						0,
+						"uid",
+					],
+					[
+						"items",
+						second.uid,
+						"lines",
+						0,
+						"uid",
+					],
+				],
+			}),
+		]);
 	});
 
 	it.each([
@@ -111,11 +141,11 @@ describe("validateItemLineIdsFn", () => {
 				lines: [
 					createLine({
 						[selection]: true,
-						id: "line:plank",
+						uid: "line:plank",
 					}),
 					createLine({
 						[selection]: true,
-						id: "line:beam",
+						uid: "line:beam",
 					}),
 				],
 			});
@@ -127,7 +157,7 @@ describe("validateItemLineIdsFn", () => {
 			).toEqual([
 				expect.objectContaining({
 					ownerItemUid: owner.uid,
-					lineIds: [
+					lineUids: [
 						"line:plank",
 						"line:beam",
 					],
@@ -158,14 +188,14 @@ describe("validateItemLineIdsFn", () => {
 			lines: [
 				{
 					...createLine({
-						id: "line:plank",
+						uid: "line:plank",
 						clock: true,
 					}),
 					clockWeight: 1,
 				},
 				{
 					...createLine({
-						id: "line:beam",
+						uid: "line:beam",
 						clock: true,
 					}),
 					clockWeight: 3,
@@ -185,11 +215,11 @@ describe("validateItemLineIdsFn", () => {
 			lines: [
 				createLine({
 					default: true,
-					id: "line:plank",
+					uid: "line:plank",
 				}),
 				createLine({
 					default: true,
-					id: "line:plank",
+					uid: "line:plank",
 				}),
 			],
 		});
@@ -201,7 +231,7 @@ describe("validateItemLineIdsFn", () => {
 		).toEqual([
 			expect.objectContaining({
 				ownerItemUid: owner.uid,
-				lineIds: [
+				lineUids: [
 					"line:plank",
 					"line:plank",
 				],

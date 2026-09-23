@@ -22,7 +22,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "idle",
+				"uid": "mb0axks497ek1b6u0hrlkdtt",
 				"title": "Idle",
 				"description": "The sick chicken barely moves.",
 				"clock": true,
@@ -39,7 +39,7 @@
 				"rules": []
 			},
 			{
-				"id": "wander",
+				"uid": "hj9fqr5z6jfclu0rkearg6ee",
 				"title": "Wander",
 				"artwork": "gzw9pd0xcl2a5kg6zqzr0zly",
 				"description": "Wanders somewhere else.",
@@ -93,7 +93,7 @@
 				"rules": []
 			},
 			{
-				"id": "die",
+				"uid": "i4afv9ntilo3vq8lzkelviee",
 				"title": "Die",
 				"description": "The animal may not survive its condition.",
 				"clock": true,
@@ -146,7 +146,7 @@
 				"rules": []
 			},
 			{
-				"id": "spread-disease",
+				"uid": "k4u06rofae6a838w0oghjcmd",
 				"title": "Spread Disease",
 				"artwork": "fnom9s6mxxkza9m7iahgp5k9",
 				"description": "The sick animal may contaminate its immediate surroundings.",

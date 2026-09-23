@@ -15,7 +15,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "lumber-camp-blueprint",
+				"uid": "b16urixye5gju959mev7jjy2",
 				"title": "Order Lumber Camp Blueprint",
 				"artwork": "vmfdb9sa06isuopjs1kqn7n2",
 				"description": "Order another set of plans for a Lumber Camp. The trees were getting too comfortable.",
@@ -100,7 +100,7 @@
 				]
 			},
 			{
-				"id": "stonemason-camp-blueprint",
+				"uid": "re4fsf6825couc4nnycpi5sl",
 				"title": "Order Stonemason Camp Blueprint",
 				"artwork": "u0ugyubcxh6gng4hljmts53j",
 				"description": "Order another Stonemason Camp plan. Apparently one pile of rocks can create several careers.",
@@ -185,7 +185,7 @@
 				]
 			},
 			{
-				"id": "house-t1-blueprint",
+				"uid": "cf9vveq81jtga39mfnv93rby",
 				"title": "Order House - Tier 1 Blueprint",
 				"artwork": "ucep41zyvgbrif6rlcqdabk1",
 				"description": "Order another basic house plan. One roof was never going to solve housing.",
@@ -270,7 +270,7 @@
 				]
 			},
 			{
-				"id": "explorer-blueprint",
+				"uid": "su1wd7140hkp6gpeb3q2g9oh",
 				"title": "Order Explorer Blueprint",
 				"artwork": "u79x20w1h96ptfjkdcyv8ojp",
 				"description": "Order another Explorer outpost plan. There is always more forest to misunderstand.",
@@ -355,7 +355,7 @@
 				]
 			},
 			{
-				"id": "hunter-blueprint",
+				"uid": "gvs81ert1mnkiov4msg8nmt5",
 				"title": "Order Hunter Blueprint",
 				"artwork": "rev9r1cphdn05gqh3wj4w7pj",
 				"description": "Order another Hunter post plan. Wildlife management scales surprisingly well.",
@@ -440,7 +440,7 @@
 				]
 			},
 			{
-				"id": "well-blueprint",
+				"uid": "o2gk3s553vypun4bcwv2yu8z",
 				"title": "Order Well Blueprint",
 				"artwork": "hki2ifgb69fb84zyd2ct3ied",
 				"description": "Order another Well plan. Water remains annoyingly popular.",
@@ -525,7 +525,7 @@
 				]
 			},
 			{
-				"id": "sawmill-blueprint",
+				"uid": "wb4a9w66kc4lpl0g7uge9ugk",
 				"title": "Order Sawmill Blueprint",
 				"artwork": "oo4txpzczam6kt5jue7vhf1a",
 				"description": "Order another Sawmill plan for when one loud spinning blade is no longer enough.",
@@ -610,7 +610,7 @@
 				]
 			},
 			{
-				"id": "stoneworks-blueprint",
+				"uid": "w6sd8kp4ggyhngi6ty01im0k",
 				"title": "Order Stoneworks Blueprint",
 				"artwork": "fz36qa41hs9xro6g0jp08592",
 				"description": "Order another Stoneworks plan. Better stones apparently deserve multiple buildings.",
@@ -695,7 +695,7 @@
 				]
 			},
 			{
-				"id": "carpenter-blueprint",
+				"uid": "dz3jgduhumrkd4j9pwi92b2g",
 				"title": "Order Carpenter Blueprint",
 				"artwork": "xu2pifv4mgpkrm75kej8c6sb",
 				"description": "Order another Carpenter workshop plan. Containers, racks, brushes, and increasingly specific wooden problems.",
@@ -780,7 +780,7 @@
 				]
 			},
 			{
-				"id": "charcoal-kiln-blueprint",
+				"uid": "hgrqxyervo15mhrcs5444i3p",
 				"title": "Order Charcoal Kiln Blueprint",
 				"artwork": "f5k76d90k3ibro2tzlio4znd",
 				"description": "Order another Charcoal Kiln plan. Early industry develops an appetite for heat very quickly.",
@@ -865,7 +865,7 @@
 				]
 			},
 			{
-				"id": "waste-incinerator-blueprint",
+				"uid": "rskvfmnxo8fs1ivq1fndye1w",
 				"title": "Order Waste Incinerator Blueprint",
 				"artwork": "mo6y7oa1ipuwt7pycm9s521t",
 				"description": "Order another Waste Incinerator plan for when one controlled fire is no longer enough.",
@@ -950,7 +950,7 @@
 				]
 			},
 			{
-				"id": "school-t1-blueprint",
+				"uid": "dwk6zv15v7nom4koyitqwk6z",
 				"title": "Order School - Tier 1 Blueprint",
 				"artwork": "e8h5l2j4tq4tu8uskz5aqd8e",
 				"description": "Order another School plan. Apparently education also scales horizontally.",

@@ -36,7 +36,7 @@ describe("createGameSessionFx / callback ordering", () => {
 			await session.runFn(
 				startLineFx({
 					ownerItemId: owner.id,
-					lineId: "line:forge:run",
+					lineUid: "line:forge:run",
 				}),
 			);
 
@@ -87,7 +87,7 @@ describe("createGameSessionFx / callback ordering", () => {
 								itemUid: "owner",
 								jobId: "job:combined",
 								ownerItemId: "owner:combined",
-								lineId: "line:combined",
+								lineUid: "line:combined",
 							},
 						],
 					] as const),
@@ -156,7 +156,7 @@ describe("createGameSessionFx / callback ordering", () => {
 								itemUid: "owner",
 								jobId: "job:nested:current",
 								ownerItemId: "owner:nested",
-								lineId: "line:nested",
+								lineUid: "line:nested",
 							},
 						],
 					] as const),
@@ -209,13 +209,13 @@ describe("createGameSessionFx / callback ordering", () => {
 			await session.runFn(
 				startLineFx({
 					ownerItemId: owner.id,
-					lineId: "line:forge:run",
+					lineUid: "line:forge:run",
 				}),
 			);
 			await session.runFn(
 				enqueueLineFx({
 					ownerItemId: owner.id,
-					lineId: "line:forge:run",
+					lineUid: "line:forge:run",
 				}),
 			);
 			await session.runFn(

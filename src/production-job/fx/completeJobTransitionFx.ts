@@ -73,10 +73,10 @@ export const completeJobTransitionFx = Effect.fn("completeJobTransitionFx")(func
 		);
 	const line = readItemLineFn({
 		item: owner.item,
-		lineId: job.lineId,
+		lineUid: job.lineUid,
 	});
 	if (line === undefined)
-		return yield* Effect.die(new Error(`Job ${job.id} line ${job.lineId} is missing.`));
+		return yield* Effect.die(new Error(`Job ${job.id} line ${job.lineUid} is missing.`));
 	const consumedItems = Array.getSomes(runtime.items.map(isJobRuntimeItemFn)).filter(
 		(item) => item.location.jobId === job.id,
 	);

@@ -15,7 +15,7 @@
 		"maxQueueSize": 4,
 		"lines": [
 			{
-				"id": "harvest",
+				"uid": "djevnl1eu6r1usq3txnbx8w5",
 				"title": "Fruit",
 				"description": "Harvest produce from a nearby planted fruit garden and pack it into an empty crate. Supply one bucket of water; the empty bucket is returned.",
 				"clockWeight": 1,
@@ -107,7 +107,7 @@
 				"rules": []
 			},
 			{
-				"id": "field",
+				"uid": "oultgldr08psrixneyyj38ky",
 				"title": "Prepare Fruit Garden",
 				"artwork": "xwzvezb9ewectwm016e5vln7",
 				"description": "Prepare a new empty growing plot.",
@@ -149,7 +149,7 @@
 				"rules": []
 			},
 			{
-				"id": "blueprint",
+				"uid": "r2dxrqls1su96l3jzadqgc4y",
 				"title": "Fruit Farm Blueprint",
 				"artwork": "so7r094glj6wfe6yoveiclrg",
 				"description": "Sketch plans for another Fruit Farm.",

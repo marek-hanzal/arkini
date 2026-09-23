@@ -7,7 +7,7 @@ import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 export namespace autofillLineInputsFx {
 	export interface Props {
 		readonly ownerItemId: IdSchema.Type;
-		readonly lineId: IdSchema.Type;
+		readonly lineUid: IdSchema.Type;
 	}
 
 	export interface Result {
@@ -25,13 +25,13 @@ export namespace autofillLineInputsFx {
  */
 export const autofillLineInputsFx = Effect.fn("autofillLineInputsFx")(function* ({
 	ownerItemId,
-	lineId,
+	lineUid,
 }: autofillLineInputsFx.Props) {
 	return yield* modifyRuntimeFx((runtime) =>
 		Effect.gen(function* () {
 			const autofill = yield* autofillLineInputsRuntimeFx({
 				ownerItemId,
-				lineId,
+				lineUid,
 				runtime,
 			});
 			return [

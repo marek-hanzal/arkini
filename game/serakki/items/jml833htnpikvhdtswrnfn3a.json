@@ -51,7 +51,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "idle",
+				"uid": "zwcec1268vw27verdalwo9f0",
 				"title": "Idle",
 				"description": "The puppy pauses briefly.",
 				"clock": true,
@@ -68,7 +68,7 @@
 				"rules": []
 			},
 			{
-				"id": "wander",
+				"uid": "pcyz8uo47u1mjt2q0k9wjfd4",
 				"title": "Wander",
 				"artwork": "wn5de1ssxn87lu63e5e4spr4",
 				"description": "Wanders somewhere else.",
@@ -122,7 +122,7 @@
 				"rules": []
 			},
 			{
-				"id": "get-hungry",
+				"uid": "g5dvxgo9wtj7v4tpwyu66xbs",
 				"title": "Get Hungry",
 				"description": "The puppy gets hungry.",
 				"clock": true,
@@ -185,7 +185,7 @@
 				"rules": []
 			},
 			{
-				"id": "get-sick",
+				"uid": "ky0snvps09nrxloupm8f036m",
 				"title": "Get Sick",
 				"description": "The puppy may become sick.",
 				"clock": true,
@@ -238,7 +238,7 @@
 				"rules": []
 			},
 			{
-				"id": "disease-exposure",
+				"uid": "lepbcqpdvyhrqh8rm81p0fcs",
 				"title": "Disease Exposure",
 				"artwork": "fnom9s6mxxkza9m7iahgp5k9",
 				"description": "Nearby disease increases the chance of illness.",
@@ -308,7 +308,7 @@
 				]
 			},
 			{
-				"id": "plague-exposure",
+				"uid": "dww0jrjkf05zfhells5kjr5k",
 				"title": "Plague Exposure",
 				"artwork": "j23vl46e91a44u0vt6qlcojt",
 				"description": "Nearby plague increases the chance of illness.",
@@ -378,7 +378,7 @@
 				]
 			},
 			{
-				"id": "cuddle-beagle",
+				"uid": "r63varfu8ezsfqmyf5kjo8bd",
 				"title": "Cuddle Beagle",
 				"artwork": "ghseglzgu6h9vg97ck3ck6ha",
 				"description": "The puppy decides to cuddle with an adult beagle.",

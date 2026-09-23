@@ -42,7 +42,7 @@ export const inputRuntimeTestConfig = GameConfigSchema.parse({
 
 			lines: [
 				{
-					id: "line:workshop:build",
+					uid: "line:workshop:build",
 					title: "Build",
 					description: "Build something.",
 					runtimeMs: 1_000,

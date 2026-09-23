@@ -18,7 +18,7 @@ const diagnosticTitles = {
 	"input:acceptance-cycle": "Circular material acceptance",
 	"source:schema-reference-conflict": "Conflicting schema references",
 	"config:schema": "Invalid project value",
-	"line:duplicate-id": "Duplicate production line ID",
+	"line:duplicate-uid": "Duplicate production line UID",
 	"line:multiple-selections": "Multiple selected production lines",
 	"config:key-uid-mismatch": "Item key and UID differ",
 	"units:missing-renewal": "Finite item cannot be recreated",
@@ -27,13 +27,13 @@ const diagnosticTitles = {
 const readDiagnosticContextFn = (diagnostic: GameDiagnosticSchema.Type): string | undefined => {
 	switch (diagnostic.code) {
 		case "input:units-invalid":
-			return `${diagnostic.ownerItemUid} · ${diagnostic.lineId} · input ${diagnostic.inputIndex + 1}`;
+			return `${diagnostic.ownerItemUid} · ${diagnostic.lineUid} · input ${diagnostic.inputIndex + 1}`;
 		case "merge:invalid":
 			return `${diagnostic.ownerItemUid} · merge ${diagnostic.mergeIndex + 1}`;
-		case "line:duplicate-id":
-			return `${diagnostic.ownerItemUid} · ${diagnostic.lineId}`;
+		case "line:duplicate-uid":
+			return `${diagnostic.ownerItemUid} · ${diagnostic.lineUid}`;
 		case "line:multiple-selections":
-			return `${diagnostic.ownerItemUid} · ${diagnostic.lineIds.join(" / ")}`;
+			return `${diagnostic.ownerItemUid} · ${diagnostic.lineUids.join(" / ")}`;
 		case "units:stochastic-renewal":
 		case "units:missing-renewal":
 			return diagnostic.itemUid;

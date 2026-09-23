@@ -527,7 +527,7 @@ describe("temporary item lifetime", () => {
 				});
 				yield* startLineFx({
 					ownerItemId: producer.id,
-					lineId: "line:producer:temporary",
+					lineUid: "line:producer:temporary",
 				});
 				yield* runTickRuntimeByFx({
 					elapsedMs: 200,

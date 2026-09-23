@@ -72,7 +72,7 @@ describe("Tick queue progress priority", () => {
 		expect(result.bypassed.runtime.jobs).toMatchObject([
 			{
 				ownerItemId: "owner:a",
-				lineId: "line:later",
+				lineUid: "line:later",
 				remainingMs: 900,
 			},
 		]);
@@ -84,7 +84,7 @@ describe("Tick queue progress priority", () => {
 		expect(result.bypassedEvents).toMatchObject([
 			{
 				type: "job:started",
-				lineId: "line:later",
+				lineUid: "line:later",
 			},
 		]);
 		expect(result.active.runtime.jobQueue).toEqual([
@@ -96,7 +96,7 @@ describe("Tick queue progress priority", () => {
 		expect(result.restored.jobs).toMatchObject([
 			{
 				ownerItemId: "owner:a",
-				lineId: "line:older",
+				lineUid: "line:older",
 				remainingMs: 1_000,
 			},
 		]);
@@ -152,14 +152,14 @@ describe("Tick queue progress priority", () => {
 				remainingDurationMs: 400,
 				target: {
 					ownerItemId: "owner:a",
-					lineId: "line:older",
+					lineUid: "line:older",
 				},
 			},
 		});
 		expect(result.bypassed.runtime.jobs).toMatchObject([
 			{
 				ownerItemId: "owner:a",
-				lineId: "line:later",
+				lineUid: "line:later",
 			},
 		]);
 		expect(result.bypassed.runtime.jobQueue).toEqual([
@@ -174,7 +174,7 @@ describe("Tick queue progress priority", () => {
 				remainingDurationMs: 300,
 				target: {
 					ownerItemId: "owner:a",
-					lineId: "line:older",
+					lineUid: "line:older",
 				},
 			},
 		});
@@ -208,7 +208,7 @@ describe("Tick queue progress priority", () => {
 				phase: "outbound",
 				target: {
 					ownerItemId: "owner:b",
-					lineId: "line:water",
+					lineUid: "line:water",
 				},
 			},
 		});
@@ -258,7 +258,7 @@ describe("Tick queue progress priority", () => {
 		expect(result.runtime.jobs).toMatchObject([
 			{
 				ownerItemId: "owner:b",
-				lineId: "line:later",
+				lineUid: "line:later",
 				remainingMs: 900,
 			},
 		]);

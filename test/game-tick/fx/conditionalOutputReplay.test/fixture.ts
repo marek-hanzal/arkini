@@ -124,7 +124,7 @@ export const createConfig = (path: OutputPath, markerDuration = 500) => {
 					},
 					{
 						...line,
-						id: "spend",
+						uid: "spend",
 						outcome: undefined,
 						input: [
 							{

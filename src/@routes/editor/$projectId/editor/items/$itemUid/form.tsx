@@ -7,8 +7,7 @@ interface EditorItemFormSearch {
 	readonly defaultTitle?: string;
 	readonly enable?: OptionalCapability;
 	readonly create?: boolean;
-	readonly lineId?: string;
-	readonly lineIndex?: number;
+	readonly lineUid?: string;
 	readonly input?: number;
 	readonly rule?: number;
 	readonly when?: number;
@@ -21,7 +20,6 @@ interface EditorItemFormSearch {
 
 export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/form")({
 	validateSearch: (search): EditorItemFormSearch => {
-		const lineIndex = typeof search.lineIndex === "number" ? search.lineIndex : Number.NaN;
 		const input = typeof search.input === "number" ? search.input : Number.NaN;
 		const rule = typeof search.rule === "number" ? search.rule : Number.NaN;
 		const when = typeof search.when === "number" ? search.when : Number.NaN;
@@ -32,11 +30,6 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 		const outcomeIndex =
 			typeof search.outcomeIndex === "number" ? search.outcomeIndex : Number.NaN;
 		return {
-			...(Number.isSafeInteger(lineIndex) && lineIndex >= 0
-				? {
-						lineIndex,
-					}
-				: {}),
 			...(Number.isInteger(when) && when >= 0
 				? {
 						when,
@@ -90,9 +83,9 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 						create: true as const,
 					}
 				: {}),
-			...(typeof search.lineId === "string" && search.lineId.length > 0
+			...(typeof search.lineUid === "string" && search.lineUid.length > 0
 				? {
-						lineId: search.lineId,
+						lineUid: search.lineUid,
 					}
 				: {}),
 			...(Number.isInteger(merge) && merge >= 0
@@ -114,8 +107,7 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 			defaultTitle,
 			enable,
 			create,
-			lineId,
-			lineIndex,
+			lineUid,
 			input,
 			rule,
 			when,
@@ -144,8 +136,7 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 				outcomeSetIndex={outcomeSet}
 				outcomeRollIndex={outcomeRoll}
 				outcomeIndex={outcomeIndex}
-				productionLineId={lineId}
-				productionLineIndex={lineIndex}
+				productionLineUid={lineUid}
 				resourceUid={resourceUid}
 				sectionId={sectionId}
 				uid={itemUid}

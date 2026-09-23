@@ -14,7 +14,7 @@
 		"maxQueueSize": 4,
 		"lines": [
 			{
-				"id": "book-t1",
+				"uid": "q766ruvne6qmni2fl3mzu8gp",
 				"title": "Book - Tier 1",
 				"description": "You can order a book",
 				"clockWeight": 1,

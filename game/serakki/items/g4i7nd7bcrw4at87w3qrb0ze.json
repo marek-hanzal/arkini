@@ -15,7 +15,7 @@
 		"maxQueueSize": 4,
 		"lines": [
 			{
-				"id": "harvest",
+				"uid": "ypytm7lvsoea71sq7jn1nstw",
 				"title": "Cacao Pod",
 				"description": "Harvest cacao pods from a nearby planted grove. Supply one bucket of water; the empty bucket is returned.",
 				"clockWeight": 1,
@@ -92,7 +92,7 @@
 				"rules": []
 			},
 			{
-				"id": "field",
+				"uid": "vditssf7ghk51t2urfg2xins",
 				"title": "Prepare Cacao Grove",
 				"artwork": "f2frxask9n914359429f6yez",
 				"description": "Prepare a new empty cacao grove.",
@@ -134,7 +134,7 @@
 				"rules": []
 			},
 			{
-				"id": "blueprint",
+				"uid": "rqvdim3qc4id7ms4y2if3osr",
 				"title": "Cacao Farm Blueprint",
 				"artwork": "so7r094glj6wfe6yoveiclrg",
 				"description": "Sketch plans for another Cacao Farm.",

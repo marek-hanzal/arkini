@@ -978,8 +978,6 @@ Lifetime:
   value: Lifetime
 Lifetime (seconds):
   value: Lifetime (seconds)
-Line ID:
-  value: Line ID
 Line behavior:
   value: Line behavior
 Line description:
@@ -1428,7 +1426,7 @@ Product lines:
   value: Production lines
 Product lines help:
   value: |
-    Each line is one job this item can perform, with its own time, requirements, rules and output.
+    Each line is one job this item can perform, with its own time, requirements, rules and output. Its UID is assigned automatically and stays the same when you rename or reorder it. Duplicating a line or copying Production creates fresh UIDs.
 
     The first line enables Production and removes Action. Removing every line disables Production.
 Production:

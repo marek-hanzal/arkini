@@ -20,7 +20,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "idle",
+				"uid": "w53sik0fjax9qs8263i54n6g",
 				"title": "No New Contract",
 				"description": "No useful trade offer arrives this time. As more trade categories unlock, the market naturally becomes busier.",
 				"clock": true,
@@ -37,7 +37,7 @@
 				"rules": []
 			},
 			{
-				"id": "quest-grain-t1",
+				"uid": "w7n5l90q5f280ss610fbssi5",
 				"title": "Grain Tier 1",
 				"artwork": "dymcjezdhim4qja2uftf90l6",
 				"description": "A possible grain tier 1 contract arrives from outside the settlement.",
@@ -96,7 +96,7 @@
 				]
 			},
 			{
-				"id": "quest-vegetables-t1",
+				"uid": "lu45oh8ijdeggtallql1taj3",
 				"title": "Vegetables Tier 1",
 				"artwork": "np1dwla0c2u3ym90ufqmfnzu",
 				"description": "A possible vegetables tier 1 contract arrives from outside the settlement.",
@@ -155,7 +155,7 @@
 				]
 			},
 			{
-				"id": "quest-fruit-t1",
+				"uid": "jjynikeitm0tjdi0pe37oppe",
 				"title": "Fruit Tier 1",
 				"artwork": "uy7kf2yffldzm1s74bjzt85n",
 				"description": "A possible fruit tier 1 contract arrives from outside the settlement.",
@@ -214,7 +214,7 @@
 				]
 			},
 			{
-				"id": "quest-wool-t1",
+				"uid": "z8utmkioovtt9wsxfubiq859",
 				"title": "Wool Tier 1",
 				"artwork": "ji2qow3knphzdbb40vgh7lef",
 				"description": "A possible wool tier 1 contract arrives from outside the settlement.",
@@ -273,7 +273,7 @@
 				]
 			},
 			{
-				"id": "quest-pumpkin-t1",
+				"uid": "s6wocxv0o8zsss0739tq4wt3",
 				"title": "Pumpkin Tier 1",
 				"artwork": "vmdthjji13y50ytd2sfxqkfk",
 				"description": "A possible pumpkin tier 1 contract arrives from outside the settlement.",
@@ -332,7 +332,7 @@
 				]
 			},
 			{
-				"id": "quest-wool-t2",
+				"uid": "a7xzmem6df4z0s6y7um28m02",
 				"title": "Wool Tier 2",
 				"artwork": "ji2qow3knphzdbb40vgh7lef",
 				"description": "A possible wool tier 2 contract arrives from outside the settlement.",

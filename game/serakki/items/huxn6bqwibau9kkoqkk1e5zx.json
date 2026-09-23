@@ -14,7 +14,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "cheese",
+				"uid": "dc04oavphy6wuxwitysb6061",
 				"title": "Cheese",
 				"description": "Make a yummi cheese",
 				"default": false,

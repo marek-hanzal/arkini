@@ -24,7 +24,7 @@ describe("blueprint completion placement", () => {
 				});
 				yield* startLineFx({
 					ownerItemId: owner.id,
-					lineId: "line:blueprint:plain",
+					lineUid: "line:blueprint:plain",
 				});
 				yield* runTickRuntimeByFx({
 					elapsedMs: 200,
@@ -76,14 +76,14 @@ describe("blueprint completion placement", () => {
 				});
 				yield* bufferInputMaterialForTestFx({
 					ownerItemId: owner.id,
-					lineId: "line:blueprint:reserve",
+					lineUid: "line:blueprint:reserve",
 					inputIndex: 0,
 					sourceItemId: tool.id,
 					sourceItemRevision: tool.revision,
 				});
 				yield* startLineFx({
 					ownerItemId: owner.id,
-					lineId: "line:blueprint:reserve",
+					lineUid: "line:blueprint:reserve",
 				});
 				yield* runTickRuntimeByFx({
 					elapsedMs: 200,

@@ -26,7 +26,7 @@ describe("item units / persistence", () => {
 				});
 				yield* startLineFx({
 					ownerItemId: shrine.id,
-					lineId: "line:shrine:pray",
+					lineUid: "line:shrine:pray",
 				});
 				const runtime = yield* readRuntimeFx();
 				const state = fromRuntimeFn({

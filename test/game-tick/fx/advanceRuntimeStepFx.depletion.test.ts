@@ -107,7 +107,7 @@ it("does not announce a job erased by its payer's template outcome", () => {
 			}
 			yield* enqueueLineFx({
 				ownerItemId: "runtime:forge",
-				lineId: "line:forge:run",
+				lineUid: "line:forge:run",
 			});
 			const before = yield* readRuntimeFx();
 			const step = yield* advanceRuntimeStepFx(before);
@@ -214,7 +214,7 @@ it("does not announce a queued job erased by another job's template outcome in t
 			}
 			yield* enqueueLineFx({
 				ownerItemId: "owner:a",
-				lineId: "line:forge:run",
+				lineUid: "line:forge:run",
 			});
 			const runtime = yield* readRuntimeFx();
 			const before = {
@@ -223,7 +223,7 @@ it("does not announce a queued job erased by another job's template outcome in t
 					{
 						id: "job:b",
 						ownerItemId: "owner:b",
-						lineId: "line:forge:run",
+						lineUid: "line:forge:run",
 						durationMs: 1_000,
 						remainingMs: 0,
 					},
@@ -322,7 +322,7 @@ it("preserves the full lifetime of temporary depletion outcome created by queue 
 			}
 			yield* enqueueLineFx({
 				ownerItemId: "runtime:producer",
-				lineId: producer.lines[0].id,
+				lineUid: producer.lines[0].uid,
 			});
 			const first = yield* advanceRuntimeStepFx(yield* readRuntimeFx());
 			const second = yield* advanceRuntimeStepFx(first.runtime);

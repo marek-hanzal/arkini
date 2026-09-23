@@ -119,7 +119,7 @@ export const settleItemDeliveryRuntimeFx = Effect.fn("settleItemDeliveryRuntimeF
 				? undefined
 				: readItemLineFn({
 						item: owner.item,
-						lineId: target.lineId,
+						lineUid: target.lineUid,
 					});
 		let inputRuntime = runtime;
 		let accepted = false;
@@ -130,14 +130,14 @@ export const settleItemDeliveryRuntimeFx = Effect.fn("settleItemDeliveryRuntimeF
 			input?.type === TypeSchema.enum.Materials &&
 			!isLineInputClosedFn({
 				ownerItemId: owner.id,
-				lineId: line.id,
+				lineUid: line.uid,
 				runtime,
 			})
 		) {
 			const storedItems = filterInputSlotItemsFn({
 				inputIndex: target.inputIndex,
 				items: runtime.items,
-				lineId: line.id,
+				lineUid: line.uid,
 				ownerItemId: owner.id,
 			});
 			const plan = planInputMaterialStoreFn({
@@ -150,7 +150,7 @@ export const settleItemDeliveryRuntimeFx = Effect.fn("settleItemDeliveryRuntimeF
 					location: {
 						scope: LocationScopeEnumSchema.enum.Input,
 						ownerItemId: owner.id,
-						lineId: line.id,
+						lineUid: line.uid,
 						inputIndex: target.inputIndex,
 					},
 					runtime,

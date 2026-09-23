@@ -126,7 +126,7 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 			maxQueueSize: 1,
 			lines: [
 				{
-					id: "line:workshop:material",
+					uid: "line:workshop:material",
 					title: "Material",
 					description: "Stores one log.",
 					runtimeMs: 200,
@@ -159,7 +159,7 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 			maxQueueSize: 1,
 			lines: [
 				{
-					id: "line:units:run",
+					uid: "line:units:run",
 					title: "Units",
 					description: "Uses one nearby payer unit.",
 					runtimeMs: 200,
@@ -191,7 +191,7 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 			maxQueueSize: 1,
 			lines: [
 				{
-					id: "line:worker:run",
+					uid: "line:worker:run",
 					title: "Run",
 					description: "Produces one log.",
 					runtimeMs: 200,

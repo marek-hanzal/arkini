@@ -9,12 +9,12 @@ export const LineEditLink = ({
 	dataUi = "EditorProductionLineEditLink",
 	disabled = false,
 	itemUid,
-	lineId,
+	lineUid,
 }: PropsWithChildren<{
 	readonly dataUi?: string;
 	readonly disabled?: boolean;
 	readonly itemUid: string;
-	readonly lineId: string;
+	readonly lineUid: string;
 }>) => {
 	const project = useEditorProject();
 	return (
@@ -27,7 +27,7 @@ export const LineEditLink = ({
 				sectionId: "production",
 			}}
 			search={{
-				lineId,
+				lineUid,
 			}}
 			className="group inline-flex min-h-0 w-fit max-w-full flex-none items-center justify-start rounded-none border-0 bg-transparent p-0 text-left text-[inherit] font-[inherit] decoration-accent/55 underline-offset-4 shadow-none hover:border-transparent hover:bg-transparent hover:text-accent hover:underline active:bg-transparent"
 			data-ui={dataUi}

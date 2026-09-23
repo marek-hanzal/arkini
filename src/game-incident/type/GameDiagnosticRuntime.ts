@@ -19,7 +19,7 @@ export interface GameDiagnosticRuntimeJob extends GameDiagnosticJobReferenceSche
 
 export interface GameDiagnosticRuntimeDefaultLine {
 	readonly owner: GameDiagnosticItemReferenceSchema.Type;
-	readonly lineId: string | null;
+	readonly lineUid: string | null;
 }
 
 export interface GameDiagnosticRuntime {

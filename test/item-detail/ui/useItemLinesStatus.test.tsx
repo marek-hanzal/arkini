@@ -47,7 +47,7 @@ it("settles bursts once without being starved by running clock ticks and drops o
 				runtime.phase === "running" && itemId === "owner:a"
 					? [
 							{
-								lineId: "line",
+								lineUid: "line",
 								status: "running",
 							},
 						]
@@ -57,7 +57,7 @@ it("settles bursts once without being starved by running clock ticks and drops o
 					? [
 							{
 								requestId: "request",
-								lineId: "line",
+								lineUid: "line",
 								status: "waiting-inputs",
 							},
 						]

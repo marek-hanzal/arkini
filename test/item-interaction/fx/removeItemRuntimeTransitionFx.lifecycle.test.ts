@@ -15,7 +15,7 @@ import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/supp
 
 const startProps = {
 	ownerItemId: "runtime:forge",
-	lineId: "line:forge:run",
+	lineUid: "line:forge:run",
 } as const;
 
 const prepareIdleOwnerInputsFx = Effect.fn("prepareIdleOwnerInputsFx")(function* () {
@@ -46,7 +46,7 @@ const prepareIdleOwnerInputsFx = Effect.fn("prepareIdleOwnerInputsFx")(function*
 		});
 		yield* bufferInputMaterialForTestFx({
 			ownerItemId: owner.id,
-			lineId: startProps.lineId,
+			lineUid: startProps.lineUid,
 			inputIndex: 0,
 			sourceItemId: water.id,
 			sourceItemRevision: water.revision,
@@ -67,7 +67,7 @@ const prepareIdleOwnerInputsFx = Effect.fn("prepareIdleOwnerInputsFx")(function*
 	});
 	yield* bufferInputMaterialForTestFx({
 		ownerItemId: owner.id,
-		lineId: startProps.lineId,
+		lineUid: startProps.lineUid,
 		inputIndex: 1,
 		sourceItemId: tool.id,
 		sourceItemRevision: tool.revision,

@@ -100,7 +100,7 @@ describe("blocked job completion", () => {
 				});
 				yield* startLineFx({
 					ownerItemId: owner.id,
-					lineId: "line:forge:run",
+					lineUid: "line:forge:run",
 				});
 				delete (config.items as Record<string, unknown>).completionOutput;
 				const before = yield* readRuntimeFx();

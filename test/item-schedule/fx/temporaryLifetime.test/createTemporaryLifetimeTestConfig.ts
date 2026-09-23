@@ -216,7 +216,7 @@ export const createTemporaryLifetimeTestConfig = () =>
 				maxQueueSize: 1,
 				lines: [
 					{
-						id: "line:producer:temporary",
+						uid: "line:producer:temporary",
 						title: "Temporary",
 						description: "Produces one temporary item.",
 						runtimeMs: 200,

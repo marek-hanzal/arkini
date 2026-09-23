@@ -113,7 +113,7 @@ describe("createGameSessionFx / synchronous admission", () => {
 									itemUid: "owner",
 									jobId: "job:event:planned",
 									ownerItemId: "owner:event:planned",
-									lineId: "line:event:planned",
+									lineUid: "line:event:planned",
 								},
 							],
 						] as const;

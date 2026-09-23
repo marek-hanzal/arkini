@@ -19,7 +19,7 @@ export const DiagnosticCodeEnumSchema = z
 		InputAcceptanceCycle: "input:acceptance-cycle",
 		SourceSchemaReferenceConflict: "source:schema-reference-conflict",
 		ConfigSchema: "config:schema",
-		LineDuplicateId: "line:duplicate-id",
+		LineDuplicateUid: "line:duplicate-uid",
 		LineMultipleSelections: "line:multiple-selections",
 		ConfigKeyUidMismatch: "config:key-uid-mismatch",
 		UnitRenewalMissing: "units:missing-renewal",

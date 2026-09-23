@@ -48,7 +48,7 @@ export const forceRemoveRuntimeItemFx = Effect.fn("forceRemoveRuntimeItemFx")(fu
 		jobId: job.id,
 		ownerItemId: item.id,
 		itemUid: item.item.uid,
-		lineId: job.lineId,
+		lineUid: job.lineUid,
 		reason: "owner-removed",
 	}));
 	let draft: RuntimeSchema.Type = {

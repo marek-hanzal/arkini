@@ -45,7 +45,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "tearing",
+				"uid": "oxndn1rwo225ooa6vhpll24g",
 				"title": "Tearing",
 				"description": "Tearing the pillow",
 				"clock": true,

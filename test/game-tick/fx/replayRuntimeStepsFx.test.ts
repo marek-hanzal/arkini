@@ -24,7 +24,7 @@ import {
 
 const hourMs = 60 * 60 * 1_000;
 const ownerItemId = "runtime:forge";
-const lineId = "line:forge:run";
+const lineUid = "line:forge:run";
 
 const summarizeRuntime = (runtime: RuntimeSchema.Type) => ({
 	cheats: {
@@ -42,7 +42,7 @@ const summarizeRuntime = (runtime: RuntimeSchema.Type) => ({
 		.sort((first, second) => JSON.stringify(first).localeCompare(JSON.stringify(second))),
 	jobQueue: runtime.jobQueue,
 	jobs: runtime.jobs.map((job) => ({
-		lineId: job.lineId,
+		lineUid: job.lineUid,
 		ownerItemId: job.ownerItemId,
 		remainingMs: job.remainingMs,
 	})),
@@ -77,7 +77,7 @@ describe("replayRuntimeStepsFx", () => {
 				forge: {
 					...queueConfig.items.forge,
 					lines: queueConfig.items.forge!.lines.map((line) =>
-						line.id === "line:later"
+						line.uid === "line:later"
 							? {
 									...line,
 									outcome: {
@@ -129,7 +129,7 @@ describe("replayRuntimeStepsFx", () => {
 								{
 									id: "job:b",
 									ownerItemId: "owner:b",
-									lineId: "line:later",
+									lineUid: "line:later",
 									durationMs: 1_000,
 									remainingMs: 200,
 								},
@@ -241,7 +241,7 @@ describe("replayRuntimeStepsFx", () => {
 				yield* prepareJobLineFx();
 				yield* startLineFx({
 					ownerItemId,
-					lineId,
+					lineUid,
 				});
 				const runtime = yield* readRuntimeFx();
 				const replay = yield* replayRuntimeStepsFx({

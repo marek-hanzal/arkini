@@ -56,7 +56,7 @@ export const lineRunTestConfig = GameConfigSchema.parse({
 			maxQueueSize: 2,
 			lines: [
 				{
-					id: "line:workshop:build",
+					uid: "line:workshop:build",
 					title: "Build",
 					description: "Build something.",
 					show: false,
@@ -230,7 +230,7 @@ const bufferedWater = ({ id }: { id: string }) => {
 		location: {
 			scope: "input",
 			ownerItemId: ownerItem.id,
-			lineId: "line:workshop:build",
+			lineUid: "line:workshop:build",
 			inputIndex: 0,
 		},
 

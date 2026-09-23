@@ -19,7 +19,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "charcoal-kiln",
+				"uid": "ftgsc32veupcuyupzv44xag7",
 				"title": "Build Charcoal Kiln",
 				"artwork": "f5k76d90k3ibro2tzlio4znd",
 				"description": "Build a compact kiln from processed wood and stone.",

@@ -29,7 +29,7 @@ export const prepareMaterialOwnerFx = Effect.fn("prepareMaterialOwnerFx")(functi
 	});
 	yield* bufferInputMaterialForTestFx({
 		ownerItemId: "owner",
-		lineId: "line:owner",
+		lineUid: "line:owner",
 		inputIndex: 0,
 		sourceItemId: input.id,
 		sourceItemRevision: input.revision,
@@ -40,7 +40,7 @@ export const startMaterialJobFx = Effect.fn("startMaterialJobFx")(function* () {
 	yield* prepareMaterialOwnerFx();
 	yield* startLineFx({
 		ownerItemId: "owner",
-		lineId: "line:owner",
+		lineUid: "line:owner",
 	});
 });
 

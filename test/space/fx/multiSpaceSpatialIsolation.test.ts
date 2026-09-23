@@ -123,7 +123,7 @@ describe("multi-space spatial isolation", () => {
 				});
 				const remoteOnly = yield* resolveLineRunFx({
 					ownerItemId: owner.id,
-					lineId: "line:units:run",
+					lineUid: "line:units:run",
 					runtime: yield* readRuntimeFx(),
 				});
 				yield* spawnItemFx({
@@ -133,7 +133,7 @@ describe("multi-space spatial isolation", () => {
 				});
 				const local = yield* resolveLineRunFx({
 					ownerItemId: owner.id,
-					lineId: "line:units:run",
+					lineUid: "line:units:run",
 					runtime: yield* readRuntimeFx(),
 				});
 

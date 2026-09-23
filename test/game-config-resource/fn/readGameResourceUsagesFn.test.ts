@@ -13,7 +13,7 @@ describe("readGameResourceUsagesFn", () => {
 					...editorTestConfig.items.water,
 					lines: [
 						{
-							id: "gather",
+							uid: "gather",
 							title: "Gather",
 							description: "Gather water",
 							artwork: "line-art",

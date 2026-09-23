@@ -43,7 +43,7 @@ export const createJobTestConfig = (maxQueueSize = 2, runtimeMs = 1_000) =>
 				maxQueueSize,
 				lines: [
 					{
-						id: "line:forge:run",
+						uid: "line:forge:run",
 						title: "Run",
 						description: "Run the forge.",
 						runtimeMs,
@@ -131,7 +131,7 @@ export const prepareJobLineFx = Effect.fn("prepareJobLineFx")(function* () {
 		if (index < 3)
 			yield* bufferInputMaterialForTestFx({
 				ownerItemId: owner.id,
-				lineId: "line:forge:run",
+				lineUid: "line:forge:run",
 				inputIndex: 0,
 				sourceItemId: water.id,
 				sourceItemRevision: water.revision,
@@ -153,7 +153,7 @@ export const prepareJobLineFx = Effect.fn("prepareJobLineFx")(function* () {
 		if (index === 0)
 			yield* bufferInputMaterialForTestFx({
 				ownerItemId: owner.id,
-				lineId: "line:forge:run",
+				lineUid: "line:forge:run",
 				inputIndex: 1,
 				sourceItemId: tool.id,
 				sourceItemRevision: tool.revision,

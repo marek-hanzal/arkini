@@ -7,14 +7,14 @@ import { CompleteItemLineSchema } from "./CompleteItemLineSchema";
 export const ReplaceItemLineInputSchema = z
 	.object({
 		itemUid: IdSchema.describe("The exact ID of the item that owns the line."),
-		lineId: IdSchema.describe("The exact existing line ID to replace."),
+		lineUid: IdSchema.describe("The exact existing line UID to replace."),
 		revision: z
 			.number()
 			.int()
 			.nonnegative()
 			.describe("The exact project revision returned by item_line_config."),
 		line: CompleteItemLineSchema.describe(
-			"The complete replacement line. Its ID must match lineId; omitted optional values are removed.",
+			"The complete replacement line. The addressed line UID is retained; omitted optional values are removed.",
 		),
 	})
 	.strict()

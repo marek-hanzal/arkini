@@ -47,15 +47,15 @@ it("keeps a queued final-unit payer intact without freezing the session, then re
 			}
 			yield* enqueueLineFx({
 				ownerItemId: "consumer",
-				lineId: "work",
+				lineUid: "work",
 			});
 			yield* enqueueLineFx({
 				ownerItemId: "payer",
-				lineId: "wait",
+				lineUid: "wait",
 			});
 			yield* enqueueLineFx({
 				ownerItemId: "independent",
-				lineId: "free",
+				lineUid: "independent-free",
 			});
 			return fromRuntimeFn({
 				runtime: yield* readRuntimeFx(),
@@ -142,11 +142,11 @@ it("counts earlier target costs and uses an alternate payer before depleting a q
 			}
 			yield* enqueueLineFx({
 				ownerItemId: "consumer",
-				lineId: "work",
+				lineUid: "work",
 			});
 			yield* enqueueLineFx({
 				ownerItemId: "queued",
-				lineId: "wait",
+				lineUid: "wait",
 			});
 			const before = yield* readRuntimeFx();
 			yield* advanceRuntimeElapsedFx({
@@ -183,11 +183,11 @@ it("lets a self-targeted final unit start while the same owner still has queued 
 			});
 			yield* enqueueLineFx({
 				ownerItemId: "payer",
-				lineId: "self",
+				lineUid: "self",
 			});
 			yield* enqueueLineFx({
 				ownerItemId: "payer",
-				lineId: "wait",
+				lineUid: "wait",
 			});
 			yield* advanceRuntimeElapsedFx({
 				elapsedMs: 100,
@@ -199,11 +199,11 @@ it("lets a self-targeted final unit start while the same owner still has queued 
 			});
 			expect(runtime.jobs[0]).toMatchObject({
 				ownerItemId: "payer",
-				lineId: "self",
+				lineUid: "self",
 			});
 			expect(runtime.jobQueue[0]).toMatchObject({
 				ownerItemId: "payer",
-				lineId: "wait",
+				lineUid: "wait",
 			});
 		}).pipe(
 			useGameFx({
@@ -228,18 +228,18 @@ it("retains an active external payer at zero units until its job completes", () 
 			});
 			yield* enqueueLineFx({
 				ownerItemId: "payer",
-				lineId: "free",
+				lineUid: "free",
 			});
 			yield* advanceRuntimeElapsedFx({
 				elapsedMs: 100,
 			});
 			yield* enqueueLineFx({
 				ownerItemId: "payer",
-				lineId: "wait",
+				lineUid: "wait",
 			});
 			yield* enqueueLineFx({
 				ownerItemId: "consumer",
-				lineId: "work",
+				lineUid: "work",
 			});
 			yield* advanceRuntimeElapsedFx({
 				elapsedMs: 100,
@@ -254,7 +254,7 @@ it("retains an active external payer at zero units until its job completes", () 
 			]);
 			expect(runtime.jobQueue[0]).toMatchObject({
 				ownerItemId: "payer",
-				lineId: "wait",
+				lineUid: "wait",
 			});
 		}).pipe(
 			useGameFx({

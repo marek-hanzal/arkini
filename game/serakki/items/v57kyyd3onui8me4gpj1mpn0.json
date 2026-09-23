@@ -17,7 +17,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "clay-deposit",
+				"uid": "r1usgxbin3u7e2c1x83s8u0z",
 				"title": "Search new Clay Deposit",
 				"description": "Find a new source of Clay.",
 				"default": false,
@@ -84,7 +84,7 @@
 				"rules": []
 			},
 			{
-				"id": "sand-deposit",
+				"uid": "x63jlthgofaeh8viglxxdxm3",
 				"title": "Search new Sand Deposit",
 				"description": "Sandman. Returns!",
 				"default": false,

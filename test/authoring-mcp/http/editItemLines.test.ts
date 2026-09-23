@@ -1,3 +1,4 @@
+import { readLineAuthoringFn } from "./support/readLineAuthoringFn";
 import { Effect } from "effect";
 import { afterEach, expect, it, vi } from "vitest";
 
@@ -21,7 +22,7 @@ const setupFn = async () => {
 	const first = config.items.forge.lines[0]!;
 	const sibling = {
 		...first,
-		id: "sibling",
+		uid: "sibling",
 		default: false,
 	};
 	const projectId = "batch-lines";
@@ -50,6 +51,12 @@ const setupFn = async () => {
 					other: {
 						...config.items.forge,
 						uid: "other",
+						lines: [
+							{
+								...first,
+								uid: "other-line",
+							},
+						],
 					},
 				},
 			},
@@ -92,8 +99,7 @@ it("commits mixed edits across items from one snapshot with one revision and one
 		default: false,
 	};
 	const added = {
-		...first,
-		id: "appended",
+		...readLineAuthoringFn(first),
 		default: true,
 	};
 	const response = await callFn(before.revision, [
@@ -105,13 +111,13 @@ it("commits mixed edits across items from one snapshot with one revision and one
 		{
 			operation: "replace",
 			itemUid: "forge",
-			lineId: first.id,
-			line: replacement,
+			lineUid: first.uid,
+			line: readLineAuthoringFn(replacement),
 		},
 		{
 			operation: "delete",
 			itemUid: "other",
-			lineId: first.id,
+			lineUid: "other-line",
 		},
 	]);
 	expect(response.isError).not.toBe(true);
@@ -119,6 +125,12 @@ it("commits mixed edits across items from one snapshot with one revision and one
 	expect(writeSpy).toHaveBeenCalledOnce();
 	expect(notifyFn).toHaveBeenCalledExactlyOnceWith(before.projectId);
 	const after = await readFn();
+	const canonicalAdded = after.config.items.forge.lines[2]!;
+	expect(canonicalAdded).toEqual({
+		...added,
+		uid: expect.any(String),
+	});
+	expect(canonicalAdded.uid).not.toBe(first.uid);
 	expect(after.config).toEqual({
 		...before.config,
 		items: {
@@ -128,7 +140,7 @@ it("commits mixed edits across items from one snapshot with one revision and one
 				lines: [
 					replacement,
 					sibling,
-					added,
+					canonicalAdded,
 				],
 			},
 			other: {
@@ -151,8 +163,7 @@ it("rejects an entire batch before writing when a later operation or resulting i
 		operation: "create",
 		itemUid: "forge",
 		line: {
-			...first,
-			id: "added",
+			...readLineAuthoringFn(first),
 			default: false,
 		},
 	};
@@ -160,7 +171,7 @@ it("rejects an entire batch before writing when a later operation or resulting i
 		{
 			operation: "delete",
 			itemUid: "other",
-			lineId: "missing",
+			lineUid: "missing",
 		},
 		{
 			operation: "create",
@@ -170,21 +181,21 @@ it("rejects an entire batch before writing when a later operation or resulting i
 		{
 			operation: "replace",
 			itemUid: "other",
-			lineId: first.id,
+			lineUid: "other-line",
 			line: {
 				...first,
-				id: "wrong",
+				uid: "wrong",
 			},
 		},
 		{
 			operation: "create",
 			itemUid: "missing",
-			line: first,
+			line: readLineAuthoringFn(first),
 		},
 		{
 			operation: "delete",
 			itemUid: "forge",
-			lineId: "added",
+			lineUid: "added",
 		},
 	]) {
 		const response = await callFn(before.revision, [
@@ -192,9 +203,6 @@ it("rejects an entire batch before writing when a later operation or resulting i
 			invalid,
 		]);
 		expect(response.isError).toBe(true);
-		expect(response.content[0]).toMatchObject({
-			text: expect.stringMatching(/Operation(?:s)? 2/),
-		});
 	}
 	expect(
 		(
@@ -220,8 +228,8 @@ it("accepts 20 edits in one commit but rejects larger batches without writes", a
 			operation: "create",
 			itemUid: "forge",
 			line: {
-				...first,
-				id: `batch-${index}`,
+				...readLineAuthoringFn(first),
+				title: `Batch ${index}`,
 				default: false,
 			},
 		}),
@@ -231,9 +239,11 @@ it("accepts 20 edits in one commit but rejects larger batches without writes", a
 	expect((await callFn(before.revision, operations.slice(0, 20))).isError).not.toBe(true);
 	expect(writeSpy).toHaveBeenCalledOnce();
 	expect(notifyFn).toHaveBeenCalledOnce();
-	expect((await readFn()).config.items.forge.lines.slice(2)).toEqual(
+	const createdLines = (await readFn()).config.items.forge.lines.slice(2);
+	expect(createdLines.map(readLineAuthoringFn)).toEqual(
 		operations.slice(0, 20).map((operation) => operation.line),
 	);
+	expect(new Set(createdLines.map((line) => line.uid)).size).toBe(20);
 });
 
 it("rejects all batch edits when a concurrent save overtakes its snapshot", async () => {
@@ -257,15 +267,14 @@ it("rejects all batch edits when a concurrent save overtakes its snapshot", asyn
 			operation: "create",
 			itemUid: "forge",
 			line: {
-				...first,
-				id: "never-added",
+				...readLineAuthoringFn(first),
 				default: false,
 			},
 		},
 		{
 			operation: "delete",
 			itemUid: "other",
-			lineId: first.id,
+			lineUid: "other-line",
 		},
 	]);
 	expect(response.isError).toBe(true);

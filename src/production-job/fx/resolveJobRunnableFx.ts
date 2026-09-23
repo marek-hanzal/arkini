@@ -27,7 +27,7 @@ export const resolveJobRunnableFx = Effect.fn("resolveJobRunnableFx")(function* 
 	if (hasReadyMaterial) return false;
 
 	const { line, owner } = yield* readBoardItemLineFx({
-		lineId: job.lineId,
+		lineUid: job.lineUid,
 		ownerItemId: job.ownerItemId,
 		runtime,
 	});

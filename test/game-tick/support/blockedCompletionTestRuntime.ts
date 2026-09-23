@@ -42,7 +42,7 @@ export const createBlockedCompletionTestConfig = () => {
 				lines: [
 					{
 						...line,
-						id: "line:blocked-forge:run",
+						uid: "line:blocked-forge:run",
 						outcome: {
 							set: [
 								{
@@ -78,7 +78,7 @@ export const createBlockedCompletionTestConfig = () => {
 				lines: [
 					{
 						...line,
-						id: "line:free-forge:run",
+						uid: "line:free-forge:run",
 						input: [
 							{
 								type: "simple",
@@ -133,7 +133,7 @@ export const prepareBlockedCompletionRuntimeFx = Effect.fn("prepareBlockedComple
 			});
 			yield* bufferInputMaterialForTestFx({
 				ownerItemId: blockedOwner.id,
-				lineId: "line:blocked-forge:run",
+				lineUid: "line:blocked-forge:run",
 				inputIndex: 0,
 				sourceItemId: water.id,
 				sourceItemRevision: water.revision,
@@ -154,18 +154,18 @@ export const prepareBlockedCompletionRuntimeFx = Effect.fn("prepareBlockedComple
 
 		yield* bufferInputMaterialForTestFx({
 			ownerItemId: blockedOwner.id,
-			lineId: "line:blocked-forge:run",
+			lineUid: "line:blocked-forge:run",
 			inputIndex: 1,
 			sourceItemId: tool.id,
 			sourceItemRevision: tool.revision,
 		});
 		yield* startLineFx({
 			ownerItemId: blockedOwner.id,
-			lineId: "line:blocked-forge:run",
+			lineUid: "line:blocked-forge:run",
 		});
 		yield* startLineFx({
 			ownerItemId: freeOwner.id,
-			lineId: "line:free-forge:run",
+			lineUid: "line:free-forge:run",
 		});
 
 		let blockerIndex = 0;

@@ -24,7 +24,7 @@ export const emitCompletedEventFx = (jobId: string) =>
 					itemUid: "owner",
 					jobId,
 					ownerItemId: "owner:listener",
-					lineId: "line:listener",
+					lineUid: "line:listener",
 				},
 			],
 		] as const),

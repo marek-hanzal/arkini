@@ -22,7 +22,7 @@ export const enqueueDefaultLineFx = Effect.fn("enqueueDefaultLineFx")(function* 
 				runtime,
 			});
 			const queued = yield* enqueueLineRuntimeFx({
-				lineId: line.id,
+				lineUid: line.uid,
 				ownerItemId,
 				runtime,
 			});

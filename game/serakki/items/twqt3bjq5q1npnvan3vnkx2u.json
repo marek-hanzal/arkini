@@ -22,7 +22,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "idle",
+				"uid": "o6kljvi0o6x8ggflg0zivvik",
 				"title": "Idle",
 				"description": "The sick goose barely moves.",
 				"clock": true,
@@ -39,7 +39,7 @@
 				"rules": []
 			},
 			{
-				"id": "wander",
+				"uid": "g7ckcrgz1r6njlg9d8j3no9g",
 				"title": "Wander",
 				"artwork": "meociv5mk1d4vcssid9kxaig",
 				"description": "Wanders somewhere else.",
@@ -93,7 +93,7 @@
 				"rules": []
 			},
 			{
-				"id": "die",
+				"uid": "trq6fpdnr6rov2owvbrwpzoe",
 				"title": "Die",
 				"description": "The animal may not survive its condition.",
 				"clock": true,
@@ -156,7 +156,7 @@
 				"rules": []
 			},
 			{
-				"id": "spread-disease",
+				"uid": "r5adt6pw6l1rwbbw52m7pgxo",
 				"title": "Spread Disease",
 				"artwork": "fnom9s6mxxkza9m7iahgp5k9",
 				"description": "The sick animal may contaminate its immediate surroundings.",

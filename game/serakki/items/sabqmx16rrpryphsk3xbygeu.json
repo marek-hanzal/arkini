@@ -22,7 +22,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "idle",
+				"uid": "dpap576qg9tuklz4fgn9o1v1",
 				"title": "Idle",
 				"description": "The hungry sheep conserves its energy.",
 				"clock": true,
@@ -39,7 +39,7 @@
 				"rules": []
 			},
 			{
-				"id": "wander",
+				"uid": "wg1jlbbolnfl9zk6km8o7zyo",
 				"title": "Wander",
 				"artwork": "vwl85lp49utb3jl24n9zkwiu",
 				"description": "Wanders somewhere else.",
@@ -93,7 +93,7 @@
 				"rules": []
 			},
 			{
-				"id": "get-sick",
+				"uid": "nrqqk3a4oe4gdex1h0pzf2u4",
 				"title": "Get Sick",
 				"description": "Hunger may make the sheep sick.",
 				"clock": true,
@@ -146,7 +146,7 @@
 				"rules": []
 			},
 			{
-				"id": "disease-exposure",
+				"uid": "oxg6h4l90fepe5wa7g2o3lw2",
 				"title": "Disease Exposure",
 				"artwork": "fnom9s6mxxkza9m7iahgp5k9",
 				"description": "Nearby disease increases the chance of illness.",
@@ -216,7 +216,7 @@
 				]
 			},
 			{
-				"id": "plague-exposure",
+				"uid": "cp9zooa2ph2vpkeoeyk25zdp",
 				"title": "Plague Exposure",
 				"artwork": "j23vl46e91a44u0vt6qlcojt",
 				"description": "Nearby plague increases the chance of illness.",
@@ -286,7 +286,7 @@
 				]
 			},
 			{
-				"id": "wolf-attack-near",
+				"uid": "p4xejda0m8vbzx1xmkpz38e5",
 				"title": "Wolf Attack",
 				"artwork": "ng6ysy8poe1dwz906gbmxons",
 				"description": "A wolf two tiles away may attack.",
@@ -390,7 +390,7 @@
 				]
 			},
 			{
-				"id": "wolf-attack-close",
+				"uid": "prylu94p1hbg78gremcdo4ru",
 				"title": "Wolf Attack",
 				"artwork": "ng6ysy8poe1dwz906gbmxons",
 				"description": "A wolf right next to the sheep may attack.",
@@ -494,7 +494,7 @@
 				]
 			},
 			{
-				"id": "eat-hay",
+				"uid": "qoe9zfgalruegw92h17z00io",
 				"title": "Find Food",
 				"artwork": "u4p2zk3urnt3ypeisgw9isck",
 				"description": "The hungry animal finds something suitable to eat.",
@@ -579,7 +579,7 @@
 				]
 			},
 			{
-				"id": "eat-cut-grass",
+				"uid": "grr8n5sppamzcxiwr17ssier",
 				"title": "Find Food",
 				"artwork": "swxw0ogeqwffwhzoz43b6mvg",
 				"description": "The hungry animal finds something suitable to eat.",

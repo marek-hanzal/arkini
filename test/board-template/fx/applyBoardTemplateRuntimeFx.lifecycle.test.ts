@@ -37,7 +37,7 @@ it("replaces one space and its full ownership tree while retaining another space
 				},
 				lines: [
 					{
-						id: "water:buffer",
+						uid: "water:buffer",
 						title: "Buffer",
 						description: "Buffer",
 						runtimeMs: 1000,
@@ -69,7 +69,7 @@ it("replaces one space and its full ownership tree while retaining another space
 			yield* prepareJobLineFx();
 			yield* startLineFx({
 				ownerItemId: "runtime:forge",
-				lineId: "line:forge:run",
+				lineUid: "line:forge:run",
 			});
 			const prepared = yield* readRuntimeFx();
 			const buffered = prepared.items.find(
@@ -91,7 +91,7 @@ it("replaces one space and its full ownership tree while retaining another space
 								location: {
 									scope: "input" as const,
 									ownerItemId: "buffer-owner",
-									lineId: "line:forge:run",
+									lineUid: "line:forge:run",
 									inputIndex: 0,
 								},
 							};
@@ -107,7 +107,7 @@ it("replaces one space and its full ownership tree while retaining another space
 									target: {
 										kind: "line-input" as const,
 										ownerItemId: "buffer-owner",
-										lineId: "line:forge:run",
+										lineUid: "line:forge:run",
 										inputIndex: 0,
 									},
 								},
@@ -134,7 +134,7 @@ it("replaces one space and its full ownership tree while retaining another space
 						location: {
 							scope: "input",
 							ownerItemId: buffered.id,
-							lineId: "water:buffer",
+							lineUid: "water:buffer",
 							inputIndex: 0,
 						},
 					},
@@ -143,7 +143,7 @@ it("replaces one space and its full ownership tree while retaining another space
 					{
 						id: "queued-forge",
 						ownerItemId: "runtime:forge",
-						lineId: "line:forge:run",
+						lineUid: "line:forge:run",
 					},
 				],
 				defaultLineByOwnerItemId: {
@@ -218,9 +218,9 @@ it("replaces one space and its full ownership tree while retaining another space
 					ownerItemId: ids.get(request.ownerItemId)!,
 				})),
 				defaultLineByOwnerItemId: Object.fromEntries(
-					Object.entries(source.defaultLineByOwnerItemId).map(([id, lineId]) => [
+					Object.entries(source.defaultLineByOwnerItemId).map(([id, lineUid]) => [
 						ids.get(id)!,
-						lineId,
+						lineUid,
 					]),
 				),
 			};

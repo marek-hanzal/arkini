@@ -38,6 +38,47 @@ const readFormValues = (item: ItemSchema.Type): FormValues => ({
 });
 
 describe("createFormSchema", () => {
+	it("rejects another item's line UID while retaining the edited owner's stable identity", () => {
+		const first = createProducerItem({
+			id: "first",
+		});
+		const second = createProducerItem({
+			id: "second",
+			lines: first.lines.map((line) => ({
+				...line,
+				uid: "line:other",
+			})),
+		});
+		const project = {
+			config: {
+				...editorTestConfig,
+				items: {
+					[first.uid]: first,
+					[second.uid]: second,
+				},
+			},
+		};
+		const schema = createFormSchema(project, first.uid);
+		expect(schema.safeParse(readFormValues(first)).success).toBe(true);
+		const result = schema.safeParse(
+			readFormValues({
+				...first,
+				lines: second.lines,
+			}),
+		);
+		expect(result.success).toBe(false);
+		if (!result.success)
+			expect(result.error.issues).toContainEqual(
+				expect.objectContaining({
+					path: [
+						"lines",
+						0,
+						"uid",
+					],
+				}),
+			);
+	});
+
 	it("rejects ambiguous receiver transport definitions at the second action", () => {
 		const source = createSimpleItem("portal");
 		const project = {

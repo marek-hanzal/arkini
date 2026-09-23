@@ -23,7 +23,7 @@ export namespace useItemDetailSceneController {
 	}
 	export interface Detail extends Pick<ItemSchema.Type, "description" | "lines" | "ui"> {
 		readonly canMake: boolean;
-		readonly disabledLineIds: readonly string[];
+		readonly disabledLineUids: readonly string[];
 		readonly lineBlockingHints: Readonly<Record<string, string | undefined>>;
 		readonly title: string;
 		readonly sourceUrl: string;
@@ -141,13 +141,13 @@ export const useItemDetailSceneController = ({
 				lines: visibleLines.map((state) => state.line),
 				lineBlockingHints: Object.fromEntries(
 					visibleLines.map((state) => [
-						state.line.id,
+						state.line.uid,
 						state.blockingHint,
 					]),
 				),
-				disabledLineIds: visibleLines
+				disabledLineUids: visibleLines
 					.filter((state) => !state.enabled)
-					.map((state) => state.line.id),
+					.map((state) => state.line.uid),
 				canMake,
 				ui: item.ui,
 				title: item.title,

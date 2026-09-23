@@ -25,12 +25,12 @@ const simpleItem = ({ id }: { id: string }) =>
 
 const blueprintItem = ({
 	id,
-	lineId,
+	lineUid,
 	outcome,
 	reserveTool = false,
 }: {
 	id: string;
-	lineId: string;
+	lineUid: string;
 	outcome?: z.input<typeof OutcomeTableSchema>;
 	reserveTool?: boolean;
 }) =>
@@ -52,9 +52,9 @@ const blueprintItem = ({
 
 		lines: [
 			{
-				id: lineId,
-				title: lineId,
-				description: lineId,
+				uid: lineUid,
+				title: lineUid,
+				description: lineUid,
 				runtimeMs: 200,
 				input: reserveTool
 					? [
@@ -158,12 +158,12 @@ export const blueprintConfig = GameConfigSchema.parse({
 	items: {
 		"blueprint:plain": blueprintItem({
 			id: "blueprint:plain",
-			lineId: "line:blueprint:plain",
+			lineUid: "line:blueprint:plain",
 			outcome: blueprintOutput("item:target"),
 		}),
 		"blueprint:outcome": blueprintItem({
 			id: "blueprint:outcome",
-			lineId: "line:blueprint:outcome",
+			lineUid: "line:blueprint:outcome",
 			outcome: blueprintOutput("item:target-unlimited", [
 				{
 					itemId: "item:byproduct",
@@ -176,7 +176,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 		}),
 		"blueprint:reserve": blueprintItem({
 			id: "blueprint:reserve",
-			lineId: "line:blueprint:reserve",
+			lineUid: "line:blueprint:reserve",
 			outcome: blueprintOutput("item:target-unlimited", [
 				{
 					itemId: "item:byproduct",
@@ -190,7 +190,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 		}),
 		"blueprint:range": blueprintItem({
 			id: "blueprint:range",
-			lineId: "line:blueprint:range",
+			lineUid: "line:blueprint:range",
 			outcome: blueprintOutput("item:target-unlimited", [
 				{
 					itemId: "item:limited",
@@ -204,7 +204,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 		"blueprint:depletion-capped": {
 			...blueprintItem({
 				id: "blueprint:depletion-capped",
-				lineId: "line:blueprint:depletion-capped",
+				lineUid: "line:blueprint:depletion-capped",
 				outcome: blueprintOutput("item:target-unlimited"),
 				reserveTool: true,
 			}),
@@ -216,7 +216,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 		"blueprint:depletion-self": {
 			...blueprintItem({
 				id: "blueprint:depletion-self",
-				lineId: "line:blueprint:depletion-self",
+				lineUid: "line:blueprint:depletion-self",
 				outcome: blueprintOutput("item:target-unlimited"),
 				reserveTool: true,
 			}),
@@ -228,7 +228,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 		"blueprint:depletion-random": {
 			...blueprintItem({
 				id: "blueprint:depletion-random",
-				lineId: "line:blueprint:depletion-random",
+				lineUid: "line:blueprint:depletion-random",
 				outcome: blueprintOutput("item:target-unlimited"),
 				reserveTool: true,
 			}),
@@ -284,7 +284,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 			maxQueueSize: 2,
 			lines: [
 				{
-					id: "line:producer:limited",
+					uid: "line:producer:limited",
 					title: "Produce",
 					description: "Produce one singleton.",
 					runtimeMs: 200,
@@ -321,7 +321,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 			maxQueueSize: 2,
 			lines: [
 				{
-					id: "line:producer:blueprint-source",
+					uid: "line:producer:blueprint-source",
 					title: "Produce blueprint",
 					description: "Produce one blueprint.",
 					runtimeMs: 200,
@@ -350,7 +350,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 			maxQueueSize: 1,
 			lines: [
 				{
-					id: "line:producer:shared-source",
+					uid: "line:producer:shared-source",
 					title: "Produce shared",
 					description: "Produce one shared item.",
 					runtimeMs: 200,
@@ -379,7 +379,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 			maxQueueSize: 1,
 			lines: [
 				{
-					id: "line:producer:shared-consumer",
+					uid: "line:producer:shared-consumer",
 					title: "Consume shared",
 					description: "Consume one shared item.",
 					runtimeMs: 200,

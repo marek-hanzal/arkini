@@ -29,10 +29,10 @@ const baseItem = (id: string) => ({
 	},
 });
 
-const makeLine = (lineId: string) => ({
-	id: lineId,
-	title: lineId,
-	description: lineId,
+const makeLine = (lineUid: string) => ({
+	uid: lineUid,
+	title: lineUid,
+	description: lineUid,
 	runtimeMs: 1_000,
 	input: [
 		{
@@ -83,7 +83,7 @@ const config = GameConfigSchema.parse({
 			lines: [
 				makeLine("line:producer"),
 				{
-					id: "line:producer:other",
+					uid: "line:producer:other",
 					title: "Other producer work",
 					description: "Keeps the owner busy while delivery settles.",
 					runtimeMs: 1_000,
@@ -122,7 +122,7 @@ const spawnScenarioFx = Effect.fn("spawnLineOwnerDeliveryBoundaryScenarioFx")(fu
 	ownerKind: (typeof ownerKinds)[number],
 ) {
 	const ownerItemId = `runtime:${ownerKind}`;
-	const lineId = `line:${ownerKind}`;
+	const lineUid = `line:${ownerKind}`;
 	yield* spawnItemFx({
 		id: ownerItemId,
 		itemUid: ownerKind,
@@ -139,7 +139,7 @@ const spawnScenarioFx = Effect.fn("spawnLineOwnerDeliveryBoundaryScenarioFx")(fu
 		location: boardLocation(2),
 	});
 	return {
-		lineId,
+		lineUid,
 		ownerItemId,
 	};
 });
@@ -204,7 +204,7 @@ describe("line-owner delivery settlement boundary", () => {
 			expect(result.finished.jobQueue).toEqual([]);
 			expect(result.finished.jobs).toEqual([
 				expect.objectContaining({
-					lineId: result.ids.lineId,
+					lineUid: result.ids.lineUid,
 					ownerItemId: result.ids.ownerItemId,
 				}),
 			]);

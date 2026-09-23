@@ -101,7 +101,7 @@ describe("queued blocked probes", () => {
 		expect(result.runtime.jobs).toMatchObject([
 			{
 				ownerItemId: request.ownerItemId,
-				lineId: "ready",
+				lineUid: "ready",
 			},
 		]);
 		expect(result.runtime.jobQueue).toEqual([
@@ -111,7 +111,7 @@ describe("queued blocked probes", () => {
 		expect(events).toMatchObject([
 			{
 				type: "job:started",
-				lineId: "ready",
+				lineUid: "ready",
 			},
 		]);
 	});

@@ -14,7 +14,7 @@
 		"maxQueueSize": 6,
 		"lines": [
 			{
-				"id": "clay",
+				"uid": "anmk1kp2ng1nav8plkhipn9l",
 				"title": "Clay",
 				"description": "Mugs and other clay-based stuff is waiting",
 				"default": true,

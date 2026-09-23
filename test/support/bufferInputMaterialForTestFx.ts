@@ -13,7 +13,7 @@ import { reconcileOutboundDeliveriesRuntimeFx } from "~/production-delivery/fx/r
 export namespace bufferInputMaterialForTestFx {
 	export interface Props {
 		readonly ownerItemId: IdSchema.Type;
-		readonly lineId: IdSchema.Type;
+		readonly lineUid: IdSchema.Type;
 		readonly inputIndex: NonNegativeIntegerSchema.Type;
 		readonly sourceItemId: IdSchema.Type;
 		readonly sourceItemRevision: RevisionSchema.Type;
@@ -23,7 +23,7 @@ export namespace bufferInputMaterialForTestFx {
 /** Establishes an already admitted material input for tests of downstream behavior. */
 export const bufferInputMaterialForTestFx = Effect.fn("bufferInputMaterialForTestFx")(function* ({
 	ownerItemId,
-	lineId,
+	lineUid,
 	inputIndex,
 	sourceItemId,
 	sourceItemRevision,
@@ -50,7 +50,7 @@ export const bufferInputMaterialForTestFx = Effect.fn("bufferInputMaterialForTes
 				location: {
 					scope: "input",
 					ownerItemId,
-					lineId,
+					lineUid,
 					inputIndex,
 				},
 				runtime: cleared,
@@ -69,7 +69,7 @@ export const bufferInputMaterialForTestFx = Effect.fn("bufferInputMaterialForTes
 						itemUid: source.item.uid,
 						previousSourceLocation: source.location,
 						ownerItemId,
-						lineId,
+						lineUid,
 						inputIndex,
 					} satisfies GameEventSchema.Type,
 				],

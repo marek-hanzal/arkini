@@ -66,7 +66,7 @@ export const ProductionLineDetail = ({
 	return (
 		<EditorRootCard
 			dataUi="EditorProductionLineDetail"
-			data-line-id={line.id}
+			data-line-uid={line.uid}
 		>
 			<div className="flex flex-wrap items-start justify-between gap-4">
 				<div className="min-w-0 flex-1">
@@ -81,7 +81,7 @@ export const ProductionLineDetail = ({
 							<LineEditLink
 								dataUi="EditorProductionLineDetailEditLink"
 								itemUid={itemUid}
-								lineId={line.id}
+								lineUid={line.uid}
 							>
 								{line.title}
 								<ArrowUpRight className="size-4 shrink-0 text-muted transition-colors group-hover:text-accent" />

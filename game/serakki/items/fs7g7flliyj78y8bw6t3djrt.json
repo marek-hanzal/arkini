@@ -42,7 +42,7 @@
 		"maxQueueSize": 8,
 		"lines": [
 			{
-				"id": "water",
+				"uid": "tnp0mjohf6hk5apyzcex1o1s",
 				"title": "Water",
 				"description": "Get some water for you infrastructure. Fresh, from deepness of earth!",
 				"default": true,

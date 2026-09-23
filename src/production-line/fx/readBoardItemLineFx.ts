@@ -8,11 +8,11 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 /** Reads one board line together with its exact live owner. */
 export const readBoardItemLineFx = Effect.fn("readBoardItemLineFx")(function* ({
-	lineId,
+	lineUid,
 	ownerItemId,
 	runtime,
 }: {
-	readonly lineId: IdSchema.Type;
+	readonly lineUid: IdSchema.Type;
 	readonly ownerItemId: IdSchema.Type;
 	readonly runtime: RuntimeSchema.Type;
 }) {
@@ -22,7 +22,7 @@ export const readBoardItemLineFx = Effect.fn("readBoardItemLineFx")(function* ({
 	});
 	const line = readItemLineFn({
 		item: owner.item,
-		lineId,
+		lineUid,
 	});
 	if (line !== undefined) {
 		return {
@@ -33,7 +33,7 @@ export const readBoardItemLineFx = Effect.fn("readBoardItemLineFx")(function* ({
 	return yield* Effect.fail(
 		new LineNotFoundError({
 			itemId: owner.id,
-			lineId,
+			lineUid,
 		}),
 	);
 });

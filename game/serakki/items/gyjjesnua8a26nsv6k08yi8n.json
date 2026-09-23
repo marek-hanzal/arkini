@@ -14,7 +14,7 @@
 		"maxQueueSize": 4,
 		"lines": [
 			{
-				"id": "pig",
+				"uid": "aj8hote8kn44eqywpkoq4cvt",
 				"title": "Pig",
 				"description": "Some yummi stuff from a pig",
 				"clockWeight": 1,
@@ -92,7 +92,7 @@
 				"rules": []
 			},
 			{
-				"id": "sausage",
+				"uid": "wka3j713ukokiexdo5bsv5o8",
 				"title": "Sausage",
 				"description": "Yummi sausage",
 				"clockWeight": 1,

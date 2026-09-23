@@ -1,4 +1,5 @@
 import { isDeepStrictEqual } from "node:util";
+import { assertUniqueLineUidsFx } from "~/project-authoring/fx/assertUniqueLineUidsFx";
 import { FileSystem, Path } from "effect";
 import { Effect } from "effect";
 
@@ -117,6 +118,7 @@ export const readProjectFilesFx = Effect.fn("readProjectFilesFx")(function* (pro
 		);
 	}
 	const config = compilation.config;
+	yield* assertUniqueLineUidsFx(config, "read-project");
 	const descriptors = yield* readResourceDescriptorsFx({
 		input: paths.root,
 	});

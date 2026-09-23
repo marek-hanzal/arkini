@@ -26,7 +26,7 @@ export const ItemLineInputs = ({
 	const translator = useTranslator();
 	const controller = useItemLineInputController({
 		ownerItemId,
-		lineId: line.id,
+		lineUid: line.uid,
 		disabled,
 	});
 	const selectorFn = useCallback(
@@ -41,7 +41,7 @@ export const ItemLineInputs = ({
 			if (Exit.isFailure(result)) throw result.cause;
 			const liveLine = runtime.items
 				.find((item) => item.id === ownerItemId)
-				?.item.lines.find((candidate) => candidate.id === line.id);
+				?.item.lines.find((candidate) => candidate.uid === line.uid);
 			return result.value.filter((input) => {
 				const requirement = (liveLine ?? line).input[input.inputIndex];
 				return requirement.type !== "units" || requirement.query.distance !== "self";

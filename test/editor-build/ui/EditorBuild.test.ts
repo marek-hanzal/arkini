@@ -329,7 +329,7 @@ describe("EditorBuild", () => {
 					0,
 				],
 				ownerItemUid: "producer:academy",
-				lineId: "line:academy:knowledge",
+				lineUid: "line:academy:knowledge",
 				inputIndex: 0,
 				reason: "self-missing-units" as const,
 			},

@@ -14,7 +14,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "bubbles",
+				"uid": "mlsw4j4579s56p12jtwt4q00",
 				"title": "Bubbles",
 				"description": "World will be nicer with some bubbles around",
 				"default": true,

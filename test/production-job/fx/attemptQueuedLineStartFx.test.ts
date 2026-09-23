@@ -13,7 +13,7 @@ const config = createJobTestConfig(2);
 const request = {
 	id: "job:request",
 	ownerItemId: "runtime:forge",
-	lineId: "line:forge:run",
+	lineUid: "line:forge:run",
 } satisfies JobQueueRequestSchema.Type;
 const owner = {
 	id: request.ownerItemId,
@@ -137,7 +137,7 @@ describe("attemptQueuedLineStartFx", () => {
 	it("propagates a missing line from a live request", () => {
 		const missingLineRequest = {
 			...request,
-			lineId: "line:missing",
+			lineUid: "line:missing",
 		} satisfies JobQueueRequestSchema.Type;
 		const runtime = {
 			cheats: {
@@ -195,7 +195,7 @@ describe("attemptQueuedLineStartFx", () => {
 
 		expect(result.type).toBe("started");
 		if (result.type !== "started") throw new Error("Expected the selected request to start.");
-		expect(result.job.lineId).toBe(request.lineId);
+		expect(result.job.lineUid).toBe(request.lineUid);
 		expect(result.runtime.jobQueue).toEqual([
 			expect.objectContaining({
 				id: request.id,

@@ -58,7 +58,7 @@ it("disables Make across all lines when the owner's queue fills and enables it w
 				(_, index) => ({
 					id: `request:${index}`,
 					ownerItemId: owner.id,
-					lineId: owner.item.lines[0].id,
+					lineUid: owner.item.lines[0].uid,
 				}),
 			),
 		};
@@ -182,7 +182,7 @@ it("updates displayed lines from live Show/Hide rules without treating disabled 
 		blocker: true,
 	});
 	const ownerId = hidden.items[0].id;
-	const lineId = hidden.items[0].item.lines[0].id;
+	const lineUid = hidden.items[0].item.lines[0].uid;
 	state.runtime = hidden;
 	state.game = {
 		readFn: Effect.runSyncExit,
@@ -206,8 +206,8 @@ it("updates displayed lines from live Show/Hide rules without treating disabled 
 		expect(output?.detail?.lines).toEqual([]);
 		state.runtime = visible;
 		await act(async () => root.render(<Probe />));
-		expect(output?.detail?.lines.map((line) => line.id)).toEqual([
-			lineId,
+		expect(output?.detail?.lines.map((line) => line.uid)).toEqual([
+			lineUid,
 		]);
 		state.runtime = vetoed;
 		await act(async () => root.render(<Probe />));
@@ -242,7 +242,7 @@ it("updates displayed lines from live Show/Hide rules without treating disabled 
 									lines: item.item.lines.flatMap((line) => [
 										{
 											...line,
-											id: "disabled-first",
+											uid: "disabled-first",
 											show: true,
 											enable: false,
 											rules: [],
@@ -257,14 +257,14 @@ it("updates displayed lines from live Show/Hide rules without treating disabled 
 										},
 										{
 											...line,
-											id: "enabled-first",
+											uid: "enabled-first",
 											show: true,
 											enable: true,
 											rules: [],
 										},
 										{
 											...line,
-											id: "enabled-second",
+											uid: "enabled-second",
 											show: true,
 											enable: true,
 											rules: [],
@@ -275,26 +275,26 @@ it("updates displayed lines from live Show/Hide rules without treating disabled 
 				),
 			};
 			await act(async () => root.render(<Probe />));
-			expect(output?.detail?.lines.map((line) => line.id)).toEqual(
+			expect(output?.detail?.lines.map((line) => line.uid)).toEqual(
 				disabled
 					? [
 							"enabled-first",
 							"enabled-second",
 							"disabled-first",
-							lineId,
+							lineUid,
 						]
 					: [
-							lineId,
+							lineUid,
 							"enabled-first",
 							"enabled-second",
 							"disabled-first",
 						],
 			);
-			expect(output?.detail?.disabledLineIds).toEqual(
+			expect(output?.detail?.disabledLineUids).toEqual(
 				disabled
 					? [
 							"disabled-first",
-							lineId,
+							lineUid,
 						]
 					: [
 							"disabled-first",
@@ -303,10 +303,10 @@ it("updates displayed lines from live Show/Hide rules without treating disabled 
 			expect(
 				state.runtime.items
 					.find((item) => item.id === ownerId)
-					?.item.lines.map((line) => line.id),
+					?.item.lines.map((line) => line.uid),
 			).toEqual([
 				"disabled-first",
-				lineId,
+				lineUid,
 				"enabled-first",
 				"enabled-second",
 			]);

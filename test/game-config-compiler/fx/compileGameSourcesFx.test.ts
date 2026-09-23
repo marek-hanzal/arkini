@@ -196,7 +196,7 @@ describe("compileGameSourcesFx", () => {
 			lines: [
 				createLine({
 					default: true,
-					id: "line:default",
+					uid: "line:default",
 				}),
 			],
 		});

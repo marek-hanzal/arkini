@@ -13,7 +13,7 @@ import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/supp
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 
 const ownerItemId = "runtime:forge";
-const lineId = "line:forge:run";
+const lineUid = "line:forge:run";
 
 const createDefaultLineConfig = (capacity: number) => {
 	const base = createJobTestConfig(capacity);
@@ -26,7 +26,7 @@ const createDefaultLineConfig = (capacity: number) => {
 				...forge,
 				lines: forge.lines.map((line) => ({
 					...line,
-					default: line.id === lineId,
+					default: line.uid === lineUid,
 				})),
 			},
 		},
@@ -78,7 +78,7 @@ describe("fillDefaultLineQueueFx", () => {
 
 		expect(result.filled).toMatchObject({
 			capacity: 5,
-			lineId,
+			lineUid,
 			used: 5,
 		});
 		expect(result.filled.added).toHaveLength(3);
@@ -123,7 +123,7 @@ describe("fillDefaultLineQueueFx", () => {
 		expect(result.second).toEqual({
 			added: [],
 			capacity: 5,
-			lineId,
+			lineUid,
 			used: 5,
 		});
 		expect(result.after).toBe(result.before);
@@ -134,7 +134,7 @@ describe("fillDefaultLineQueueFx", () => {
 			Effect.gen(function* () {
 				yield* prepareJobLineFx();
 				yield* startLineFx({
-					lineId,
+					lineUid,
 					ownerItemId,
 				});
 				yield* enqueueDefaultLineFx({
@@ -169,7 +169,7 @@ describe("fillDefaultLineQueueFx", () => {
 				yield* spawnOwnerFx;
 				yield* setLineSelectionFx({
 					selection: "default",
-					lineId: null,
+					lineUid: null,
 					ownerItemId,
 				});
 				const before = yield* (yield* CommittedTransitionsFx).read;

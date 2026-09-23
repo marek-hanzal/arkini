@@ -18,7 +18,7 @@ export const InvalidInputUnitsDiagnosticSchema = z
 			"Error",
 		]),
 		ownerItemUid: IdSchema,
-		lineId: IdSchema,
+		lineUid: IdSchema,
 		inputIndex: z.number().int().nonnegative(),
 		reason: InvalidInputUnitsReasonEnumSchema,
 	})

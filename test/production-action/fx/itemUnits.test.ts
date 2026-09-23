@@ -24,7 +24,7 @@ describe("item units / owner lifecycle", () => {
 				});
 				yield* startLineFx({
 					ownerItemId: well.id,
-					lineId: "line:self-well:water",
+					lineUid: "line:self-well:water",
 				});
 				const firstStart = yield* (yield* CommittedTransitionsFx).read;
 				expect(
@@ -36,7 +36,7 @@ describe("item units / owner lifecycle", () => {
 				});
 				yield* startLineFx({
 					ownerItemId: well.id,
-					lineId: "line:self-well:water",
+					lineUid: "line:self-well:water",
 				});
 				expect(
 					(yield* readRuntimeFx()).items.find((item) => item.id === well.id)
@@ -91,7 +91,7 @@ describe("item units / owner lifecycle", () => {
 				});
 				yield* startLineFx({
 					ownerItemId: shrine.id,
-					lineId: "line:shrine:pray",
+					lineUid: "line:shrine:pray",
 				});
 				const firstStart = yield* (yield* CommittedTransitionsFx).read;
 				let current = yield* readRuntimeFx();
@@ -101,7 +101,7 @@ describe("item units / owner lifecycle", () => {
 				});
 				yield* startLineFx({
 					ownerItemId: shrine.id,
-					lineId: "line:shrine:pray",
+					lineUid: "line:shrine:pray",
 				});
 				const finalStart = yield* (yield* CommittedTransitionsFx).read;
 				current = yield* readRuntimeFx();

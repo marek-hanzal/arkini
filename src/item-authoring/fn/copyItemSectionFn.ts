@@ -1,3 +1,4 @@
+import type { LineSchema } from "~/production-line/schema/LineSchema";
 import type { FormValues } from "~/item-authoring/schema/FormSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 
@@ -5,11 +6,12 @@ export namespace copyItemSectionFn {
 	export type Section = "identity" | "artwork" | "production" | "merges" | "units" | "clock";
 }
 
-/** Replaces one authored section while retaining destination identity and unrelated capabilities. */
+/** Replaces one section; the caller supplies freshly identified production lines for copying. */
 export const copyItemSectionFn = (
 	current: FormValues,
 	source: ItemSchema.Type,
 	section: copyItemSectionFn.Section,
+	productionLines: readonly LineSchema.Type[],
 ): FormValues => {
 	if (current.uid === source.uid) return current;
 	switch (section) {
@@ -35,7 +37,9 @@ export const copyItemSectionFn = (
 		case "production":
 			return {
 				...current,
-				lines: structuredClone(source.lines),
+				lines: structuredClone([
+					...productionLines,
+				]),
 				maxQueueSize: source.maxQueueSize,
 			};
 		case "merges":

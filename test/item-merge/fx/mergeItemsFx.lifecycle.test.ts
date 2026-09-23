@@ -43,7 +43,7 @@ const producerItem = ({
 	merge,
 	lines: [
 		{
-			id: `line:${id}`,
+			uid: `line:${id}`,
 			title: `line:${id}`,
 			description: `line:${id}`,
 			runtimeMs: 1_000,
@@ -274,7 +274,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 						? {
 								scope: "input" as const,
 								ownerItemId: "runtime:owner",
-								lineId: "line:owner",
+								lineUid: "line:owner",
 								inputIndex: 0,
 							}
 						: {
@@ -312,7 +312,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 									{
 										id: "job:owner",
 										ownerItemId: "runtime:owner",
-										lineId: "line:owner",
+										lineUid: "line:owner",
 										durationMs: 1_000,
 										remainingMs: 1_000,
 									},
@@ -367,7 +367,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 								{
 									id: "job:source",
 									ownerItemId: "runtime:source",
-									lineId: "line:source",
+									lineUid: "line:source",
 									durationMs: 1_000,
 									remainingMs: 1_000,
 								},
@@ -379,7 +379,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 								{
 									id: "request:source",
 									ownerItemId: "runtime:source",
-									lineId: "line:source",
+									lineUid: "line:source",
 								},
 							]
 						: [],
@@ -436,7 +436,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 					itemUid: "child",
 					location: {
 						inputIndex: 0,
-						lineId: "line:source",
+						lineUid: "line:source",
 						ownerItemId: "runtime:source",
 						scope: "input",
 					},
@@ -464,12 +464,12 @@ describe("mergeItemsFx participant lifecycle", () => {
 					jobQueue: [
 						{
 							id: "request:unrelated",
-							lineId: "line:child",
+							lineUid: "line:child",
 							ownerItemId: "runtime:unrelated",
 						},
 						{
 							id: "request:child",
-							lineId: "line:child",
+							lineUid: "line:child",
 							ownerItemId: "runtime:child",
 						},
 					],
@@ -537,7 +537,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 					{
 						id: "job:target",
 						ownerItemId: "runtime:target",
-						lineId: "line:target",
+						lineUid: "line:target",
 						durationMs: 1_000,
 						remainingMs: 1_000,
 					},
@@ -594,7 +594,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 						location: {
 							scope: "input",
 							ownerItemId: "runtime:source",
-							lineId: "line:source",
+							lineUid: "line:source",
 							inputIndex: 0,
 						},
 					},
@@ -862,7 +862,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 						location: {
 							scope: "input",
 							ownerItemId: "runtime:target",
-							lineId: "line:target",
+							lineUid: "line:target",
 							inputIndex: 0,
 						},
 

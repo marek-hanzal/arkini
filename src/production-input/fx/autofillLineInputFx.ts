@@ -15,7 +15,7 @@ import { autofillLineInputsRuntimeFx } from "~/production-input/fx/autofillLineI
 export namespace autofillLineInputFx {
 	export interface Props {
 		readonly ownerItemId: IdSchema.Type;
-		readonly lineId: IdSchema.Type;
+		readonly lineUid: IdSchema.Type;
 		readonly inputIndex: number;
 	}
 }

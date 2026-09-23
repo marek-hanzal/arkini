@@ -6,7 +6,7 @@ export const JobQueueRequestSchema = z
 	.object({
 		id: IdSchema,
 		ownerItemId: IdSchema,
-		lineId: IdSchema,
+		lineUid: IdSchema,
 	})
 	.strict()
 	.meta({

@@ -18,7 +18,7 @@ const expiryOutput = createOutput([
 	},
 ]);
 const materialLine = createLine({
-	id: "material",
+	uid: "material",
 	default: true,
 	clock: true,
 	input: [
@@ -93,12 +93,12 @@ describe("Clock expiry settlement", () => {
 			expect(result.expired.jobs).toHaveLength(1);
 			expect(result.expired.jobQueue).toMatchObject([
 				{
-					lineId: "a",
+					lineUid: "a",
 				},
 			]);
 			expect(result.nextJob.jobs).toMatchObject([
 				{
-					lineId: "a",
+					lineUid: "a",
 					remainingMs: 100,
 				},
 			]);
@@ -284,7 +284,7 @@ describe("Clock expiry settlement", () => {
 					config: createClockConfig({
 						lines: [
 							createLine({
-								id: "unused",
+								uid: "unused",
 							}),
 						],
 						clock: {

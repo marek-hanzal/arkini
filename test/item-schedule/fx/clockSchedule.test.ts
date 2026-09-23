@@ -20,7 +20,7 @@ describe("Clock schedule boundaries", () => {
 				yield* setLineSelectionFx({
 					selection: "clock",
 					ownerItemId,
-					lineIds: [
+					lineUids: [
 						"b",
 					],
 				});
@@ -28,7 +28,7 @@ describe("Clock schedule boundaries", () => {
 				yield* setLineSelectionFx({
 					selection: "clock",
 					ownerItemId,
-					lineIds: [
+					lineUids: [
 						"a",
 					],
 				});
@@ -49,19 +49,19 @@ describe("Clock schedule boundaries", () => {
 		expect(result.before.items[0].schedule?.remainingIntervalMs).toBe(50);
 		expect(result.pulse.jobs).toMatchObject([
 			{
-				lineId: "a",
+				lineUid: "a",
 				remainingMs: 400,
 			},
 		]);
 		expect(result.pulse.items[0].schedule?.remainingIntervalMs).toBe(200);
 		expect(result.second.jobQueue).toMatchObject([
 			{
-				lineId: "b",
+				lineUid: "b",
 			},
 		]);
 		expect(result.third.jobs).toMatchObject([
 			{
-				lineId: "a",
+				lineUid: "a",
 				remainingMs: 400,
 			},
 		]);
@@ -140,12 +140,12 @@ describe("Clock schedule boundaries", () => {
 				yield* setLineSelectionFx({
 					ownerItemId,
 					selection: "default",
-					lineId: "b",
+					lineUid: "b",
 				});
 				yield* setLineSelectionFx({
 					ownerItemId,
 					selection: "clock",
-					lineIds: [],
+					lineUids: [],
 				});
 				const silent = yield* tickClockFx(300);
 				const hydrated = yield* fromStateFx({
@@ -156,14 +156,14 @@ describe("Clock schedule boundaries", () => {
 				yield* setLineSelectionFx({
 					ownerItemId,
 					selection: "clock",
-					lineIds: [
+					lineUids: [
 						"b",
 					],
 				});
 				yield* setLineSelectionFx({
 					ownerItemId,
 					selection: "default",
-					lineId: "a",
+					lineUid: "a",
 				});
 				const selected = yield* tickClockFx(100);
 				return {
@@ -182,7 +182,7 @@ describe("Clock schedule boundaries", () => {
 			),
 		);
 		expect(result.silent.items[0].schedule).toEqual({
-			lineIds: [],
+			lineUids: [],
 			pulseSequence: 1,
 			remainingIntervalMs: 100,
 			remainingDurationMs: 600,
@@ -193,7 +193,7 @@ describe("Clock schedule boundaries", () => {
 		expect(result.hydrated.defaultLineByOwnerItemId[ownerItemId]).toBe("b");
 		expect(result.selected.defaultLineByOwnerItemId[ownerItemId]).toBe("a");
 		expect(result.selected.items[0].schedule).toEqual({
-			lineIds: [
+			lineUids: [
 				"b",
 			],
 			pulseSequence: 2,
@@ -202,7 +202,7 @@ describe("Clock schedule boundaries", () => {
 		});
 		expect(result.selected.jobs).toMatchObject([
 			{
-				lineId: "b",
+				lineUid: "b",
 				remainingMs: 100,
 			},
 		]);

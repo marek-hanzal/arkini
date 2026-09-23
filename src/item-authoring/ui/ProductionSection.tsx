@@ -1,3 +1,4 @@
+import { createId } from "@paralleldrive/cuid2";
 import { ProductionLineOption } from "~/production-authoring/ui/ProductionLineOption";
 import { readCapabilityRelatedTermsFn } from "~/item-authoring/fn/readCapabilityRelatedTermsFn";
 import { createLineFn } from "~/production-authoring/fn/createLineFn";
@@ -30,10 +31,9 @@ const ProductionFields = withFieldGroupFn({
 	defaultValues: defaultProductionFieldValues,
 	props: {
 		invalidLineIndex: undefined as number | undefined,
-		selectedLineId: undefined as string | undefined,
-		selectedLineIndex: undefined as number | undefined,
+		selectedLineUid: undefined as string | undefined,
 	},
-	render: ({ group, invalidLineIndex, selectedLineId, selectedLineIndex }) => {
+	render: ({ group, invalidLineIndex, selectedLineUid }) => {
 		const translator = useTranslator();
 		const { form, project } = useFormSession();
 		return (
@@ -67,7 +67,7 @@ const ProductionFields = withFieldGroupFn({
 							const lines = linesField.state.value ?? [];
 							const addLineFn = () => {
 								const currentLines = form.state.values.lines ?? [];
-								const line = createLineFn(currentLines, "", "");
+								const line = createLineFn(currentLines, "", "", createId());
 								form.setFieldValue("lines", [
 									...currentLines,
 									line,
@@ -93,7 +93,7 @@ const ProductionFields = withFieldGroupFn({
 											/>
 										)}
 										itemSearchTermsFn={(index) => [
-											lines[index].id,
+											lines[index].uid,
 											lines[index].description,
 										]}
 										itemRelatedSearchTermsFn={(index) =>
@@ -102,17 +102,10 @@ const ProductionFields = withFieldGroupFn({
 												project.config.items,
 											)
 										}
-										initialSelectedIndex={
-											selectedLineIndex !== undefined &&
-											lines[selectedLineIndex]?.id === selectedLineId
-												? selectedLineIndex
-												: Math.max(
-														0,
-														lines.findIndex(
-															(line) => line.id === selectedLineId,
-														),
-													)
-										}
+										initialSelectedIndex={Math.max(
+											0,
+											lines.findIndex((line) => line.uid === selectedLineUid),
+										)}
 										selectedIndex={invalidLineIndex}
 										label={translator.textFn("Product lines")}
 										navigationCard
@@ -120,8 +113,8 @@ const ProductionFields = withFieldGroupFn({
 										onDuplicateFn={(index) => {
 											const currentLines = form.state.values.lines ?? [];
 											const duplicate = duplicateLineFn(
-												currentLines,
 												currentLines[index],
+												createId(),
 											);
 											form.setFieldValue("lines", [
 												...currentLines.slice(0, index + 1),
@@ -161,7 +154,7 @@ const ProductionFields = withFieldGroupFn({
 });
 
 export const ProductionSection = () => {
-	const { form, productionLineId, productionLineIndex } = useFormSession();
+	const { form, productionLineUid } = useFormSession();
 	const lines = useStore(form.store, (state) => state.values.lines);
 	const invalidLineIndex = useFormValidationFocusIndex(lines);
 	return (
@@ -172,8 +165,7 @@ export const ProductionSection = () => {
 				lines: "lines",
 			}}
 			invalidLineIndex={invalidLineIndex}
-			selectedLineId={productionLineId}
-			selectedLineIndex={productionLineIndex}
+			selectedLineUid={productionLineUid}
 		/>
 	);
 };

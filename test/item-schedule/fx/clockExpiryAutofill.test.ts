@@ -12,7 +12,7 @@ const runRangePulseFx = (durationMs: number) =>
 		const material = yield* spawnClockItemFx("permit", 1);
 		yield* bufferInputMaterialForTestFx({
 			ownerItemId: "runtime:clock",
-			lineId: "range",
+			lineUid: "range",
 			inputIndex: 0,
 			sourceItemId: material.id,
 			sourceItemRevision: material.revision,
@@ -43,7 +43,7 @@ const runRangePulseFx = (durationMs: number) =>
 				lines: [
 					{
 						...createLine({
-							id: "range",
+							uid: "range",
 							clock: true,
 							input: [
 								{
@@ -81,7 +81,7 @@ describe("Clock expiry and optional Autofill", () => {
 		expect(pulsed.jobs).toMatchObject([
 			{
 				ownerItemId: "runtime:clock",
-				lineId: "range",
+				lineUid: "range",
 				remainingMs: 500,
 			},
 		]);
@@ -103,7 +103,7 @@ describe("Clock expiry and optional Autofill", () => {
 		expect(pulsed.jobQueue).toMatchObject([
 			{
 				ownerItemId: "runtime:clock",
-				lineId: "range",
+				lineUid: "range",
 			},
 		]);
 		expect(pulsed.items.find((item) => item.id === "spare")?.location).toMatchObject({

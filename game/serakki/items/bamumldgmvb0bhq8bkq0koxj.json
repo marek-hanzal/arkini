@@ -60,7 +60,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "idle",
+				"uid": "el8b32zf81owh8crugxc15xd",
 				"title": "Idle",
 				"description": "The kitten pauses for almost a whole moment.",
 				"clock": true,
@@ -77,7 +77,7 @@
 				"rules": []
 			},
 			{
-				"id": "wander",
+				"uid": "d6lyvh4mrhzfq64kzujg95qw",
 				"title": "Wander",
 				"artwork": "r93kw8rkdkuwo21gm6fu6i57",
 				"description": "Wanders somewhere else.",
@@ -131,7 +131,7 @@
 				"rules": []
 			},
 			{
-				"id": "get-hungry",
+				"uid": "hjs9kksjvbadzlhsy2zhay7d",
 				"title": "Get Hungry",
 				"description": "The kitten gets hungry.",
 				"clock": true,
@@ -194,7 +194,7 @@
 				"rules": []
 			},
 			{
-				"id": "get-sick",
+				"uid": "qui5jcrlovorqbsd4j2hpy2f",
 				"title": "Get Sick",
 				"description": "The kitten may become sick.",
 				"clock": true,
@@ -247,7 +247,7 @@
 				"rules": []
 			},
 			{
-				"id": "disease-exposure",
+				"uid": "cn4slu2993a9s967u56z2lkz",
 				"title": "Disease Exposure",
 				"artwork": "fnom9s6mxxkza9m7iahgp5k9",
 				"description": "Nearby disease increases the chance of illness.",
@@ -317,7 +317,7 @@
 				]
 			},
 			{
-				"id": "plague-exposure",
+				"uid": "zuk7u24zwsoo5do16ja6pg10",
 				"title": "Plague Exposure",
 				"artwork": "j23vl46e91a44u0vt6qlcojt",
 				"description": "Nearby plague increases the chance of illness.",
@@ -387,7 +387,7 @@
 				]
 			},
 			{
-				"id": "cuddle-cat",
+				"uid": "dqfe7lxblugore8vr5d16m4o",
 				"title": "Cuddle Cat",
 				"artwork": "ecd9h52614atfopdxdtmtfvo",
 				"description": "The kitten seeks out an adult cat for a cuddle.",

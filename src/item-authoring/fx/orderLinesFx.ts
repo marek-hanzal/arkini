@@ -10,13 +10,13 @@ import { saveWithRepositoryFx } from "./saveWithRepositoryFx";
 export const orderLinesFx = Effect.fn("orderItemLinesFx")(function* ({
 	project,
 	itemUid,
-	lineIds,
+	lineUids,
 	revision,
 	repository,
 }: {
 	readonly project: Project;
 	readonly itemUid: string;
-	readonly lineIds: ReadonlyArray<string>;
+	readonly lineUids: ReadonlyArray<string>;
 	readonly revision: number;
 	readonly repository: ProjectRepositoryService;
 }) {
@@ -36,35 +36,28 @@ export const orderLinesFx = Effect.fn("orderItemLinesFx")(function* ({
 				message: `Revision ${revision} is stale; the open project is at revision ${project.revision}. Read item_config again before ordering lines.`,
 			}),
 		);
-	const byId = new Map(
+	const byUid = new Map(
 		item.lines.map((line) => [
-			line.id,
+			line.uid,
 			line,
 		]),
 	);
-	if (byId.size !== item.lines.length)
-		return yield* Effect.fail(
-			new ProjectOperationError({
-				reason: "invalid-item",
-				message: `Item ${itemUid} has duplicate line IDs; their order is ambiguous.`,
-			}),
-		);
-	if (new Set(lineIds).size !== lineIds.length)
+	if (new Set(lineUids).size !== lineUids.length)
 		return yield* Effect.fail(
 			new ProjectOperationError({
 				reason: "invalid-item",
 				message:
-					"lineIds must contain each line ID exactly once; duplicates are not allowed.",
+					"lineUids must contain each line UID exactly once; duplicates are not allowed.",
 			}),
 		);
 	const lines = [];
-	for (const lineId of lineIds) {
-		const line = byId.get(lineId);
+	for (const lineUid of lineUids) {
+		const line = byUid.get(lineUid);
 		if (line === undefined)
 			return yield* Effect.fail(
 				new ProjectOperationError({
 					reason: "invalid-item",
-					message: `Line ${lineId} does not exist on item ${itemUid}.`,
+					message: `Line ${lineUid} does not exist on item ${itemUid}.`,
 				}),
 			);
 		lines.push(line);
@@ -73,7 +66,7 @@ export const orderLinesFx = Effect.fn("orderItemLinesFx")(function* ({
 		return yield* Effect.fail(
 			new ProjectOperationError({
 				reason: "invalid-item",
-				message: `lineIds must include all ${item.lines.length} lines on item ${itemUid}; received ${lines.length}.`,
+				message: `lineUids must include all ${item.lines.length} lines on item ${itemUid}; received ${lines.length}.`,
 			}),
 		);
 	// The repository checks the revision again so a concurrent edit cannot be overwritten.

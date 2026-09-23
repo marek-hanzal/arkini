@@ -22,7 +22,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "idle",
+				"uid": "l07ekcr8o4250ei73wd3optu",
 				"title": "Idle",
 				"description": "The cat is recovering.",
 				"clock": true,
@@ -39,7 +39,7 @@
 				"rules": []
 			},
 			{
-				"id": "wander",
+				"uid": "fjpnakew320irnb5hquq3zyn",
 				"title": "Wander",
 				"artwork": "ukzyjazcrg9yjjzv3m17mbde",
 				"description": "Wanders somewhere else.",
@@ -93,7 +93,7 @@
 				"rules": []
 			},
 			{
-				"id": "recover",
+				"uid": "tdivpett5qo1bdpc2smy5bta",
 				"title": "Recover",
 				"description": "The cat recovers.",
 				"clock": true,
@@ -146,7 +146,7 @@
 				"rules": []
 			},
 			{
-				"id": "relapse",
+				"uid": "jwg8l5ha56ikvtmzzl5nk26b",
 				"title": "Relapse",
 				"description": "Recovery may fail.",
 				"clock": true,
@@ -199,7 +199,7 @@
 				"rules": []
 			},
 			{
-				"id": "disease-relapse",
+				"uid": "cngd6rm09ph7lqpxbvofsd91",
 				"title": "Disease Relapse",
 				"artwork": "fnom9s6mxxkza9m7iahgp5k9",
 				"description": "Nearby disease increases the chance of illness.",
@@ -269,7 +269,7 @@
 				]
 			},
 			{
-				"id": "plague-relapse",
+				"uid": "lskpkjtlq8sxfswc549tnwlt",
 				"title": "Plague Relapse",
 				"artwork": "j23vl46e91a44u0vt6qlcojt",
 				"description": "Nearby plague increases the chance of illness.",

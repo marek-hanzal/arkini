@@ -55,7 +55,7 @@ export const advanceItemSchedulesFx = Effect.fn("advanceItemSchedulesFx")(functi
 				if (line === undefined) return undefined;
 				return yield* enqueueLineRuntimeFx({
 					ownerItemId: item.id,
-					lineId: line.id,
+					lineUid: line.uid,
 					runtime: draft,
 				});
 			}).pipe(

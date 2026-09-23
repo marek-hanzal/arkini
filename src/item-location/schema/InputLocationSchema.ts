@@ -20,9 +20,9 @@ export const InputLocationSchema = z
 		 */
 		ownerItemId: IdSchema.describe("The runtime item that owns this input buffer."),
 		/**
-		 * Stable ID of the owner product line.
+		 * Stable UID of the owner product line.
 		 */
-		lineId: IdSchema.describe("The stable ID of the owner product line."),
+		lineUid: IdSchema.describe("The stable UID of the owner product line."),
 		/**
 		 * Zero-based position of this material input inside the product line.
 		 */

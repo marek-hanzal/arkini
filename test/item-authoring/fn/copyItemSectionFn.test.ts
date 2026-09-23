@@ -16,7 +16,7 @@ const source = ItemSchema.parse({
 	maxQueueSize: 3,
 	lines: [
 		{
-			id: "source-line",
+			uid: "source-line",
 			title: "Line",
 			description: "Line",
 			default: true,
@@ -77,11 +77,11 @@ const destination: FormValues = {
 	lines: [
 		{
 			...source.lines[0],
-			id: "old-line",
+			uid: "old-line",
 		},
 		{
 			...source.lines[0],
-			id: "extra-line",
+			uid: "extra-line",
 		},
 	],
 };
@@ -89,8 +89,18 @@ const destination: FormValues = {
 describe("section copy ownership", () => {
 	it("replaces every production line without mutating the source or other draft sections", () => {
 		const before = structuredClone(source);
-		const result = copyItemSectionFn(destination, source, "production");
-		expect(result.lines).toEqual(source.lines);
+		const result = copyItemSectionFn(destination, source, "production", [
+			{
+				...source.lines[0],
+				uid: "fresh-line",
+			},
+		]);
+		expect(result.lines).toEqual([
+			{
+				...source.lines[0],
+				uid: "fresh-line",
+			},
+		]);
 		expect(result.lines).toHaveLength(1);
 		expect(result.lines).not.toBe(source.lines);
 		expect(result.lines?.[0].input).not.toBe(source.lines[0].input);
@@ -120,6 +130,7 @@ describe("section copy ownership", () => {
 				clock: undefined,
 			},
 			"identity",
+			[],
 		);
 		expect(result).toMatchObject({
 			uid: "destination",
@@ -142,6 +153,7 @@ describe("section copy ownership", () => {
 				},
 			},
 			"artwork",
+			[],
 		);
 		expect(result.artwork).toEqual({
 			scale: 0.5,
@@ -167,6 +179,7 @@ describe("section copy ownership", () => {
 				clock: undefined,
 			},
 			section,
+			[],
 		);
 		expect(result[section === "merges" ? "merge" : section]).toBeUndefined();
 		expect(result.artwork).toBe(current.artwork);
@@ -180,6 +193,7 @@ describe("section copy ownership", () => {
 				},
 				source,
 				"production",
+				[],
 			).lines,
 		).toBe(destination.lines);
 	});

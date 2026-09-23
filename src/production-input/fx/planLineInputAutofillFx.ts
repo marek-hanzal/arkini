@@ -18,7 +18,7 @@ export namespace planLineInputAutofillFx {
 		/** Omission plans the whole line; a target allocates only this material slot. */
 		readonly inputIndex?: number;
 		readonly ownerItemId: IdSchema.Type;
-		readonly lineId: IdSchema.Type;
+		readonly lineUid: IdSchema.Type;
 		readonly runtime: RuntimeSchema.Type;
 	}
 
@@ -58,12 +58,12 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 	includeIncomingDeliveries = true,
 	inputIndex: targetInputIndex,
 	ownerItemId,
-	lineId,
+	lineUid,
 	runtime,
 }: planLineInputAutofillFx.Props) {
 	const { line, owner } = yield* readBoardItemLineFx({
 		ownerItemId,
-		lineId,
+		lineUid,
 		runtime,
 	});
 	const candidatesById = new Map<string, BoardRuntimeItemSchema.Type>();
@@ -86,14 +86,14 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 			(item) =>
 				item.location.scope === LocationScopeEnumSchema.enum.Input &&
 				item.location.ownerItemId === ownerItemId &&
-				item.location.lineId === lineId &&
+				item.location.lineUid === lineUid &&
 				item.location.inputIndex === inputIndex,
 		);
 		const storedQuantity = storedItems.length;
 		const incomingQuantity = includeIncomingDeliveries
 			? readLineInputDeliveryClaimsFn({
 					inputIndex,
-					lineId,
+					lineUid,
 					ownerItemId,
 					runtime,
 				}).length
@@ -105,7 +105,7 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 		});
 		const closed = isLineInputClosedFn({
 			ownerItemId,
-			lineId,
+			lineUid,
 			runtime,
 		});
 		const matchingItems = readLineInputAutofillSourcesFn({

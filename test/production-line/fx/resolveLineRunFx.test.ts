@@ -12,7 +12,7 @@ import {
 const resolveFx = (runtime: ReturnType<typeof lineRunRuntime>) => {
 	return resolveLineRunFx({
 		ownerItemId: "runtime:workshop",
-		lineId: "line:workshop:build",
+		lineUid: "line:workshop:build",
 		runtime,
 	}).pipe(Effect.provideService(GameConfigFx, lineRunTestConfig));
 };

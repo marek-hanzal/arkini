@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { LineSchema } from "~/production-line/schema/LineSchema";
 import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 
@@ -20,10 +21,16 @@ export const CreateItemInputSchema = z
 		maxQueueSize: PositiveIntegerSchema.optional().describe(
 			"Optional accepted active and queued work count; defaults to one.",
 		),
-		lines: ItemSchema.shape.lines
-			.removeDefault()
+		lines: z
+			.array(
+				LineSchema.omit({
+					uid: true,
+				}),
+			)
 			.optional()
-			.describe("Optional production lines; omitted or empty lines create a passive item."),
+			.describe(
+				"Optional production lines without UIDs; every line receives a fresh immutable UID. Omitted or empty lines create a passive item.",
+			),
 	})
 	.strict()
 	.meta({

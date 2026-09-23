@@ -14,7 +14,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "iron-ingot",
+				"uid": "ofh8ety6tz4siepdqdnksrba",
 				"title": "Iron Ingot",
 				"description": "Make an iron ingot",
 				"default": false,
@@ -67,7 +67,7 @@
 				"rules": []
 			},
 			{
-				"id": "copper-ingot",
+				"uid": "kwherb5sfxbinhbaoltt34s7",
 				"title": "Copper Ingot",
 				"description": "Copper stuff",
 				"default": false,

@@ -16,13 +16,13 @@ import { RuleTypeSchema } from "~/production-line/schema/RuleTypeSchema";
 
 interface ItemDetailQueueRequest {
 	readonly requestId: IdSchema.Type;
-	readonly lineId: IdSchema.Type;
+	readonly lineUid: IdSchema.Type;
 	readonly status: "inputs-ready" | "waiting-inputs" | "blocked-active" | "blocked-condition";
 }
 
 interface ItemDetailQueueActiveJob {
 	readonly jobId: IdSchema.Type;
-	readonly lineId: IdSchema.Type;
+	readonly lineUid: IdSchema.Type;
 	readonly status: JobStatusEnumSchema.Type;
 }
 
@@ -47,22 +47,22 @@ const unavailable = {
 	kind: "unavailable",
 } as const satisfies readItemDetailQueueFx.Result;
 
-const readVisibleWorkLineIdsFx = Effect.fn("readVisibleWorkLineIdsFx")(function* ({
+const readVisibleWorkLineUidsFx = Effect.fn("readVisibleWorkLineUidsFx")(function* ({
 	lineOwner,
 	owner,
 	runtime,
-	workLineIds,
+	workLineUids,
 }: {
 	readonly lineOwner: ItemSchema.Type;
 	readonly owner: RuntimeSchema.Type["items"][number];
 	readonly runtime: RuntimeSchema.Type;
-	readonly workLineIds: ReadonlySet<IdSchema.Type>;
+	readonly workLineUids: ReadonlySet<IdSchema.Type>;
 }) {
-	const visibleLineIds = new Set<IdSchema.Type>();
+	const visibleLineUids = new Set<IdSchema.Type>();
 	for (const line of lineOwner.lines) {
-		if (!workLineIds.has(line.id)) continue;
+		if (!workLineUids.has(line.uid)) continue;
 		if (owner.location.scope !== LocationScopeEnumSchema.enum.Board) {
-			if (line.show) visibleLineIds.add(line.id);
+			if (line.show) visibleLineUids.add(line.uid);
 			continue;
 		}
 		const visibilityRules = line.rules.filter(
@@ -83,9 +83,9 @@ const readVisibleWorkLineIdsFx = Effect.fn("readVisibleWorkLineIdsFx")(function*
 				rules,
 			})
 		)
-			visibleLineIds.add(line.id);
+			visibleLineUids.add(line.uid);
 	}
-	return visibleLineIds;
+	return visibleLineUids;
 });
 
 /** Projects active and queued line work for one exact line owner. */
@@ -99,17 +99,17 @@ export const readItemDetailQueueFx = Effect.fn("readItemDetailQueueFx")(function
 	if (Option.isNone(lineOwner)) return unavailable;
 	const allActive = runtime.jobs.filter((job) => job.ownerItemId === owner.id);
 	const allRequests = runtime.jobQueue.filter((request) => request.ownerItemId === owner.id);
-	const visibleWorkLineIds = yield* readVisibleWorkLineIdsFx({
+	const visibleWorkLineUids = yield* readVisibleWorkLineUidsFx({
 		lineOwner: lineOwner.value,
 		owner,
 		runtime,
-		workLineIds: new Set([
-			...allActive.map((job) => job.lineId),
-			...allRequests.map((request) => request.lineId),
+		workLineUids: new Set([
+			...allActive.map((job) => job.lineUid),
+			...allRequests.map((request) => request.lineUid),
 		]),
 	});
 	const active = yield* Effect.forEach(
-		allActive.filter((job) => visibleWorkLineIds.has(job.lineId)),
+		allActive.filter((job) => visibleWorkLineUids.has(job.lineUid)),
 		(job) =>
 			resolveActiveJobStatusFx({
 				job,
@@ -117,12 +117,12 @@ export const readItemDetailQueueFx = Effect.fn("readItemDetailQueueFx")(function
 			}).pipe(
 				Effect.map((status) => ({
 					jobId: job.id,
-					lineId: job.lineId,
+					lineUid: job.lineUid,
 					status,
 				})),
 			),
 	);
-	const requests = allRequests.filter((request) => visibleWorkLineIds.has(request.lineId));
+	const requests = allRequests.filter((request) => visibleWorkLineUids.has(request.lineUid));
 	const projectedRequests = yield* Effect.forEach(requests, (request) =>
 		Effect.gen(function* () {
 			let status: ItemDetailQueueRequest["status"] =
@@ -133,7 +133,7 @@ export const readItemDetailQueueFx = Effect.fn("readItemDetailQueueFx")(function
 			) {
 				const start = yield* resolveLineStartFx({
 					ownerItemId: owner.id,
-					lineId: request.lineId,
+					lineUid: request.lineUid,
 					runtime,
 				});
 				const nonMaterialInputsReady = start.run.input.every(
@@ -149,7 +149,7 @@ export const readItemDetailQueueFx = Effect.fn("readItemDetailQueueFx")(function
 					if (Result.isSuccess(hardConditions)) {
 						const coverage = yield* readLineInputAutofillCoverageFx({
 							ownerItemId: owner.id,
-							lineId: request.lineId,
+							lineUid: request.lineUid,
 							runtime,
 						});
 						if (coverage.type === "incomplete" || coverage.plan.entry.length > 0) {
@@ -163,7 +163,7 @@ export const readItemDetailQueueFx = Effect.fn("readItemDetailQueueFx")(function
 			}
 			return {
 				requestId: request.id,
-				lineId: request.lineId,
+				lineUid: request.lineUid,
 				status,
 			} satisfies ItemDetailQueueRequest;
 		}),

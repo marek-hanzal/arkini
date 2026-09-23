@@ -23,7 +23,7 @@ describe("blueprint completion lifecycle", () => {
 				});
 				yield* startLineFx({
 					ownerItemId: owner.id,
-					lineId: "line:blueprint:plain",
+					lineUid: "line:blueprint:plain",
 				});
 				const runtime = yield* readRuntimeFx();
 				const state = fromRuntimeFn({

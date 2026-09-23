@@ -32,14 +32,14 @@ describe("craft job completion transition", () => {
 				});
 				yield* bufferInputMaterialForTestFx({
 					ownerItemId: owner.id,
-					lineId: "line:craft:reserve",
+					lineUid: "line:craft:reserve",
 					inputIndex: 0,
 					sourceItemId: tool.id,
 					sourceItemRevision: tool.revision,
 				});
 				yield* startLineFx({
 					ownerItemId: owner.id,
-					lineId: "line:craft:reserve",
+					lineUid: "line:craft:reserve",
 				});
 				yield* runTickRuntimeByFx({
 					elapsedMs: 200,
@@ -95,7 +95,7 @@ describe("craft job completion transition", () => {
 				});
 				yield* startLineFx({
 					ownerItemId: owner.id,
-					lineId: "line:craft:ordered-outcome",
+					lineUid: "line:craft:ordered-outcome",
 				});
 				yield* runTickRuntimeByFx({
 					elapsedMs: 200,
@@ -137,7 +137,7 @@ describe("craft job completion transition", () => {
 				});
 				yield* startLineFx({
 					ownerItemId: owner.id,
-					lineId: "line:craft:sink",
+					lineUid: "line:craft:sink",
 				});
 				yield* runTickRuntimeByFx({
 					elapsedMs: 200,

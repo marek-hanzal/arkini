@@ -249,7 +249,7 @@ describe("PixiBoardSurface", () => {
 			},
 			primaryAction: {
 				kind: "enqueue-default-line",
-				lineId: "line:default",
+				lineUid: "line:default",
 				queue: {
 					available: true,
 					capacity: 5,

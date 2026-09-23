@@ -22,7 +22,7 @@ describe("item units / readiness and selection", () => {
 				});
 				return yield* readLineRunFx({
 					ownerItemId: owner.id,
-					lineId: "line:overdrawn:work",
+					lineUid: "line:overdrawn:work",
 				});
 			}),
 		);
@@ -47,7 +47,7 @@ describe("item units / readiness and selection", () => {
 				});
 				yield* startLineFx({
 					ownerItemId: owner.id,
-					lineId: "line:double-target:work",
+					lineUid: "line:double-target:work",
 				});
 				return {
 					runtime: yield* readRuntimeFx(),
@@ -79,7 +79,7 @@ describe("item units / readiness and selection", () => {
 				});
 				yield* startLineFx({
 					ownerItemId: owner.id,
-					lineId: "line:double-target:saplings",
+					lineUid: "line:double-target:saplings",
 				});
 				return yield* readRuntimeFx();
 			}),

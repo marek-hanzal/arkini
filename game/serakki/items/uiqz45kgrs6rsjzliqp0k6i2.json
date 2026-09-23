@@ -15,7 +15,7 @@
 		"maxQueueSize": 4,
 		"lines": [
 			{
-				"id": "house-t2-blueprint",
+				"uid": "g1hx2xb2y9glup6oe21dd4uu",
 				"title": "House - Tier 2 Blueprint",
 				"artwork": "f0vnkcqwb0i3r7l5dqs3852l",
 				"description": "Discover plans for a larger household that can organize Tier 2 labor.",
@@ -130,7 +130,7 @@
 				]
 			},
 			{
-				"id": "school-t2-blueprint",
+				"uid": "k7znlylvu9nd55b1yqlpljma",
 				"title": "School - Tier 2 Blueprint",
 				"artwork": "sj22vclculpow2m4a5d58b8t",
 				"description": "Discover plans for an advanced school once a Tier 2 household can supply the labor needed to build it.",
@@ -260,7 +260,7 @@
 				]
 			},
 			{
-				"id": "composting-workshop-blueprint",
+				"uid": "zsla9xszojlmjtznxx6u17qj",
 				"title": "Composting Workshop Blueprint",
 				"artwork": "d1nx3rme3j7j161hpd2cu7jv",
 				"description": "Discover plans for a Composting Workshop. Agriculture starts with having somewhere useful to put the mess.",
@@ -375,7 +375,7 @@
 				]
 			},
 			{
-				"id": "growers-guild-blueprint",
+				"uid": "ks2fn05lq1kyy4xp3a92vq1e",
 				"title": "Growers Guild Blueprint",
 				"artwork": "g12ykuh5vwadvkoy3cs9r6zd",
 				"description": "Discover plans for Growers Guild.",
@@ -505,7 +505,7 @@
 				]
 			},
 			{
-				"id": "animal-feed-workshop-blueprint",
+				"uid": "mgu04ej7a6hl2e310rwamh7j",
 				"title": "Animal Feed Workshop Blueprint",
 				"artwork": "qgam58n66dfu2yc9s2cdtoug",
 				"description": "Discover plans for an Animal Feed Workshop after establishing the Growers Guild.",
@@ -635,7 +635,7 @@
 				]
 			},
 			{
-				"id": "herders-guild-blueprint",
+				"uid": "w2twuo8r6sl2clp7tezm1u8g",
 				"title": "Herders Guild Blueprint",
 				"artwork": "sfiecse95ohoctxsonulfpfa",
 				"description": "Discover plans for Herders Guild after establishing animal-feed production.",

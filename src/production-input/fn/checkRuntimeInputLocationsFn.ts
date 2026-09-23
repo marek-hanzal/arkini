@@ -68,7 +68,7 @@ export const checkRuntimeInputLocationsFn = ({ runtime }: checkRuntimeInputLocat
 
 		const line = readItemLineFn({
 			item: owner.item,
-			lineId: location.lineId,
+			lineUid: location.lineUid,
 		});
 		if (line === undefined) {
 			lineIssues.push({
@@ -114,7 +114,7 @@ export const checkRuntimeInputLocationsFn = ({ runtime }: checkRuntimeInputLocat
 		const alreadyChecked = checkedLocations.some((location) => {
 			return (
 				location.ownerItemId === current.location.ownerItemId &&
-				location.lineId === current.location.lineId &&
+				location.lineUid === current.location.lineUid &&
 				location.inputIndex === current.location.inputIndex
 			);
 		});
@@ -124,20 +124,20 @@ export const checkRuntimeInputLocationsFn = ({ runtime }: checkRuntimeInputLocat
 		const items = validItems.filter((candidate) => {
 			return (
 				candidate.location.ownerItemId === current.location.ownerItemId &&
-				candidate.location.lineId === current.location.lineId &&
+				candidate.location.lineUid === current.location.lineUid &&
 				candidate.location.inputIndex === current.location.inputIndex
 			);
 		});
 		const storedQuantity = items.length;
 		const closed = isLineInputClosedFn({
 			ownerItemId: current.location.ownerItemId,
-			lineId: current.location.lineId,
+			lineUid: current.location.lineUid,
 			runtime,
 		});
 		if (closed) {
 			closedIssues.push({
 				ownerItemId: current.location.ownerItemId,
-				lineId: current.location.lineId,
+				lineUid: current.location.lineUid,
 				inputIndex: current.location.inputIndex,
 				itemIds: items.map((candidate) => candidate.item.id),
 				type: RuntimeCheckIssueEnumSchema.enum.LineInputClosed,
@@ -150,7 +150,7 @@ export const checkRuntimeInputLocationsFn = ({ runtime }: checkRuntimeInputLocat
 		if (storedQuantity > resolution.maxStoredQuantity) {
 			capacityIssues.push({
 				ownerItemId: current.location.ownerItemId,
-				lineId: current.location.lineId,
+				lineUid: current.location.lineUid,
 				inputIndex: current.location.inputIndex,
 				itemIds: items.map((candidate) => candidate.item.id),
 				storedQuantity,

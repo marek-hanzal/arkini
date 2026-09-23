@@ -1394,8 +1394,8 @@
 		"LineSchema": {
 			"type": "object",
 			"properties": {
-				"id": {
-					"description": "The stable ID of this product line within its owning item.",
+				"uid": {
+					"description": "The immutable generated UID of this product line, unique across the project.",
 					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
 				},
 				"title": {
@@ -1466,7 +1466,7 @@
 				}
 			},
 			"required": [
-				"id",
+				"uid",
 				"title",
 				"description",
 				"clockWeight",

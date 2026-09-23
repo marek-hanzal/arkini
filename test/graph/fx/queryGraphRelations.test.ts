@@ -117,7 +117,7 @@ it("answers who produces B separately from merges into B and rule mentions of B"
 		).status,
 	).toBe("no");
 });
-it("keeps duplicate authored line IDs in distinct operations and bounds node-owned operation results", async () => {
+it("keeps distinct line UIDs in separate operations and bounds node-owned operation results", async () => {
 	const project = {
 		...projectFn(
 			[],
@@ -128,10 +128,10 @@ it("keeps duplicate authored line IDs in distinct operations and bounds node-own
 		config: configFn({
 			A: itemFn("A", {
 				lines: [
-					lineFn("duplicate", {
+					lineFn("first-line", {
 						outcome: outputFn("B"),
 					}),
-					lineFn("duplicate", {
+					lineFn("second-line", {
 						outcome: outputFn("C"),
 					}),
 				],

@@ -15,7 +15,7 @@
 		"maxQueueSize": 4,
 		"lines": [
 			{
-				"id": "goose",
+				"uid": "spt0coweip3eelfveoj9rv8a",
 				"title": "Goose",
 				"artwork": "c7nyplvmdbrgzcpmv5dx4xgt",
 				"description": "Feed and water a goose before releasing it from a nearby populated pen.",
@@ -108,7 +108,7 @@
 				"rules": []
 			},
 			{
-				"id": "empty-goose-pen",
+				"uid": "cbaej8cdq240iiu2mwdexvys",
 				"title": "Prepare Goose Pen",
 				"artwork": "iemj1plgthrak61dsn4yrrxx",
 				"description": "Prepare a new empty enclosure using 2 planks.",
@@ -162,7 +162,7 @@
 				"rules": []
 			},
 			{
-				"id": "blueprint",
+				"uid": "phal83t35rinle3ktm475zrw",
 				"title": "Goose Farm Blueprint",
 				"artwork": "so7r094glj6wfe6yoveiclrg",
 				"description": "Sketch plans for another Goose Farm.",

@@ -7,7 +7,7 @@ import type { lineRuleFx } from "~/production-line/fx/lineRuleFx";
 export namespace LineRun {
 	export interface Plan {
 		readonly ownerItemId: IdSchema.Type;
-		readonly lineId: IdSchema.Type;
+		readonly lineUid: IdSchema.Type;
 		readonly runtimeMs: TimeSchema.Type;
 		readonly input: readonly [
 			InputRun.Plan,
@@ -17,7 +17,7 @@ export namespace LineRun {
 
 	export interface Resolution {
 		readonly ownerItemId: IdSchema.Type;
-		readonly lineId: IdSchema.Type;
+		readonly lineUid: IdSchema.Type;
 		readonly show: boolean;
 		readonly enable: boolean;
 		readonly rules: ReadonlyArray<lineRuleFx.Result>;

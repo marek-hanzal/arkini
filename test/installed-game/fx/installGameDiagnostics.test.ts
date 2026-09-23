@@ -158,7 +158,7 @@ describe("Game diagnostics", () => {
 					{
 						id: "request:water:1",
 						ownerItemId: "runtime:item:well",
-						lineId: "line:water",
+						lineUid: "line:water",
 					},
 				],
 			},
@@ -172,7 +172,7 @@ describe("Game diagnostics", () => {
 					queueAdded: [
 						{
 							requestId: "request:water:1",
-							lineId: "line:water",
+							lineUid: "line:water",
 							owner: {
 								runtimeItemId: "runtime:item:well",
 							},
@@ -204,7 +204,7 @@ describe("Game diagnostics", () => {
 							owner: {
 								runtimeItemId: "runtime:item:well",
 							},
-							lineId: "line:water",
+							lineUid: "line:water",
 						},
 					],
 				},
@@ -261,7 +261,7 @@ describe("Game diagnostics", () => {
 									target: {
 										kind: "line-input",
 										ownerItemId: "runtime:item:upgrade",
-										lineId: "line:upgrade",
+										lineUid: "line:upgrade",
 										inputIndex: 0,
 									},
 								},

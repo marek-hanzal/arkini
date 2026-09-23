@@ -12,7 +12,7 @@ import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema
 export const InputCapacityExceededIssueSchema = z
 	.object({
 		ownerItemId: IdSchema.describe("The runtime item that owns the overfilled input."),
-		lineId: IdSchema.describe("The stable ID of the owner product line."),
+		lineUid: IdSchema.describe("The stable UID of the owner product line."),
 		inputIndex: NonNegativeIntegerSchema.describe("The zero-based input position."),
 		itemIds: z.array(IdSchema).min(1).describe("The runtime items stored in this input."),
 		storedQuantity: PositiveIntegerSchema.describe("The total stored material quantity."),

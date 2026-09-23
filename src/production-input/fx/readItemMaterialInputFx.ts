@@ -13,7 +13,7 @@ export namespace readItemMaterialInputFx {
 	export interface Props {
 		inputIndex: NonNegativeIntegerSchema.Type;
 		item: ItemSchema.Type;
-		lineId: IdSchema.Type;
+		lineUid: IdSchema.Type;
 		ownerItemId: IdSchema.Type;
 	}
 }
@@ -24,18 +24,18 @@ export namespace readItemMaterialInputFx {
 export const readItemMaterialInputFx = Effect.fn("readItemMaterialInputFx")(function* ({
 	inputIndex,
 	item,
-	lineId,
+	lineUid,
 	ownerItemId,
 }: readItemMaterialInputFx.Props) {
 	const line = readItemLineFn({
 		item,
-		lineId,
+		lineUid,
 	});
 	if (line === undefined) {
 		return yield* Effect.fail(
 			new LineNotFoundError({
 				itemId: ownerItemId,
-				lineId,
+				lineUid,
 			}),
 		);
 	}
@@ -45,7 +45,7 @@ export const readItemMaterialInputFx = Effect.fn("readItemMaterialInputFx")(func
 		return yield* Effect.fail(
 			new InputMaterialNotFoundError({
 				ownerItemId,
-				lineId,
+				lineUid,
 				inputIndex,
 			}),
 		);

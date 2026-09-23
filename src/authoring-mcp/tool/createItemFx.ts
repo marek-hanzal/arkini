@@ -29,6 +29,11 @@ export const createItemFx = Effect.fn("createItemFx")(function* ({
 		item: {
 			...draft,
 			...input,
+			lines:
+				input.lines?.map((line) => ({
+					...line,
+					uid: createId(),
+				})) ?? [],
 		},
 		projectId: project.projectId,
 		repository,

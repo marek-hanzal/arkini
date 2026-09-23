@@ -57,7 +57,7 @@ export const checkRuntimeDeliveriesFn = ({ runtime }: checkRuntimeDeliveriesFn.P
 		}
 		const line = readItemLineFn({
 			item: owner.item,
-			lineId: target.lineId,
+			lineUid: target.lineUid,
 		});
 		if (line === undefined) {
 			issues.push(issueFn(DeliveryTargetIssueReasonEnumSchema.enum.LineMissing));
@@ -82,7 +82,7 @@ export const checkRuntimeDeliveriesFn = ({ runtime }: checkRuntimeDeliveriesFn.P
 			if (
 				isLineInputClosedFn({
 					ownerItemId: owner.id,
-					lineId: line.id,
+					lineUid: line.uid,
 					runtime,
 				})
 			) {
@@ -102,7 +102,7 @@ export const checkRuntimeDeliveriesFn = ({ runtime }: checkRuntimeDeliveriesFn.P
 		if (target.phase !== "outbound") continue;
 		const key = JSON.stringify([
 			target.target.ownerItemId,
-			target.target.lineId,
+			target.target.lineUid,
 			current.inputIndex,
 		]);
 		if (checkedSlots.has(key)) continue;
@@ -113,7 +113,7 @@ export const checkRuntimeDeliveriesFn = ({ runtime }: checkRuntimeDeliveriesFn.P
 			return (
 				location.phase === "outbound" &&
 				location.target.ownerItemId === target.target.ownerItemId &&
-				location.target.lineId === target.target.lineId &&
+				location.target.lineUid === target.target.lineUid &&
 				candidate.inputIndex === current.inputIndex
 			);
 		});
@@ -121,7 +121,7 @@ export const checkRuntimeDeliveriesFn = ({ runtime }: checkRuntimeDeliveriesFn.P
 		if (owner === undefined) continue;
 		const line = readItemLineFn({
 			item: owner.item,
-			lineId: target.target.lineId,
+			lineUid: target.target.lineUid,
 		});
 		if (line === undefined) continue;
 		const input = line.input[current.inputIndex];
@@ -130,7 +130,7 @@ export const checkRuntimeDeliveriesFn = ({ runtime }: checkRuntimeDeliveriesFn.P
 		const storedQuantity = runtime.items.reduce((total, candidate) => {
 			return candidate.location.scope === LocationScopeEnumSchema.enum.Input &&
 				candidate.location.ownerItemId === owner.id &&
-				candidate.location.lineId === line.id &&
+				candidate.location.lineUid === line.uid &&
 				candidate.location.inputIndex === current.inputIndex
 				? total + 1
 				: total;

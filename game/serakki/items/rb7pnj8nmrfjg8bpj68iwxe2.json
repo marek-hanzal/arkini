@@ -15,7 +15,7 @@
 		"maxQueueSize": 4,
 		"lines": [
 			{
-				"id": "harvest",
+				"uid": "epxxv4s1uv5r71lvddox8o6j",
 				"title": "Grape",
 				"description": "Harvest grape from a nearby planted field. Supply one bucket of water; the empty bucket is returned.",
 				"clockWeight": 1,
@@ -92,7 +92,7 @@
 				"rules": []
 			},
 			{
-				"id": "field",
+				"uid": "fvqk8aob9w4lr0rbpwzo39q6",
 				"title": "Prepare Grape Field",
 				"artwork": "j8xfgnxm4ngwbqry0jcr3f2c",
 				"description": "Prepare a new grape field for planting.",
@@ -134,7 +134,7 @@
 				"rules": []
 			},
 			{
-				"id": "blueprint",
+				"uid": "vgbo7aia7h169rqxhbq0jcqn",
 				"title": "Grape Farm Blueprint",
 				"artwork": "so7r094glj6wfe6yoveiclrg",
 				"description": "Sketch plans for another Grape Farm.",

@@ -94,7 +94,7 @@ describe("kill-switch material expiry", () => {
 				] as const) {
 					yield* bufferInputMaterialForTestFx({
 						ownerItemId: "owner",
-						lineId: "line:owner",
+						lineUid: "line:owner",
 						inputIndex,
 						sourceItemId: source.id,
 						sourceItemRevision: source.revision,
@@ -102,7 +102,7 @@ describe("kill-switch material expiry", () => {
 				}
 				yield* startLineFx({
 					ownerItemId: "owner",
-					lineId: "line:owner",
+					lineUid: "line:owner",
 				});
 				const before = yield* readRuntimeFx();
 				const committed = yield* modifyRuntimeWithTransitionFx((runtime) =>

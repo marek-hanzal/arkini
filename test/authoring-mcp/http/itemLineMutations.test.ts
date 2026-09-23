@@ -1,3 +1,4 @@
+import { readLineAuthoringFn } from "./support/readLineAuthoringFn";
 import { Effect, Result } from "effect";
 import { afterEach, expect, it, vi } from "vitest";
 
@@ -59,8 +60,7 @@ it("rejects a missing Template outcome through HTTP without persisting the line 
 			itemUid: "forge",
 			revision: before.revision,
 			line: {
-				...before.config.items.forge.lines[0]!,
-				id: "missing-template-line",
+				...readLineAuthoringFn(before.config.items.forge.lines[0]!),
 				outcome: {
 					set: [
 						{
@@ -93,12 +93,11 @@ it("rejects a missing Template outcome through HTTP without persisting the line 
 });
 
 it("appends and deletes exact lines without losing other item fields, rejecting invalid identity and incomplete input", async () => {
-	const { client, repository, notifyFn, readFn, projectId } = await setupFn();
+	const { client, notifyFn, readFn } = await setupFn();
 	const before = await readFn();
 	const first = before.config.items.forge.lines[0]!;
 	const added = {
-		...first,
-		id: "second-line",
+		...readLineAuthoringFn(first),
 		title: "Second line",
 	};
 	const callFn = (name: string, input: object) =>
@@ -113,13 +112,22 @@ it("appends and deletes exact lines without losing other item fields, rejecting 
 	});
 	expect(created.isError).not.toBe(true);
 	const afterCreate = await readFn();
+	const canonicalAdded = afterCreate.config.items.forge.lines[1]!;
+	expect(canonicalAdded).toEqual({
+		...added,
+		uid: expect.any(String),
+	});
+	expect(canonicalAdded.uid).not.toBe(first.uid);
+	expect(created.content[0]).toMatchObject({
+		text: expect.stringContaining(`Line UID: ${canonicalAdded.uid}`),
+	});
 	expect(afterCreate.config.items).toEqual({
 		...before.config.items,
 		forge: {
 			...before.config.items.forge,
 			lines: [
 				first,
-				added,
+				canonicalAdded,
 			],
 		},
 	});
@@ -130,14 +138,16 @@ it("appends and deletes exact lines without losing other item fields, rejecting 
 		{
 			itemUid: "forge",
 			revision: afterCreate.revision,
-			line: added,
+			line: {
+				...added,
+				uid: canonicalAdded.uid,
+			},
 		},
 		{
 			itemUid: "forge",
 			revision: before.revision,
 			line: {
 				...added,
-				id: "stale",
 			},
 		},
 		{
@@ -145,7 +155,6 @@ it("appends and deletes exact lines without losing other item fields, rejecting 
 			revision: afterCreate.revision,
 			line: {
 				...added,
-				id: "incomplete",
 				enable: undefined,
 			},
 		},
@@ -160,12 +169,12 @@ it("appends and deletes exact lines without losing other item fields, rejecting 
 		{
 			itemUid: "forge",
 			revision: afterCreate.revision,
-			lineId: "missing",
+			lineUid: "missing",
 		},
 		{
 			itemUid: "forge",
 			revision: before.revision,
-			lineId: first.id,
+			lineUid: first.uid,
 		},
 	])
 		expect((await callFn("delete_item_line", input)).isError).toBe(true);
@@ -175,7 +184,7 @@ it("appends and deletes exact lines without losing other item fields, rejecting 
 	const deleted = await callFn("delete_item_line", {
 		itemUid: "forge",
 		revision: afterCreate.revision,
-		lineId: first.id,
+		lineUid: first.uid,
 	});
 	expect(deleted.isError).not.toBe(true);
 	const afterDelete = await readFn();
@@ -184,37 +193,13 @@ it("appends and deletes exact lines without losing other item fields, rejecting 
 		forge: {
 			...before.config.items.forge,
 			lines: [
-				added,
+				canonicalAdded,
 			],
 		},
 	});
 	expect(deleted.content[0]).toMatchObject({
 		text: expect.stringContaining(`Revision: ${afterDelete.revision}`),
 	});
-	expect(notifyFn).toHaveBeenCalledTimes(2);
-	const ambiguous = await Effect.runPromise(
-		repository.upsertItemFx({
-			projectId,
-			expectedRevision: afterDelete.revision,
-			item: {
-				...afterDelete.config.items.forge,
-				lines: [
-					added,
-					added,
-				],
-			},
-		}),
-	);
-	expect(
-		(
-			await callFn("delete_item_line", {
-				itemUid: "forge",
-				revision: ambiguous.revision,
-				lineId: added.id,
-			})
-		).isError,
-	).toBe(true);
-	expect((await readFn()).revision).toBe(ambiguous.revision);
 	expect(notifyFn).toHaveBeenCalledTimes(2);
 });
 
@@ -239,17 +224,16 @@ it("rejects all line writes when another save wins after the MCP snapshot was re
 			itemUid: "forge",
 			revision: snapshot.revision,
 			line: {
-				...first,
-				id: "new-line",
+				...readLineAuthoringFn(first),
 			},
 		},
 		{
 			operation: "replace",
 			itemUid: "forge",
 			revision: snapshot.revision,
-			lineId: first.id,
+			lineUid: first.uid,
 			line: {
-				...first,
+				...readLineAuthoringFn(first),
 				title: "Stale line",
 			},
 		},
@@ -257,7 +241,7 @@ it("rejects all line writes when another save wins after the MCP snapshot was re
 			operation: "delete",
 			itemUid: "forge",
 			revision: snapshot.revision,
-			lineId: first.id,
+			lineUid: first.uid,
 		},
 	];
 	for (const input of commands) {
@@ -296,8 +280,8 @@ it("admits omitted non-Clock weights but rejects missing Clock weights before ei
 			const before = await readFn();
 			const first = before.config.items.forge.lines[0]!;
 			const line = {
-				...first,
-				id: name === "create_item_line" ? `clock-${String(clock)}` : first.id,
+				...readLineAuthoringFn(first),
+				title: `Clock ${name} ${String(clock)}`,
 				clock,
 				clockWeight: undefined,
 			};
@@ -306,7 +290,7 @@ it("admits omitted non-Clock weights but rejects missing Clock weights before ei
 				revision: before.revision,
 				...(name === "replace_item_line"
 					? {
-							lineId: first.id,
+							lineUid: first.uid,
 						}
 					: {}),
 				line,
@@ -333,7 +317,7 @@ it("admits omitted non-Clock weights but rejects missing Clock weights before ei
 				expect(explicit.isError).not.toBe(true);
 			} else expect(result.isError).not.toBe(true);
 			const saved = (await readFn()).config.items.forge.lines.find(
-				({ id }) => id === line.id,
+				(candidate) => candidate.title === line.title,
 			);
 			expect(saved?.clockWeight).toBe(1);
 			expect(saved?.clock).toBe(clock);

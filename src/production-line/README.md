@@ -4,6 +4,8 @@ This README maps the peer `production-*` roots. It lives beside Production Line 
 
 [`GAME.MD`](../../GAME.MD) owns production semantics. [`src/game-runtime/README.md`](../game-runtime/README.md) explains the canonical transaction and Tick lifecycle around these operations.
 
+Each authored Line has an immutable generated `uid`, unique across the project. Runtime owners retain their separate instance IDs; jobs, queue intents, input locations, deliveries and Default/Clock selections reference `lineUid`. Copying an authored line assigns a new UID; editing or reordering preserves it.
+
 ## Owners
 
 | Domain | Owns | Public entrypoints |
@@ -91,7 +93,7 @@ Scheduled owners filter their selected Clock pool by line rules, draw by `clockW
 - A skipped request keeps its identity, line and valid stored inputs, regaining priority when actionable. Existing in-flight delivery alone does not claim priority in a later pass.
 - One owner may progress at most once per queue pass. Completion and expiry can trigger separate passes in the same fixed step; queue dispatch never preempts active Jobs. Explicit forced owner removal can abort active Jobs.
 - The engine can cancel an exact active job through [`cancelItemJobFx`](../production-job/fx/cancelItemJobFx.ts). Shared [`abortJobRuntimeFx`](../production-job/fx/abortJobRuntimeFx.ts) consumes committed material, returns reservations, and settles owner depletion atomically. Stale job IDs never cancel a replacement.
-- Clearing pending work returns its unused line-input material without cancelling active work. An optional line ID restricts clearing to that line. An exact request ID cancels only that pending request; stale IDs are no-ops. Shared line buffers and deliveries stay while another request for that line remains.
+- Clearing pending work returns its unused line-input material without cancelling active work. An optional line UID restricts clearing to that line. An exact request ID cancels only that pending request; stale IDs are no-ops. Shared line buffers and deliveries stay while another request for that line remains.
 - Start re-resolves all live facts and atomically applies input ownership, unit spending, reservation and Job creation.
 - Completion failure preserves the pre-completion state for retry and does not block independent owners.
 - Randomness is derived from stable canonical identities and explicit algorithm versions, never wall time or Tick.

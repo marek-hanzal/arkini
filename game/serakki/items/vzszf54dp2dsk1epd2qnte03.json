@@ -14,7 +14,7 @@
 		"maxQueueSize": 6,
 		"lines": [
 			{
-				"id": "planks",
+				"uid": "assqhy3g8djuhm6nf6jy3cr5",
 				"title": "Planks",
 				"description": "This will get you nicer piece of wood.",
 				"clockWeight": 1,
@@ -67,7 +67,7 @@
 				"rules": []
 			},
 			{
-				"id": "wood-fibers",
+				"uid": "ngi9gjek3fwz5luve9oi930l",
 				"title": "Wood Fibers",
 				"artwork": "kw3efx1p35vtxbs675l229h4",
 				"description": "Process wood into fibers suitable for making paper pulp.",

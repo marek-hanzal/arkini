@@ -17,7 +17,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "copper-mine",
+				"uid": "sd2gw6mcnqf05d2wkiusjam3",
 				"title": "Copper Mine",
 				"description": "Search for new copper mine",
 				"default": false,
@@ -84,7 +84,7 @@
 				"rules": []
 			},
 			{
-				"id": "iron-mine",
+				"uid": "zgjerbc4pbeqf694pd7gh1e4",
 				"title": "Iron Mine",
 				"description": "New iron mine",
 				"default": false,

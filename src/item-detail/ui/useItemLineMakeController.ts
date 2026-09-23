@@ -11,7 +11,7 @@ import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErr
 export namespace useItemLineMakeController {
 	export interface Props {
 		readonly ownerItemId?: IdSchema.Type;
-		readonly lineId: IdSchema.Type;
+		readonly lineUid: IdSchema.Type;
 		readonly disabled: boolean;
 	}
 	export interface Output {
@@ -23,7 +23,7 @@ export namespace useItemLineMakeController {
 /** Submits one exact line to the canonical queue; admission remains an engine decision. */
 export const useItemLineMakeController = ({
 	ownerItemId,
-	lineId,
+	lineUid,
 	disabled,
 }: useItemLineMakeController.Props): useItemLineMakeController.Output => {
 	const game = useGameEngine();
@@ -32,7 +32,7 @@ export const useItemLineMakeController = ({
 		[
 			game,
 			ownerItemId,
-			lineId,
+			lineUid,
 		],
 	);
 	const [result, enqueueFn] = useAtom(commandAtom);
@@ -43,7 +43,7 @@ export const useItemLineMakeController = ({
 			if (disabled || result.waiting || ownerItemId === undefined) return;
 			enqueueFn({
 				ownerItemId,
-				lineId,
+				lineUid,
 			});
 		},
 		pending: result.waiting,

@@ -24,8 +24,24 @@ const readInputCollectionsFn = (item: ItemSchema.Type): ReadonlyArray<InputColle
 };
 
 /** Adds project-local identity and selected-target validation to the canonical item form schema. */
-export const createFormSchema = (project: Pick<Project, "config">, _itemUid: string) =>
+export const createFormSchema = (project: Pick<Project, "config">, itemUid: string) =>
 	FormSchema.superRefine((item, context) => {
+		const otherLineUids = new Set(
+			Object.values(project.config.items)
+				.filter((owner) => owner.uid !== itemUid)
+				.flatMap((owner) => owner.lines.map((line) => line.uid)),
+		);
+		for (const [index, line] of item.lines.entries())
+			if (otherLineUids.has(line.uid))
+				context.addIssue({
+					code: "custom",
+					message: "Line UID is already owned by another item.",
+					path: [
+						"lines",
+						index,
+						"uid",
+					],
+				});
 		for (const issue of readTemplateReferenceIssuesFn(item, project.config.templates))
 			context.addIssue({
 				code: "custom",

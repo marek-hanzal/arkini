@@ -57,21 +57,21 @@ const formatRuntimeFn = (report: GameIncidentReport) => {
 	if (runtime.jobs.length === 0) lines.push("No active jobs.");
 	for (const job of runtime.jobs) {
 		lines.push(
-			`- ${job.jobId} · line ${job.lineId} · owner ${formatGameDiagnosticItemPointerTextFn(job.owner)} · ${job.remainingMs}/${job.durationMs} ms remaining`,
+			`- ${job.jobId} · line ${job.lineUid} · owner ${formatGameDiagnosticItemPointerTextFn(job.owner)} · ${job.remainingMs}/${job.durationMs} ms remaining`,
 		);
 	}
 	lines.push("", "## Queue", "");
 	if (runtime.queue.length === 0) lines.push("No queued requests.");
 	for (const request of runtime.queue) {
 		lines.push(
-			`- ${request.requestId} · line ${request.lineId} · owner ${formatGameDiagnosticItemPointerTextFn(request.owner)}`,
+			`- ${request.requestId} · line ${request.lineUid} · owner ${formatGameDiagnosticItemPointerTextFn(request.owner)}`,
 		);
 	}
 	lines.push("", "## Default lines", "");
 	if (runtime.defaultLines.length === 0) lines.push("No explicit default lines.");
 	for (const entry of runtime.defaultLines) {
 		lines.push(
-			`- ${formatGameDiagnosticItemPointerTextFn(entry.owner)} · ${entry.lineId ?? "disabled"}`,
+			`- ${formatGameDiagnosticItemPointerTextFn(entry.owner)} · ${entry.lineUid ?? "disabled"}`,
 		);
 	}
 	return lines.join("\n");

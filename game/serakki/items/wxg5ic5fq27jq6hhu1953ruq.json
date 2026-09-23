@@ -19,7 +19,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "waste-incinerator",
+				"uid": "adpwcwn9cft6wo6vn9gfogml",
 				"title": "Build Waste Incinerator",
 				"artwork": "mo6y7oa1ipuwt7pycm9s521t",
 				"description": "Build a sturdy incinerator for turning accumulated Waste into smoke and ash.",

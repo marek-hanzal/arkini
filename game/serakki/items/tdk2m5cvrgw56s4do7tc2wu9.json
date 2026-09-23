@@ -14,7 +14,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "dye",
+				"uid": "i7q31qgck7oh1ou74hqnpi3t",
 				"title": "Dye",
 				"description": "Color dye you can use to make world colorful",
 				"default": true,

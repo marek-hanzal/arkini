@@ -13,7 +13,7 @@ export namespace readRuntimeItemPrimaryActionFx {
 		  }
 		| {
 				readonly kind: "enqueue-default-line";
-				readonly lineId: string;
+				readonly lineUid: string;
 				readonly queue: {
 					readonly available: boolean;
 					readonly capacity: number;
@@ -48,7 +48,7 @@ export const readRuntimeItemPrimaryActionFx = Effect.fn("readRuntimeItemPrimaryA
 			});
 			return {
 				kind: "enqueue-default-line" as const,
-				lineId: defaultLine.id,
+				lineUid: defaultLine.uid,
 				queue: {
 					available: queue.available,
 					capacity: queue.capacity,

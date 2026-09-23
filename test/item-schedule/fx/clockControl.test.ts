@@ -18,7 +18,7 @@ it("rejects player production commands atomically for simple UI owners while aut
 		lines: [
 			{
 				...createLine({
-					id: "a",
+					uid: "a",
 					default: true,
 					clock: true,
 				}),
@@ -32,7 +32,7 @@ it("rejects player production commands atomically for simple UI owners while aut
 			const before = yield* readRuntimeFx();
 			const enqueue = yield* Effect.result(
 				enqueueLineFx({
-					lineId: "a",
+					lineUid: "a",
 					ownerItemId: owner.id,
 				}),
 			);
@@ -40,7 +40,7 @@ it("rejects player production commands atomically for simple UI owners while aut
 				setLineSelectionFx({
 					selection: "default",
 					ownerItemId: owner.id,
-					lineId: "a",
+					lineUid: "a",
 				}),
 			);
 			const after = yield* readRuntimeFx();
@@ -77,7 +77,7 @@ it("rejects player production commands atomically for simple UI owners while aut
 	expect(result.after).toEqual(result.before);
 	expect(result.automatic.jobs).toMatchObject([
 		{
-			lineId: "a",
+			lineUid: "a",
 			remainingMs: 400,
 		},
 	]);
@@ -88,7 +88,7 @@ it("does not age a Clock created by a job completion until the next simulation b
 		lines: [
 			{
 				...createLine({
-					id: "a",
+					uid: "a",
 					default: true,
 					clock: true,
 					outcome: createOutput([
@@ -132,7 +132,7 @@ it("runs a manually chosen line ahead of the next pulse without shifting cadence
 		lines: [
 			{
 				...createLine({
-					id: "automatic",
+					uid: "automatic",
 					default: true,
 					clock: true,
 				}),
@@ -140,7 +140,7 @@ it("runs a manually chosen line ahead of the next pulse without shifting cadence
 			},
 			{
 				...createLine({
-					id: "manual",
+					uid: "manual",
 				}),
 				runtimeMs: 700,
 			},
@@ -156,19 +156,19 @@ it("runs a manually chosen line ahead of the next pulse without shifting cadence
 			const before = yield* tickClockFx(100);
 			yield* enqueueLineFx({
 				ownerItemId: owner.id,
-				lineId: "manual",
+				lineUid: "manual",
 			});
 			const admitted = yield* readRuntimeFx();
 			const pulse = yield* tickClockFx(400);
 			yield* setLineSelectionFx({
 				selection: "clock",
-				lineIds: [],
+				lineUids: [],
 				ownerItemId: owner.id,
 			});
 			const drained = yield* tickClockFx(400);
 			yield* enqueueLineFx({
 				ownerItemId: owner.id,
-				lineId: "manual",
+				lineUid: "manual",
 			});
 			const manualWhilePaused = yield* tickClockFx(100);
 			return {
@@ -185,16 +185,16 @@ it("runs a manually chosen line ahead of the next pulse without shifting cadence
 		),
 	);
 	expect(result.admitted.items[0].schedule).toEqual(result.before.items[0].schedule);
-	expect(result.admitted.jobQueue.map((request) => request.lineId)).toEqual([
+	expect(result.admitted.jobQueue.map((request) => request.lineUid)).toEqual([
 		"manual",
 	]);
 	expect(result.pulse.jobs).toMatchObject([
 		{
-			lineId: "manual",
+			lineUid: "manual",
 			remainingMs: 300,
 		},
 	]);
-	expect(result.pulse.jobQueue.map((request) => request.lineId)).toEqual([
+	expect(result.pulse.jobQueue.map((request) => request.lineUid)).toEqual([
 		"automatic",
 	]);
 	expect(result.pulse.items[0].schedule).toMatchObject({
@@ -204,18 +204,18 @@ it("runs a manually chosen line ahead of the next pulse without shifting cadence
 	expect(result.drained.jobs).toHaveLength(0);
 	expect(result.drained.jobQueue).toHaveLength(0);
 	expect(result.drained.items[0].schedule).toMatchObject({
-		lineIds: [],
+		lineUids: [],
 		remainingIntervalMs: 100,
 		remainingDurationMs: 1100,
 	});
 	expect(result.manualWhilePaused.jobs).toMatchObject([
 		{
-			lineId: "manual",
+			lineUid: "manual",
 			remainingMs: 600,
 		},
 	]);
 	expect(result.manualWhilePaused.items[0].schedule).toMatchObject({
-		lineIds: [],
+		lineUids: [],
 		remainingIntervalMs: 500,
 		remainingDurationMs: 1000,
 	});
@@ -230,7 +230,7 @@ it.each([
 		lines: [
 			{
 				...createLine({
-					id: "a",
+					uid: "a",
 					default: defaultLine,
 				}),
 				runtimeMs: 400,
@@ -270,7 +270,7 @@ it.each([
 		expect(result.after.jobQueue).toMatchObject([
 			{
 				ownerItemId: "runtime:clock",
-				lineId: "a",
+				lineUid: "a",
 			},
 		]);
 	else expect(result.after).toEqual(result.before);

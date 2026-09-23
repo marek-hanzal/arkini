@@ -161,7 +161,7 @@ describe("readTileActorsFx", () => {
 							},
 							schedule: {
 								remainingIntervalMs: 7_500,
-								lineIds: [],
+								lineUids: [],
 							},
 						},
 			),

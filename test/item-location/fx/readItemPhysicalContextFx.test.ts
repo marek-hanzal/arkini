@@ -45,7 +45,7 @@ describe("readItemPhysicalContextFx", () => {
 					...base.items.temporary,
 					lines: [
 						createLine({
-							id: "buffer",
+							uid: "buffer",
 							input: [
 								{
 									type: "materials",
@@ -90,7 +90,7 @@ describe("readItemPhysicalContextFx", () => {
 				});
 				yield* bufferInputMaterialForTestFx({
 					ownerItemId: material.id,
-					lineId: "buffer",
+					lineUid: "buffer",
 					inputIndex: 0,
 					sourceItemId: child.id,
 					sourceItemRevision: child.revision,
@@ -102,14 +102,14 @@ describe("readItemPhysicalContextFx", () => {
 					return yield* Effect.die(new Error("Missing material."));
 				yield* bufferInputMaterialForTestFx({
 					ownerItemId: "owner",
-					lineId: "line:owner",
+					lineUid: "line:owner",
 					inputIndex: 0,
 					sourceItemId: storedMaterial.id,
 					sourceItemRevision: storedMaterial.revision,
 				});
 				yield* startLineFx({
 					ownerItemId: "owner",
-					lineId: "line:owner",
+					lineUid: "line:owner",
 				});
 				const runtime = yield* readRuntimeFx();
 				const nestedChild = runtime.items.find((item) => item.id === child.id);

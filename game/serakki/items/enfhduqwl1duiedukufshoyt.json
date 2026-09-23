@@ -14,7 +14,7 @@
 		"maxQueueSize": 4,
 		"lines": [
 			{
-				"id": "Honeycomb",
+				"uid": "x43vbbkoqufxufd9g5ibybag",
 				"title": "Honeycomb",
 				"description": "Produce honeycomb when an active beehive and flowering field are within reach. Each batch consumes one unit from both.",
 				"clockWeight": 1,
@@ -113,7 +113,7 @@
 				]
 			},
 			{
-				"id": "beehive",
+				"uid": "hge1wndndteop09z0ybdx0y0",
 				"title": "Beehive",
 				"description": "Build a new beehive",
 				"clockWeight": 1,
@@ -196,7 +196,7 @@
 				"rules": []
 			},
 			{
-				"id": "restore-beehive",
+				"uid": "zf76xdpgvplu1csxg2yidvm4",
 				"title": "Restore Beehive",
 				"artwork": "lf8latln6upg44g47cjl34op",
 				"description": "Use a fresh bunch of flowers to repopulate a nearby empty hive.",

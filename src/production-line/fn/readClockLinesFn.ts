@@ -10,5 +10,7 @@ export const readClockLinesFn = ({
 	readonly schedule: ScheduleStateSchema.Type | undefined;
 }) =>
 	item.lines.filter((line) =>
-		schedule?.lineIds === undefined ? line.clock === true : schedule.lineIds.includes(line.id),
+		schedule?.lineUids === undefined
+			? line.clock === true
+			: schedule.lineUids.includes(line.uid),
 	);

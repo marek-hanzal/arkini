@@ -29,7 +29,7 @@ const configFn = (mode: "reserve" | "consume") => {
 				lines: [
 					{
 						...workshop.lines[0],
-						id: "recycle",
+						uid: "recycle",
 						input: [
 							{
 								type: "materials",
@@ -91,7 +91,7 @@ const stateFn = (origin: BoardLocationSchema.Type): StateSchema.Type => ({
 			location: {
 				scope: "input",
 				ownerItemId: "source",
-				lineId: "line:workshop:build",
+				lineUid: "line:workshop:build",
 				inputIndex: 0,
 			},
 		},
@@ -104,7 +104,7 @@ const dispatchFx = Effect.fn("dispatchFx")(function* () {
 	const before = yield* readRuntimeFx();
 	yield* enqueueLineFx({
 		ownerItemId: "receiver",
-		lineId: "recycle",
+		lineUid: "recycle",
 	});
 	yield* advanceRuntimeElapsedFx({
 		elapsedMs: 100,
@@ -134,7 +134,7 @@ const settleDeliveryFx = Effect.fn("settleDeliveryFx")(function* () {
 	expect(stored.items.find(({ id }) => id === "source")?.location).toMatchObject({
 		scope: "input",
 		ownerItemId: "receiver",
-		lineId: "recycle",
+		lineUid: "recycle",
 	});
 	expect(stored.items.find(({ id }) => id === "water")).toEqual(
 		dispatched.before.items.find(({ id }) => id === "water"),

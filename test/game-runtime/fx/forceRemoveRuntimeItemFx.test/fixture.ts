@@ -30,7 +30,7 @@ export const fixtureFn = (width = 2) => {
 					base.items.forge.lines[0],
 					{
 						...base.items.forge.lines[0],
-						id: "line:forge:stored-holder",
+						uid: "line:forge:stored-holder",
 						title: "Stored holder",
 						input: [
 							{
@@ -52,7 +52,7 @@ export const fixtureFn = (width = 2) => {
 					},
 					{
 						...base.items.forge.lines[0],
-						id: "line:forge:stored-water",
+						uid: "line:forge:stored-water",
 						title: "Stored water",
 						input: [
 							{
@@ -105,11 +105,11 @@ export const fixtureFn = (width = 2) => {
 	const inputFn = (
 		ownerItemId: string,
 		inputIndex: number,
-		lineId = "line:forge:stored-holder",
+		lineUid = "line:forge:stored-holder",
 	) => ({
 		scope: "input" as const,
 		ownerItemId,
-		lineId,
+		lineUid,
 		inputIndex,
 	});
 	const reserve = {
@@ -148,7 +148,7 @@ export const fixtureFn = (width = 2) => {
 			{
 				id: "job",
 				ownerItemId: owner.id,
-				lineId: "line:forge:run",
+				lineUid: "line:forge:run",
 				durationMs: 1000,
 				remainingMs: 500,
 			},
@@ -157,7 +157,7 @@ export const fixtureFn = (width = 2) => {
 			{
 				id: "queued",
 				ownerItemId: owner.id,
-				lineId: "line:forge:run",
+				lineUid: "line:forge:run",
 			},
 		],
 		defaultLineByOwnerItemId: {

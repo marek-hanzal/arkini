@@ -15,7 +15,7 @@
 		"maxQueueSize": 4,
 		"lines": [
 			{
-				"id": "harvest",
+				"uid": "o5el023ny7a1e5r483t3su21",
 				"title": "Corn",
 				"description": "Harvest corn from a nearby planted field. Supply one bucket of water; the empty bucket is returned.",
 				"clockWeight": 1,
@@ -92,7 +92,7 @@
 				"rules": []
 			},
 			{
-				"id": "field",
+				"uid": "avq4np0z3frkwxmy3ux10y04",
 				"title": "Prepare Corn Field",
 				"artwork": "avy9cop1q4y4gd885hzopoo0",
 				"description": "Prepare a new corn field for planting.",
@@ -134,7 +134,7 @@
 				"rules": []
 			},
 			{
-				"id": "blueprint",
+				"uid": "f1ybovi5qfydmr1d5gedxdcu",
 				"title": "Corn Farm Blueprint",
 				"artwork": "so7r094glj6wfe6yoveiclrg",
 				"description": "Sketch plans for another Corn Farm.",

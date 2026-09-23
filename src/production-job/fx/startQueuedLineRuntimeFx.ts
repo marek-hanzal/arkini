@@ -42,7 +42,7 @@ export const startQueuedLineRuntimeFx = Effect.fn("startQueuedLineRuntimeFx")(fu
 	request,
 	runtime,
 }: startQueuedLineRuntimeFx.Props) {
-	const { id: queueRequestId, ownerItemId, lineId } = request;
+	const { id: queueRequestId, ownerItemId, lineUid } = request;
 	const jobIds = runtime.jobs
 		.filter((job) => job.ownerItemId === ownerItemId)
 		.map((job) => job.id);
@@ -67,7 +67,7 @@ export const startQueuedLineRuntimeFx = Effect.fn("startQueuedLineRuntimeFx")(fu
 	// turn that accepted work into a blocked Autofill request.
 	if (isItemProductionAdmissionOpenFn(owner)) {
 		const coverage = yield* readLineInputAutofillCoverageFx({
-			lineId,
+			lineUid,
 			ownerItemId,
 			runtime,
 		});
@@ -76,7 +76,7 @@ export const startQueuedLineRuntimeFx = Effect.fn("startQueuedLineRuntimeFx")(fu
 			// conditions still hold. A blocked probe must not lease shared supply.
 			const resolution = yield* resolveLineStartFx({
 				ownerItemId,
-				lineId,
+				lineUid,
 				runtime,
 			});
 			yield* assertLineEnqueueConditionsFx({
@@ -97,7 +97,7 @@ export const startQueuedLineRuntimeFx = Effect.fn("startQueuedLineRuntimeFx")(fu
 		}),
 	};
 	const [job, startedRuntime, startFacts] = yield* startLineRuntimeFx({
-		lineId,
+		lineUid,
 		ownerItemId,
 		runtime: candidate,
 	});

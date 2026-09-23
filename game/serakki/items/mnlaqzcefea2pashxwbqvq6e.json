@@ -18,7 +18,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "stock",
+				"uid": "wxar2d5kuzn6nzf9qyc76a8r",
 				"title": "Stock Sheep Pen",
 				"artwork": "gzmgh8zm5rqimmud53xfuiyh",
 				"description": "Provide starter feed and water so the enclosure can be stocked with animals.",

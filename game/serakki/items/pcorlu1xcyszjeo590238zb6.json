@@ -45,7 +45,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "wish",
+				"uid": "v6j5ovcxyyuixrwp7ej60c3h",
 				"title": "Make a Wish",
 				"description": "Wishing a Wine",
 				"clock": true,

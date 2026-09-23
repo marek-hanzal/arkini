@@ -9,7 +9,7 @@ import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeInteger
 export const LineInputClosedIssueSchema = z
 	.object({
 		ownerItemId: IdSchema.describe("The runtime item that owns the closed line input."),
-		lineId: IdSchema.describe("The running line whose input is closed."),
+		lineUid: IdSchema.describe("The running line whose input is closed."),
 		inputIndex: NonNegativeIntegerSchema.describe("The zero-based closed input position."),
 		itemIds: z
 			.array(IdSchema)

@@ -50,7 +50,7 @@ export namespace readItemDetailSourcesFx {
 		  };
 
 	export interface Line {
-		readonly lineId: IdSchema.Type;
+		readonly lineUid: IdSchema.Type;
 		readonly title: string;
 		readonly outcome: readonly OutcomeFact[];
 	}
@@ -176,7 +176,7 @@ const readOwnedSourcesFx = Effect.fn("readOwnedItemDetailSourcesFx")(function* (
 	readonly runtime: RuntimeSchema.Type;
 	readonly targetItemUid: IdSchema.Type;
 }) {
-	const activeLine = new Set(runtime.jobs.map((job) => `${job.ownerItemId}\u0000${job.lineId}`));
+	const activeLine = new Set(runtime.jobs.map((job) => `${job.ownerItemId}\u0000${job.lineUid}`));
 	const source: OrderedSource[] = [];
 	for (const owner of runtime.items) {
 		const ownerItem = Option.getOrUndefined(narrowLineOwnerItemFn(owner.item));
@@ -214,11 +214,11 @@ const readOwnedSourcesFx = Effect.fn("readOwnedItemDetailSourcesFx")(function* (
 						rules,
 					});
 				}
-				visible ||= activeLine.has(`${owner.id}\u0000${line.id}`);
+				visible ||= activeLine.has(`${owner.id}\u0000${line.uid}`);
 				if (!visible) continue;
 			}
 			matchingLines.push({
-				lineId: line.id,
+				lineUid: line.uid,
 				title: line.title,
 				outcome,
 			});

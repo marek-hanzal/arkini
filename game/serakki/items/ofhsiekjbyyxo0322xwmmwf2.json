@@ -45,7 +45,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "treasure",
+				"uid": "x59n6fpihn0ttdsvsfwc49c8",
 				"title": "Treasure",
 				"description": "Generates some treasure, because you wish it",
 				"clock": true,

@@ -3,7 +3,6 @@ import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { EditorTextControl } from "~/editor-control/ui/EditorValueControls";
 import { readEditorFieldErrorFn } from "~/editor-control/fn/readEditorFieldErrorFn";
-import { readEditorIdFromTitleFn } from "~/editor-control/fn/readEditorIdFromTitleFn";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { withFieldGroupFn } from "~/authoring-form/ui/EditorForm";
@@ -18,7 +17,7 @@ import { EditorBooleanToggleGroup } from "~/editor-control/ui/EditorBooleanToggl
 import { ResourceReferenceControl } from "~/authoring-form/ui/ResourceAutocompleteField";
 
 const defaultLine: LineSchema.Type = {
-	id: "",
+	uid: "",
 	title: "",
 	description: "",
 	default: false,
@@ -58,7 +57,7 @@ export const LineFields = withFieldGroupFn({
 					)}
 					<div className="grid grid-cols-2 items-stretch gap-4">
 						<div className="grid content-start gap-3">
-							<div className="grid min-w-0 grid-cols-2 items-start gap-3">
+							<div className="grid min-w-0 items-start gap-3">
 								<group.AppField name="title">
 									{(field) => (
 										<EditorTextControl
@@ -67,19 +66,8 @@ export const LineFields = withFieldGroupFn({
 											value={field.state.value}
 											error={readEditorFieldErrorFn(field.state.meta.errors)}
 											onBlurFn={field.handleBlur}
-											onChangeFn={(title) => {
-												field.handleChange(title);
-												group.setFieldValue(
-													"id",
-													readEditorIdFromTitleFn(title),
-												);
-											}}
+											onChangeFn={field.handleChange}
 										/>
-									)}
-								</group.AppField>
-								<group.AppField name="id">
-									{(field) => (
-										<field.TextField label={translator.textFn("Line ID")} />
 									)}
 								</group.AppField>
 							</div>

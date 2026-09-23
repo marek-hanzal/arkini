@@ -31,7 +31,7 @@ export const ProductionSummaryDetail = ({ item }: { readonly item: ItemSchema.Ty
 				>
 					{item.lines.slice(0, 2).map((line) => (
 						<EditorRootCard
-							key={line.id}
+							key={line.uid}
 							dataUi="EditorItemProductionOutputCard"
 						>
 							<OutcomeDetail
@@ -40,7 +40,7 @@ export const ProductionSummaryDetail = ({ item }: { readonly item: ItemSchema.Ty
 									<span className="inline-flex flex-wrap items-center gap-2">
 										<LineEditLink
 											itemUid={item.uid}
-											lineId={line.id}
+											lineUid={line.uid}
 										>
 											{line.title}
 											<ArrowUpRight className="size-4 shrink-0 text-muted transition-colors group-hover:text-accent" />

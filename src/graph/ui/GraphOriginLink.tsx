@@ -77,8 +77,7 @@ export const GraphOriginLink = ({
 					sectionId,
 				}}
 				search={{
-					lineId: operation.kind === "line" ? operation.data.id : undefined,
-					lineIndex: operation.kind === "line" ? Number(operation.source[3]) : undefined,
+					lineUid: operation.kind === "line" ? operation.data.uid : undefined,
 					merge: operation.kind === "merge" ? Number(operation.source[3]) : undefined,
 					input: annotations.inputIndex,
 					rule: annotations.ruleIndex,

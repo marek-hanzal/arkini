@@ -33,7 +33,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "idle",
+				"uid": "wmptrgdk0mtv0hus2wotlqmz",
 				"title": "Idle",
 				"description": "The goose watches everything suspiciously.",
 				"clock": true,
@@ -50,7 +50,7 @@
 				"rules": []
 			},
 			{
-				"id": "wander",
+				"uid": "l9804alvf9erp2kbsona07uq",
 				"title": "Wander",
 				"artwork": "c7nyplvmdbrgzcpmv5dx4xgt",
 				"description": "Wanders somewhere else.",
@@ -104,7 +104,7 @@
 				"rules": []
 			},
 			{
-				"id": "get-hungry",
+				"uid": "f2ynpvvpwlst8i7yvm3bojm0",
 				"title": "Get Hungry",
 				"description": "The goose gets hungry.",
 				"clock": true,
@@ -157,7 +157,7 @@
 				"rules": []
 			},
 			{
-				"id": "get-sick",
+				"uid": "a3dczocywgp93dzqj81vcz42",
 				"title": "Get Sick",
 				"description": "The goose may become sick.",
 				"clock": true,
@@ -210,7 +210,7 @@
 				"rules": []
 			},
 			{
-				"id": "disease-exposure",
+				"uid": "pdqewq4oj5akrsfjtfdq9sfh",
 				"title": "Disease Exposure",
 				"artwork": "fnom9s6mxxkza9m7iahgp5k9",
 				"description": "Nearby disease increases the chance of illness.",
@@ -280,7 +280,7 @@
 				]
 			},
 			{
-				"id": "plague-exposure",
+				"uid": "vg48yiijljna386gicios56q",
 				"title": "Plague Exposure",
 				"artwork": "j23vl46e91a44u0vt6qlcojt",
 				"description": "Nearby plague increases the chance of illness.",

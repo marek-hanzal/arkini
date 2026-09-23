@@ -69,7 +69,7 @@ const dispatchQueueRequestFx = Effect.fn("dispatchQueueRequestFx")(function* (
 				jobId: attempt.job.id,
 				ownerItemId: attempt.job.ownerItemId,
 				itemUid: owner.item.uid,
-				lineId: attempt.job.lineId,
+				lineUid: attempt.job.lineUid,
 			} satisfies EngineFact,
 			...attempt.facts,
 		],
@@ -178,7 +178,7 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 			jobId: liveJob.id,
 			ownerItemId: liveJob.ownerItemId,
 			itemUid: completedOwner.item.uid,
-			lineId: liveJob.lineId,
+			lineUid: liveJob.lineUid,
 		});
 		facts.push(...completion.facts);
 		completedOwnerItemIds.push(liveJob.ownerItemId);

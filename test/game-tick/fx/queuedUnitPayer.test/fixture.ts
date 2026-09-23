@@ -3,7 +3,7 @@ import type { InputSchema } from "~/production-input/schema/InputSchema";
 import { base, targetUnitInput } from "~test/production-action/fx/itemUnits.test/fixture";
 
 const line = (id: string, input: InputSchema.Type[]) => ({
-	id,
+	uid: id,
 	title: id,
 	description: id,
 	runtimeMs: 5_000,
@@ -110,7 +110,7 @@ export const createConfig = (amount = 1, inputCount = 1) =>
 
 				maxQueueSize: 1,
 				lines: [
-					line("free", [
+					line("independent-free", [
 						{
 							type: "simple",
 						},

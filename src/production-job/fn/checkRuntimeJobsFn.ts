@@ -82,13 +82,13 @@ export const checkRuntimeJobsFn = ({ runtime }: checkRuntimeJobsFn.Props) => {
 			});
 		const line = readItemLineFn({
 			item: owner.item,
-			lineId: entry.lineId,
+			lineUid: entry.lineUid,
 		});
 		if (line === undefined)
 			lineIssues.push({
 				jobId: entry.id,
 				ownerItemId: entry.ownerItemId,
-				lineId: entry.lineId,
+				lineUid: entry.lineUid,
 				type: RuntimeCheckIssueEnumSchema.enum.JobLineMissing,
 			});
 	}
@@ -147,7 +147,7 @@ export const checkRuntimeJobsFn = ({ runtime }: checkRuntimeJobsFn.Props) => {
 		if (owner === undefined) continue;
 		const line = readItemLineFn({
 			item: owner.item,
-			lineId: job.lineId,
+			lineUid: job.lineUid,
 		});
 		if (line === undefined) continue;
 		const input = line.input[location.inputIndex];

@@ -11,8 +11,7 @@ type FormSession = useFormController.Output & {
 	readonly outcomeSetIndex?: number;
 	readonly outcomeRollIndex?: number;
 	readonly outcomeIndex?: number;
-	readonly productionLineId?: string;
-	readonly productionLineIndex?: number;
+	readonly productionLineUid?: string;
 };
 
 const FormContext = createContext<FormSession | undefined>(undefined);

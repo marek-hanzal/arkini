@@ -44,7 +44,7 @@ it("commits a production template reset without resurrecting captured reserved m
 			const owner = yield* prepareJobLineFx();
 			yield* startLineFx({
 				ownerItemId: owner.id,
-				lineId: "line:forge:run",
+				lineUid: "line:forge:run",
 			});
 			expect(
 				(yield* readRuntimeFx()).items.some((item) => item.location.scope === "reserved"),
@@ -137,7 +137,7 @@ it("does not publish a line spawn erased by the owner's depletion Template", () 
 			const owner = yield* prepareJobLineFx();
 			yield* startLineFx({
 				ownerItemId: owner.id,
-				lineId: "line:forge:run",
+				lineUid: "line:forge:run",
 			});
 			yield* runTickRuntimeByFx({
 				elapsedMs: 5000,
@@ -232,7 +232,7 @@ it("keeps line output without mistaking it for a depleted owner's expired replac
 			const owner = yield* prepareJobLineFx();
 			yield* startLineFx({
 				ownerItemId: owner.id,
-				lineId: "line:forge:run",
+				lineUid: "line:forge:run",
 			});
 			yield* runTickRuntimeByFx({
 				elapsedMs: 1200,

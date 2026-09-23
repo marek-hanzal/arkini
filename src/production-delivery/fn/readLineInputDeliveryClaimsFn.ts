@@ -13,12 +13,12 @@ interface LineInputDeliveryClaim {
 /** Reads ordered outbound soft claims for one exact line or material-input slot. */
 export const readLineInputDeliveryClaimsFn = ({
 	inputIndex,
-	lineId,
+	lineUid,
 	ownerItemId,
 	runtime,
 }: {
 	readonly inputIndex?: number;
-	readonly lineId: IdSchema.Type;
+	readonly lineUid: IdSchema.Type;
 	readonly ownerItemId: IdSchema.Type;
 	readonly runtime: RuntimeSchema.Type;
 }) => {
@@ -29,7 +29,7 @@ export const readLineInputDeliveryClaimsFn = ({
 			Option.isNone(delivery) ||
 			delivery.value.location.phase !== "outbound" ||
 			delivery.value.location.target.ownerItemId !== ownerItemId ||
-			delivery.value.location.target.lineId !== lineId
+			delivery.value.location.target.lineUid !== lineUid
 		) {
 			continue;
 		}

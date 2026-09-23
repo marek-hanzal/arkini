@@ -43,7 +43,7 @@
 		"maxQueueSize": 6,
 		"lines": [
 			{
-				"id": "copper-ore---candle",
+				"uid": "k4n5rohatw75euy79meotevd",
 				"title": "Copper Ore - Candle",
 				"artwork": "rxpbi0mu35ylblwwky8w04bm",
 				"description": "Copper ore",
@@ -111,7 +111,7 @@
 				"rules": []
 			},
 			{
-				"id": "copper-ore---lantern",
+				"uid": "fgngrpnyl1wwn8jbln19az6i",
 				"title": "Copper Ore - Lantern",
 				"artwork": "d849jmpyesvhw3kxx0in38ni",
 				"description": "Copper ore",

@@ -29,7 +29,7 @@ export const createFixedStepTestConfig = () => {
 				description: "Produces the permit at the end of one step.",
 				lines: [
 					{
-						id: "line:enabler:run",
+						uid: "line:enabler:run",
 						title: "Enable",
 						description: "Produce one permit.",
 						runtimeMs: 200,
@@ -73,7 +73,7 @@ export const createFixedStepTestConfig = () => {
 				description: "Runs only while the permit exists.",
 				lines: [
 					{
-						id: "line:dependent:run",
+						uid: "line:dependent:run",
 						title: "Depend",
 						description: "Wait for the permit.",
 						runtimeMs: 400,
@@ -136,11 +136,11 @@ export const prepareFixedStepRuntimeFx = Effect.fn("prepareFixedStepRuntimeFx")(
 	});
 	yield* startLineFx({
 		ownerItemId: dependent.id,
-		lineId: "line:dependent:run",
+		lineUid: "line:dependent:run",
 	});
 	yield* startLineFx({
 		ownerItemId: enabler.id,
-		lineId: "line:enabler:run",
+		lineUid: "line:enabler:run",
 	});
 	yield* removeRuntimeItemForTestFx({
 		itemId: permit.id,

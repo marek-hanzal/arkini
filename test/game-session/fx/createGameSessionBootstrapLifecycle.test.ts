@@ -130,7 +130,7 @@ describe("createGameSessionFx bootstrap lifecycle", () => {
 				yield* preparation.runFx(
 					startLineFx({
 						ownerItemId: owner.id,
-						lineId: "line:forge:run",
+						lineUid: "line:forge:run",
 					}),
 				);
 				yield* preparation.flushSaveFx;

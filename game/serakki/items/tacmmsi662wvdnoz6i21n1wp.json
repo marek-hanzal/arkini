@@ -14,7 +14,7 @@
 		"maxQueueSize": 8,
 		"lines": [
 			{
-				"id": "burn-waste",
+				"uid": "xqh4ai4m8tt7jebs2sjp7p55",
 				"title": "Burn Waste",
 				"description": "Feed the incinerator with Charcoal and burn accumulated Waste. The board gets cleaner; the air files a complaint.",
 				"clockWeight": 1,
@@ -98,7 +98,7 @@
 				"rules": []
 			},
 			{
-				"id": "burn-bio-waste",
+				"uid": "azezo3c4gsb35md2r8gktftf",
 				"title": "Burn Bio-Waste",
 				"description": "Burn organic waste with Charcoal when composting is still somebody else's future problem.",
 				"clockWeight": 1,

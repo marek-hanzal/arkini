@@ -29,7 +29,7 @@ const passiveChild = {
 	location: {
 		scope: "input" as const,
 		ownerItemId: root.id,
-		lineId: "line:forge:run",
+		lineUid: "line:forge:run",
 		inputIndex: 0,
 	},
 
@@ -87,7 +87,7 @@ it("rejects active or queued work anywhere beneath the discarded ownership tree"
 		const busyEntry = {
 			id: busyId,
 			ownerItemId: passiveChild.id,
-			lineId: "line:missing",
+			lineUid: "line:missing",
 		};
 		const runtime = {
 			cheats: {

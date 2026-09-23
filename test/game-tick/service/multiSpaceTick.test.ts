@@ -19,7 +19,7 @@ describe("multi-space simulation", () => {
 				});
 				yield* startLineFx({
 					ownerItemId: worker.id,
-					lineId: "line:worker:run",
+					lineUid: "line:worker:run",
 				});
 				yield* runTickRuntimeByFx({
 					elapsedMs: 200,

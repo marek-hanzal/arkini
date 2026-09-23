@@ -1,4 +1,5 @@
 import { createId } from "@paralleldrive/cuid2";
+import { assertUniqueLineUidsFx } from "~/project-authoring/fx/assertUniqueLineUidsFx";
 import { Clock, FileSystem, Path } from "effect";
 import { Effect, type Semaphore } from "effect";
 
@@ -335,6 +336,7 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 				pendingRoot: string,
 			) => Effect.Effect<void, unknown, never>;
 		}) {
+			yield* assertUniqueLineUidsFx(config, "create-project");
 			const nowMs = yield* Clock.currentTimeMillis;
 			return yield* operations
 				.withPermits(1)(

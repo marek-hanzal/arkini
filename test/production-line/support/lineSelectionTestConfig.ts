@@ -48,7 +48,7 @@ export const lineSelectionTestConfig = GameConfigSchema.parse({
 
 			lines: [
 				{
-					id: "line:producer:zero",
+					uid: "line:producer:zero",
 					title: "Zero capacity",
 					description: "A line with one exact input.",
 					runtimeMs: 1_000,
@@ -84,7 +84,7 @@ export const lineSelectionTestConfig = GameConfigSchema.parse({
 			},
 			lines: [
 				{
-					id: "line:craft",
+					uid: "line:craft",
 					title: "Craft",
 					description: "One single-use line.",
 					runtimeMs: 1_000,

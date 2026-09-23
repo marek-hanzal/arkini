@@ -42,7 +42,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "idle",
+				"uid": "uy64lvtnskzbe7k3dxjiywxt",
 				"title": "Linger",
 				"description": "The ghost hangs around, being unsettling but otherwise unproductive.",
 				"clock": true,
@@ -59,7 +59,7 @@
 				"rules": []
 			},
 			{
-				"id": "wander",
+				"uid": "kn41v06x70ywbreer24kdtyt",
 				"title": "Wander",
 				"artwork": "l8fcutyu853b3qmfb8tnig91",
 				"description": "The ghost drifts somewhere else on the board.",

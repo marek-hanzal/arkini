@@ -254,7 +254,7 @@ it("scopes punctuation-containing identities and keeps line relation identity ac
 		}),
 		B: itemFn("B", {
 			lines: [
-				lineFn(l, {
+				lineFn(`B:${l}`, {
 					outcome: outputFn(a),
 				}),
 			],

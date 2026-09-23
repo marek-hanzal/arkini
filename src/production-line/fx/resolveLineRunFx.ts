@@ -20,7 +20,7 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace resolveLineRunFx {
 	export interface Props {
-		lineId: IdSchema.Type;
+		lineUid: IdSchema.Type;
 		ownerItemId: IdSchema.Type;
 		runtime: RuntimeSchema.Type;
 	}
@@ -29,7 +29,7 @@ export namespace resolveLineRunFx {
 const planLineRunFn = ({
 	enable,
 	input,
-	lineId,
+	lineUid,
 	ownerItemId,
 	runtimeMs,
 }: {
@@ -38,7 +38,7 @@ const planLineRunFn = ({
 		InputRun.Resolution,
 		...InputRun.Resolution[],
 	];
-	readonly lineId: IdSchema.Type;
+	readonly lineUid: IdSchema.Type;
 	readonly ownerItemId: IdSchema.Type;
 	readonly runtimeMs: TimeSchema.Type;
 }) => {
@@ -54,7 +54,7 @@ const planLineRunFn = ({
 
 	return {
 		ownerItemId,
-		lineId,
+		lineUid,
 		runtimeMs,
 		input: [
 			firstInputPlan,
@@ -98,7 +98,7 @@ const resolveLineRuntimeFn = ({
  * mutation planner can make queue, rule, and input decisions without a stale-plan race.
  */
 export const resolveLineRunFx = Effect.fn("resolveLineRunFx")(function* ({
-	lineId,
+	lineUid,
 	ownerItemId,
 	runtime,
 }: resolveLineRunFx.Props) {
@@ -118,13 +118,13 @@ export const resolveLineRunFx = Effect.fn("resolveLineRunFx")(function* ({
 
 	const line = readItemLineFn({
 		item: owner.item,
-		lineId,
+		lineUid,
 	});
 	if (line === undefined) {
 		return yield* Effect.fail(
 			new LineNotFoundError({
 				itemId: ownerItemId,
-				lineId,
+				lineUid,
 			}),
 		);
 	}
@@ -155,7 +155,7 @@ export const resolveLineRunFx = Effect.fn("resolveLineRunFx")(function* ({
 		const resolvedInput = yield* resolveInputRunFx({
 			input: configuredInput,
 			inputIndex,
-			lineId,
+			lineUid,
 			ownerItemId,
 			reservedUnits,
 			runtime,
@@ -184,7 +184,7 @@ export const resolveLineRunFx = Effect.fn("resolveLineRunFx")(function* ({
 	const plan = planLineRunFn({
 		enable,
 		input,
-		lineId,
+		lineUid,
 		ownerItemId,
 		runtimeMs,
 	});
@@ -192,7 +192,7 @@ export const resolveLineRunFx = Effect.fn("resolveLineRunFx")(function* ({
 
 	return {
 		ownerItemId,
-		lineId,
+		lineUid,
 		show,
 		enable,
 		rules,

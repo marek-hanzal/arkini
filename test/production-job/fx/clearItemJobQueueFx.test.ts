@@ -43,7 +43,7 @@ const prepareBlockedReserveQueueFx = Effect.fn("prepareBlockedReserveQueueFx")(f
 	});
 	const request = yield* enqueueLineFx({
 		ownerItemId: owner.id,
-		lineId: "line:forge:run",
+		lineUid: "line:forge:run",
 	});
 	return {
 		owner,
@@ -100,7 +100,7 @@ describe("clearItemJobQueueFx", () => {
 				});
 				const requeued = yield* enqueueLineFx({
 					ownerItemId: "runtime:forge:primary",
-					lineId: "line:forge:run",
+					lineUid: "line:forge:run",
 				});
 				return {
 					after: yield* readRuntimeFx(),
@@ -285,7 +285,7 @@ it("keeps shared line material until its final queued request is cancelled", () 
 			const prepared = yield* prepareBlockedReserveQueueFx();
 			const second = yield* enqueueLineFx({
 				ownerItemId: prepared.owner.id,
-				lineId: "line:forge:run",
+				lineUid: "line:forge:run",
 			});
 			yield* runTickRuntimeByFx({
 				elapsedMs: 100,

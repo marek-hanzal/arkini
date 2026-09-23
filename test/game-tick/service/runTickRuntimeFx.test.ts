@@ -22,7 +22,7 @@ import {
 
 const props = {
 	ownerItemId: "runtime:forge",
-	lineId: "line:forge:run",
+	lineUid: "line:forge:run",
 };
 
 const removeAvailableWaterFx = Effect.fn("removeAvailableWaterFx")(function* () {
@@ -53,7 +53,7 @@ const refillBufferedWaterFx = Effect.fn("refillBufferedWaterFx")(function* () {
 		});
 		yield* bufferInputMaterialForTestFx({
 			ownerItemId: props.ownerItemId,
-			lineId: props.lineId,
+			lineUid: props.lineUid,
 			inputIndex: 0,
 			sourceItemId: water.id,
 			sourceItemRevision: water.revision,
@@ -413,12 +413,12 @@ describe("fixed Tick steps", () => {
 						{
 							id: "job:older-global-request",
 							ownerItemId: olderOwnerItemId,
-							lineId: props.lineId,
+							lineUid: props.lineUid,
 						},
 						{
 							id: "job:newer-global-request",
 							ownerItemId: newerOwnerItemId,
-							lineId: props.lineId,
+							lineUid: props.lineUid,
 						},
 					],
 				});
@@ -435,12 +435,12 @@ describe("fixed Tick steps", () => {
 			{
 				id: "job:older-global-request",
 				ownerItemId: "runtime:zzz-forge",
-				lineId: props.lineId,
+				lineUid: props.lineUid,
 			},
 			{
 				id: "job:newer-global-request",
 				ownerItemId: "runtime:aaa-forge",
-				lineId: props.lineId,
+				lineUid: props.lineUid,
 			},
 		]);
 		const deliveries = result.items.filter((item) => item.location.scope === "delivery");

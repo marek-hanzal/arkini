@@ -15,7 +15,7 @@
 		"maxQueueSize": 4,
 		"lines": [
 			{
-				"id": "harvest",
+				"uid": "tyhdydcbmk5q4hat0647a04b",
 				"title": "Rapeseed",
 				"description": "Harvest rapeseed from a nearby planted field. Supply one bucket of water; the empty bucket is returned.",
 				"clockWeight": 1,
@@ -92,7 +92,7 @@
 				"rules": []
 			},
 			{
-				"id": "field",
+				"uid": "plyaugr0scgp129izsm4d6tp",
 				"title": "Prepare Rapeseed Field",
 				"artwork": "j32cdouc0x1c1ngan5lsz8ma",
 				"description": "Prepare a new rapeseed field for planting.",
@@ -134,7 +134,7 @@
 				"rules": []
 			},
 			{
-				"id": "blueprint",
+				"uid": "co8gy3rbbcd0ljypx7krgyxu",
 				"title": "Rapeseed Farm Blueprint",
 				"artwork": "so7r094glj6wfe6yoveiclrg",
 				"description": "Sketch plans for another Rapeseed Farm.",

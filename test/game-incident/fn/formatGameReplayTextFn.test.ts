@@ -19,12 +19,12 @@ const runtime = ({
 		speedUpGameplay: false,
 	},
 	currentSpace,
-	defaultLineId,
+	defaultLineUid,
 	remainingUnits = 3,
 }: {
 	readonly cheats?: GameDiagnosticRuntime["cheats"];
 	readonly currentSpace: number;
-	readonly defaultLineId?: string;
+	readonly defaultLineUid?: string;
 	readonly remainingUnits?: number;
 }): GameDiagnosticRuntime => ({
 	currentSpace,
@@ -43,12 +43,12 @@ const runtime = ({
 	jobs: [],
 	queue: [],
 	defaultLines:
-		defaultLineId === undefined
+		defaultLineUid === undefined
 			? []
 			: [
 					{
 						owner: itemReference,
-						lineId: defaultLineId,
+						lineUid: defaultLineUid,
 					},
 				],
 });
@@ -146,7 +146,7 @@ describe("formatGameReplayTextFn", () => {
 				}),
 				finalRuntime: runtime({
 					currentSpace: 0,
-					defaultLineId: "line:forge",
+					defaultLineUid: "line:forge",
 				}),
 			}),
 		);

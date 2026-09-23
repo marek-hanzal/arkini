@@ -160,7 +160,7 @@ export const formatGameDiagnosticHistoryTextFn = (history: GameDiagnosticHistory
 			lines.push("", `${label}:`);
 			for (const job of jobs) {
 				lines.push(
-					`- ${job.jobId} · line ${job.lineId} · owner ${formatGameDiagnosticItemPointerTextFn(job.owner)}`,
+					`- ${job.jobId} · line ${job.lineUid} · owner ${formatGameDiagnosticItemPointerTextFn(job.owner)}`,
 				);
 			}
 		};
@@ -174,7 +174,7 @@ export const formatGameDiagnosticHistoryTextFn = (history: GameDiagnosticHistory
 			lines.push("", `${label}:`);
 			for (const request of requests) {
 				lines.push(
-					`- ${request.requestId} · line ${request.lineId} · owner ${formatGameDiagnosticItemPointerTextFn(request.owner)}`,
+					`- ${request.requestId} · line ${request.lineUid} · owner ${formatGameDiagnosticItemPointerTextFn(request.owner)}`,
 				);
 			}
 		};
@@ -184,7 +184,7 @@ export const formatGameDiagnosticHistoryTextFn = (history: GameDiagnosticHistory
 			lines.push("", "Default lines changed:");
 			for (const change of entry.defaultLinesChanged) {
 				lines.push(
-					`- ${formatGameDiagnosticItemPointerTextFn(change.owner)} · ${change.previousLineId ?? "none"} → ${change.lineId ?? "none"}`,
+					`- ${formatGameDiagnosticItemPointerTextFn(change.owner)} · ${change.previousLineUid ?? "none"} → ${change.lineUid ?? "none"}`,
 				);
 			}
 		}

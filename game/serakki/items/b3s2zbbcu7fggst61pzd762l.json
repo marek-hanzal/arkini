@@ -14,7 +14,7 @@
 		"maxQueueSize": 3,
 		"lines": [
 			{
-				"id": "hunt-steak",
+				"uid": "jm7c0zh8wmkjh4o96pf47dje",
 				"title": "Hunt For Steak",
 				"artwork": "ygces9f1ynk9qr5yrs3fl8q7",
 				"description": "Work a nearby Forest for a clean cut of meat. Slow, deliberate, and intentionally boring enough to bootstrap food without vomiting half a carcass onto the board.",
@@ -101,7 +101,7 @@
 				]
 			},
 			{
-				"id": "hunt-raw-meat",
+				"uid": "j4ezv688v0zqtxtuuiaild8p",
 				"title": "Hunt For Raw Meat",
 				"artwork": "e3credp19j7on2s4n2y7d4f8",
 				"description": "Work a nearby Forest for generic raw game meat. Uses the same hunting gear but returns only the meat instead of the whole unpleasant accounting exercise.",
@@ -188,7 +188,7 @@
 				]
 			},
 			{
-				"id": "hunt-fawn",
+				"uid": "piqbfkkhpo3f0enz3mxpoa7s",
 				"title": "Hunt Fawn",
 				"artwork": "mq003g3xomvl71vvq6648gt4",
 				"description": "Hunt a specific fawn with a reserved Bow and one consumed Arrow.",
@@ -273,7 +273,7 @@
 				"rules": []
 			},
 			{
-				"id": "hunt-wild-boar",
+				"uid": "l2k0fxmls3sbzkhiimek26yw",
 				"title": "Hunt Wild Boar",
 				"artwork": "rseqyidiainkls2qbo0hp78q",
 				"description": "Hunt a specific wild boar with a reserved Bow and one consumed Arrow.",
@@ -358,7 +358,7 @@
 				"rules": []
 			},
 			{
-				"id": "hunt-shorn-wild-boar",
+				"uid": "vbubmqxtje7il30bqu1wc51r",
 				"title": "Hunt Shorn Wild Boar",
 				"artwork": "nim1xmgkvpq5nfufzrbukgpp",
 				"description": "Hunt a specific shorn wild boar with a reserved Bow and one consumed Arrow.",
@@ -443,7 +443,7 @@
 				"rules": []
 			},
 			{
-				"id": "hunt-wolf",
+				"uid": "i11qdmv8wvfyqroutmtn8pw3",
 				"title": "Hunt Wolf",
 				"artwork": "ng6ysy8poe1dwz906gbmxons",
 				"description": "Hunt a specific wolf with a reserved Bow and one consumed Arrow.",
@@ -528,7 +528,7 @@
 				"rules": []
 			},
 			{
-				"id": "hunt-bear",
+				"uid": "cv16l5t3iukteel9v6j6jbxe",
 				"title": "Hunt Bear",
 				"artwork": "qi3z0prh4ozd1ofelnucin2s",
 				"description": "Hunt a specific bear with a reserved Bow and two consumed Arrows. Large target, large disagreement.",

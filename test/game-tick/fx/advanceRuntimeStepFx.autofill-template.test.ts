@@ -32,7 +32,7 @@ it("does not announce Autofill erased by a later payer Template reset in the sam
 			forge: {
 				...base.items.forge,
 				lines: base.items.forge.lines.map((line) =>
-					line.id === "line:later"
+					line.uid === "line:later"
 						? {
 								...line,
 								input: line.input.map((input) =>

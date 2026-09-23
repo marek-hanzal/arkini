@@ -11,14 +11,14 @@ import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 export namespace startLineFx {
 	export interface Props {
 		readonly ownerItemId: IdSchema.Type;
-		readonly lineId: IdSchema.Type;
+		readonly lineUid: IdSchema.Type;
 	}
 }
 
 /** Test-only direct admission helper for constructing already-running scenarios. */
 export const startLineFx = Effect.fn("startLineTestFx")(function* ({
 	ownerItemId,
-	lineId,
+	lineUid,
 }: startLineFx.Props) {
 	return yield* modifyRuntimeFx((runtime) =>
 		Effect.gen(function* () {
@@ -27,14 +27,14 @@ export const startLineFx = Effect.fn("startLineTestFx")(function* ({
 				(runtime.jobQueue ?? []).some((request) => request.ownerItemId === ownerItemId);
 			const resolution = yield* resolveLineStartFx({
 				ownerItemId,
-				lineId,
+				lineUid,
 				runtime,
 			});
 			if (hasOwnerWork || !resolution.ready) {
 				return yield* Effect.fail(
 					new LineRunUnavailableError({
 						ownerItemId,
-						lineId,
+						lineUid,
 					}),
 				);
 			}
@@ -44,7 +44,7 @@ export const startLineFx = Effect.fn("startLineTestFx")(function* ({
 			});
 			const [job, nextRuntime, itemEvents] = yield* startLineRuntimeFx({
 				ownerItemId,
-				lineId,
+				lineUid,
 				runtime,
 			});
 			return [
@@ -59,7 +59,7 @@ export const startLineFx = Effect.fn("startLineTestFx")(function* ({
 						itemUid: owner.item.uid,
 						jobId: job.id,
 						ownerItemId: job.ownerItemId,
-						lineId: job.lineId,
+						lineUid: job.lineUid,
 					},
 					...itemEvents,
 				],

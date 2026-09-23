@@ -74,12 +74,12 @@ export const attemptQueuedLineStartFx = Effect.fn("attemptQueuedLineStartFx")(fu
 					runtime,
 					error: new LineRunUnavailableError({
 						ownerItemId: request.ownerItemId,
-						lineId: request.lineId,
+						lineUid: request.lineUid,
 					}),
 				} as const;
 			const autofill = yield* autofillLineInputsRuntimeFx({
 				ownerItemId: request.ownerItemId,
-				lineId: request.lineId,
+				lineUid: request.lineUid,
 				runtime,
 			});
 			if (autofill.result.scheduledQuantity > 0) {
@@ -93,7 +93,7 @@ export const attemptQueuedLineStartFx = Effect.fn("attemptQueuedLineStartFx")(fu
 				type: "blocked",
 				error: new LineRunUnavailableError({
 					ownerItemId: request.ownerItemId,
-					lineId: request.lineId,
+					lineUid: request.lineUid,
 				}),
 				runtime,
 			} satisfies attemptQueuedLineStartFx.Result;

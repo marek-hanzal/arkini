@@ -15,7 +15,7 @@
 		"maxQueueSize": 4,
 		"lines": [
 			{
-				"id": "empty-bucket",
+				"uid": "yd8pwq3x6exvxdof3p31bnsh",
 				"title": "Empty Bucket",
 				"artwork": "jjjclycevj28udhuw8z2dj0h",
 				"description": "Make a wooden bucket for carrying water and other liquids.",
@@ -69,7 +69,7 @@
 				"rules": []
 			},
 			{
-				"id": "empty-crate",
+				"uid": "wm9w6krw8xfvzsnlvuklzyta",
 				"title": "Empty Crate",
 				"artwork": "ds3rbh45niqolr0afwqwz4r9",
 				"description": "Build a wooden crate for packing goods.",
@@ -123,7 +123,7 @@
 				"rules": []
 			},
 			{
-				"id": "empty-basket",
+				"uid": "mya6lyex3rwsa5npzdpdz1f4",
 				"title": "Empty Basket",
 				"artwork": "xg7vezdfetjkmpfjhfigjqhq",
 				"description": "Weave a simple basket from processed wood fibers for eggs, bread, and other loose goods.",
@@ -177,7 +177,7 @@
 				"rules": []
 			},
 			{
-				"id": "empty-paper-drying-rack",
+				"uid": "win1joz8zhabqgqc44ok2mkf",
 				"title": "Paper Drying Rack",
 				"artwork": "yzibccv5myux6gvh7c9rbjch",
 				"description": "Build a reusable wooden rack for forming and drying sheets of paper.",
@@ -231,7 +231,7 @@
 				"rules": []
 			},
 			{
-				"id": "scrubbing-brush",
+				"uid": "a82n8ffm3an0vl0wg2hc9py3",
 				"title": "Scrubbing Brush",
 				"artwork": "taxw7u1lko0lx1z4ym93fcoy",
 				"description": "Build a sturdy wooden scrubbing brush using boar bristles.",
@@ -300,7 +300,7 @@
 				"rules": []
 			},
 			{
-				"id": "cutting-board",
+				"uid": "sqmp65ahqxr8rkopcvg0hhaf",
 				"title": "Cutting Board",
 				"artwork": "xbl6vn5ornfwxztuw4x58vjs",
 				"description": "Make a simple wooden cutting board for food preparation and other increasingly questionable kitchen chemistry.",
@@ -354,7 +354,7 @@
 				"rules": []
 			},
 			{
-				"id": "shepherds-crook",
+				"uid": "d3bnrk352k5axjua8djrg0rv",
 				"title": "Shepherd's Crook",
 				"artwork": "bfhaec6ttp7jufstqez635sg",
 				"description": "Carve a reusable crook for manually releasing animals from populated enclosures.",
@@ -408,7 +408,7 @@
 				"rules": []
 			},
 			{
-				"id": "wooden-sticks",
+				"uid": "kap5p7925u8z56y0gm8vh94v",
 				"title": "Wooden Sticks",
 				"artwork": "sph5etm2s4wtaq97o9zpzcvr",
 				"description": "Cut processed planks into a larger batch of straight wooden sticks with less waste.",

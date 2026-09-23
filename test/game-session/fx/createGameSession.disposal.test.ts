@@ -36,7 +36,7 @@ describe("createGameSessionFx / planner disposal", () => {
 								itemUid: "owner",
 								jobId: "job:dispose:pending",
 								ownerItemId: "owner:dispose:pending",
-								lineId: "line:dispose:pending",
+								lineUid: "line:dispose:pending",
 							},
 						],
 					] as const),

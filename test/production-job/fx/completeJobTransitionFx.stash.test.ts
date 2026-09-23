@@ -79,11 +79,11 @@ const simpleItem = (id: string) => ({
 
 const stashItem = ({
 	id,
-	lineId,
+	lineUid,
 	lineOutcome,
 }: {
 	id: string;
-	lineId: string;
+	lineUid: string;
 	lineOutcome: ReturnType<typeof outcome>;
 }) => ({
 	maxQueueSize: 1,
@@ -105,9 +105,9 @@ const stashItem = ({
 
 	lines: [
 		{
-			id: lineId,
-			title: lineId,
-			description: lineId,
+			uid: lineUid,
+			title: lineUid,
+			description: lineUid,
 			runtimeMs: 200,
 			input: [
 				{
@@ -151,7 +151,7 @@ const stashConfig = GameConfigSchema.parse({
 	items: {
 		"stash:guaranteed": stashItem({
 			id: "stash:guaranteed",
-			lineId: "line:stash:guaranteed",
+			lineUid: "line:stash:guaranteed",
 			lineOutcome: outcome([
 				{
 					itemUid: "item:coin",
@@ -160,7 +160,7 @@ const stashConfig = GameConfigSchema.parse({
 		}),
 		"stash:chance": stashItem({
 			id: "stash:chance",
-			lineId: "line:stash:chance",
+			lineUid: "line:stash:chance",
 			lineOutcome: outcome([
 				{
 					itemUid: "item:gem",
@@ -170,7 +170,7 @@ const stashConfig = GameConfigSchema.parse({
 		}),
 		"stash:blocked": stashItem({
 			id: "stash:blocked",
-			lineId: "line:stash:blocked",
+			lineUid: "line:stash:blocked",
 			lineOutcome: outcome([
 				{
 					itemUid: "item:board-a",
@@ -200,10 +200,10 @@ const run = <A, E>(effect: Effect.Effect<A, E, Layer.Success<ReturnType<typeof G
 
 const startStashFx = Effect.fn("startStashFx")(function* ({
 	itemUid,
-	lineId,
+	lineUid,
 }: {
 	itemUid: "stash:blocked" | "stash:chance" | "stash:guaranteed";
-	lineId: string;
+	lineUid: string;
 }) {
 	const owner = yield* spawnItemFx({
 		id: "runtime:stash",
@@ -231,17 +231,17 @@ const startStashFx = Effect.fn("startStashFx")(function* ({
 	});
 	yield* bufferInputMaterialForTestFx({
 		ownerItemId: owner.id,
-		lineId,
+		lineUid,
 		inputIndex: 0,
 		sourceItemId: key.id,
 		sourceItemRevision: key.revision,
 	});
 	const started = yield* startLineFx({
 		ownerItemId: owner.id,
-		lineId,
+		lineUid,
 	});
 	if (started.type !== "started") {
-		return yield* Effect.die(new Error(`Expected ${lineId} to start immediately.`));
+		return yield* Effect.die(new Error(`Expected ${lineUid} to start immediately.`));
 	}
 
 	return {
@@ -256,7 +256,7 @@ describe("stash line completion transition", () => {
 			Effect.gen(function* () {
 				const started = yield* startStashFx({
 					itemUid: "stash:guaranteed",
-					lineId: "line:stash:guaranteed",
+					lineUid: "line:stash:guaranteed",
 				});
 				yield* runTickRuntimeByFx({
 					elapsedMs: 200,
@@ -295,7 +295,7 @@ describe("stash line completion transition", () => {
 			Effect.gen(function* () {
 				yield* startStashFx({
 					itemUid: "stash:chance",
-					lineId: "line:stash:chance",
+					lineUid: "line:stash:chance",
 				});
 				yield* runTickRuntimeByFx({
 					elapsedMs: 200,
@@ -313,7 +313,7 @@ describe("stash line completion transition", () => {
 			Effect.gen(function* () {
 				const started = yield* startStashFx({
 					itemUid: "stash:blocked",
-					lineId: "line:stash:blocked",
+					lineUid: "line:stash:blocked",
 				});
 				const blocker = yield* spawnItemFx({
 					id: "runtime:blocker",
@@ -368,7 +368,7 @@ describe("stash line completion transition", () => {
 			Effect.gen(function* () {
 				yield* startStashFx({
 					itemUid: "stash:guaranteed",
-					lineId: "line:stash:guaranteed",
+					lineUid: "line:stash:guaranteed",
 				});
 				const runtime = yield* readRuntimeFx();
 				const state = fromRuntimeFn({

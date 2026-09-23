@@ -25,7 +25,7 @@ it("keeps queued material identities intact, uses idle alternatives, and retries
 				lines: [
 					{
 						...workshop.lines[0],
-						id: "recycle",
+						uid: "recycle",
 						input: [
 							{
 								type: "materials",
@@ -61,11 +61,11 @@ it("keeps queued material identities intact, uses idle alternatives, and retries
 			});
 			yield* enqueueLineFx({
 				ownerItemId: "receiver",
-				lineId: "recycle",
+				lineUid: "recycle",
 			});
 			yield* enqueueLineFx({
 				ownerItemId: "queued",
-				lineId: "line:workshop:build",
+				lineUid: "line:workshop:build",
 			});
 			const before = yield* readRuntimeFx();
 

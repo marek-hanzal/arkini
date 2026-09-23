@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { ConfigSchemaDiagnosticSchema } from "./ConfigSchemaDiagnosticSchema";
-import { DuplicateLineIdDiagnosticSchema } from "./DuplicateLineIdDiagnosticSchema";
+import { DuplicateLineUidDiagnosticSchema } from "./DuplicateLineUidDiagnosticSchema";
 import { DuplicateProviderDiagnosticSchema } from "./DuplicateProviderDiagnosticSchema";
 import { UnusedResourceDiagnosticSchema } from "./UnusedResourceDiagnosticSchema";
 import { MissingResourceDiagnosticSchema } from "./MissingResourceDiagnosticSchema";
@@ -41,7 +41,7 @@ export const GameDiagnosticSchema = z
 		StartInvalidDiagnosticSchema,
 		SourceJsonDiagnosticSchema,
 		SourceSchemaDiagnosticSchema,
-		DuplicateLineIdDiagnosticSchema,
+		DuplicateLineUidDiagnosticSchema,
 		MultipleLineSelectionsDiagnosticSchema,
 	])
 	.meta({

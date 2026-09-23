@@ -7,17 +7,17 @@ import { IdSchema } from "~/game-value/schema/IdSchema";
 import { DiagnosticPathSchema } from "./DiagnosticPathSchema";
 import { BaseDiagnosticSchema } from "./BaseDiagnosticSchema";
 
-export const DuplicateLineIdDiagnosticSchema = z
+export const DuplicateLineUidDiagnosticSchema = z
 	.object({
 		...BaseDiagnosticSchema.shape,
 		code: DiagnosticCodeEnumSchema.extract([
-			"LineDuplicateId",
+			"LineDuplicateUid",
 		]),
 		severity: DiagnosticSeverityEnumSchema.extract([
 			"Error",
 		]),
 		ownerItemUid: IdSchema,
-		lineId: IdSchema,
+		lineUid: IdSchema,
 		paths: z.tuple([
 			DiagnosticPathSchema,
 			DiagnosticPathSchema,
@@ -25,11 +25,12 @@ export const DuplicateLineIdDiagnosticSchema = z
 	})
 	.strict()
 	.meta({
-		id: "DuplicateLineIdDiagnosticSchema",
-		description: "Two product lines owned by one item use the same stable line ID.",
+		id: "DuplicateLineUidDiagnosticSchema",
+		description:
+			"Two product lines use the same project-wide UID; paths identify both owners and occurrences.",
 	});
 
-export type DuplicateLineIdDiagnosticSchema = typeof DuplicateLineIdDiagnosticSchema;
-export namespace DuplicateLineIdDiagnosticSchema {
-	export type Type = z.infer<DuplicateLineIdDiagnosticSchema>;
+export type DuplicateLineUidDiagnosticSchema = typeof DuplicateLineUidDiagnosticSchema;
+export namespace DuplicateLineUidDiagnosticSchema {
+	export type Type = z.infer<DuplicateLineUidDiagnosticSchema>;
 }

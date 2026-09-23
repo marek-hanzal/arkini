@@ -22,7 +22,7 @@ describe("startLineRuntimeFx", () => {
 
 				const [job, runtime, facts] = yield* startLineRuntimeFx({
 					ownerItemId: "runtime:forge",
-					lineId: "line:forge:run",
+					lineUid: "line:forge:run",
 					runtime: before,
 				});
 

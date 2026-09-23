@@ -56,7 +56,7 @@ describe("blueprint completion rollback", () => {
 				}
 				yield* startLineFx({
 					ownerItemId: owner.id,
-					lineId: "line:blueprint:outcome",
+					lineUid: "line:blueprint:outcome",
 				});
 				yield* runTickRuntimeByFx({
 					elapsedMs: 200,
@@ -127,14 +127,14 @@ describe("blueprint completion rollback", () => {
 				}
 				yield* bufferInputMaterialForTestFx({
 					ownerItemId: owner.id,
-					lineId: "line:blueprint:reserve",
+					lineUid: "line:blueprint:reserve",
 					inputIndex: 0,
 					sourceItemId: tool.id,
 					sourceItemRevision: tool.revision,
 				});
 				yield* startLineFx({
 					ownerItemId: owner.id,
-					lineId: "line:blueprint:reserve",
+					lineUid: "line:blueprint:reserve",
 				});
 				yield* runTickRuntimeByFx({
 					elapsedMs: 200,

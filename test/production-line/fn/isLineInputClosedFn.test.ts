@@ -16,7 +16,7 @@ const activeRuntime = {
 		{
 			id: "job:active",
 			ownerItemId: "runtime:owner",
-			lineId: "line:run",
+			lineUid: "line:run",
 			durationMs: 1_000,
 			remainingMs: 1_000,
 		},
@@ -30,7 +30,7 @@ describe("isLineInputClosedFn", () => {
 		const resolve = (runtime: RuntimeSchema.Type = activeRuntime) =>
 			isLineInputClosedFn({
 				ownerItemId: "runtime:owner",
-				lineId: "line:run",
+				lineUid: "line:run",
 				runtime,
 			});
 

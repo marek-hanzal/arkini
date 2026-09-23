@@ -17,7 +17,7 @@ export namespace autofillLineInputsRuntimeFx {
 	export interface Props {
 		readonly inputIndex?: number;
 		readonly ownerItemId: IdSchema.Type;
-		readonly lineId: IdSchema.Type;
+		readonly lineUid: IdSchema.Type;
 		readonly runtime: RuntimeSchema.Type;
 	}
 
@@ -34,14 +34,14 @@ export namespace autofillLineInputsRuntimeFx {
 /** Applies canonical delivery admission to an immutable runtime draft. */
 export const autofillLineInputsRuntimeFx = Effect.fn("autofillLineInputsRuntimeFx")(function* ({
 	ownerItemId,
-	lineId,
+	lineUid,
 	inputIndex,
 	runtime,
 }: autofillLineInputsRuntimeFx.Props) {
 	const plan = yield* planLineInputAutofillFx({
 		inputIndex,
 		ownerItemId,
-		lineId,
+		lineUid,
 		runtime,
 	});
 	if (plan.entry.length === 0) {
@@ -96,7 +96,7 @@ export const autofillLineInputsRuntimeFx = Effect.fn("autofillLineInputsRuntimeF
 					target: {
 						kind: "line-input",
 						ownerItemId,
-						lineId,
+						lineUid,
 						inputIndex,
 					},
 				},
@@ -126,7 +126,7 @@ export const autofillLineInputsRuntimeFx = Effect.fn("autofillLineInputsRuntimeF
 			type: "autofill:admitted",
 			ownerItemId,
 			itemUid: owner.item.uid,
-			lineId,
+			lineUid,
 			deliveries: admittedDeliveries,
 		});
 	}

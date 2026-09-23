@@ -74,7 +74,7 @@ const craftItem = ({
 		lines: [
 			{
 				description: `line:${id}`,
-				id: `line:${id}`,
+				uid: `line:${id}`,
 				input:
 					inputItemUid === undefined
 						? [

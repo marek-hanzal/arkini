@@ -15,7 +15,7 @@
 		"maxQueueSize": 4,
 		"lines": [
 			{
-				"id": "chicken-farm-blueprint",
+				"uid": "h2rzzamytvdqecqcy5r48pu0",
 				"title": "Chicken Farm Blueprint",
 				"artwork": "t00oswv00ifkupq0qr67cb53",
 				"description": "Draw plans for Chicken Farm.",
@@ -130,7 +130,7 @@
 				]
 			},
 			{
-				"id": "pig-farm-blueprint",
+				"uid": "ie2nyuatfwbazeb7llbqb42w",
 				"title": "Pig Farm Blueprint",
 				"artwork": "mg241ly73avd22s3ncv4e5q9",
 				"description": "Draw plans for Pig Farm.",
@@ -245,7 +245,7 @@
 				]
 			},
 			{
-				"id": "goose-farm-blueprint",
+				"uid": "vafc8ierlip8p5ab7ssmajth",
 				"title": "Goose Farm Blueprint",
 				"artwork": "oxittviuc7021lcpe04kybb9",
 				"description": "Draw plans for Goose Farm.",
@@ -360,7 +360,7 @@
 				]
 			},
 			{
-				"id": "sheep-farm-blueprint",
+				"uid": "zljuphfwd8ojvl7fcmhktbjq",
 				"title": "Sheep Farm Blueprint",
 				"artwork": "mrnd35l8q8ynnve32m7znypb",
 				"description": "Draw plans for Sheep Farm.",
@@ -475,7 +475,7 @@
 				]
 			},
 			{
-				"id": "cow-farm-blueprint",
+				"uid": "tirt8p0wbxaoquzdpi7knr20",
 				"title": "Cow Farm Blueprint",
 				"artwork": "idjjruev1o20fc0k5r90nppr",
 				"description": "Draw plans for Cow Farm.",
@@ -590,7 +590,7 @@
 				]
 			},
 			{
-				"id": "apiary-blueprint",
+				"uid": "igab9cavhh5bwdtd2j0oqusi",
 				"title": "Apiary Blueprint",
 				"artwork": "wvvpfewnw4oxnti4ljsn4w9o",
 				"description": "Draw plans for an Apiary once flower farming is established.",

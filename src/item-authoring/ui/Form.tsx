@@ -52,8 +52,7 @@ interface FormProps extends PropsWithChildren {
 	readonly outcomeSetIndex?: number;
 	readonly outcomeRollIndex?: number;
 	readonly outcomeIndex?: number;
-	readonly productionLineId?: string;
-	readonly productionLineIndex?: number;
+	readonly productionLineUid?: string;
 	readonly resourceUid?: string;
 	readonly sectionId?: SectionId;
 	readonly uid: string;
@@ -73,8 +72,7 @@ export const Form = ({
 	outcomeSetIndex,
 	outcomeRollIndex,
 	outcomeIndex,
-	productionLineId,
-	productionLineIndex,
+	productionLineUid,
 	resourceUid,
 	sectionId = "identity",
 	uid,
@@ -100,8 +98,7 @@ export const Form = ({
 			outcomeSetIndex={outcomeSetIndex}
 			outcomeRollIndex={outcomeRollIndex}
 			outcomeIndex={outcomeIndex}
-			productionLineId={productionLineId}
-			productionLineIndex={productionLineIndex}
+			productionLineUid={productionLineUid}
 			resourceUid={resourceUid}
 			sectionId={sectionId}
 		>

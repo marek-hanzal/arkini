@@ -41,15 +41,15 @@ const hasMergeIdentityStateFn = ({
 				({ location }) =>
 					(location.scope === "input" &&
 						location.ownerItemId === item.id &&
-						location.lineId === line.id) ||
+						location.lineUid === line.uid) ||
 					(location.scope === "delivery" &&
 						location.phase === "outbound" &&
 						location.target.ownerItemId === item.id &&
-						location.target.lineId === line.id),
+						location.target.lineUid === line.uid),
 			) ||
-			runtime.jobs.some((job) => job.ownerItemId === item.id && job.lineId === line.id) ||
+			runtime.jobs.some((job) => job.ownerItemId === item.id && job.lineUid === line.uid) ||
 			runtime.jobQueue.some(
-				(request) => request.ownerItemId === item.id && request.lineId === line.id,
+				(request) => request.ownerItemId === item.id && request.lineUid === line.uid,
 			),
 	);
 };

@@ -69,7 +69,7 @@ it("keeps a depletion replacement when Autofill moves it into Delivery in the sa
 				lines: [
 					{
 						...forge.lines[0],
-						id: "line:collector:run",
+						uid: "line:collector:run",
 						input: [
 							{
 								type: "materials",
@@ -119,11 +119,11 @@ it("keeps a depletion replacement when Autofill moves it into Delivery in the sa
 			}
 			yield* enqueueLineFx({
 				ownerItemId: "runtime:forge",
-				lineId: "line:forge:run",
+				lineUid: "line:forge:run",
 			});
 			yield* enqueueLineFx({
 				ownerItemId: "runtime:collector",
-				lineId: "line:collector:run",
+				lineUid: "line:collector:run",
 			});
 			const before = yield* readRuntimeFx();
 			const step = yield* advanceRuntimeStepFx(before);
@@ -148,7 +148,7 @@ it("keeps a depletion replacement when Autofill moves it into Delivery in the sa
 			phase: "outbound",
 			target: {
 				ownerItemId: "runtime:collector",
-				lineId: "line:collector:run",
+				lineUid: "line:collector:run",
 			},
 		},
 	});

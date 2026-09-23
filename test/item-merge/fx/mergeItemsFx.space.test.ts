@@ -281,7 +281,7 @@ describe("receiver-owned Space merge", () => {
 		const config = makeConfig();
 		config.items.source.lines = [
 			{
-				id: "line",
+				uid: "line",
 				title: "line",
 				description: "line",
 				default: false,
@@ -317,14 +317,14 @@ describe("receiver-owned Space merge", () => {
 			location: {
 				scope: "input",
 				ownerItemId: "runtime:source",
-				lineId: "line",
+				lineUid: "line",
 				inputIndex: 0,
 			},
 		});
 		state.jobQueue.push({
 			id: "request",
 			ownerItemId: "runtime:source",
-			lineId: "line",
+			lineUid: "line",
 		});
 		const result = Effect.runSync(
 			attemptFx().pipe(

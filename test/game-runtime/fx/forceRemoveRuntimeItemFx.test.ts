@@ -158,7 +158,7 @@ describe("forceRemoveRuntimeItemFx", () => {
 			target: {
 				kind: "line-input",
 				ownerItemId: owner.id,
-				lineId: "line:forge:stored-water",
+				lineUid: "line:forge:stored-water",
 				inputIndex: 0,
 			},
 		});

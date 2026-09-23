@@ -27,7 +27,7 @@ export const createSimpleItem = (id: string) =>
 export const createLine = ({
 	default: isDefault = false,
 	clock,
-	id = "line:test",
+	uid = "line:test",
 	input = [
 		{
 			type: "simple",
@@ -37,14 +37,14 @@ export const createLine = ({
 }: {
 	default?: boolean;
 	clock?: boolean;
-	id?: string;
+	uid?: string;
 	input?: ReadonlyArray<InputSchema.Type>;
 	outcome?: OutcomeTableSchema.Type;
 }) =>
 	LineSchema.parse({
-		id,
-		title: id,
-		description: id,
+		uid,
+		title: uid,
+		description: uid,
 		default: isDefault,
 		clock,
 		runtimeMs: 0,

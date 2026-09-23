@@ -6,6 +6,6 @@ import type { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIn
 /** A material delivery targeted an input while its line was running. */
 export class LineInputClosedError extends Data.TaggedError("LineInputClosedError")<{
 	ownerItemId: IdSchema.Type;
-	lineId: IdSchema.Type;
+	lineUid: IdSchema.Type;
 	inputIndex: NonNegativeIntegerSchema.Type;
 }> {}

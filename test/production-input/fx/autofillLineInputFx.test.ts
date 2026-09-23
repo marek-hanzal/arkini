@@ -16,7 +16,7 @@ import {
 
 const target = {
 	ownerItemId: "runtime:workshop",
-	lineId: "line:workshop:build",
+	lineUid: "line:workshop:build",
 	inputIndex: 1,
 };
 const workshop = inputRuntimeTestConfig.items.workshop;
@@ -87,7 +87,7 @@ it("targets only the clicked reserve slot, accounts for incoming stock and settl
 					target: {
 						kind: "line-input",
 						ownerItemId: target.ownerItemId,
-						lineId: target.lineId,
+						lineUid: target.lineUid,
 						inputIndex: 1,
 					},
 				},
@@ -117,7 +117,7 @@ it("targets only the clicked reserve slot, accounts for incoming stock and settl
 			for (const item of buffered)
 				expect(item.location).toMatchObject({
 					ownerItemId: target.ownerItemId,
-					lineId: target.lineId,
+					lineUid: target.lineUid,
 					inputIndex: 1,
 				});
 			expect(settled.jobs).toEqual([]);

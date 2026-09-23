@@ -13,7 +13,7 @@ import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErr
 export namespace useItemLineInputController {
 	export interface Props {
 		readonly ownerItemId?: IdSchema.Type;
-		readonly lineId: IdSchema.Type;
+		readonly lineUid: IdSchema.Type;
 		readonly disabled: boolean;
 	}
 	export interface Output {
@@ -25,7 +25,7 @@ export namespace useItemLineInputController {
 /** Binds explicit fill/withdraw intent; the transaction rechecks the live slot before acting. */
 export const useItemLineInputController = ({
 	ownerItemId,
-	lineId,
+	lineUid,
 	disabled,
 }: useItemLineInputController.Props): useItemLineInputController.Output => {
 	const game = useGameEngine();
@@ -51,7 +51,7 @@ export const useItemLineInputController = ({
 		[
 			game,
 			ownerItemId,
-			lineId,
+			lineUid,
 		],
 	);
 	const [result, activateFn] = useAtom(commandAtom);
@@ -62,7 +62,7 @@ export const useItemLineInputController = ({
 			if (disabled || result.waiting || ownerItemId === undefined) return;
 			activateFn({
 				ownerItemId,
-				lineId,
+				lineUid,
 				inputIndex,
 				action,
 			});

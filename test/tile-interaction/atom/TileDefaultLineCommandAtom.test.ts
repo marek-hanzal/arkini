@@ -176,7 +176,7 @@ describe("TileDefaultLineCommandAtom", () => {
 				Effect.as({
 					added: [],
 					capacity: 5,
-					lineId: "line:producer",
+					lineUid: "line:producer",
 					used: 5,
 				}),
 			),

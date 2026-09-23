@@ -12,7 +12,7 @@ export const DefaultLineIssueSchema = z
 			"DefaultLine",
 		]),
 		ownerItemId: IdSchema,
-		lineId: IdSchema.nullable(),
+		lineUid: IdSchema.nullable(),
 		reason: DefaultLineIssueReasonEnumSchema,
 	})
 	.strict()

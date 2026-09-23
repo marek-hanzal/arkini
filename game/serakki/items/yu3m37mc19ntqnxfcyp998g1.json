@@ -15,7 +15,7 @@
 		"maxQueueSize": 4,
 		"lines": [
 			{
-				"id": "harvest",
+				"uid": "eiteiv859wc1golmt6uqdqos",
 				"title": "Sugar Cane",
 				"description": "Harvest sugar cane from a nearby planted field. Supply one bucket of water; the empty bucket is returned.",
 				"clockWeight": 1,
@@ -92,7 +92,7 @@
 				"rules": []
 			},
 			{
-				"id": "field",
+				"uid": "omhlyyud6fdpijb99vw8tqwi",
 				"title": "Prepare Sugar Cane Field",
 				"artwork": "zx0tptnskxjl62ubeg7hmvim",
 				"description": "Prepare a new sugar cane field for planting.",
@@ -134,7 +134,7 @@
 				"rules": []
 			},
 			{
-				"id": "blueprint",
+				"uid": "opq52gltrbqv15s5i8iei58j",
 				"title": "Sugar Cane Farm Blueprint",
 				"artwork": "so7r094glj6wfe6yoveiclrg",
 				"description": "Sketch plans for another Sugar Cane Farm.",

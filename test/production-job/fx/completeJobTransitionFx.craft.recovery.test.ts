@@ -51,14 +51,14 @@ describe("craft completion recovery", () => {
 				});
 				yield* bufferInputMaterialForTestFx({
 					ownerItemId: owner.id,
-					lineId: "line:craft:reserve",
+					lineUid: "line:craft:reserve",
 					inputIndex: 0,
 					sourceItemId: tool.id,
 					sourceItemRevision: tool.revision,
 				});
 				yield* startLineFx({
 					ownerItemId: owner.id,
-					lineId: "line:craft:reserve",
+					lineUid: "line:craft:reserve",
 				});
 				const runtime = yield* readRuntimeFx();
 				const state = fromRuntimeFn({
@@ -111,7 +111,7 @@ it("keeps blocked craft completion unchanged and replays one deterministic outco
 			}
 			yield* startLineFx({
 				ownerItemId: owner.id,
-				lineId: "line:craft:random",
+				lineUid: "line:craft:random",
 			});
 			const running = yield* readRuntimeFx();
 			const liveJob = running.jobs[0];

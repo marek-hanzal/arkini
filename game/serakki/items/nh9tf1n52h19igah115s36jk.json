@@ -22,7 +22,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "drift",
+				"uid": "o2dfcl832mrbf9q3gpaop49k",
 				"title": "Drift",
 				"artwork": "fp7k69wp5fyf55nz796git6e",
 				"description": "The pollution cloud drifts elsewhere.",
@@ -76,7 +76,7 @@
 				"rules": []
 			},
 			{
-				"id": "disperse",
+				"uid": "k6i3f5euhsm1g27ldbnt60zu",
 				"title": "Disperse",
 				"description": "The pollution thins out and disappears.",
 				"clock": true,

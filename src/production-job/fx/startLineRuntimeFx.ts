@@ -26,7 +26,7 @@ const assertLineStartReadyFx = Effect.fn("assertLineStartReadyFx")(function* ({
 		return yield* Effect.fail(
 			new LineRunUnavailableError({
 				ownerItemId: resolution.ownerItemId,
-				lineId: resolution.lineId,
+				lineUid: resolution.lineUid,
 			}),
 		);
 	}
@@ -43,7 +43,7 @@ const assertLineStartReadyFx = Effect.fn("assertLineStartReadyFx")(function* ({
 		return yield* Effect.fail(
 			new LineRunUnavailableError({
 				ownerItemId: resolution.ownerItemId,
-				lineId: resolution.lineId,
+				lineUid: resolution.lineUid,
 			}),
 		);
 	}
@@ -53,17 +53,17 @@ const assertLineStartReadyFx = Effect.fn("assertLineStartReadyFx")(function* ({
 
 const createJobFx = Effect.fn("createJobFx")(function* ({
 	ownerItemId,
-	lineId,
+	lineUid,
 	durationMs,
 }: {
 	readonly ownerItemId: IdSchema.Type;
-	readonly lineId: IdSchema.Type;
+	readonly lineUid: IdSchema.Type;
 	readonly durationMs: TimeSchema.Type;
 }) {
 	return {
 		id: yield* createJobIdFx(),
 		ownerItemId,
-		lineId,
+		lineUid,
 		durationMs,
 		remainingMs: durationMs,
 	} satisfies JobSchema.Type;
@@ -88,7 +88,7 @@ const applyLineRunPlanFx = Effect.fn("applyLineRunPlanFx")(function* ({
 			applyInputRunPlanFx({
 				jobId: job.id,
 				ownerItemId: plan.ownerItemId,
-				lineId: plan.lineId,
+				lineUid: plan.lineUid,
 				inputIndex,
 				plan: input,
 				runtime: state.runtime,
@@ -114,7 +114,7 @@ const applyLineUnitPlansFx = Effect.fn("applyLineUnitPlansFx")(function* ({
 	readonly runtime: RuntimeSchema.Type;
 }) {
 	return yield* settleActionUnitsFx({
-		actionId: job.lineId,
+		actionId: job.lineUid,
 		units: plan.input.flatMap(({ units }) =>
 			units === undefined
 				? []
@@ -130,7 +130,7 @@ const applyLineUnitPlansFx = Effect.fn("applyLineUnitPlansFx")(function* ({
 export namespace startLineRuntimeFx {
 	export interface Props {
 		ownerItemId: IdSchema.Type;
-		lineId: IdSchema.Type;
+		lineUid: IdSchema.Type;
 		runtime: RuntimeSchema.Type;
 	}
 }
@@ -144,12 +144,12 @@ export namespace startLineRuntimeFx {
  */
 export const startLineRuntimeFx = Effect.fn("startLineRuntimeFx")(function* ({
 	ownerItemId,
-	lineId,
+	lineUid,
 	runtime,
 }: startLineRuntimeFx.Props) {
 	const resolution = yield* resolveLineStartFx({
 		ownerItemId,
-		lineId,
+		lineUid,
 		runtime,
 	});
 	const plan = yield* assertLineStartReadyFx({
@@ -157,7 +157,7 @@ export const startLineRuntimeFx = Effect.fn("startLineRuntimeFx")(function* ({
 	});
 	const job = yield* createJobFx({
 		ownerItemId,
-		lineId,
+		lineUid,
 		durationMs: plan.runtimeMs,
 	});
 	const jobRuntime = {

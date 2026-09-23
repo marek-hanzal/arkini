@@ -3,7 +3,7 @@ import type { readItemDetailQueueFx } from "~/item-detail-read/fx/readItemDetail
 
 export namespace readItemLineStatusesFn {
 	export interface Status {
-		readonly lineId: IdSchema.Type;
+		readonly lineUid: IdSchema.Type;
 		readonly state:
 			| "idle"
 			| "waiting-inputs"
@@ -23,15 +23,15 @@ export const readItemLineStatusesFn = (
 	queue: readItemDetailQueueFx.Result,
 ): readonly readItemLineStatusesFn.Status[] => {
 	if (queue.kind === "unavailable") return [];
-	const lineIds = new Set([
-		...queue.active.map((job) => job.lineId),
-		...queue.request.map((request) => request.lineId),
+	const lineUids = new Set([
+		...queue.active.map((job) => job.lineUid),
+		...queue.request.map((request) => request.lineUid),
 	]);
 	return [
-		...lineIds,
-	].map((lineId) => {
-		const active = queue.active.find((job) => job.lineId === lineId);
-		const requests = queue.request.filter((request) => request.lineId === lineId);
+		...lineUids,
+	].map((lineUid) => {
+		const active = queue.active.find((job) => job.lineUid === lineUid);
+		const requests = queue.request.filter((request) => request.lineUid === lineUid);
 		const first = requests[0];
 		const state =
 			active !== undefined
@@ -44,7 +44,7 @@ export const readItemLineStatusesFn = (
 							? "waiting-start"
 							: "queued";
 		return {
-			lineId,
+			lineUid,
 			state,
 			queued: requests.length,
 			...(active === undefined

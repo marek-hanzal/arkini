@@ -42,7 +42,7 @@ describe("Clock lifetime boundaries", () => {
 						lines: [
 							{
 								...createLine({
-									id: "pulse",
+									uid: "pulse",
 									clock: true,
 								}),
 								runtimeMs: 100,
@@ -89,7 +89,7 @@ describe("Clock lifetime boundaries", () => {
 				});
 				yield* bufferInputMaterialForTestFx({
 					ownerItemId: "owner",
-					lineId: "line:owner",
+					lineUid: "line:owner",
 					inputIndex: 0,
 					sourceItemId: material.id,
 					sourceItemRevision: material.revision,
@@ -151,7 +151,7 @@ describe("Clock lifetime boundaries", () => {
 					},
 					lines: [
 						createLine({
-							id: "buffer",
+							uid: "buffer",
 							input: [
 								{
 									type: "materials",
@@ -196,7 +196,7 @@ describe("Clock lifetime boundaries", () => {
 				});
 				yield* bufferInputMaterialForTestFx({
 					ownerItemId: material.id,
-					lineId: "buffer",
+					lineUid: "buffer",
 					inputIndex: 0,
 					sourceItemId: child.id,
 					sourceItemRevision: child.revision,
@@ -207,7 +207,7 @@ describe("Clock lifetime boundaries", () => {
 				if (current === undefined) throw new Error("Missing material owner.");
 				yield* bufferInputMaterialForTestFx({
 					ownerItemId: "owner",
-					lineId: "line:owner",
+					lineUid: "line:owner",
 					inputIndex: 0,
 					sourceItemId: current.id,
 					sourceItemRevision: current.revision,
@@ -244,7 +244,7 @@ describe("Clock lifetime boundaries", () => {
 					lines: [
 						{
 							...createLine({
-								id: "first",
+								uid: "first",
 							}),
 							runtimeMs: 100,
 						},
@@ -284,18 +284,18 @@ describe("Clock lifetime boundaries", () => {
 				});
 				yield* bufferInputMaterialForTestFx({
 					ownerItemId: "owner",
-					lineId: "line:owner",
+					lineUid: "line:owner",
 					inputIndex: 0,
 					sourceItemId: material.id,
 					sourceItemRevision: material.revision,
 				});
 				yield* startLineFx({
 					ownerItemId: "owner",
-					lineId: "first",
+					lineUid: "first",
 				});
 				yield* enqueueLineFx({
 					ownerItemId: "owner",
-					lineId: "line:owner",
+					lineUid: "line:owner",
 				});
 				return yield* tickClockFx(100);
 			}).pipe(
@@ -310,7 +310,7 @@ describe("Clock lifetime boundaries", () => {
 		expect(result.jobQueue).toMatchObject([
 			{
 				ownerItemId: "owner",
-				lineId: "line:owner",
+				lineUid: "line:owner",
 			},
 		]);
 	});

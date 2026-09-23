@@ -52,18 +52,18 @@ interface ItemLineProps extends useItemLineMakeController.Props {
 /** Progress follows the live job's captured duration, independently of debounced status. */
 const ItemLineProgressBackdrop = ({
 	ownerItemId,
-	lineId,
+	lineUid,
 	artworkId,
 }: {
 	readonly ownerItemId?: IdSchema.Type;
-	readonly lineId: IdSchema.Type;
+	readonly lineUid: IdSchema.Type;
 	readonly artworkId: IdSchema.Type;
 }) => {
 	const game = useGameEngine();
 	const selectorFn = useCallback(
 		(runtime: RuntimeSchema.Type) => {
 			const job = runtime.jobs.find(
-				(job) => job.ownerItemId === ownerItemId && job.lineId === lineId,
+				(job) => job.ownerItemId === ownerItemId && job.lineUid === lineUid,
 			);
 			return job === undefined
 				? undefined
@@ -73,7 +73,7 @@ const ItemLineProgressBackdrop = ({
 		},
 		[
 			ownerItemId,
-			lineId,
+			lineUid,
 		],
 	);
 	const progress = useRuntimeSelector(game, selectorFn);
@@ -97,12 +97,12 @@ const ItemLine = ({
 	const disabled = props.disabled || !present;
 	const controller = useItemLineMakeController({
 		ownerItemId: props.ownerItemId,
-		lineId: props.lineId,
+		lineUid: props.lineUid,
 		disabled: disabled || makeDisabled,
 	});
 	const defaultController = useItemLineDefaultController({
 		ownerItemId: props.ownerItemId,
-		lineId: props.lineId,
+		lineUid: props.lineUid,
 		authoredDefault: line.default,
 		disabled,
 	});
@@ -131,7 +131,7 @@ const ItemLine = ({
 					line.artwork === undefined ? null : (
 						<ItemLineProgressBackdrop
 							ownerItemId={props.ownerItemId}
-							lineId={line.id}
+							lineUid={line.uid}
 							artworkId={line.artwork}
 						/>
 					)
@@ -166,7 +166,7 @@ const ItemLine = ({
 				actions={
 					<ItemLineWorkControls
 						ownerItemId={props.ownerItemId}
-						lineId={line.id}
+						lineUid={line.uid}
 						jobId={status?.jobId}
 						queued={status?.queued ?? 0}
 						running={state === "running"}
@@ -221,14 +221,14 @@ const ItemLine = ({
 
 export const ItemLines = ({
 	lines,
-	disabledLineIds,
+	disabledLineUids,
 	lineBlockingHints,
 	ownerItemId,
 	disabled,
 	makeDisabled,
 }: {
 	readonly lines: readonly LineSchema.Type[];
-	readonly disabledLineIds: readonly string[];
+	readonly disabledLineUids: readonly string[];
 	readonly lineBlockingHints: Readonly<Record<string, string | undefined>>;
 	readonly ownerItemId?: IdSchema.Type;
 	readonly disabled: boolean;
@@ -241,15 +241,15 @@ export const ItemLines = ({
 			<AnimatePresence initial={false}>
 				{lines.map((line) => (
 					<ItemLine
-						key={`line:${line.id}`}
+						key={`line:${line.uid}`}
 						line={line}
-						ruleDisabled={disabledLineIds.includes(line.id)}
-						blockingHint={lineBlockingHints[line.id]}
-						lineId={line.id}
+						ruleDisabled={disabledLineUids.includes(line.uid)}
+						blockingHint={lineBlockingHints[line.uid]}
+						lineUid={line.uid}
 						ownerItemId={ownerItemId}
 						disabled={disabled}
 						makeDisabled={makeDisabled}
-						status={statuses.find((status) => status.lineId === line.id)}
+						status={statuses.find((status) => status.lineUid === line.uid)}
 					/>
 				))}
 				{lines.length === 0 ? (

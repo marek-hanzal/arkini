@@ -25,7 +25,7 @@ const config = GameConfigSchema.parse({
 				"c",
 			].map((id) => ({
 				...workshop.lines[0],
-				id,
+				uid: id,
 			})),
 		},
 	},
@@ -77,7 +77,7 @@ const createDeliveriesFx = Effect.gen(function* () {
 					target: {
 						kind: "line-input" as const,
 						ownerItemId: first ? "runtime:a" : "runtime:a:b",
-						lineId: first ? "b:c" : "c",
+						lineUid: first ? "b:c" : "c",
 						inputIndex: 0,
 					},
 				},

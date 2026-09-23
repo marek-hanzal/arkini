@@ -19,7 +19,7 @@ it("activates the row without stealing nested controls or activating an unavaila
 	const activateFn = vi.fn();
 	const controlFn = vi.fn();
 	const line = {
-		id: "line",
+		uid: "line",
 		title: "Production",
 		runtimeMs: 1000,
 	} as LineSchema.Type;

@@ -14,7 +14,7 @@
 		"maxQueueSize": 4,
 		"lines": [
 			{
-				"id": "harvest",
+				"uid": "e34wxw4pl81s5dn98m1q6v38",
 				"title": "Herbs",
 				"description": "Harvest herbs from a nearby planted herb garden. Supply one bucket of water; the empty bucket is returned.",
 				"clockWeight": 1,
@@ -91,7 +91,7 @@
 				"rules": []
 			},
 			{
-				"id": "medicine",
+				"uid": "sif6nj47z0o3z38czvi6oxm8",
 				"title": "Medicine",
 				"description": "You can heal something",
 				"clockWeight": 1,
@@ -159,7 +159,7 @@
 				"rules": []
 			},
 			{
-				"id": "poison",
+				"uid": "soh6kxgtos7dkm7270703orw",
 				"title": "Poison",
 				"description": "Be careful, it may kill something",
 				"clockWeight": 1,
@@ -227,7 +227,7 @@
 				"rules": []
 			},
 			{
-				"id": "field",
+				"uid": "pt3xpvh2b6b2fqz1onm7nzeu",
 				"title": "Prepare Herb Garden",
 				"artwork": "n5vp6l4aeq5yzor4v8qzzvbs",
 				"description": "Prepare a new herb garden for planting.",
@@ -269,7 +269,7 @@
 				"rules": []
 			},
 			{
-				"id": "blueprint",
+				"uid": "teqnua0v83bl9mbl1j5p2k4x",
 				"title": "Herbalist Blueprint",
 				"artwork": "so7r094glj6wfe6yoveiclrg",
 				"description": "Sketch plans for another Herbalist.",

@@ -29,7 +29,7 @@ describe("validateGameResourcesFn", () => {
 					...item,
 					lines: [
 						{
-							id: "gather",
+							uid: "gather",
 							title: "Gather",
 							description: "Gather resources",
 							artwork: "line-art",
@@ -423,7 +423,7 @@ describe("validateGameResourcesFn", () => {
 			},
 			lines: [
 				{
-					id: `line:${id}:construct`,
+					uid: `line:${id}:construct`,
 					title: id,
 					description: id,
 					runtimeMs: 0,

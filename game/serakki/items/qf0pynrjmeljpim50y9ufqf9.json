@@ -15,7 +15,7 @@
 		"maxQueueSize": 4,
 		"lines": [
 			{
-				"id": "harvest",
+				"uid": "kqtivdfm357i5nyklu1dk0n5",
 				"title": "Sugar Beet",
 				"description": "Harvest sugar beet from a nearby planted field. Supply one bucket of water; the empty bucket is returned.",
 				"clockWeight": 1,
@@ -92,7 +92,7 @@
 				"rules": []
 			},
 			{
-				"id": "field",
+				"uid": "ngnsgdzhrggxzs541f66evwt",
 				"title": "Prepare Sugar Beet Field",
 				"artwork": "kzf3uwdq48hgeapu9dx4sir5",
 				"description": "Prepare a new sugar beet field for planting.",
@@ -134,7 +134,7 @@
 				"rules": []
 			},
 			{
-				"id": "blueprint",
+				"uid": "d9nrrkrk8vppg6an4pke214y",
 				"title": "Sugar Beet Farm Blueprint",
 				"artwork": "so7r094glj6wfe6yoveiclrg",
 				"description": "Sketch plans for another Sugar Beet Farm.",

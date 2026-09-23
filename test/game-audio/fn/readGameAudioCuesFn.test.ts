@@ -17,7 +17,7 @@ const boardLocation = {
 const inputLocation = {
 	scope: "input" as const,
 	ownerItemId: "runtime:producer",
-	lineId: "line:1",
+	lineUid: "line:1",
 	inputIndex: 0,
 };
 
@@ -54,7 +54,7 @@ describe("readGameAudioCuesFn", () => {
 							requestId: "request:1",
 							itemUid: "producer",
 							ownerItemId: "runtime:producer",
-							lineId: "line:1",
+							lineUid: "line:1",
 						},
 						{
 							type: "job-queue:cleared",
@@ -86,7 +86,7 @@ describe("readGameAudioCuesFn", () => {
 		const job = {
 			...owner,
 			jobId: "job:1",
-			lineId: "line:1",
+			lineUid: "line:1",
 		};
 		const batch = {
 			events: [
@@ -94,7 +94,7 @@ describe("readGameAudioCuesFn", () => {
 					...owner,
 					type: "job:queued",
 					requestId: "request:1",
-					lineId: "line:1",
+					lineUid: "line:1",
 				},
 				{
 					...job,
@@ -103,7 +103,7 @@ describe("readGameAudioCuesFn", () => {
 				{
 					...owner,
 					type: "line-input:autofill-started",
-					lineId: "line:1",
+					lineUid: "line:1",
 					scheduledQuantity: 2,
 				},
 				{
@@ -185,7 +185,7 @@ describe("readGameAudioCuesFn", () => {
 							itemUid: "producer",
 							jobId: "job:1",
 							ownerItemId: "runtime:producer",
-							lineId: "line:1",
+							lineUid: "line:1",
 							reason: "owner-removed",
 						},
 						{
@@ -219,7 +219,7 @@ describe("readGameAudioCuesFn", () => {
 					itemUid: "producer",
 					jobId: "job:1",
 					ownerItemId: "runtime:producer",
-					lineId: "line:1",
+					lineUid: "line:1",
 				},
 				{
 					type: GameEventEnumSchema.enum.ItemSpawned,
@@ -263,7 +263,7 @@ describe("readGameAudioCuesFn", () => {
 					itemUid: "producer",
 					jobId: "job:1",
 					ownerItemId: "runtime:producer",
-					lineId: "line:1",
+					lineUid: "line:1",
 				},
 				{
 					type: GameEventEnumSchema.enum.ItemSpawned,
@@ -292,7 +292,7 @@ describe("readGameAudioCuesFn", () => {
 					itemUid: "producer",
 					jobId: "job:1",
 					ownerItemId: "runtime:producer",
-					lineId: "line:1",
+					lineUid: "line:1",
 				},
 				{
 					type: GameEventEnumSchema.enum.ItemDepleted,

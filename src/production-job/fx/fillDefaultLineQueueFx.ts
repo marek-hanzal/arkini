@@ -16,7 +16,7 @@ export namespace fillDefaultLineQueueFx {
 	export interface Result {
 		readonly added: readonly JobQueueRequestSchema.Type[];
 		readonly capacity: number;
-		readonly lineId: IdSchema.Type;
+		readonly lineUid: IdSchema.Type;
 		readonly terminalError?: unknown;
 		readonly used: number;
 	}
@@ -38,7 +38,7 @@ export const fillDefaultLineQueueFx = Effect.fn("fillDefaultLineQueueFx")(functi
 				runtime,
 			});
 			const initial = yield* resolveLineStartFx({
-				lineId: line.id,
+				lineUid: line.uid,
 				ownerItemId,
 				runtime,
 			});
@@ -48,7 +48,7 @@ export const fillDefaultLineQueueFx = Effect.fn("fillDefaultLineQueueFx")(functi
 					{
 						added: [],
 						capacity: initial.queue.capacity,
-						lineId: line.id,
+						lineUid: line.uid,
 						used: initial.queue.used,
 					} satisfies fillDefaultLineQueueFx.Result,
 					runtime,
@@ -61,7 +61,7 @@ export const fillDefaultLineQueueFx = Effect.fn("fillDefaultLineQueueFx")(functi
 			for (let index = 0; index < remainingCapacity; index += 1) {
 				const attempt = yield* Effect.result(
 					enqueueLineRuntimeFx({
-						lineId: line.id,
+						lineUid: line.uid,
 						ownerItemId,
 						runtime: candidate,
 					}),
@@ -72,7 +72,7 @@ export const fillDefaultLineQueueFx = Effect.fn("fillDefaultLineQueueFx")(functi
 						{
 							added,
 							capacity: initial.queue.capacity,
-							lineId: line.id,
+							lineUid: line.uid,
 							terminalError: attempt.failure,
 							used: initial.queue.used + added.length,
 						} satisfies fillDefaultLineQueueFx.Result,
@@ -89,7 +89,7 @@ export const fillDefaultLineQueueFx = Effect.fn("fillDefaultLineQueueFx")(functi
 				{
 					added,
 					capacity: initial.queue.capacity,
-					lineId: line.id,
+					lineUid: line.uid,
 					used: initial.queue.used + added.length,
 				} satisfies fillDefaultLineQueueFx.Result,
 				candidate,

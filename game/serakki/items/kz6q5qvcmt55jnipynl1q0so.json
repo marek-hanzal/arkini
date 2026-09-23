@@ -22,7 +22,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "idle",
+				"uid": "ewtyxmqiq9ql6dv35a6uakex",
 				"title": "Idle",
 				"description": "The hungry puppy slows down.",
 				"clock": true,
@@ -39,7 +39,7 @@
 				"rules": []
 			},
 			{
-				"id": "wander",
+				"uid": "xbj3cjlq09oyb6v1fefnylgx",
 				"title": "Wander",
 				"artwork": "h81uidkqin7h5si6nvalxjky",
 				"description": "Wanders somewhere else.",
@@ -93,7 +93,7 @@
 				"rules": []
 			},
 			{
-				"id": "get-sick",
+				"uid": "rl9xk73gzik7zjouc7vtj57s",
 				"title": "Get Sick",
 				"description": "Hunger may make the puppy sick.",
 				"clock": true,
@@ -146,7 +146,7 @@
 				"rules": []
 			},
 			{
-				"id": "disease-exposure",
+				"uid": "t5kjhaov7hi4yb9lrrmzveld",
 				"title": "Disease Exposure",
 				"artwork": "fnom9s6mxxkza9m7iahgp5k9",
 				"description": "Nearby disease increases the chance of illness.",
@@ -216,7 +216,7 @@
 				]
 			},
 			{
-				"id": "plague-exposure",
+				"uid": "eyeq7scofrur4if833dnok8n",
 				"title": "Plague Exposure",
 				"artwork": "j23vl46e91a44u0vt6qlcojt",
 				"description": "Nearby plague increases the chance of illness.",
@@ -286,7 +286,7 @@
 				]
 			},
 			{
-				"id": "eat-raw-game-meat",
+				"uid": "feprc5grz2x1xify96ktch9k",
 				"title": "Find Food",
 				"artwork": "e3credp19j7on2s4n2y7d4f8",
 				"description": "The hungry animal finds something suitable to eat.",

@@ -68,7 +68,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "idle",
+				"uid": "w9fxnqbasdh3fu5p2rkkr9i0",
 				"title": "Idle",
 				"description": "The wolf watches and waits.",
 				"clock": true,
@@ -85,7 +85,7 @@
 				"rules": []
 			},
 			{
-				"id": "wander",
+				"uid": "olppic043zpqynqb2v7saw35",
 				"title": "Wander",
 				"artwork": "ng6ysy8poe1dwz906gbmxons",
 				"description": "The wolf roams to another part of the board.",
@@ -139,7 +139,7 @@
 				"rules": []
 			},
 			{
-				"id": "leave",
+				"uid": "qxrg135w8ut7hsmzw5fe031e",
 				"title": "Leave",
 				"description": "The wolf leaves the area.",
 				"clock": true,
@@ -167,7 +167,7 @@
 				"rules": []
 			},
 			{
-				"id": "leave-biowaste",
+				"uid": "jpirruup2ucemhkgylqa1doy",
 				"title": "Leave",
 				"artwork": "cepf602vecdhm30jmqhqe2am",
 				"description": "The wolf leaves the area and leaves something behind.",

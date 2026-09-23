@@ -16,7 +16,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "lumber-camp-blueprint",
+				"uid": "ig34ro2fl5avtd8kqb49lrii",
 				"title": "Lumber Camp Blueprint",
 				"artwork": "vmfdb9sa06isuopjs1kqn7n2",
 				"description": "Sketch a place dedicated to turning nearby trees into a steady supply of wood. Civilization rarely begins elegantly, but it often begins with lumber.",
@@ -116,7 +116,7 @@
 				]
 			},
 			{
-				"id": "forester-blueprint",
+				"uid": "w1vn35b9weopnkm760xm0jfk",
 				"title": "Forester Blueprint",
 				"artwork": "fg49qoxb45alma2nc715rspz",
 				"description": "Sketch a small forestry post for keeping the settlement supplied with renewable trees instead of slowly deleting the map.",
@@ -232,7 +232,7 @@
 				]
 			},
 			{
-				"id": "stonemason-camp-blueprint",
+				"uid": "mruexbb5dys1i1cy2gen40a3",
 				"title": "Stonemason Camp Blueprint",
 				"artwork": "u0ugyubcxh6gng4hljmts53j",
 				"description": "Draw plans for a rough stone-working camp. Heavy rocks become much more useful once somebody agrees where to put them.",
@@ -332,7 +332,7 @@
 				]
 			},
 			{
-				"id": "townhall-t1-blueprint",
+				"uid": "xcvf45zcex2s2bq19g6z9w0t",
 				"title": "Townhall I Blueprint",
 				"artwork": "c7uw765u5c2hqnjvv3zmwkgn",
 				"description": "The campsite is starting to look suspiciously permanent. Put the settlement on paper and give all this chaos an address.",
@@ -511,7 +511,7 @@
 				]
 			},
 			{
-				"id": "house-t1-blueprint",
+				"uid": "nfa0nl4vuncu7b74blkkd4ml",
 				"title": "House - Tier 1 Blueprint",
 				"artwork": "ucep41zyvgbrif6rlcqdabk1",
 				"description": "Four walls, a roof, and the radical idea that people should not sleep next to the wood pile forever.",
@@ -611,7 +611,7 @@
 				]
 			},
 			{
-				"id": "campfire",
+				"uid": "y3bf1tfhe0p7ozame3eaetr9",
 				"title": "Campfire",
 				"artwork": "gjqw5dyec2yuimlommt648er",
 				"description": "A proper camp needs somewhere warm to gather, cook, and accidentally test the flammability of nearby objects.",
@@ -680,7 +680,7 @@
 				"rules": []
 			},
 			{
-				"id": "explorer-blueprint",
+				"uid": "u1ya22amqa76k99d7wl9b337",
 				"title": "Explorer Blueprint",
 				"artwork": "u79x20w1h96ptfjkdcyv8ojp",
 				"description": "Plans for someone whose job is to walk into the forest and return with tracks, wildlife, stories, or occasionally problems.",
@@ -805,7 +805,7 @@
 				]
 			},
 			{
-				"id": "hunter-blueprint",
+				"uid": "spuggk00h8hxu948si6p5rqj",
 				"title": "Hunter Blueprint",
 				"artwork": "rev9r1cphdn05gqh3wj4w7pj",
 				"description": "Plans for someone who solves wildlife opportunities with considerably less diplomacy. Efficient, messy, useful.",

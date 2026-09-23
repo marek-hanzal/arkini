@@ -149,7 +149,7 @@ it("runs the browser-bundled DataScript worker with the same canonical answers a
 										length: 3,
 									},
 									(_, branch) =>
-										lineFn(`line-${branch}`, {
+										lineFn(`${uid}-line-${branch}`, {
 											outcome: outputFn(
 												`item-${(index + branch + 1) % count}`,
 											),

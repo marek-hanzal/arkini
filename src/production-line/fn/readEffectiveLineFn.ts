@@ -17,7 +17,7 @@ export namespace readEffectiveLineFn {
  * Resolves one exact owner's runtime override before the immutable authored fallback.
  *
  * A present `null` override deliberately disables the fallback. Invalid persisted
- * line IDs do not silently fall back; runtime validation owns reporting that stale state.
+ * line UIDs do not silently fall back; runtime validation owns reporting that stale state.
  */
 export const readEffectiveLineFn = ({
 	ownerItemId,
@@ -29,7 +29,7 @@ export const readEffectiveLineFn = ({
 		? runtime.defaultLineByOwnerItemId[ownerItemId]
 		: undefined;
 	if (override !== undefined) {
-		return override === null ? undefined : lines.find((line) => line.id === override);
+		return override === null ? undefined : lines.find((line) => line.uid === override);
 	}
 	return lines.find((line) => line.default);
 };

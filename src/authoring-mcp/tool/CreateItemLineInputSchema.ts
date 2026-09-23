@@ -17,7 +17,7 @@ export const CreateItemLineInputSchema = z
 		id: "urn:serakki:schema:mcp:create-item-line-input",
 		$id: "urn:serakki:schema:mcp:create-item-line-input",
 		title: "Create item line tool input",
-		description: "Append one complete production line; reject an existing line ID.",
+		description: "Append one complete production line with a freshly generated immutable UID.",
 	});
 export type CreateItemLineInputSchema = typeof CreateItemLineInputSchema;
 export namespace CreateItemLineInputSchema {

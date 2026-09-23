@@ -9,15 +9,14 @@ export const DeleteItemLineInputSchema = z
 			.int()
 			.nonnegative()
 			.describe("The exact project revision returned by the preceding config read."),
-		lineId: IdSchema.describe("The exact existing line ID to delete."),
+		lineUid: IdSchema.describe("The exact existing line UID to delete."),
 	})
 	.strict()
 	.meta({
 		id: "urn:serakki:schema:mcp:delete-item-line-input",
 		$id: "urn:serakki:schema:mcp:delete-item-line-input",
 		title: "Delete item line tool input",
-		description:
-			"Remove exactly one existing production line; reject missing or ambiguous line IDs.",
+		description: "Remove exactly one existing production line; reject missing line UIDs.",
 	});
 export type DeleteItemLineInputSchema = typeof DeleteItemLineInputSchema;
 export namespace DeleteItemLineInputSchema {

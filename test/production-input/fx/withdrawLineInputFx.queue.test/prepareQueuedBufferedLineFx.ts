@@ -13,7 +13,7 @@ import {
 
 export const ownerItemId = "runtime:workshop";
 export const otherOwnerItemId = "runtime:other-workshop";
-export const lineId = "line:workshop:build";
+export const lineUid = "line:workshop:build";
 
 const workshop = inputRuntimeTestConfig.items.workshop;
 
@@ -51,7 +51,7 @@ export const prepareQueuedBufferedLineFx = Effect.fn("prepareQueuedBufferedLineF
 		});
 		yield* bufferInputMaterialForTestFx({
 			ownerItemId,
-			lineId,
+			lineUid,
 			inputIndex: 0,
 			sourceItemId: water.id,
 			sourceItemRevision: water.revision,
@@ -60,15 +60,15 @@ export const prepareQueuedBufferedLineFx = Effect.fn("prepareQueuedBufferedLineF
 
 	const first = yield* enqueueLineFx({
 		ownerItemId,
-		lineId,
+		lineUid,
 	});
 	const other = yield* enqueueLineFx({
 		ownerItemId: otherOwnerItemId,
-		lineId,
+		lineUid,
 	});
 	const second = yield* enqueueLineFx({
 		ownerItemId,
-		lineId,
+		lineUid,
 	});
 	return {
 		firstRequestId: first.id,

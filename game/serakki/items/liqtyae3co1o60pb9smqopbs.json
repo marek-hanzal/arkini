@@ -15,7 +15,7 @@
 		"maxQueueSize": 4,
 		"lines": [
 			{
-				"id": "harvest",
+				"uid": "ufobueyrz5yuui54rk6vp4qn",
 				"title": "Pumpkin",
 				"description": "Harvest pumpkins from a nearby planted field. Supply one bucket of water; the empty bucket is returned.",
 				"clockWeight": 1,
@@ -92,7 +92,7 @@
 				"rules": []
 			},
 			{
-				"id": "field",
+				"uid": "psy11qd4h192r0g2h0fbljyx",
 				"title": "Prepare Pumpkin Field",
 				"artwork": "rld9qlckzvq8xggvehqg4et4",
 				"description": "Prepare an empty pumpkin field.",
@@ -134,7 +134,7 @@
 				"rules": []
 			},
 			{
-				"id": "blueprint",
+				"uid": "uyyvq40wn4hu5vj1kgbkgq82",
 				"title": "Pumpkin Farm Blueprint",
 				"artwork": "so7r094glj6wfe6yoveiclrg",
 				"description": "Sketch another Pumpkin Farm.",

@@ -7,14 +7,14 @@ import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 
 export namespace enqueueLineFx {
 	export interface Props {
-		readonly lineId: IdSchema.Type;
+		readonly lineUid: IdSchema.Type;
 		readonly ownerItemId: IdSchema.Type;
 	}
 }
 
 /** Appends one explicit queue intent without implicitly starting or filling the line. */
 export const enqueueLineFx = Effect.fn("enqueueLineFx")(function* ({
-	lineId,
+	lineUid,
 	ownerItemId,
 }: enqueueLineFx.Props) {
 	return yield* modifyRuntimeFx((runtime) =>
@@ -24,7 +24,7 @@ export const enqueueLineFx = Effect.fn("enqueueLineFx")(function* ({
 				runtime,
 			});
 			const queued = yield* enqueueLineRuntimeFx({
-				lineId,
+				lineUid,
 				ownerItemId,
 				runtime,
 			});

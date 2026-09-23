@@ -27,7 +27,7 @@ export const assertLineEnqueueConditionsFx = Effect.fn("assertLineEnqueueConditi
 }: assertLineEnqueueConditionsFx.Props) {
 	const { line } = yield* readBoardItemLineFx({
 		ownerItemId: resolution.ownerItemId,
-		lineId: resolution.lineId,
+		lineUid: resolution.lineUid,
 		runtime,
 	});
 	const reservedUnits = new Map<IdSchema.Type, number>();
@@ -71,7 +71,7 @@ export const assertLineEnqueueConditionsFx = Effect.fn("assertLineEnqueueConditi
 		return yield* Effect.fail(
 			new LineRunUnavailableError({
 				ownerItemId: resolution.ownerItemId,
-				lineId: resolution.lineId,
+				lineUid: resolution.lineUid,
 			}),
 		);
 	}

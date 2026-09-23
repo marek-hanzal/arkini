@@ -15,7 +15,7 @@ import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/supp
 
 const startProps = {
 	ownerItemId: "runtime:forge",
-	lineId: "line:forge:run",
+	lineUid: "line:forge:run",
 } as const;
 
 describe("Speed up", () => {

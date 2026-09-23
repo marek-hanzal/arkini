@@ -46,7 +46,7 @@ const portalConfig = GameConfigSchema.parse({
 			description: "Portal",
 			lines: [
 				{
-					id: "travel",
+					uid: "travel",
 					title: "Travel",
 					description: "Travel",
 					default: true,

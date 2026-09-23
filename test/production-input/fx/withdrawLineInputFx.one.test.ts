@@ -9,7 +9,7 @@ import { spawnItemFx } from "~test/support/spawnItemFx";
 import { useGameFx } from "~test/support/useGameFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import {
-	lineId,
+	lineUid,
 	ownerItemId,
 	prepareQueuedBufferedLineFx,
 	queuedInputTestConfig,
@@ -23,7 +23,7 @@ it("returns exactly one piece per click, retaining other identities and the queu
 			for (let remaining = 2; remaining >= 0; remaining--) {
 				const result = yield* withdrawLineInputFx({
 					ownerItemId,
-					lineId,
+					lineUid,
 					inputIndex: 0,
 					amount: "one",
 				});
@@ -45,7 +45,7 @@ it("returns exactly one piece per click, retaining other identities and the queu
 					yield* Effect.exit(
 						withdrawLineInputFx({
 							ownerItemId,
-							lineId,
+							lineUid,
 							inputIndex: 0,
 							amount: "one",
 						}),
@@ -95,7 +95,7 @@ it("returns a timed input with its exact identity and elapsed clock intact", () 
 				location: {
 					scope: "input",
 					ownerItemId,
-					lineId,
+					lineUid,
 					inputIndex: 0,
 				},
 			});
@@ -123,7 +123,7 @@ it("returns a timed input with its exact identity and elapsed clock intact", () 
 			);
 			yield* withdrawLineInputFx({
 				ownerItemId,
-				lineId,
+				lineUid,
 				inputIndex: 0,
 				amount: "one",
 			});

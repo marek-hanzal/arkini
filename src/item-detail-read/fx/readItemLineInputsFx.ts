@@ -49,25 +49,25 @@ export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* 
 	runtime,
 }: readItemLineInputsFx.Props) {
 	const owner = runtime.items.find((item) => item.id === ownerItemId);
-	const liveLine = owner?.item.lines.find((candidate) => candidate.id === line.id);
+	const liveLine = owner?.item.lines.find((candidate) => candidate.uid === line.uid);
 	const plan =
 		owner?.location.scope === "board" && liveLine !== undefined
 			? yield* planLineInputAutofillFx({
 					ownerItemId: owner.id,
-					lineId: line.id,
+					lineUid: line.uid,
 					runtime,
 				})
 			: undefined;
 
 	const job = runtime.jobs.find(
-		(candidate) => candidate.ownerItemId === ownerItemId && candidate.lineId === line.id,
+		(candidate) => candidate.ownerItemId === ownerItemId && candidate.lineUid === line.uid,
 	);
 	// Resolve the whole line so several inputs cannot claim the same remaining units.
 	const unitReadiness =
 		owner?.location.scope === "board" && liveLine?.input.some((input) => input.type === "units")
 			? yield* resolveLineRunFx({
 					ownerItemId: owner.id,
-					lineId: line.id,
+					lineUid: line.uid,
 					runtime,
 				})
 			: undefined;
@@ -110,7 +110,7 @@ export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* 
 			if (
 				location.scope === "input" &&
 				location.ownerItemId === ownerItemId &&
-				location.lineId === line.id &&
+				location.lineUid === line.uid &&
 				location.inputIndex === inputIndex
 			) {
 				filled += 1;
@@ -155,7 +155,7 @@ export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* 
 				? []
 				: readLineInputDeliveryClaimsFn({
 						ownerItemId,
-						lineId: line.id,
+						lineUid: line.uid,
 						inputIndex,
 						runtime,
 					});
@@ -187,7 +187,7 @@ export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* 
 				isItemProductionAdmissionOpenFn(owner) &&
 				!isLineInputClosedFn({
 					ownerItemId: owner.id,
-					lineId: line.id,
+					lineUid: line.uid,
 					runtime,
 				}) &&
 				incoming.length < input.quantity.max &&

@@ -14,13 +14,13 @@ const fixtureFn = () => {
 		first,
 		{
 			...first,
-			id: "second",
+			uid: "second",
 			default: false,
 			title: "Second",
 		},
 		{
 			...first,
-			id: "third",
+			uid: "third",
 			default: false,
 			title: "Third",
 		},
@@ -90,10 +90,10 @@ describe("exact item line ordering", () => {
 				repository,
 				itemUid: "forge",
 				revision: 7,
-				lineIds: [
-					lines[2]!.id,
-					lines[0]!.id,
-					lines[1]!.id,
+				lineUids: [
+					lines[2]!.uid,
+					lines[0]!.uid,
+					lines[1]!.uid,
 				],
 			}),
 		);
@@ -116,24 +116,24 @@ describe("exact item line ordering", () => {
 	it("rejects every invalid permutation before invoking persistence", () => {
 		const { project, repository, upsertItemFx, lines } = fixtureFn();
 		const original = structuredClone(project);
-		for (const lineIds of [
+		for (const lineUids of [
 			[],
 			[
-				lines[0]!.id,
-				lines[1]!.id,
+				lines[0]!.uid,
+				lines[1]!.uid,
 			],
 			[
-				lines[0]!.id,
-				lines[1]!.id,
+				lines[0]!.uid,
+				lines[1]!.uid,
 				"missing",
 			],
 			[
-				lines[0]!.id,
-				lines[1]!.id,
-				lines[1]!.id,
+				lines[0]!.uid,
+				lines[1]!.uid,
+				lines[1]!.uid,
 			],
 			[
-				...lines.map((line) => line.id),
+				...lines.map((line) => line.uid),
 				"extra",
 			],
 		]) {
@@ -143,7 +143,7 @@ describe("exact item line ordering", () => {
 					repository,
 					itemUid: "forge",
 					revision: 7,
-					lineIds,
+					lineUids,
 				}).pipe(Effect.result),
 			);
 			expect(Result.isFailure(result)).toBe(true);
@@ -152,42 +152,18 @@ describe("exact item line ordering", () => {
 					reason: "invalid-item",
 				});
 		}
-		const duplicateProject = {
-			...project,
-			config: {
-				...project.config,
-				items: {
-					...project.config.items,
-					forge: {
-						...project.config.items.forge,
-						lines: [
-							lines[0]!,
-							lines[0]!,
-						],
-					},
-				},
-			},
-		};
 		for (const input of [
-			{
-				project: duplicateProject,
-				itemUid: "forge",
-				revision: 7,
-				lineIds: [
-					lines[0]!.id,
-				],
-			},
 			{
 				project,
 				itemUid: "missing",
 				revision: 7,
-				lineIds: [],
+				lineUids: [],
 			},
 			{
 				project,
 				itemUid: "forge",
 				revision: 6,
-				lineIds: lines.map((line) => line.id),
+				lineUids: lines.map((line) => line.uid),
 			},
 		])
 			expect(
@@ -213,7 +189,7 @@ describe("exact item line ordering", () => {
 				repository,
 				itemUid: "tool",
 				revision: 7,
-				lineIds: [],
+				lineUids: [],
 			}),
 		);
 		expect(result.item).toEqual(project.config.items.tool);

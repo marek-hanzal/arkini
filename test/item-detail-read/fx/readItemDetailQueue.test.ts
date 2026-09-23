@@ -31,7 +31,7 @@ const queuedRuntime = (runtime: RuntimeSchema.Type) =>
 			{
 				id: "job:queued",
 				ownerItemId: "runtime:workshop",
-				lineId: "line:workshop:build",
+				lineUid: "line:workshop:build",
 			},
 		],
 	}) satisfies RuntimeSchema.Type;
@@ -47,7 +47,7 @@ describe("readItemDetailQueue", () => {
 				{
 					id: "job:active",
 					ownerItemId: "runtime:workshop",
-					lineId: "line:workshop:build",
+					lineUid: "line:workshop:build",
 					durationMs: 1_000,
 					remainingMs: 600,
 				},
@@ -63,7 +63,7 @@ describe("readItemDetailQueue", () => {
 			kind: "available",
 			active: [
 				{
-					lineId: "line:workshop:build",
+					lineUid: "line:workshop:build",
 					status: "running",
 					jobId: "job:active",
 				},
@@ -71,7 +71,7 @@ describe("readItemDetailQueue", () => {
 			request: [
 				{
 					requestId: "job:queued",
-					lineId: "line:workshop:build",
+					lineUid: "line:workshop:build",
 					status: "blocked-active",
 				},
 			],
@@ -83,7 +83,7 @@ describe("readItemDetailQueue", () => {
 		const workshop = config.items.workshop;
 		workshop.lines.push({
 			...workshop.lines[0],
-			id: "line:workshop:ready",
+			uid: "line:workshop:ready",
 			input: [
 				{
 					type: "simple",
@@ -107,7 +107,7 @@ describe("readItemDetailQueue", () => {
 				{
 					id: "job:later",
 					ownerItemId: "runtime:workshop",
-					lineId: "line:workshop:ready",
+					lineUid: "line:workshop:ready",
 				},
 			],
 		} satisfies RuntimeSchema.Type;
@@ -125,12 +125,12 @@ describe("readItemDetailQueue", () => {
 			request: [
 				{
 					requestId: "job:queued",
-					lineId: "line:workshop:build",
+					lineUid: "line:workshop:build",
 					status: "waiting-inputs",
 				},
 				{
 					requestId: "job:later",
-					lineId: "line:workshop:ready",
+					lineUid: "line:workshop:ready",
 					status: "inputs-ready",
 				},
 			],
@@ -168,7 +168,7 @@ describe("readItemDetailQueue", () => {
 			request: [
 				{
 					requestId: "job:queued",
-					lineId: "line:workshop:build",
+					lineUid: "line:workshop:build",
 					status: "inputs-ready",
 				},
 			],
@@ -199,7 +199,7 @@ describe("readItemDetailQueue", () => {
 				{
 					id: "job:hidden",
 					ownerItemId: "runtime:workshop",
-					lineId: "line:workshop:build",
+					lineUid: "line:workshop:build",
 					durationMs: 1_000,
 					remainingMs: 600,
 				},

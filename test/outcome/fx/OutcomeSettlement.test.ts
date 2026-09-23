@@ -86,7 +86,7 @@ const configFn = (outcome: OutcomeTableSchema.Type, width = 3) =>
 				...definitionFn("owner"),
 				lines: [
 					{
-						id: "run",
+						uid: "run",
 						title: "Run",
 						description: "Run",
 						default: true,

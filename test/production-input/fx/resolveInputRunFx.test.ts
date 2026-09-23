@@ -31,7 +31,7 @@ const bufferedItem = ({ id, inputIndex }: { id: string; inputIndex: number }) =>
 		location: {
 			scope: "input",
 			ownerItemId: owner.id,
-			lineId: "line:workshop:build",
+			lineUid: "line:workshop:build",
 			inputIndex,
 		},
 
@@ -45,7 +45,7 @@ describe("resolveInputRunFx", () => {
 			resolveInputRunFx({
 				input: workshopLine.input[1],
 				inputIndex: 1,
-				lineId: "line:workshop:build",
+				lineUid: "line:workshop:build",
 				ownerItemId: owner.id,
 				reservedUnits: new Map(),
 				runtime: {
@@ -119,7 +119,7 @@ describe("resolveInputRunFx", () => {
 			resolveInputRunFx({
 				input: workshopLine.input[0],
 				inputIndex: 0,
-				lineId: "line:workshop:build",
+				lineUid: "line:workshop:build",
 				ownerItemId: owner.id,
 				reservedUnits: new Map(),
 				runtime,
@@ -179,7 +179,7 @@ describe("resolveInputRunFx", () => {
 					},
 				},
 				inputIndex: 0,
-				lineId: "line:workshop:build",
+				lineUid: "line:workshop:build",
 				ownerItemId: owner.id,
 				reservedUnits: new Map(),
 				runtime: {

@@ -26,7 +26,7 @@ const configFn = (runtimeMs = 1000) =>
 		lines: [
 			{
 				...createLine({
-					id: "work",
+					uid: "work",
 					input: [
 						{
 							type: "simple",
@@ -127,7 +127,7 @@ describe("committed runtime removal snapshots", () => {
 								{
 									id: "queued:work",
 									ownerItemId: initial.id,
-									lineId: "work",
+									lineUid: "work",
 								},
 							],
 						},
@@ -203,7 +203,7 @@ describe("committed runtime removal snapshots", () => {
 						{
 							id: "queued:work",
 							ownerItemId: owner.id,
-							lineId: "work",
+							lineUid: "work",
 						},
 					],
 				});

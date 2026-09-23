@@ -15,7 +15,7 @@
 		"maxQueueSize": 4,
 		"lines": [
 			{
-				"id": "harvest",
+				"uid": "niulz9ont96dfvj6jhtdyxgk",
 				"title": "Hop",
 				"description": "Harvest hop from a nearby planted field. Supply one bucket of water; the empty bucket is returned.",
 				"clockWeight": 1,
@@ -92,7 +92,7 @@
 				"rules": []
 			},
 			{
-				"id": "field",
+				"uid": "jaiwddetqqmdlp9uh3m6d871",
 				"title": "Prepare Hop Field",
 				"artwork": "l30oo2nvumphxsc0frobu1di",
 				"description": "Prepare a new hop field for planting.",
@@ -134,7 +134,7 @@
 				"rules": []
 			},
 			{
-				"id": "blueprint",
+				"uid": "mdniyiy5x21afzrty5knyva8",
 				"title": "Hop Farm Blueprint",
 				"artwork": "so7r094glj6wfe6yoveiclrg",
 				"description": "Sketch plans for another Hop Farm.",

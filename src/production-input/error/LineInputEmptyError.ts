@@ -6,6 +6,6 @@ import type { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIn
 /** One exact material input no longer contains anything that can be withdrawn. */
 export class LineInputEmptyError extends Data.TaggedError("LineInputEmptyError")<{
 	ownerItemId: IdSchema.Type;
-	lineId: IdSchema.Type;
+	lineUid: IdSchema.Type;
 	inputIndex: NonNegativeIntegerSchema.Type;
 }> {}

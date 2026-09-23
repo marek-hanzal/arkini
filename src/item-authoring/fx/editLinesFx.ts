@@ -1,10 +1,11 @@
+import { createId } from "@paralleldrive/cuid2";
 import { Effect } from "effect";
 
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { ProjectOperationError } from "~/project-authoring/error/ProjectOperationError";
 import { ProjectRepositoryError } from "~/project-authoring/error/ProjectRepositoryError";
-import type { Project } from "~/project-authoring/type/Project";
+import type { Project, ProjectCommit } from "~/project-authoring/type/Project";
 import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
 
 /** Builds the whole line batch before one existing best-effort repository commit. */
@@ -18,7 +19,7 @@ export const editLinesFx = Effect.fn("editItemLinesFx")(function* ({
 	readonly revision: number;
 	readonly operations: ReadonlyArray<editLinesFx.Operation>;
 	readonly repository: ProjectRepositoryService;
-}) {
+}): Effect.fn.Return<editLinesFx.Output, ProjectOperationError | ProjectRepositoryError> {
 	if (operations.length < 1 || operations.length > 20)
 		return yield* Effect.fail(
 			new ProjectOperationError({
@@ -31,14 +32,15 @@ export const editLinesFx = Effect.fn("editItemLinesFx")(function* ({
 	};
 	const targets = new Set<string>();
 	const touched = new Map<string, number[]>();
+	const applied: editLinesFx.AppliedOperation[] = [];
 	for (const [index, operation] of operations.entries()) {
 		const { itemUid } = operation;
-		const lineId = operation.operation === "create" ? operation.line.id : operation.lineId;
+		const lineUid = operation.operation === "create" ? createId() : operation.lineUid;
 		const failFx = (message: string) =>
 			Effect.fail(
 				new ProjectOperationError({
 					reason: "invalid-item",
-					message: `Operation ${index + 1} (${operation.operation}, item ${itemUid}, line ${lineId}): ${message}`,
+					message: `Operation ${index + 1} (${operation.operation}, item ${itemUid}, line ${lineUid}): ${message}`,
 				}),
 			);
 		const item = items[itemUid];
@@ -54,33 +56,36 @@ export const editLinesFx = Effect.fn("editItemLinesFx")(function* ({
 			);
 		const target = JSON.stringify([
 			itemUid,
-			lineId,
+			lineUid,
 		]);
 		if (targets.has(target))
 			return yield* failFx("Each item/line pair may be edited only once per batch.");
 		targets.add(target);
-		if (operation.operation === "replace" && operation.line.id !== lineId)
-			return yield* failFx(
-				`Replacement line ID ${operation.line.id} must match target line ID ${lineId}.`,
-			);
-		const matches = item.lines.filter((line) => line.id === lineId);
-		if (operation.operation === "create" && matches.length > 0)
-			return yield* failFx(`Line ${lineId} already exists on item ${itemUid}.`);
-		if (operation.operation !== "create" && matches.length === 0)
-			return yield* failFx(`Line ${lineId} does not exist on item ${itemUid}.`);
-		if (operation.operation !== "create" && matches.length > 1)
-			return yield* failFx(
-				`Line ${lineId} is ambiguous on item ${itemUid}; fix its duplicate line IDs before editing it.`,
-			);
+		const selectedIndex = item.lines.findIndex((line) => line.uid === lineUid);
+		if (operation.operation !== "create" && selectedIndex === -1)
+			return yield* failFx(`Line ${lineUid} does not exist on item ${itemUid}.`);
+		const canonical: editLinesFx.AppliedOperation =
+			operation.operation === "delete"
+				? operation
+				: {
+						...operation,
+						line: {
+							...operation.line,
+							uid: lineUid,
+						},
+					};
+		applied.push(canonical);
 		const lines =
-			operation.operation === "create"
+			canonical.operation === "create"
 				? [
 						...item.lines,
-						operation.line,
+						canonical.line,
 					]
-				: operation.operation === "delete"
-					? item.lines.filter((line) => line !== matches[0])
-					: item.lines.map((line) => (line === matches[0] ? operation.line : line));
+				: canonical.operation === "delete"
+					? item.lines.filter((_line, lineIndex) => lineIndex !== selectedIndex)
+					: item.lines.map((line, lineIndex) =>
+							lineIndex === selectedIndex ? canonical.line : line,
+						);
 		items[itemUid] = {
 			...item,
 			lines,
@@ -101,7 +106,7 @@ export const editLinesFx = Effect.fn("editItemLinesFx")(function* ({
 				}),
 		});
 	}
-	return yield* repository.replaceConfigFx({
+	const commit = yield* repository.replaceConfigFx({
 		projectId: project.projectId,
 		expectedRevision: revision,
 		config: {
@@ -109,10 +114,18 @@ export const editLinesFx = Effect.fn("editItemLinesFx")(function* ({
 			items,
 		},
 	});
+	return {
+		commit,
+		operations: applied,
+	};
 });
 
 export namespace editLinesFx {
-	export type Operation =
+	export interface Output {
+		readonly commit: ProjectCommit;
+		readonly operations: readonly AppliedOperation[];
+	}
+	export type AppliedOperation =
 		| {
 				readonly operation: "create";
 				readonly itemUid: string;
@@ -121,12 +134,30 @@ export namespace editLinesFx {
 		| {
 				readonly operation: "replace";
 				readonly itemUid: string;
-				readonly lineId: string;
+				readonly lineUid: string;
 				readonly line: LineSchema.Type;
 		  }
 		| {
 				readonly operation: "delete";
 				readonly itemUid: string;
-				readonly lineId: string;
+				readonly lineUid: string;
+		  };
+
+	export type Operation =
+		| {
+				readonly operation: "create";
+				readonly itemUid: string;
+				readonly line: Omit<LineSchema.Type, "uid">;
+		  }
+		| {
+				readonly operation: "replace";
+				readonly itemUid: string;
+				readonly lineUid: string;
+				readonly line: Omit<LineSchema.Type, "uid">;
+		  }
+		| {
+				readonly operation: "delete";
+				readonly itemUid: string;
+				readonly lineUid: string;
 		  };
 }

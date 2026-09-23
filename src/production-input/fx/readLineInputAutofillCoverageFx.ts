@@ -6,7 +6,7 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
 export namespace readLineInputAutofillCoverageFx {
 	export interface Props {
-		readonly lineId: IdSchema.Type;
+		readonly lineUid: IdSchema.Type;
 		readonly ownerItemId: IdSchema.Type;
 		readonly runtime: RuntimeSchema.Type;
 	}
@@ -31,10 +31,10 @@ export namespace readLineInputAutofillCoverageFx {
  * not physically available to queued start admission until their canonical settlement.
  */
 export const readLineInputAutofillCoverageFx = Effect.fn("readLineInputAutofillCoverageFx")(
-	function* ({ lineId, ownerItemId, runtime }: readLineInputAutofillCoverageFx.Props) {
+	function* ({ lineUid, ownerItemId, runtime }: readLineInputAutofillCoverageFx.Props) {
 		const plan = yield* planLineInputAutofillFx({
 			includeIncomingDeliveries: false,
-			lineId,
+			lineUid,
 			ownerItemId,
 			runtime,
 		});

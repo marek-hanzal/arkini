@@ -22,7 +22,7 @@ import {
 } from "~test/production-input/support/inputRuntimeTestConfig";
 
 const ownerItemId = "runtime:workshop";
-const lineId = "line:workshop:build";
+const lineUid = "line:workshop:build";
 const spawnOwnerAndWaterFx = Effect.gen(function* () {
 	yield* spawnItemFx({
 		id: ownerItemId,
@@ -43,7 +43,7 @@ describe("settleItemDeliveryFx", () => {
 				yield* spawnOwnerAndWaterFx;
 				yield* autofillLineInputsFx({
 					ownerItemId,
-					lineId,
+					lineUid,
 				});
 				const before = yield* readRuntimeFx();
 				yield* setCheatEnabledFx({
@@ -113,7 +113,7 @@ describe("settleItemDeliveryFx", () => {
 				yield* spawnOwnerAndWaterFx;
 				const admission = yield* autofillLineInputsFx({
 					ownerItemId,
-					lineId,
+					lineUid,
 				});
 				const before = yield* readRuntimeFx();
 				const settled = yield* settleItemDeliveryFx({
@@ -155,7 +155,7 @@ describe("settleItemDeliveryFx", () => {
 		expect(item?.location).toMatchObject({
 			scope: "input",
 			ownerItemId,
-			lineId,
+			lineUid,
 			inputIndex: 0,
 		});
 		expect(result.hydrated.items.find((item) => item.id === "runtime:water")?.location).toEqual(
@@ -172,7 +172,7 @@ describe("settleItemDeliveryFx", () => {
 				yield* spawnOwnerAndWaterFx;
 				yield* autofillLineInputsFx({
 					ownerItemId,
-					lineId,
+					lineUid,
 				});
 				const before = yield* readRuntimeFx();
 				const state = fromRuntimeFn({
@@ -232,7 +232,7 @@ describe("settleItemDeliveryFx", () => {
 				yield* spawnOwnerAndWaterFx;
 				yield* autofillLineInputsFx({
 					ownerItemId,
-					lineId,
+					lineUid,
 				});
 				const owner = yield* getItemFx({
 					itemId: ownerItemId,

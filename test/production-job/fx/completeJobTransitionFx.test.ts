@@ -207,7 +207,7 @@ describe("job completion transition", () => {
 		const baseJob = {
 			id: "job:completion-random:first",
 			ownerItemId: "runtime:owner",
-			lineId: "line:owner:run",
+			lineUid: "line:owner:run",
 			durationMs: 200,
 			remainingMs: 0,
 		} satisfies JobSchema.Type;

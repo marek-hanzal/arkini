@@ -108,10 +108,12 @@ export const formatGameRuntimeDiffTextFn = ({
 		latest: latest.jobs,
 		readIdFn: (job) => job.jobId,
 		formatFn: (job) =>
-			`${job.jobId} · line ${job.lineId} · owner ${formatGameDiagnosticItemPointerTextFn(job.owner)}`,
+			`${job.jobId} · line ${job.lineUid} · owner ${formatGameDiagnosticItemPointerTextFn(job.owner)}`,
 		formatChangeFn: (previous, job) =>
 			formatChangesFn([
-				previous.lineId === job.lineId ? null : `line ${previous.lineId} → ${job.lineId}`,
+				previous.lineUid === job.lineUid
+					? null
+					: `line ${previous.lineUid} → ${job.lineUid}`,
 				readItemReferenceIdFn(previous.owner) === readItemReferenceIdFn(job.owner)
 					? null
 					: `owner ${formatGameDiagnosticItemPointerTextFn(previous.owner)} → ${formatGameDiagnosticItemPointerTextFn(job.owner)}`,
@@ -128,12 +130,12 @@ export const formatGameRuntimeDiffTextFn = ({
 		latest: latest.queue,
 		readIdFn: (request) => request.requestId,
 		formatFn: (request) =>
-			`${request.requestId} · line ${request.lineId} · owner ${formatGameDiagnosticItemPointerTextFn(request.owner)}`,
+			`${request.requestId} · line ${request.lineUid} · owner ${formatGameDiagnosticItemPointerTextFn(request.owner)}`,
 		formatChangeFn: (previous, request) =>
 			formatChangesFn([
-				previous.lineId === request.lineId
+				previous.lineUid === request.lineUid
 					? null
-					: `line ${previous.lineId} → ${request.lineId}`,
+					: `line ${previous.lineUid} → ${request.lineUid}`,
 				readItemReferenceIdFn(previous.owner) === readItemReferenceIdFn(request.owner)
 					? null
 					: `owner ${formatGameDiagnosticItemPointerTextFn(previous.owner)} → ${formatGameDiagnosticItemPointerTextFn(request.owner)}`,
@@ -155,11 +157,11 @@ export const formatGameRuntimeDiffTextFn = ({
 		latest: latest.defaultLines,
 		readIdFn: (entry) => readItemReferenceIdFn(entry.owner),
 		formatFn: (entry) =>
-			`${formatGameDiagnosticItemPointerTextFn(entry.owner)} · ${entry.lineId ?? "disabled"}`,
+			`${formatGameDiagnosticItemPointerTextFn(entry.owner)} · ${entry.lineUid ?? "disabled"}`,
 		formatChangeFn: (previous, entry) =>
-			previous.lineId === entry.lineId
+			previous.lineUid === entry.lineUid
 				? null
-				: `line ${previous.lineId ?? "disabled"} → ${entry.lineId ?? "disabled"}`,
+				: `line ${previous.lineUid ?? "disabled"} → ${entry.lineUid ?? "disabled"}`,
 	});
 	const sections = [
 		{

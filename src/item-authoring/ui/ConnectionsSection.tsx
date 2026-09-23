@@ -8,6 +8,7 @@ import {
 import { EditorSelect } from "~/editor-control/ui/EditorSelect";
 import type { ItemConnectionFilterSchema } from "~/graph/schema/ItemConnectionFilterSchema";
 import { readItemConnectionQueryFn } from "~/graph/fn/readItemConnectionQueryFn";
+import { readItemConnectionCountsFn } from "~/graph/fn/readItemConnectionCountsFn";
 import { useEditorGraphQuery } from "~/graph/ui/useEditorGraphQuery";
 import { GraphQueryResult } from "~/graph/ui/GraphQueryResult";
 import { useTranslator } from "~/translation/ui/useTranslator";
@@ -68,6 +69,28 @@ export const ConnectionsSection = ({
 		nodeId: "",
 	});
 	const counterpart = selection.itemUid === itemUid ? selection.nodeId : "";
+	const countQuery = useMemo(
+		() => ({
+			...readItemConnectionQueryFn(itemUid, "all", counterpart || undefined),
+			detail: "summary" as const,
+			limit: 1000,
+		}),
+		[
+			itemUid,
+			counterpart,
+		],
+	);
+	const countState = useEditorGraphQuery(countQuery);
+	const counts = useMemo(
+		() =>
+			countState.status === "ready"
+				? readItemConnectionCountsFn(itemUid, countState.result.edges)
+				: undefined,
+		[
+			itemUid,
+			countState,
+		],
+	);
 	const query = useMemo(
 		() => readItemConnectionQueryFn(itemUid, filter, counterpart || undefined),
 		[
@@ -77,6 +100,20 @@ export const ConnectionsSection = ({
 		],
 	);
 	const state = useEditorGraphQuery(query);
+	const countLabelFn = (category: ItemConnectionFilterSchema.Type): string => {
+		// A complete selected query is exact even when the broader count query is partial.
+		if (category === filter && state.status === "ready" && !state.result.truncated)
+			return String(state.result.edges.length);
+		if (countState.status === "ready" && counts !== undefined) {
+			const count =
+				category === filter && state.status === "ready"
+					? Math.max(counts[category], state.result.edges.length)
+					: counts[category];
+			return `${countState.result.truncated ? "≥" : ""}${count}`;
+		}
+		if (category === filter && state.status === "ready") return `≥${state.result.edges.length}`;
+		return countState.status === "loading" ? "…" : "—";
+	};
 	const searchOptions = useMemo(() => {
 		const options = new Map<string, EditorSearchOption>();
 		for (const item of Object.values(project.config.items))
@@ -129,9 +166,9 @@ export const ConnectionsSection = ({
 							label={translator.textFn("Counterpart")}
 							labelVisible={false}
 							displaySelectedLabel
-							placeholder={translator.textFn(
+							placeholder={`${translator.textFn(
 								"Choose a counterpart to inspect its relationships…",
-							)}
+							)} (${countLabelFn(filter)})`}
 							emptyLabel={translator.textFn("No matching items")}
 							value={counterpart}
 							options={searchOptions}
@@ -159,6 +196,7 @@ export const ConnectionsSection = ({
 						options={Filters.map((option) => ({
 							...option,
 							label: translator.textFn(option.label),
+							trailingLabel: countLabelFn(option.value),
 						}))}
 					/>
 				</div>

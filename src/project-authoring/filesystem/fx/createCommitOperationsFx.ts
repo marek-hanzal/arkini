@@ -1,4 +1,5 @@
 import { isDeepStrictEqual } from "node:util";
+import { assertUniqueLineUidsFx } from "~/project-authoring/fx/assertUniqueLineUidsFx";
 import { readTemplateReferenceIssuesFn } from "~/item-authoring/fn/readTemplateReferenceIssuesFn";
 import {
 	ProjectResourceFileReplacementSchema,
@@ -270,6 +271,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 						},
 					});
 					yield* assertTemplateReferencesFx(config, state.project.config, "upsert-item");
+					yield* assertUniqueLineUidsFx(config, "upsert-item");
 					return asCommitFn(
 						yield* commitFx({
 							state,
@@ -371,6 +373,7 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 				Effect.gen(function* () {
 					const state = yield* readStateFx(projectId);
 					yield* assertExpectedRevisionFx(state, expectedRevision, "replace-config");
+					yield* assertUniqueLineUidsFx(config, "replace-config");
 					yield* assertTemplateReferencesFx(
 						config,
 						state.project.config,

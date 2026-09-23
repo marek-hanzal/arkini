@@ -186,7 +186,7 @@ it("far excludes the origin, remote spaces, buffered and reserved material", () 
 			item("buffer", {
 				scope: "input",
 				ownerItemId: "self",
-				lineId: "line",
+				lineUid: "line",
 				inputIndex: 0,
 			}),
 			item("reserved", {

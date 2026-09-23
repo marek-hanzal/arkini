@@ -38,21 +38,21 @@ export const readGameDiagnosticRuntimeFn = ({
 		})),
 		jobs: runtime.jobs.map((job) => ({
 			jobId: job.id,
-			lineId: job.lineId,
+			lineUid: job.lineUid,
 			owner: readOwnerFn(job.ownerItemId),
 			durationMs: job.durationMs,
 			remainingMs: job.remainingMs,
 		})),
 		queue: runtime.jobQueue.map((request) => ({
 			requestId: request.id,
-			lineId: request.lineId,
+			lineUid: request.lineUid,
 			owner: readOwnerFn(request.ownerItemId),
 		})),
 		defaultLines: Object.entries(runtime.defaultLineByOwnerItemId)
 			.sort(([left], [right]) => left.localeCompare(right))
-			.map(([runtimeItemId, lineId]) => ({
+			.map(([runtimeItemId, lineUid]) => ({
 				owner: readOwnerFn(runtimeItemId),
-				lineId,
+				lineUid,
 			})),
 	};
 };

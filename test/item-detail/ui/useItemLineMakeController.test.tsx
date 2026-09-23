@@ -53,23 +53,23 @@ it("queues the exact selected owner and line, blocks disabled submissions, and p
 	try {
 		await renderFn({
 			ownerItemId: "owner:a",
-			lineId: "line:second",
+			lineUid: "line:second",
 			disabled: false,
 		});
 		await act(async () => output!.makeFn());
 		expect(state.enqueueFx).toHaveBeenCalledExactlyOnceWith({
 			ownerItemId: "owner:a",
-			lineId: "line:second",
+			lineUid: "line:second",
 		});
 		expect(state.game.runFx).toHaveBeenCalledTimes(1);
 		await renderFn({
 			ownerItemId: "owner:a",
-			lineId: "line:second",
+			lineUid: "line:second",
 			disabled: true,
 		});
 		await act(async () => output!.makeFn());
 		await renderFn({
-			lineId: "line:second",
+			lineUid: "line:second",
 			disabled: false,
 		});
 		await act(async () => output!.makeFn());
@@ -86,14 +86,14 @@ it("queues the exact selected owner and line, blocks disabled submissions, and p
 		);
 		await renderFn({
 			ownerItemId: "owner:a",
-			lineId: "line:second",
+			lineUid: "line:second",
 			disabled: false,
 		});
 		await act(async () => output!.makeFn());
 		expect(output!.pending).toBe(false);
 		await renderFn({
 			ownerItemId: "owner:b",
-			lineId: "line:second",
+			lineUid: "line:second",
 			disabled: false,
 		});
 		state.enqueueFx.mockReturnValue(
@@ -104,7 +104,7 @@ it("queues the exact selected owner and line, blocks disabled submissions, and p
 		await act(async () => output!.makeFn());
 		expect(state.enqueueFx).toHaveBeenLastCalledWith({
 			ownerItemId: "owner:b",
-			lineId: "line:second",
+			lineUid: "line:second",
 		});
 	} finally {
 		await act(async () => root.unmount());

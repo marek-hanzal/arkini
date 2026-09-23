@@ -14,7 +14,7 @@
 		"maxQueueSize": 1,
 		"lines": [
 			{
-				"id": "bricks",
+				"uid": "zdcc07q8phmdyur4i8anzy53",
 				"title": "Bricks",
 				"description": "Make something to make something else",
 				"default": true,

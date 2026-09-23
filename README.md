@@ -62,6 +62,8 @@ argc dev-control
 argc mcp-inspect
 ```
 
+The repository also builds a local `serakki-cli`. To discover its current commands from source, run `argc preview-cli --build -- --help` once, then use `argc preview-cli -- <subcommand> --help` to walk the command tree. For example, `argc preview-cli -- editor import --help` lists resource types, and `argc preview-cli -- editor import artwork --help` shows the project ID and `--file` arguments. The `--` passes CLI flags to `serakki-cli`; omit `--build` on later calls only when reusing the build you just made. Use `argc preview-cli -- <command> ...` to run a discovered command. This CLI can import Artwork, Music and SFX directly into a saved Editor project; see [`CONFIG.md`](CONFIG.md) for the resource rules.
+
 `argc translations:sync` reconciles every `src/translation/*.yaml` catalog. It extracts configured literal keys, adds missing entries, removes dead static entries, preserves explicit dynamic entries, and sorts the result. `argc translations:check` performs the same work without writing and fails on drift. The renderer bundles those catalogs, negotiates against Electron's preferred languages, and falls back to `en`; there is no generated copy or runtime download.
 
 `argc dc` checks dependency topology across every active module root and standalone TypeScript config. `argc check` runs formatting and translation drift, all TypeScript configurations, a production Electron build, Community Serapack packing and verification, dependency checks, copy/paste detection, and the permanent Vitest suite.

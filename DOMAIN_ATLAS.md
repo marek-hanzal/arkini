@@ -128,6 +128,9 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 
 | Domain | Role | First read |
 | --- | --- | --- |
+| `board-template` | Portable space-less board templates with independent dimensions | [`src/board-template/schema/TemplateSchema.ts`](src/board-template/schema/TemplateSchema.ts) |
+| `board-authoring` | Shared board preview, placement picker and editing gestures | [`src/board-authoring/ui/BoardGrid.tsx`](src/board-authoring/ui/BoardGrid.tsx) |
+| `template-authoring` | Editor template catalog, UID routes and revision-pinned drafts | [`src/template-authoring/ui/Templates.tsx`](src/template-authoring/ui/Templates.tsx) |
 | `project-authoring` | Project model, repository contract and catalog workflows | [`src/project-authoring/service/ProjectRepository.ts`](src/project-authoring/service/ProjectRepository.ts) |
 | `authoring-session` | Mounted project projection, replacement and unsaved guard | [`src/authoring-session/ui/useEditorProject.ts`](src/authoring-session/ui/useEditorProject.ts) |
 | `authoring-shell` | Cross-product Editor shell and navigation | [`src/authoring-shell/ui/EditorShell.tsx`](src/authoring-shell/ui/EditorShell.tsx) |

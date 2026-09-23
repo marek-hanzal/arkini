@@ -13,6 +13,7 @@ export const readProjectValidationTextFx = Effect.fn("readProjectValidationTextF
 	const provenance = {
 		meta: source,
 		resources: source,
+		templates: source,
 		start: source,
 		items: Object.fromEntries(
 			Object.keys(project.config.items).map((id) => [

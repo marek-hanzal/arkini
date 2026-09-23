@@ -31,6 +31,11 @@ export namespace forceDeleteFx {
 			readonly ownerItemId: string;
 			readonly ruleNumber: number;
 		}>;
+		readonly removedTemplateEntries: ReadonlyArray<{
+			readonly templateUid: string;
+			readonly title: string;
+			readonly count: number;
+		}>;
 		readonly removedStartEntries: Readonly<Record<StartSurface, number>>;
 	}
 
@@ -72,6 +77,7 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 			startIndexes[second].add(third);
 			continue;
 		}
+		if (root === "templates") continue;
 		if (root !== "items" || typeof second !== "string" || typeof third !== "string")
 			throw new Error(`Unsupported item delete reference path ${blocker.path.join(".")}.`);
 		const cleanup = itemCleanups.get(second) ?? createItemCleanupFn();
@@ -189,6 +195,10 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 	return {
 		config: GameConfig.parse({
 			...config,
+			templates: config.templates?.map((template) => ({
+				...template,
+				board: template.board.filter((cell) => cell.itemId !== itemId),
+			})),
 			start: {
 				...config.start,
 				board: config.start.board.filter((_entry, index) => !startIndexes.board.has(index)),
@@ -196,6 +206,18 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 			items,
 		}),
 		impact: {
+			removedTemplateEntries: (config.templates ?? []).flatMap((template) => {
+				const count = template.board.filter((cell) => cell.itemId === itemId).length;
+				return count === 0
+					? []
+					: [
+							{
+								templateUid: template.uid,
+								title: template.title,
+								count,
+							},
+						];
+			}),
 			removedClockRules,
 			removedUnitOutcomeOwnerIds,
 			removedExpiryOutcomeOwnerIds,

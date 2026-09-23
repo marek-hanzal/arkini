@@ -10,6 +10,7 @@ export const GameSourceProvenanceSchema = z
 		music: z.string().min(1).optional(),
 		sfx: z.string().min(1).optional(),
 		resources: z.string().min(1).optional(),
+		templates: z.string().min(1).optional(),
 		start: z.string().min(1).optional(),
 		items: z.record(IdSchema, z.string().min(1)),
 	})

@@ -24,7 +24,7 @@ vi.mock("~/ui/ui/Button", () => ({
 		),
 }));
 
-import { ProjectStartGrid } from "~/project-authoring/ui/ProjectStartGrid";
+import { BoardGrid } from "~/board-authoring/ui/BoardGrid";
 import { boardSpaceProject } from "~test/project-authoring/support/BoardSpaceProject";
 
 (
@@ -43,7 +43,7 @@ afterEach(async () => {
 	document.body.replaceChildren();
 });
 
-describe("ProjectStartGrid", () => {
+describe("BoardGrid", () => {
 	it("keeps detail mode independent from edit context and drag lifecycle", async () => {
 		const addWindowListenerFn = vi.spyOn(window, "addEventListener");
 		const container = document.createElement("div");
@@ -52,7 +52,7 @@ describe("ProjectStartGrid", () => {
 		roots.push(root);
 		await act(async () => {
 			root.render(
-				<ProjectStartGrid
+				<BoardGrid
 					cells={[
 						{
 							itemId: "water",
@@ -70,16 +70,12 @@ describe("ProjectStartGrid", () => {
 		});
 
 		expect(
-			container
-				.querySelector('[data-ui="EditorProjectStartGrid"]')
-				?.getAttribute("data-mode"),
+			container.querySelector('[data-ui="EditorBoardGrid"]')?.getAttribute("data-mode"),
 		).toBe("detail");
-		expect(container.querySelectorAll('[data-ui="EditorProjectStartGridSlot"]')).toHaveLength(
-			4,
-		);
+		expect(container.querySelectorAll('[data-ui="EditorBoardGridSlot"]')).toHaveLength(4);
 		expect(container.querySelector('[data-ui="EditorItemThumbnail"]')).not.toBeNull();
 		const itemLink = container.querySelector<HTMLAnchorElement>(
-			'a[data-ui="EditorProjectStartGridSlot"]',
+			'a[data-ui="EditorBoardGridSlot"]',
 		);
 		expect(itemLink?.dataset.to).toBe(
 			"/editor/$projectId/editor/items/$itemUid/detail/$sectionId",
@@ -89,9 +85,7 @@ describe("ProjectStartGrid", () => {
 			projectId: boardSpaceProject.projectId,
 			sectionId: "identity",
 		});
-		expect(
-			container.querySelectorAll('div[data-ui="EditorProjectStartGridSlot"]'),
-		).toHaveLength(3);
+		expect(container.querySelectorAll('div[data-ui="EditorBoardGridSlot"]')).toHaveLength(3);
 		expect(
 			addWindowListenerFn.mock.calls.filter(([type]) =>
 				[

@@ -318,5 +318,233 @@
 				"itemId": "foundation-chest"
 			}
 		]
-	}
+	},
+	"templates": [
+		{
+			"uid": "blnlysibqlvgocdqibrsovdf",
+			"title": "Default Template",
+			"width": 17,
+			"height": 11,
+			"board": [
+				{
+					"x": 8,
+					"y": 7,
+					"itemId": "forest"
+				},
+				{
+					"x": 8,
+					"y": 6,
+					"itemId": "base-camp"
+				},
+				{
+					"x": 6,
+					"y": 6,
+					"itemId": "tree"
+				},
+				{
+					"x": 10,
+					"y": 6,
+					"itemId": "tree"
+				},
+				{
+					"x": 7,
+					"y": 5,
+					"itemId": "stone-deposit"
+				},
+				{
+					"x": 8,
+					"y": 5,
+					"itemId": "tree"
+				},
+				{
+					"x": 9,
+					"y": 5,
+					"itemId": "stone-deposit"
+				},
+				{
+					"x": 9,
+					"y": 4,
+					"itemId": "tree"
+				},
+				{
+					"x": 7,
+					"y": 4,
+					"itemId": "tree"
+				},
+				{
+					"x": 8,
+					"y": 3,
+					"itemId": "foundation-chest"
+				}
+			]
+		},
+		{
+			"uid": "kuuffstuxxozvrnsunxgqxtt",
+			"title": "The End",
+			"width": 17,
+			"height": 11,
+			"board": [
+				{
+					"x": 1,
+					"y": 1,
+					"itemId": "tree"
+				},
+				{
+					"x": 1,
+					"y": 2,
+					"itemId": "tree"
+				},
+				{
+					"x": 1,
+					"y": 3,
+					"itemId": "tree"
+				},
+				{
+					"x": 1,
+					"y": 4,
+					"itemId": "tree"
+				},
+				{
+					"x": 1,
+					"y": 5,
+					"itemId": "tree"
+				},
+				{
+					"x": 2,
+					"y": 1,
+					"itemId": "tree"
+				},
+				{
+					"x": 3,
+					"y": 1,
+					"itemId": "tree"
+				},
+				{
+					"x": 2,
+					"y": 3,
+					"itemId": "tree"
+				},
+				{
+					"x": 2,
+					"y": 5,
+					"itemId": "tree"
+				},
+				{
+					"x": 3,
+					"y": 5,
+					"itemId": "tree"
+				},
+				{
+					"x": 5,
+					"y": 5,
+					"itemId": "tree"
+				},
+				{
+					"x": 5,
+					"y": 4,
+					"itemId": "tree"
+				},
+				{
+					"x": 5,
+					"y": 3,
+					"itemId": "tree"
+				},
+				{
+					"x": 5,
+					"y": 2,
+					"itemId": "tree"
+				},
+				{
+					"x": 5,
+					"y": 1,
+					"itemId": "tree"
+				},
+				{
+					"x": 6,
+					"y": 2,
+					"itemId": "tree"
+				},
+				{
+					"x": 7,
+					"y": 3,
+					"itemId": "tree"
+				},
+				{
+					"x": 8,
+					"y": 4,
+					"itemId": "tree"
+				},
+				{
+					"x": 8,
+					"y": 5,
+					"itemId": "tree"
+				},
+				{
+					"x": 8,
+					"y": 3,
+					"itemId": "tree"
+				},
+				{
+					"x": 8,
+					"y": 2,
+					"itemId": "tree"
+				},
+				{
+					"x": 8,
+					"y": 1,
+					"itemId": "tree"
+				},
+				{
+					"x": 10,
+					"y": 1,
+					"itemId": "tree"
+				},
+				{
+					"x": 10,
+					"y": 2,
+					"itemId": "tree"
+				},
+				{
+					"x": 10,
+					"y": 3,
+					"itemId": "tree"
+				},
+				{
+					"x": 10,
+					"y": 4,
+					"itemId": "tree"
+				},
+				{
+					"x": 10,
+					"y": 5,
+					"itemId": "tree"
+				},
+				{
+					"x": 11,
+					"y": 5,
+					"itemId": "tree"
+				},
+				{
+					"x": 12,
+					"y": 4,
+					"itemId": "tree"
+				},
+				{
+					"x": 12,
+					"y": 3,
+					"itemId": "tree"
+				},
+				{
+					"x": 12,
+					"y": 2,
+					"itemId": "tree"
+				},
+				{
+					"x": 11,
+					"y": 1,
+					"itemId": "tree"
+				}
+			]
+		}
+	]
 }

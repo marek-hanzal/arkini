@@ -9,6 +9,7 @@ export const createSerapackSourceProvenanceFn = (
 	return {
 		meta: source,
 		resources: source,
+		templates: source,
 		start: source,
 		items: Object.fromEntries(
 			Object.keys(items).map((id) => [

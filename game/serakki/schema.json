@@ -38,6 +38,13 @@
 					"description": "Optional SFX event assignments for this game.",
 					"$ref": "urn:serakki:schema:project#/$defs/sfx.SfxSchema"
 				},
+				"templates": {
+					"description": "Reusable board templates with independent dimensions and no space identity.",
+					"type": "array",
+					"items": {
+						"$ref": "urn:serakki:schema:project#/$defs/TemplateSchema"
+					}
+				},
 				"start": {
 					"description": "The initial Board contents created for a new game.",
 					"$ref": "urn:serakki:schema:project#/$defs/StartSchema"
@@ -219,6 +226,60 @@
 				"item-detail:closed"
 			],
 			"description": "The finite vocabulary of events assignable to SFX."
+		},
+		"TemplateSchema": {
+			"type": "object",
+			"properties": {
+				"uid": {
+					"description": "The immutable identity of this board template.",
+					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
+				},
+				"title": {
+					"$ref": "urn:serakki:schema:project#/$defs/TitleSchema"
+				},
+				"width": {
+					"description": "The positive number of grid cells arranged horizontally.",
+					"$ref": "urn:serakki:schema:project#/$defs/PositiveIntegerSchema"
+				},
+				"height": {
+					"description": "The positive number of grid cells arranged vertically.",
+					"$ref": "urn:serakki:schema:project#/$defs/PositiveIntegerSchema"
+				},
+				"board": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"x": {
+								"description": "The zero-based horizontal grid coordinate.",
+								"$ref": "urn:serakki:schema:project#/$defs/NonNegativeIntegerSchema"
+							},
+							"y": {
+								"description": "The zero-based vertical grid coordinate.",
+								"$ref": "urn:serakki:schema:project#/$defs/NonNegativeIntegerSchema"
+							},
+							"itemId": {
+								"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
+							}
+						},
+						"required": [
+							"x",
+							"y",
+							"itemId"
+						],
+						"additionalProperties": false
+					}
+				}
+			},
+			"required": [
+				"uid",
+				"title",
+				"width",
+				"height",
+				"board"
+			],
+			"additionalProperties": false,
+			"description": "An authored space-less board template with its own dimensions."
 		},
 		"NonNegativeIntegerSchema": {
 			"type": "integer",

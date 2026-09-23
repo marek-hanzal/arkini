@@ -188,6 +188,10 @@ const readItemDeleteImpactTextFx = Effect.fn("readItemDeleteImpactTextFx")(funct
 		`- Expiry outcomes removed from: ${formatListFn(impact.removedExpiryOutcomeOwnerIds)}`,
 		`- Lines removed: ${formatListFn(impact.removedLines.map(({ ownerItemId, lineId }) => `${ownerItemId}/${lineId}`))}`,
 		`- Merge rules removed: ${formatListFn(impact.removedMergeRules.map(({ ownerItemId, ruleNumber }) => `${ownerItemId}#${ruleNumber}`))}`,
+		...impact.removedTemplateEntries.map(
+			(template) =>
+				`- Template ${template.title} (${template.templateUid}): ${template.count} placements removed`,
+		),
 		`- Start entries removed: board ${impact.removedStartEntries.board}`,
 	);
 	return lines.join("\n");

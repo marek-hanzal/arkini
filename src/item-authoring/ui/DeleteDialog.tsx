@@ -38,6 +38,10 @@ const ForceDeleteImpactList = ({
 				`${translator.textFn("Remove")} ${count} ${translator.textFn("starting")} ${translator.textFn(startSurfaceTitles[surface as keyof typeof startSurfaceTitles])} ${translator.textFn(count === 1 ? "entry" : "entries")}`,
 			);
 	}
+	for (const { title, count } of impact.removedTemplateEntries)
+		entries.push(
+			`${translator.textFn("Remove")} ${count} ${translator.textFn("entries")} · ${translator.textFn("Template")} ${title}`,
+		);
 	for (const { ownerItemId, ruleNumber } of impact.removedMergeRules)
 		entries.push(
 			`${translator.textFn("Remove merge rule")} ${ruleNumber} ${translator.textFn("from")} ${readItemTitleFn(project, ownerItemId)}`,

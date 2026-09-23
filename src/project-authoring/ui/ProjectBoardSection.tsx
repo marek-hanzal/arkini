@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { editorInputClassName } from "~/editor-control/constant/EditorInputClassName";
-import { ProjectStartGrid } from "~/project-authoring/ui/ProjectStartGrid";
+import { BoardGrid } from "~/board-authoring/ui/BoardGrid";
 import { useProjectFormSession } from "~/project-authoring/ui/ProjectFormContext";
 import { ProjectGridSizeValue } from "~/project-authoring/ui/ProjectGridSizeValue";
 import { EditorProjectSizeMax } from "~/project-authoring/schema/ProjectFormSchema";
@@ -102,7 +102,7 @@ export const ProjectBoardSection = () => {
 					</div>
 				</div>
 			</EditorFormCard>
-			<ProjectStartGrid
+			<BoardGrid
 				key={selectedSpace}
 				cells={cells}
 				height={height}

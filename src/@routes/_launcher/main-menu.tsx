@@ -116,7 +116,48 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 		]);
 
 		return (
-			<LauncherPageLayout page="main-menu">
+			<LauncherPageLayout
+				page="main-menu"
+				foregroundOverlay={
+					<div
+						data-ui="MainMenuCommunityLinks"
+						className="pointer-events-auto absolute bottom-6 right-6 flex items-center gap-3"
+					>
+						<a
+							href="https://www.youtube.com/@Serakki-Game"
+							target="_blank"
+							rel="noreferrer"
+							className="flex size-12 items-center justify-center text-accent transition-transform duration-200 ease-out hover:scale-110"
+						>
+							<svg
+								viewBox="0 0 24 24"
+								className="size-10"
+								fill="currentColor"
+							>
+								<path
+									fillRule="evenodd"
+									d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1c.5-1.9.5-5.8.5-5.8s0-3.9-.5-5.8ZM9.6 15.6V8.4l6.3 3.6-6.3 3.6Z"
+								/>
+							</svg>
+						</a>
+
+						<a
+							href="https://discord.gg/XtjRQgbdrK"
+							target="_blank"
+							rel="noreferrer"
+							className="flex size-12 items-center justify-center text-accent transition-transform duration-200 ease-out hover:scale-110"
+						>
+							<svg
+								viewBox="0 0 24 24"
+								className="size-10"
+								fill="currentColor"
+							>
+								<path d="M20.32 4.37a19.8 19.8 0 0 0-4.89-1.52l-.6 1.23a18.3 18.3 0 0 0-5.66 0l-.6-1.23a19.8 19.8 0 0 0-4.89 1.52C.59 8.96-.25 13.44.17 17.85a19.9 19.9 0 0 0 6 3.03l1.23-2a12.9 12.9 0 0 1-1.93-.93l.47-.37a14.2 14.2 0 0 0 12.12 0l.47.37c-.62.36-1.27.67-1.93.93l1.23 2a19.9 19.9 0 0 0 6-3.03c.49-5.11-.84-9.55-3.51-13.48ZM8.02 15.13c-1.18 0-2.15-1.08-2.15-2.41s.95-2.42 2.15-2.42c1.2 0 2.17 1.09 2.15 2.42 0 1.33-.95 2.41-2.15 2.41Zm7.96 0c-1.18 0-2.15-1.08-2.15-2.41s.95-2.42 2.15-2.42c1.2 0 2.17 1.09 2.15 2.42 0 1.33-.95 2.41-2.15 2.41Z" />
+							</svg>
+						</a>
+					</div>
+				}
+			>
 				<nav
 					className="grid w-full gap-4 [&_button]:border-line/30 [&_a]:border-line/30"
 					data-ui="MainMenu"

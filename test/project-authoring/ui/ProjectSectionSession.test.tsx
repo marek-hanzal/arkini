@@ -121,8 +121,8 @@ vi.mock("~/authoring-form/ui/EditorItemAutocompleteField", () => ({
 		createElement("span", null, label),
 }));
 
-vi.mock("~/project-authoring/ui/ProjectStartGrid", () => ({
-	ProjectStartGrid: ({
+vi.mock("~/board-authoring/ui/BoardGrid", () => ({
+	BoardGrid: ({
 		cells,
 		invalidCells = [],
 		onCellsChangeFn,
@@ -141,7 +141,7 @@ vi.mock("~/project-authoring/ui/ProjectStartGrid", () => ({
 			{
 				"data-cells": cells.map(({ itemId, x, y }) => `${itemId}:${x}:${y}`).join("|"),
 				"data-invalid-cells": invalidCells.map(({ x, y }) => `${x}:${y}`).join("|"),
-				"data-ui": "EditorProjectStartGrid",
+				"data-ui": "EditorBoardGrid",
 				"data-width": width,
 				onClick: () =>
 					onCellsChangeFn(
@@ -615,8 +615,7 @@ describe("project section form session", () => {
 			'input[type="number"][min="0"]',
 		);
 		const readGridCells = () =>
-			container.querySelector<HTMLElement>('[data-ui="EditorProjectStartGrid"]')?.dataset
-				.cells;
+			container.querySelector<HTMLElement>('[data-ui="EditorBoardGrid"]')?.dataset.cells;
 		if (spaceInput === null) throw new Error("Missing initial Board space selector.");
 
 		expect(spaceInput.value).toBe("0");
@@ -634,7 +633,7 @@ describe("project section form session", () => {
 		expect(readGridCells()).toBe("water:1:1");
 
 		const gridButton = container.querySelector<HTMLButtonElement>(
-			'[data-ui="EditorProjectStartGrid"]',
+			'[data-ui="EditorBoardGrid"]',
 		);
 		if (gridButton === null) throw new Error("Missing test grid action.");
 		await act(async () => gridButton.click());
@@ -707,7 +706,7 @@ describe("project section form session", () => {
 			await Promise.resolve();
 		});
 
-		const grid = container.querySelector<HTMLElement>('[data-ui="EditorProjectStartGrid"]');
+		const grid = container.querySelector<HTMLElement>('[data-ui="EditorBoardGrid"]');
 		expect(container.textContent).toContain("Initial board → space 0 → slot 1, 1:");
 		expect(
 			container.querySelector<HTMLInputElement>('input[type="number"][min="0"]')?.value,
@@ -730,7 +729,7 @@ describe("project section form session", () => {
 		);
 
 		const widthInput = container.querySelector<HTMLInputElement>('input[name="board.width"]');
-		const grid = container.querySelector<HTMLElement>('[data-ui="EditorProjectStartGrid"]');
+		const grid = container.querySelector<HTMLElement>('[data-ui="EditorBoardGrid"]');
 		if (widthInput === null || grid === null) throw new Error("Missing Board size controls.");
 
 		await changeInput(widthInput, "1500");

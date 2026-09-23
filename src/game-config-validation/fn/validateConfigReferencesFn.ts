@@ -305,6 +305,27 @@ export const validateConfigReferencesFn = ({
 }: validateConfigReferencesFn.Props) => {
 	const diagnostics: GameDiagnosticsSchema.Type = [];
 
+	for (const [templateIndex, template] of (config.templates ?? []).entries()) {
+		for (const [cellIndex, cell] of template.board.entries()) {
+			if (config.items[cell.itemId] !== undefined) continue;
+			diagnostics.push({
+				code: DiagnosticCodeEnumSchema.enum.ConfigMissingReference,
+				severity: DiagnosticSeverityEnumSchema.enum.Error,
+				path: [
+					"templates",
+					templateIndex,
+					"board",
+					cellIndex,
+					"itemId",
+				],
+				source: provenance.templates,
+				message: `Template ${template.title} references missing item ${cell.itemId}.`,
+				reference: DiagnosticRecordEntityEnumSchema.enum.Item,
+				referenceId: cell.itemId,
+			});
+		}
+	}
+
 	for (const [index, value] of config.start.board.entries()) {
 		if (config.items[value.itemId] !== undefined) {
 			continue;

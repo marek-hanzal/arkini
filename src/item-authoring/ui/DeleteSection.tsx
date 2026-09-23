@@ -53,6 +53,28 @@ const DeleteBlockerLink = ({
 		);
 	}
 
+	const template =
+		blocker.path[0] === "templates" && typeof blocker.path[1] === "number"
+			? project.config.templates?.[blocker.path[1]]
+			: undefined;
+	if (template !== undefined)
+		return (
+			<ButtonLink
+				to="/editor/$projectId/templates/$templateUid/form/$sectionId"
+				params={{
+					projectId: project.projectId,
+					templateUid: template.uid,
+					sectionId: "general",
+				}}
+				className="ak-list-row ak-list-row-interactive flex justify-between gap-4 p-4 text-left"
+			>
+				<span>
+					<span className="block font-semibold">{template.title}</span>
+					<span className="text-sm text-muted">{blocker.message}</span>
+				</span>
+				<ArrowRight className="size-4" />
+			</ButtonLink>
+		);
 	const sectionId = readProjectSectionForPathFn(blocker.path);
 	const section = ProjectSections.find((candidate) => candidate.id === sectionId);
 	return (

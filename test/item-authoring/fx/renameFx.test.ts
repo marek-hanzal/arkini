@@ -12,6 +12,52 @@ import { renameFx } from "~/item-authoring/fx/renameFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 describe("renameFx", () => {
+	it("renames template placements without changing template identity or dimensions", () => {
+		const template = {
+			uid: "template",
+			title: "Template",
+			width: 8,
+			height: 3,
+			board: [
+				{
+					x: 7,
+					y: 2,
+					itemId: "water",
+				},
+			],
+		};
+		const result = Effect.runSync(
+			renameFx({
+				config: {
+					...editorTestConfig,
+					templates: [
+						template,
+					],
+				},
+				itemId: "water",
+				newItemId: "fresh-water",
+			}),
+		);
+		expect(result.config.templates).toEqual([
+			{
+				...template,
+				board: [
+					{
+						x: 7,
+						y: 2,
+						itemId: "fresh-water",
+					},
+				],
+			},
+		]);
+		expect(result.updatedReferencePaths).toContainEqual([
+			"templates",
+			0,
+			"board",
+			0,
+			"itemId",
+		]);
+	});
 	it("rewrites Clock timer rules and expiry outcome without changing its line identities", () => {
 		const config = GameConfigSchema.parse({
 			...editorTestConfig,

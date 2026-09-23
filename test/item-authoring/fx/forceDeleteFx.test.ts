@@ -18,6 +18,45 @@ const waterOutput = createOutput([
 ]);
 
 describe("forceDeleteFx", () => {
+	it("removes referenced template cells while retaining the template and unrelated placements", () => {
+		const template = {
+			uid: "template",
+			title: "Template",
+			width: 8,
+			height: 3,
+			board: [
+				{
+					x: 7,
+					y: 2,
+					itemId: "water",
+				},
+			],
+		};
+		const result = Effect.runSync(
+			forceDeleteFx({
+				config: {
+					...editorTestConfig,
+					templates: [
+						template,
+					],
+				},
+				itemId: "water",
+			}),
+		);
+		expect(result.config.templates).toEqual([
+			{
+				...template,
+				board: [],
+			},
+		]);
+		expect(result.impact.removedTemplateEntries).toEqual([
+			{
+				templateUid: "template",
+				title: "Template",
+				count: 1,
+			},
+		]);
+	});
 	it("clears Clock timer references and expiry outcome, retaining owners after their final line is removed", () => {
 		const clock = {
 			...createProducerItem({
@@ -154,6 +193,7 @@ describe("forceDeleteFx", () => {
 			],
 		});
 		expect(result.impact).toEqual({
+			removedTemplateEntries: [],
 			removedClockRules: [],
 			removedUnitOutcomeOwnerIds: [
 				"oil",

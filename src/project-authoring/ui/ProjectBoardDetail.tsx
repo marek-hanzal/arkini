@@ -4,7 +4,7 @@ import { useState } from "react";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { EditorSearchCombobox } from "~/editor-control/ui/EditorSearchCombobox";
 import type { Project } from "~/project-authoring/type/Project";
-import { ProjectStartGrid } from "~/project-authoring/ui/ProjectStartGrid";
+import { BoardGrid } from "~/board-authoring/ui/BoardGrid";
 
 export const ProjectBoardDetail = ({ project }: { readonly project: Project }) => {
 	const translator = useTranslator();
@@ -40,7 +40,7 @@ export const ProjectBoardDetail = ({ project }: { readonly project: Project }) =
 				/>
 			</EditorRootCard>
 			<EditorRootCard dataUi="EditorProjectSpacePreviewCard">
-				<ProjectStartGrid
+				<BoardGrid
 					cells={project.config.start.board
 						.filter((entry) => entry.space === selectedSpace)
 						.map((entry) => ({

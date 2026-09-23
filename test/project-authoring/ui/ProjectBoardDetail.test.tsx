@@ -6,8 +6,8 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("~/project-authoring/ui/ProjectStartGrid", () => ({
-	ProjectStartGrid: ({
+vi.mock("~/board-authoring/ui/BoardGrid", () => ({
+	BoardGrid: ({
 		cells,
 	}: {
 		readonly cells: ReadonlyArray<{
@@ -16,7 +16,7 @@ vi.mock("~/project-authoring/ui/ProjectStartGrid", () => ({
 	}) =>
 		createElement("div", {
 			"data-items": cells.map((cell) => cell.itemId).join(","),
-			"data-ui": "EditorProjectStartGrid",
+			"data-ui": "EditorBoardGrid",
 		}),
 }));
 
@@ -99,8 +99,7 @@ describe("project Board detail", () => {
 		});
 
 		const select = container.querySelector("select");
-		const preview = () =>
-			container.querySelector<HTMLElement>('[data-ui="EditorProjectStartGrid"]');
+		const preview = () => container.querySelector<HTMLElement>('[data-ui="EditorBoardGrid"]');
 		if (select === null) throw new Error("Missing Space selector.");
 		expect(Array.from(select.options, (option) => option.value)).toEqual([
 			"0",
@@ -118,6 +117,6 @@ describe("project Board detail", () => {
 		});
 
 		expect(preview()?.dataset.items).toBe("water");
-		expect(container.querySelectorAll('[data-ui="EditorProjectStartGrid"]')).toHaveLength(1);
+		expect(container.querySelectorAll('[data-ui="EditorBoardGrid"]')).toHaveLength(1);
 	});
 });

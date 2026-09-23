@@ -8,6 +8,7 @@ export const SfxEventEnumSchema = z
 	.enum({
 		...GameEventEnumSchema.exclude([
 			"ItemRemoved",
+			"BoardTemplateApplied",
 		]).enum,
 		...PresentationSfxEventEnumSchema.enum,
 	})

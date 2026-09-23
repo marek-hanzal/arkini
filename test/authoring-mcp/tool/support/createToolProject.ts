@@ -22,38 +22,46 @@ export const createGraphProject = () => {
 	return createToolProject(
 		GameConfigSchema.parse({
 			...base,
+			templates: [
+				{
+					uid: "initial",
+					title: "Initial",
+					...base.meta.board,
+					board: [
+						{
+							itemId: "water",
+							x: 3,
+							y: 0,
+						},
+						{
+							itemId: "water",
+							x: 4,
+							y: 0,
+						},
+						{
+							itemId: "water",
+							x: 1,
+							y: 0,
+						},
+						{
+							itemId: "tool",
+							x: 2,
+							y: 0,
+						},
+						{
+							itemId: "forge",
+							x: 0,
+							y: 0,
+						},
+					],
+				},
+			],
 			start: {
-				...base.start,
-				board: [
+				currentSpace: 0,
+				spaces: [
 					{
-						itemId: "water",
 						space: 0,
-						x: 3,
-						y: 0,
-					},
-					{
-						itemId: "water",
-						space: 0,
-						x: 4,
-						y: 0,
-					},
-					{
-						itemId: "water",
-						space: 0,
-						x: 1,
-						y: 0,
-					},
-					{
-						itemId: "tool",
-						space: 0,
-						x: 2,
-						y: 0,
-					},
-					{
-						itemId: "forge",
-						space: 0,
-						x: 0,
-						y: 0,
+						templateUid: "initial",
 					},
 				],
 			},

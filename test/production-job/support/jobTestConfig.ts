@@ -33,6 +33,7 @@ export const createJobTestConfig = (maxQueueSize = 2, runtimeMs = 1_000) =>
 		},
 		start: {
 			currentSpace: 0,
+			spaces: [],
 		},
 		items: {
 			forge: {

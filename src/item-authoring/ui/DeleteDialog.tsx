@@ -19,10 +19,6 @@ const DeleteError = ({ error }: { readonly error: unknown }) =>
 const readItemTitleFn = (project: Project, itemId: string) =>
 	project.config.items[itemId]?.title || itemId;
 
-const startSurfaceTitles = {
-	board: "board",
-} as const;
-
 const ForceDeleteImpactList = ({
 	impact,
 	project,
@@ -32,12 +28,6 @@ const ForceDeleteImpactList = ({
 }) => {
 	const translator = useTranslator();
 	const entries: string[] = [];
-	for (const [surface, count] of Object.entries(impact.removedStartEntries)) {
-		if (count > 0)
-			entries.push(
-				`${translator.textFn("Remove")} ${count} ${translator.textFn("starting")} ${translator.textFn(startSurfaceTitles[surface as keyof typeof startSurfaceTitles])} ${translator.textFn(count === 1 ? "entry" : "entries")}`,
-			);
-	}
 	for (const { title, count } of impact.removedTemplateEntries)
 		entries.push(
 			`${translator.textFn("Remove")} ${count} ${translator.textFn("entries")} · ${translator.textFn("Template")} ${title}`,

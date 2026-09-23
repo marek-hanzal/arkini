@@ -287,35 +287,6 @@
 			"maximum": 9007199254740991,
 			"description": "A whole number greater than or equal to zero."
 		},
-		"start.BoardItemSchema": {
-			"type": "object",
-			"properties": {
-				"x": {
-					"description": "The zero-based horizontal grid coordinate.",
-					"$ref": "urn:serakki:schema:project#/$defs/NonNegativeIntegerSchema"
-				},
-				"y": {
-					"description": "The zero-based vertical grid coordinate.",
-					"$ref": "urn:serakki:schema:project#/$defs/NonNegativeIntegerSchema"
-				},
-				"space": {
-					"description": "The explicit board space containing this initial item.",
-					"$ref": "urn:serakki:schema:project#/$defs/NonNegativeIntegerSchema"
-				},
-				"itemId": {
-					"description": "The canonical item ID placed on the initial board.",
-					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
-				}
-			},
-			"required": [
-				"x",
-				"y",
-				"space",
-				"itemId"
-			],
-			"additionalProperties": false,
-			"description": "One canonical item placed at an explicit initial board coordinate."
-		},
 		"StartSchema": {
 			"type": "object",
 			"properties": {
@@ -323,21 +294,32 @@
 					"description": "The board space presented when a new game starts.",
 					"$ref": "urn:serakki:schema:project#/$defs/NonNegativeIntegerSchema"
 				},
-				"board": {
-					"default": [],
-					"description": "The items placed at explicit coordinates when a new game starts.",
+				"spaces": {
 					"type": "array",
 					"items": {
-						"$ref": "urn:serakki:schema:project#/$defs/start.BoardItemSchema"
+						"type": "object",
+						"properties": {
+							"space": {
+								"$ref": "urn:serakki:schema:project#/$defs/NonNegativeIntegerSchema"
+							},
+							"templateUid": {
+								"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
+							}
+						},
+						"required": [
+							"space",
+							"templateUid"
+						],
+						"additionalProperties": false
 					}
 				}
 			},
 			"required": [
 				"currentSpace",
-				"board"
+				"spaces"
 			],
 			"additionalProperties": false,
-			"description": "The initial board placements for a new game."
+			"description": "Template assignments for the initial world spaces."
 		},
 		"VersionPartsSchema": {
 			"type": "object",
@@ -797,9 +779,12 @@
 				},
 				{
 					"$ref": "urn:serakki:schema:project#/$defs/SpaceOutcomeSchema"
+				},
+				{
+					"$ref": "urn:serakki:schema:project#/$defs/TemplateOutcomeSchema"
 				}
 			],
-			"description": "One authored item or space outcome."
+			"description": "One authored item, space or template outcome."
 		},
 		"ItemOutcomeSchema": {
 			"type": "object",
@@ -895,6 +880,34 @@
 			],
 			"additionalProperties": false,
 			"description": "Selects the player's Board space when this outcome settles."
+		},
+		"TemplateOutcomeSchema": {
+			"type": "object",
+			"properties": {
+				"type": {
+					"type": "string",
+					"enum": [
+						"template"
+					]
+				},
+				"templateUid": {
+					"description": "The board template applied by this outcome.",
+					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
+				},
+				"rules": {
+					"type": "array",
+					"items": {
+						"$ref": "urn:serakki:schema:project#/$defs/outcome.RuleSchema"
+					}
+				}
+			},
+			"required": [
+				"type",
+				"templateUid",
+				"rules"
+			],
+			"additionalProperties": false,
+			"description": "Replaces a Board space and its entire owned runtime state with a template."
 		},
 		"roll.ChanceSchema": {
 			"type": "object",

@@ -186,5 +186,6 @@ export const craftCompletionConfig = GameConfigSchema.parse({
 	},
 	start: {
 		currentSpace: 0,
+		spaces: [],
 	},
 } satisfies z.input<typeof GameConfigSchema>);

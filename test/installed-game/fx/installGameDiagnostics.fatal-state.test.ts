@@ -92,6 +92,7 @@ describe("Game fatal-state diagnostics", () => {
 					speedUpGameplay: false,
 				},
 				currentSpace: 0,
+				templateUidBySpace: {},
 				items: [
 					{
 						id: ownerItemId,

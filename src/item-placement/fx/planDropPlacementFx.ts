@@ -1,3 +1,4 @@
+import { readBoardSizeFn } from "~/game-runtime/fn/readBoardSizeFn";
 import { assertPlacementPlanCompleteFx } from "./assertPlacementPlanCompleteFx";
 import { Effect } from "effect";
 
@@ -34,6 +35,11 @@ const assertBoardOnlyCapacityFx = Effect.fn("assertBoardOnlyCapacityFx")(functio
 	readonly runtime: RuntimeSchema.Type;
 }) {
 	const config = yield* GameConfigFx;
+	const size = readBoardSizeFn({
+		runtime,
+		config,
+		space: origin.space,
+	});
 	const boardSpace = origin.space;
 	const occupied = new Set<string>();
 	for (const location of [
@@ -46,14 +52,14 @@ const assertBoardOnlyCapacityFx = Effect.fn("assertBoardOnlyCapacityFx")(functio
 			location.scope === "board" &&
 			location.space === boardSpace &&
 			location.position.x >= 0 &&
-			location.position.x < config.meta.board.width &&
+			location.position.x < size.width &&
 			location.position.y >= 0 &&
-			location.position.y < config.meta.board.height
+			location.position.y < size.height
 		) {
 			occupied.add(readGridLocationKeyFn(location));
 		}
 	}
-	const available = config.meta.board.width * config.meta.board.height - occupied.size;
+	const available = size.width * size.height - occupied.size;
 	if (available >= drop.quantity) return;
 
 	return yield* Effect.fail(

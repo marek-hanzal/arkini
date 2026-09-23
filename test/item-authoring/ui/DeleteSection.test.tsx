@@ -81,10 +81,12 @@ const createFixture = async ({ force = false, history = true } = {}) => {
 					id: "stone",
 				},
 			},
-			start: {
-				...editorTestPayload.config.start,
-				board: force ? editorTestPayload.config.start.board : [],
-			},
+			templates: [
+				{
+					...editorTestPayload.config.templates![0]!,
+					board: force ? editorTestPayload.config.templates![0]!.board : [],
+				},
+			],
 		},
 		resources: [],
 	};
@@ -100,10 +102,12 @@ const createFixture = async ({ force = false, history = true } = {}) => {
 		config: {
 			...project.config,
 			items,
-			start: {
-				...project.config.start,
-				board: [],
-			},
+			templates: [
+				{
+					...project.config.templates![0]!,
+					board: [],
+				},
+			],
 		},
 	};
 	const deletion = createGate<unknown>();

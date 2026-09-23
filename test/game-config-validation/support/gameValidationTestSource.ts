@@ -1,3 +1,4 @@
+import type { TemplateSchema } from "~/board-template/schema/TemplateSchema";
 import { GameSourceFileSchema } from "~/game-config-source/schema/GameSourceFileSchema";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { LineSchema } from "~/production-line/schema/LineSchema";
@@ -108,14 +109,29 @@ export const createOutput = (
 export const createRootSource = ({
 	path = "/game/game.json",
 	items = {},
+	templates = [
+		{
+			uid: "initial",
+			title: "Initial",
+			width: 3,
+			height: 3,
+			board: [],
+		},
+	],
 	start = {
 		currentSpace: 0,
-		board: [],
+		spaces: [
+			{
+				space: 0,
+				templateUid: "initial",
+			},
+		],
 	},
 }: {
 	path?: string;
 	items?: Record<string, unknown>;
 	start?: StartSchema.Type;
+	templates?: TemplateSchema.Type[];
 } = {}) =>
 	GameSourceFileSchema.parse({
 		path,
@@ -133,6 +149,7 @@ export const createRootSource = ({
 				},
 			},
 			start,
+			templates,
 			items,
 		},
 	});

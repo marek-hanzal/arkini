@@ -29,77 +29,48 @@ const createValidFormValue = (project: Project): ProjectFormSchema.Type => ({
 	hero: project.config.resources.hero,
 	avatars: [],
 	board: project.config.meta.board,
-	start: {
-		...project.config.start,
-		board: project.config.start.board.map((entry) => ({
-			...entry,
-		})),
-	},
+	templates: project.config.templates ?? [],
+	start: project.config.start,
 });
 
 describe("ProjectFormSchema", () => {
-	it("rejects two different items in one Board cell while the same coordinate in another Space stays available", () => {
+	it("rejects unresolved template assignments while allowing shared templates", () => {
 		const project = createProject();
-		const stone = {
-			...project.config.items.water!,
-			id: "stone",
-			uid: "stone",
-		};
-		const schema = createProjectFormSchema({
-			...project,
-			config: {
-				...project.config,
-				items: {
-					...project.config.items,
-					stone,
+		const value = createValidFormValue(project);
+		const uid = value.templates[0]!.uid;
+		const schema = createProjectFormSchema(project);
+		expect(
+			schema.safeParse({
+				...value,
+				start: {
+					currentSpace: 0,
+					spaces: [
+						{
+							space: 0,
+							templateUid: uid,
+						},
+						{
+							space: 1,
+							templateUid: uid,
+						},
+					],
 				},
-			},
-		});
-		const value = {
-			...createValidFormValue(project),
-			start: {
-				...createValidFormValue(project).start,
-				board: [
-					{
-						itemId: "water",
-						space: 0,
-						x: 0,
-						y: 0,
-					},
-					{
-						itemId: "stone",
-						space: 1,
-						x: 0,
-						y: 0,
-					},
-				],
-			},
-		};
-		expect(schema.safeParse(value).success).toBe(true);
-		const result = schema.safeParse({
-			...value,
-			start: {
-				...value.start,
-				board: [
-					...value.start.board,
-					{
-						itemId: "stone",
-						space: 0,
-						x: 0,
-						y: 0,
-					},
-				],
-			},
-		});
-		expect(result.success).toBe(false);
-		if (result.success) throw new Error("Expected occupied-cell rejection.");
-		expect(result.error.issues.map((issue) => issue.path)).toEqual([
-			[
-				"start",
-				"board",
-				2,
-			],
-		]);
+			}).success,
+		).toBe(true);
+		expect(
+			schema.safeParse({
+				...value,
+				start: {
+					currentSpace: 0,
+					spaces: [
+						{
+							space: 0,
+							templateUid: "missing",
+						},
+					],
+				},
+			}).success,
+		).toBe(false);
 	});
 
 	it("limits Editor-authored Board sizes to 42", () => {
@@ -161,38 +132,17 @@ describe("ProjectFormSchema", () => {
 		]);
 	});
 
-	it("rejects layout changes that orphan explicit start placements", () => {
-		const project = createProject({
-			config: {
-				...editorTestPayload.config,
-				start: {
-					...editorTestPayload.config.start,
-					board: [
-						{
-							itemId: "water",
-							space: 0,
-							x: 1,
-							y: 1,
-						},
-					],
+	it("keeps template dimensions independent from project defaults", () => {
+		const project = createProject();
+		const value = createValidFormValue(project);
+		expect(
+			createProjectFormSchema(project).safeParse({
+				...value,
+				board: {
+					width: 1,
+					height: 1,
 				},
-			},
-		});
-		const result = createProjectFormSchema(project).safeParse({
-			...createValidFormValue(project),
-			board: {
-				width: 1,
-				height: 1,
-			},
-		});
-
-		expect(result.success).toBe(false);
-		if (result.success) return;
-		expect(result.error.issues.map(({ path }) => path)).toEqual([
-			[
-				"board",
-				"width",
-			],
-		]);
+			}).success,
+		).toBe(true);
 	});
 });

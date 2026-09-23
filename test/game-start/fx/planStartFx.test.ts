@@ -1,66 +1,32 @@
-import { Effect, Result } from "effect";
-import { describe, expect, it } from "vitest";
-
+import { Effect } from "effect";
+import { expect, it } from "vitest";
 import { useGameFx } from "~test/support/useGameFx";
 import { startTestConfig } from "~test/game-start/support/startTestConfig";
 import { planStartFx } from "~/game-start/fx/planStartFx";
-import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckIssueEnumSchema";
+import { startFx } from "~/game-start/fx/startFx";
 
-describe("planStartFx", () => {
-	it("rejects conflicting exact board locations", () => {
-		const result = Effect.runSync(
-			Effect.result(
-				planStartFx({
-					runtime: {
-						cheats: {
-							enabled: false,
-							everEnabled: false,
-							speedUpGameplay: false,
-						},
-						currentSpace: 0,
-						items: [],
-						jobs: [],
-
-						jobQueue: [],
-						defaultLineByOwnerItemId: {},
-					},
-					start: {
-						currentSpace: 0,
-						board: [
-							{
-								space: 0,
-								itemId: "tree",
-								x: 0,
-								y: 0,
-							},
-							{
-								space: 0,
-								itemId: "tree",
-								x: 0,
-								y: 0,
-							},
-						],
-					},
-				}),
-			).pipe(
-				useGameFx({
-					config: startTestConfig,
-				}),
-			),
-		);
-
-		expect(Result.isFailure(result)).toBe(true);
-		if (Result.isFailure(result)) {
-			expect(result.failure).toMatchObject({
-				_tag: "RuntimeInvalidError",
-				result: {
-					issues: [
-						expect.objectContaining({
-							type: RuntimeCheckIssueEnumSchema.enum.LocationOccupied,
-						}),
-					],
-				},
+it("applies templates through replacement rather than stacking initial items", () => {
+	const { first, next } = Effect.runSync(
+		Effect.gen(function* () {
+			const first = yield* startFx();
+			const next = yield* planStartFx({
+				runtime: first,
+				start: startTestConfig.start,
 			});
-		}
+			return {
+				first,
+				next: next.runtime,
+			};
+		}).pipe(
+			useGameFx({
+				config: startTestConfig,
+			}),
+		),
+	);
+	expect(next.items).toHaveLength(first.items.length);
+	expect(next.items[0]?.id).not.toBe(first.items[0]?.id);
+	expect(next.items[0]?.location).toEqual(first.items[0]?.location);
+	expect(next.templateUidBySpace).toEqual({
+		0: "start",
 	});
 });

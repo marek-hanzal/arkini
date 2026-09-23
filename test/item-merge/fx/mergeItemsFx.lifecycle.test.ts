@@ -171,6 +171,7 @@ const createLifecycleConfig = ({
 		},
 		start: {
 			currentSpace: 0,
+			spaces: [],
 		},
 		items: {
 			source,
@@ -288,6 +289,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 						speedUpGameplay: false,
 					},
 					currentSpace: 0,
+					templateUidBySpace: {},
 					items: [
 						participant === "source"
 							? {
@@ -354,6 +356,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 					speedUpGameplay: false,
 				},
 				currentSpace: 0,
+				templateUidBySpace: {},
 				items: [
 					boardItem("source", 0),
 					boardItem("target", 1),
@@ -412,6 +415,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 				speedUpGameplay: false,
 			},
 			currentSpace: 0,
+			templateUidBySpace: {},
 			items: [
 				boardItem("source", 0),
 				boardItem("target", 1),
@@ -523,6 +527,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 					speedUpGameplay: false,
 				},
 				currentSpace: 0,
+				templateUidBySpace: {},
 				items: [
 					boardItem("source", 0),
 					boardItem("target", 1),
@@ -579,6 +584,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 					speedUpGameplay: false,
 				},
 				currentSpace: 0,
+				templateUidBySpace: {},
 				items: [
 					boardItem("source", 0),
 					boardItem("target", 1),
@@ -633,6 +639,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 				speedUpGameplay: false,
 			},
 			currentSpace: 0,
+			templateUidBySpace: {},
 			items: [
 				boardItem("source", 0),
 				boardItem("target", 1),
@@ -680,6 +687,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 				speedUpGameplay: false,
 			},
 			currentSpace: 0,
+			templateUidBySpace: {},
 			items: [
 				boardItem("source", 0),
 				{
@@ -725,6 +733,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 				speedUpGameplay: false,
 			},
 			currentSpace: 0,
+			templateUidBySpace: {},
 			items: [
 				boardItem("source", 0),
 				{
@@ -780,6 +789,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 					speedUpGameplay: false,
 				},
 				currentSpace: 0,
+				templateUidBySpace: {},
 				items: [
 					boardItem("source", 0),
 					{
@@ -842,6 +852,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 					speedUpGameplay: false,
 				},
 				currentSpace: 0,
+				templateUidBySpace: {},
 				items: [
 					boardItem("source", 0),
 					boardItem("target", 1),

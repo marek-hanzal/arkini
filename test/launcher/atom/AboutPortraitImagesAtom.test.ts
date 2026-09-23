@@ -39,6 +39,7 @@ const payload = {
 		},
 		start: {
 			currentSpace: 0,
+			spaces: [],
 		},
 		items: {},
 	}),

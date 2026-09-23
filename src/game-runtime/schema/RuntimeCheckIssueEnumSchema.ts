@@ -25,7 +25,6 @@ export const RuntimeCheckIssueEnumSchema = z
 		LineInputClosed: "line:input-closed",
 		DeliveryTarget: "delivery:target",
 		LocationOccupied: "location:occupied",
-		LocationOutOfBounds: "location:out-of-bounds",
 	})
 	.meta({
 		id: "RuntimeCheckIssueEnumSchema",

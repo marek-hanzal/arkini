@@ -35,6 +35,7 @@ export const validateStartStateFx = Effect.fn("validateStartStateFx")(function* 
 					speedUpGameplay: false,
 				},
 				currentSpace: config.start.currentSpace,
+				templateUidBySpace: {},
 				items: [],
 				jobs: [],
 				jobQueue: [],

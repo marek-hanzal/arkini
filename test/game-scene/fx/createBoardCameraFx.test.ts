@@ -9,6 +9,8 @@ import { readMainLayoutFn } from "~/game-scene/fn/readMainLayoutFn";
 import type { PixiApplicationOwner } from "~/tile-rendering/service/PixiApplicationOwner";
 import type { SurfaceLayout } from "~/game-scene/type/SceneLayout";
 
+import type { AnimationDriver } from "~/tile-rendering/service/AnimationDriver";
+
 const cleanup: Array<() => void> = [];
 afterEach(() => {
 	for (const closeFn of cleanup.splice(0)) closeFn();
@@ -47,8 +49,19 @@ const mountFn = (
 	};
 	let resizeFn = () => {};
 	const edgeFrames = new Set<() => void>();
+	const tweens: Array<Parameters<AnimationDriver["startTweenFx"]>[0]> = [];
+	const stopTweenFn = vi.fn();
 	const camera = Effect.runSync(
 		createBoardCameraFx({
+			animationDriver: {
+				startTweenFx: (props) =>
+					Effect.sync(() => {
+						tweens.push(props);
+						return {
+							stopFx: Effect.sync(stopTweenFn),
+						};
+					}),
+			} as AnimationDriver,
 			canStartLeftPanFx:
 				canStartLeftPanFn === undefined
 					? undefined
@@ -120,6 +133,8 @@ const mountFn = (
 			}),
 		);
 	return {
+		tweens,
+		stopTweenFn,
 		camera,
 		edgeFrames,
 		frameFn: () => {
@@ -370,4 +385,77 @@ describe("Board edge navigation", () => {
 		mounted.pointerFn("pointerdown", 1010, 440, 0);
 		expect(mounted.edgeFrames.size).toBe(0);
 	});
+});
+
+it("refits the camera and reset bounds when the current board dimensions change", () => {
+	const mounted = mountFn([
+		mainLayout.board,
+	]);
+	const next = readMainLayoutFn({
+		boardWidth: 2,
+		boardHeight: 1,
+		fixedCellSize: 512,
+		width: 1000,
+		height: 800,
+	});
+	Effect.runSync(
+		mounted.camera.setSurfacesFx([
+			next.board,
+		]),
+	);
+	expect(mounted.tweens).toHaveLength(1);
+	const tween = mounted.tweens[0]!;
+	const previousScale = mounted.stage.scale.x;
+	tween.onUpdateFn(0.5);
+	expect(mounted.stage.scale.x).not.toBe(previousScale);
+	tween.onUpdateFn(1);
+	const expected = Math.min(1000 / (1024 + 256), 800 / (512 + 256), 1);
+	expect(mounted.stage.scale.x).toBe(expected);
+	expect(mounted.stage.x).toBe((1000 - 1024 * expected) / 2);
+	expect(mounted.stage.y).toBe((800 - 512 * expected) / 2);
+	mounted.wheelFn();
+	const zoomedScale = mounted.stage.scale.x;
+	tween.onUpdateFn(0);
+	expect(mounted.stage.scale.x).toBe(zoomedScale);
+	expect(mounted.stopTweenFn).toHaveBeenCalled();
+	window.dispatchEvent(
+		new KeyboardEvent("keydown", {
+			key: "0",
+		}),
+	);
+	expect(mounted.stage.scale.x).toBe(expected);
+});
+
+it("retargets size fitting from the live camera and retires callbacks on close", () => {
+	const mounted = mountFn([
+		mainLayout.board,
+	]);
+	const small = readMainLayoutFn({
+		boardWidth: 2,
+		boardHeight: 1,
+		fixedCellSize: 512,
+		width: 1000,
+		height: 800,
+	}).board;
+	Effect.runSync(
+		mounted.camera.setSurfacesFx([
+			small,
+		]),
+	);
+	const first = mounted.tweens[0]!;
+	first.onUpdateFn(0.4);
+	const liveScale = mounted.stage.scale.x;
+	Effect.runSync(
+		mounted.camera.setSurfacesFx([
+			mainLayout.board,
+		]),
+	);
+	const second = mounted.tweens[1]!;
+	first.onUpdateFn(1);
+	expect(mounted.stage.scale.x).toBe(liveScale);
+	second.onUpdateFn(0);
+	expect(mounted.stage.scale.x).toBe(liveScale);
+	Effect.runSync(mounted.camera.closeFx);
+	second.onUpdateFn(1);
+	expect(mounted.stage.scale.x).toBe(liveScale);
 });

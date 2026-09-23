@@ -46,6 +46,7 @@ export const tileActorTestConfig = GameConfigSchema.parse({
 	},
 	start: {
 		currentSpace: 0,
+		spaces: [],
 	},
 	items: {
 		material: {
@@ -156,6 +157,7 @@ export const createTileActorRuntime = ({
 			speedUpGameplay: false,
 		},
 		currentSpace: 0,
+		templateUidBySpace: {},
 		items: [
 			{
 				id: "runtime:owner",
@@ -207,6 +209,7 @@ export const createTemporaryTileActorRuntime = ({
 			speedUpGameplay: false,
 		},
 		currentSpace: 0,
+		templateUidBySpace: {},
 		items: [
 			{
 				id: "runtime:temporary",

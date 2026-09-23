@@ -89,7 +89,7 @@ describe("createFreshProjectFx", () => {
 				},
 				start: {
 					currentSpace: 0,
-					board: [],
+					spaces: [],
 				},
 				items: {},
 			},

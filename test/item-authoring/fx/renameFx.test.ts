@@ -212,7 +212,7 @@ describe("renameFx", () => {
 			id: "fresh-water",
 			uid: "water",
 		});
-		expect(result.config.start.board[0]?.itemId).toBe("fresh-water");
+		expect(result.config.templates![0]!.board[0]?.itemId).toBe("fresh-water");
 		expect(JSON.stringify(result.config.items.oil)).not.toContain('"water"');
 		expect(JSON.stringify(result.config.items.producer)).not.toContain('"water"');
 		expect(result.updatedReferencePaths).toHaveLength(5);

@@ -67,6 +67,7 @@ const config = GameConfigSchema.parse({
 	},
 	start: {
 		currentSpace: 0,
+		spaces: [],
 	},
 	items: {
 		material: {

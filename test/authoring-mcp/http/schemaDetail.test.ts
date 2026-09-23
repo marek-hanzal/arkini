@@ -195,22 +195,20 @@ describe("editor MCP authoring schema registry", () => {
 		expect(await readSchemaDetail("item.CompositionSchema")).toHaveProperty("anyOf");
 		expect(await readSchemaDetail("StartSchema")).toMatchObject({
 			properties: {
-				board: {
+				spaces: {
 					items: {
-						$ref: "start.BoardItemSchema",
+						properties: {
+							space: {
+								$ref: "NonNegativeIntegerSchema",
+							},
+							templateUid: {
+								$ref: "IdSchema",
+							},
+						},
 					},
 				},
 			},
 		});
-		for (const id of [
-			"start.BoardItemSchema",
-		]) {
-			expect(await readSchemaDetail(id), id).toMatchObject({
-				additionalProperties: false,
-				properties: expect.any(Object),
-				type: "object",
-			});
-		}
 		const pending = [
 			"urn:serakki:schema:mcp:create-item-input",
 			"urn:serakki:schema:mcp:edit-item-input",
@@ -257,7 +255,7 @@ describe("editor MCP authoring schema registry", () => {
 				"CompleteItemLineSchema",
 				"item.CompositionSchema",
 				"StartSchema",
-				"start.BoardItemSchema",
+				"TemplateSchema",
 			]),
 		);
 

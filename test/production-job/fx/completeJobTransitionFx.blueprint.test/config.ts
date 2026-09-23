@@ -155,6 +155,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 	},
 	start: {
 		currentSpace: 0,
+		spaces: [],
 	},
 	items: {
 		"blueprint:plain": blueprintItem({

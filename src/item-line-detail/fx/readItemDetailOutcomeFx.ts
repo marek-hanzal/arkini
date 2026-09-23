@@ -1,3 +1,4 @@
+import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
@@ -53,25 +54,39 @@ const readItemDetailOutcomeEntriesFx = Effect.fn("readItemDetailOutcomeEntriesFx
 	readonly outcomes: readonly OutcomeSchema.Type[];
 	readonly ruleContext?: ItemDetailOutcomeRuleContext;
 }) {
-	const outcome: (ItemDetailLines.OutcomeItem | OutcomeProjection.Space)[] = [];
+	const outcome: (
+		| ItemDetailLines.OutcomeItem
+		| OutcomeProjection.Space
+		| OutcomeProjection.Template
+	)[] = [];
+	const config = yield* GameConfigFx;
 	for (const entry of outcomes) {
 		const activeRuleHints = yield* readActiveRuleHintsFx({
 			rules: entry.rules,
 			ruleContext,
 		});
 		outcome.push(
-			entry.type === "space"
+			entry.type === "template"
 				? {
-						type: "space",
-						space: entry.space,
+						type: "template",
+						templateUid: entry.templateUid,
+						title: config.templates?.find(
+							(template) => template.uid === entry.templateUid,
+						)?.title,
 						activeRuleHints,
 					}
-				: {
-						type: "item",
-						itemId: entry.itemId,
-						quantity: entry.quantity,
-						activeRuleHints,
-					},
+				: entry.type === "space"
+					? {
+							type: "space",
+							space: entry.space,
+							activeRuleHints,
+						}
+					: {
+							type: "item",
+							itemId: entry.itemId,
+							quantity: entry.quantity,
+							activeRuleHints,
+						},
 		);
 	}
 	return outcome;

@@ -1,4 +1,5 @@
-import { ArrowRight } from "lucide-react";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
+import { ArrowRight, PanelsTopLeft } from "lucide-react";
 import { EditorCollectionOption } from "~/editor-control/ui/EditorCollectionOption";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
@@ -12,6 +13,7 @@ const readItemSidesFn = (line: LineSchema.Type) => {
 	const inputs = new Set<string>();
 	const outputs = new Set<string>();
 	const spaces = new Set<number>();
+	const templates = new Set<string>();
 	for (const input of line.input) {
 		switch (input.type) {
 			case "materials":
@@ -31,7 +33,8 @@ const readItemSidesFn = (line: LineSchema.Type) => {
 			const drops = readDraftRollOutcomesFn(roll);
 			for (const outcome of drops) {
 				if (outcome.type === "item") outputs.add(outcome.itemId);
-				else spaces.add(outcome.space);
+				else if (outcome.type === "space") spaces.add(outcome.space);
+				else templates.add(outcome.templateUid);
 			}
 			for (const drop of drops)
 				for (const rule of drop.rules)
@@ -39,6 +42,9 @@ const readItemSidesFn = (line: LineSchema.Type) => {
 		}
 	}
 	return {
+		templates: [
+			...templates,
+		],
 		spaces: [
 			...spaces,
 		],
@@ -92,7 +98,8 @@ export const ProductionLineOption = ({
 	readonly items: GameConfigSchema.Type["items"];
 }) => {
 	const translator = useTranslator();
-	const { inputs, outputs, spaces } = readItemSidesFn(line);
+	const project = useEditorProject();
+	const { inputs, outputs, spaces, templates } = readItemSidesFn(line);
 	return (
 		<EditorCollectionOption
 			label={label}
@@ -109,6 +116,16 @@ export const ProductionLineOption = ({
 				/>
 				<ArrowRight className="size-4 shrink-0 text-subtle" />
 				<span className="flex min-w-0 items-center justify-end gap-2">
+					{templates.map((uid) => (
+						<span
+							key={uid}
+							className="flex items-center gap-1 text-xs text-subtle"
+						>
+							<PanelsTopLeft className="size-4" />
+							{project.config.templates?.find((template) => template.uid === uid)
+								?.title ?? uid}
+						</span>
+					))}
 					{spaces.map((space) => (
 						<span
 							key={space}
@@ -120,7 +137,11 @@ export const ProductionLineOption = ({
 					<ItemImages
 						ids={outputs}
 						items={items}
-						emptyLabel={spaces.length === 0 ? translator.textFn("No outcomes") : ""}
+						emptyLabel={
+							spaces.length === 0 && templates.length === 0
+								? translator.textFn("No outcomes")
+								: ""
+						}
 					/>
 				</span>
 			</span>

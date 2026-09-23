@@ -6,7 +6,7 @@ import { createAcquisitionGraphFn } from "~/flow/fn/createAcquisitionGraphFn";
 import { estimateRequestsFn } from "~/estimate/fn/estimateRequestsFn";
 import { compileGameSourcesFx } from "~/game-config-compiler/fx/compileGameSourcesFx";
 import { resolveLineRunFx } from "~/production-line/fx/resolveLineRunFx";
-import type { StartSchema } from "~/game-start/schema/StartSchema";
+import type { TemplateSchema } from "~/board-template/schema/TemplateSchema";
 import {
 	createMergeTestConfig,
 	guaranteedMergeOutput,
@@ -34,12 +34,32 @@ const spentUnits = (itemId: string, cost = 1) => ({
 	type: "units" as const,
 });
 
-const compileConfig = async (items: Record<string, unknown>, start?: StartSchema.Type) => {
+const compileConfig = async (
+	items: Record<string, unknown>,
+	board: TemplateSchema.Type["board"] = [],
+) => {
 	const result = await Effect.runPromise(
 		compileGameSourcesFx([
 			createRootSource({
 				items,
-				start,
+				start: {
+					currentSpace: 0,
+					spaces: [
+						{
+							space: 0,
+							templateUid: "initial",
+						},
+					],
+				},
+				templates: [
+					{
+						uid: "initial",
+						title: "Initial",
+						width: 3,
+						height: 3,
+						board,
+					},
+				],
 			}),
 		]),
 	);
@@ -81,23 +101,18 @@ describe("createAcquisitionGraphFn", () => {
 				"depleted-output": createSimpleItem("depleted-output"),
 				target: createSimpleItem("target"),
 			},
-			{
-				currentSpace: 0,
-				board: [
-					{
-						itemId: "payer",
-						space: 0,
-						x: 0,
-						y: 0,
-					},
-					{
-						itemId: "producer",
-						space: 0,
-						x: 1,
-						y: 0,
-					},
-				],
-			},
+			[
+				{
+					itemId: "payer",
+					x: 0,
+					y: 0,
+				},
+				{
+					itemId: "producer",
+					x: 1,
+					y: 0,
+				},
+			],
 		);
 
 		const nonDivisible = createAcquisitionGraphFn(config);
@@ -472,6 +487,7 @@ describe("createAcquisitionGraphFn", () => {
 						speedUpGameplay: false,
 					},
 					currentSpace: 0,
+					templateUidBySpace: {},
 					items: [
 						owner,
 						runtimePayer("runtime:payer:a", 0),

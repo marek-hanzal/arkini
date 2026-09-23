@@ -6,7 +6,10 @@ import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { GameAudioCue } from "~/game-audio/type/GameAudioCue";
 
 type GameEvent = GameEventBatchSchema.Type["events"][number];
-type AudibleGameEvent = Exclude<GameEventEnumSchema.Type, "item:removed">;
+type AudibleGameEvent = Exclude<
+	GameEventEnumSchema.Type,
+	"item:removed" | "board:template-applied"
+>;
 type GameEventAudioCue = GameAudioCue & {
 	readonly event: AudibleGameEvent;
 };
@@ -59,6 +62,12 @@ const readGameAudioCueFn = (
 	items: GameConfigSchema.Type["items"],
 ): GameEventAudioCue | undefined =>
 	match(event)
+		.with(
+			{
+				type: GameEventEnumSchema.enum.BoardTemplateApplied,
+			},
+			() => undefined,
+		)
 		.with(
 			{
 				type: GameEventEnumSchema.enum.ItemRemoved,

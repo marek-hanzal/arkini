@@ -58,7 +58,7 @@ export interface AcquisitionOperation {
 	readonly id: string;
 	readonly inputs: ReadonlyArray<AcquisitionOperationInput>;
 	/** Explicitly prevents Estimate from treating an uncompiled distribution as zero yield. */
-	readonly outputCompilation?: "state-space-unsupported";
+	readonly outputCompilation?: "state-space-unsupported" | "template-reset-unsupported";
 	/** Joint distribution of all correlated outputs produced by one operation sample. */
 	readonly outputDistribution?: ReadonlyArray<AcquisitionOperationOutcome>;
 }
@@ -135,7 +135,8 @@ export interface AcquisitionRoot {
 export type AcquisitionLimitation =
 	| "conditional-runtime-adjustments-ignored"
 	| "negative-availability-constraints-ignored"
-	| "spatial-requirements-approximated";
+	| "spatial-requirements-approximated"
+	| "template-resets-not-simulated";
 
 /** Immutable projection of authored acquisition facts and routes. */
 export interface AcquisitionGraph {

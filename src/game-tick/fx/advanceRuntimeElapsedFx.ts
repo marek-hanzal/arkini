@@ -1,3 +1,4 @@
+import type { TemplateNotFoundError } from "~/board-template/error/TemplateNotFoundError";
 import { Effect } from "effect";
 
 import type { GameConfigFx } from "~/game-config/context/GameConfigFx";
@@ -33,6 +34,7 @@ export interface AdvanceRuntimeElapsedResult {
 }
 
 export type AdvanceRuntimeElapsedError =
+	| TemplateNotFoundError
 	| RuntimeInvalidError
 	| ItemNotFoundError
 	| ItemNotOnBoardError

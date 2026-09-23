@@ -35,7 +35,7 @@ describe("editor MCP note item links", () => {
 					...editorTestPayload.config,
 					start: {
 						...editorTestPayload.config.start,
-						board: [],
+						spaces: [],
 					},
 					items: {
 						...editorTestPayload.config.items,

@@ -79,6 +79,8 @@ clear pending owner queue
 → commit all or nothing
 ```
 
+Autofill sources always belong to the producer’s board space, including `universe` queries. Authored reach still filters sources within that board; general queries and unit payments retain their own reach semantics. All outbound deliveries are admitted by the same autofill planner.
+
 A queued request owns no time, material or units. Input filling never starts work. Renderer delivery contact never admits material or settles a job.
 
 Scheduled owners filter their selected Clock pool by line rules, draw by `clockWeight`, then use ordinary one-intent admission. `Item.clock` composes scheduling data; `item-schedule` owns phase, lifetime and the Clock override, while Production retains queue ordering and the complete job/delivery lifecycle. An exhausted schedule closes new intent and Autofill; accepted runnable work still dispatches normally in loose-kill mode, while kill-switch cancels it. Player-control admission is separate from autonomous work and shared by production commands and their projections.

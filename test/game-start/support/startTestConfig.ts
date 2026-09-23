@@ -30,14 +30,27 @@ export const startTestConfig = GameConfigSchema.parse({
 			height: 2,
 		},
 	},
+	templates: [
+		{
+			uid: "start",
+			title: "Start",
+			width: 3,
+			height: 2,
+			board: [
+				{
+					itemId: "tree",
+					x: 1,
+					y: 1,
+				},
+			],
+		},
+	],
 	start: {
 		currentSpace: 0,
-		board: [
+		spaces: [
 			{
 				space: 0,
-				itemId: "tree",
-				x: 1,
-				y: 1,
+				templateUid: "start",
 			},
 		],
 	},

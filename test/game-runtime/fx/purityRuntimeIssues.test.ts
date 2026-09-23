@@ -25,6 +25,7 @@ describe("runtime purity invariants", () => {
 				speedUpGameplay: false,
 			},
 			currentSpace: 0,
+			templateUidBySpace: {},
 			items: [
 				{
 					id: "runtime:craft",

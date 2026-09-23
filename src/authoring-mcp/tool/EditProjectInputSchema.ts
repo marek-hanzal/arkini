@@ -1,3 +1,4 @@
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { z } from "zod";
 
 import { MetaSchema } from "~/game-config/schema/MetaSchema";
@@ -28,6 +29,7 @@ export const EditProjectInputSchema = z
 				resources: RolesSchema.optional().describe(
 					"Complete replacement of every named non-item resource role.",
 				),
+				templates: GameConfigSchema.shape.templates,
 				start: StartSchema.optional().describe(
 					"Complete replacement of the initial board state.",
 				),

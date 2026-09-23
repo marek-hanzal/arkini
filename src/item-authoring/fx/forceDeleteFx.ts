@@ -4,8 +4,6 @@ import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { GameConfigSchema as GameConfig } from "~/game-config/schema/GameConfigSchema";
 import { readDeleteBlockersFn } from "~/item-authoring/fn/readDeleteBlockersFn";
 
-type StartSurface = "board";
-
 interface ItemCleanup {
 	readonly clockRuleIndexes: Set<number>;
 	readonly mergeIndexes: Set<number>;
@@ -36,7 +34,6 @@ export namespace forceDeleteFx {
 			readonly title: string;
 			readonly count: number;
 		}>;
-		readonly removedStartEntries: Readonly<Record<StartSurface, number>>;
 	}
 
 	export interface Props {
@@ -67,16 +64,9 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 		config,
 		itemId,
 	});
-	const startIndexes: Record<StartSurface, Set<number>> = {
-		board: new Set(),
-	};
 	const itemCleanups = new Map<string, ItemCleanup>();
 	for (const blocker of blockers) {
 		const [root, second, third, fourth, fifth] = blocker.path;
-		if (root === "start" && second === "board" && typeof third === "number") {
-			startIndexes[second].add(third);
-			continue;
-		}
 		if (root === "templates") continue;
 		if (root !== "items" || typeof second !== "string" || typeof third !== "string")
 			throw new Error(`Unsupported item delete reference path ${blocker.path.join(".")}.`);
@@ -199,10 +189,6 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 				...template,
 				board: template.board.filter((cell) => cell.itemId !== itemId),
 			})),
-			start: {
-				...config.start,
-				board: config.start.board.filter((_entry, index) => !startIndexes.board.has(index)),
-			},
 			items,
 		}),
 		impact: {
@@ -223,9 +209,6 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 			removedExpiryOutcomeOwnerIds,
 			removedLines,
 			removedMergeRules,
-			removedStartEntries: {
-				board: startIndexes.board.size,
-			},
 		},
 	};
 });

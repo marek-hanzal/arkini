@@ -3,8 +3,15 @@ import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerS
 import type { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
 
 /** Concrete results after chance, availability and quantities have resolved. */
-export type ResolvedOutcome = ResolvedOutcome.Item | ResolvedOutcome.Space;
+export type ResolvedOutcome =
+	| ResolvedOutcome.Item
+	| ResolvedOutcome.Space
+	| ResolvedOutcome.Template;
 export namespace ResolvedOutcome {
+	export interface Template {
+		readonly type: "template";
+		readonly templateUid: IdSchema.Type;
+	}
 	export interface Item {
 		readonly type: "item";
 		readonly itemId: IdSchema.Type;

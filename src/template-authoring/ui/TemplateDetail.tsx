@@ -1,3 +1,4 @@
+import { validateConfigReferencesFn } from "~/game-config-validation/fn/validateConfigReferencesFn";
 import { Status } from "~/ui/ui/Status";
 import { TemplateSectionBar } from "~/template-authoring/ui/TemplateSectionBar";
 import { DetailFact, DetailFacts, DetailSection } from "~/item-authoring/ui/DetailDefinition";
@@ -5,7 +6,7 @@ import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { useEditorEditShortcut } from "~/authoring-shell/ui/useEditorEditShortcut";
 import { useLayoutEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Pencil, ShieldCheck } from "lucide-react";
+import { Pencil, ShieldCheck, ShieldAlert } from "lucide-react";
 import { BoardGrid } from "~/board-authoring/ui/BoardGrid";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
@@ -26,6 +27,20 @@ export const TemplateDetail = ({
 	const project = useEditorProject();
 	const template = project.config.templates?.find((entry) => entry.uid === templateUid);
 	const translator = useTranslator();
+	const references = validateConfigReferencesFn({
+		config: {
+			...project.config,
+			templates: project.config.templates?.filter((entry) => entry.uid !== templateUid),
+		},
+		provenance: {
+			items: {},
+		},
+	}).filter(
+		(entry) =>
+			entry.code === "config:missing-reference" &&
+			entry.reference === "template" &&
+			entry.referenceId === templateUid,
+	);
 	const navigateFn = useNavigate();
 	const editActionRef = useEditorEditShortcut();
 
@@ -40,7 +55,7 @@ export const TemplateDetail = ({
 		[],
 	);
 	const deleteFn = async () => {
-		if (inFlight.current) return;
+		if (inFlight.current || references.length > 0) return;
 		inFlight.current = true;
 		setPendingFn(true);
 		setErrorFn(undefined);
@@ -128,14 +143,30 @@ export const TemplateDetail = ({
 						dataUi="TemplateDeleteState"
 						size="large"
 						variant="flat"
-						icon={ShieldCheck}
-						title={translator.textFn("This template can be deleted")}
-						description={translator.textFn(
-							"Deleting this template removes its saved board layout from the project.",
+						icon={references.length > 0 ? ShieldAlert : ShieldCheck}
+						title={translator.textFn(
+							references.length > 0
+								? "This template cannot be deleted yet"
+								: "This template can be deleted",
 						)}
+						description={
+							references.length > 0 ? (
+								<div className="grid gap-2">
+									{references.map((reference, index) => (
+										<p key={index}>
+											{reference.message} · {reference.path.join(".")}
+										</p>
+									))}
+								</div>
+							) : (
+								translator.textFn(
+									"Deleting this template removes its saved board layout from the project.",
+								)
+							)
+						}
 						action={
 							<DangerButton
-								disabled={pending}
+								disabled={pending || references.length > 0}
 								onClick={() => void deleteFn()}
 							>
 								{translator.textFn("Delete")}

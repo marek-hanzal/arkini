@@ -45,8 +45,23 @@ export const writeSigningGame = async (root: string) => {
 			resources: {
 				hero: "hero",
 			},
+			templates: [
+				{
+					uid: "initial",
+					title: "Initial",
+					width: 2,
+					height: 2,
+					board: [],
+				},
+			],
 			start: {
 				currentSpace: 0,
+				spaces: [
+					{
+						space: 0,
+						templateUid: "initial",
+					},
+				],
 			},
 		})}\n`,
 	);

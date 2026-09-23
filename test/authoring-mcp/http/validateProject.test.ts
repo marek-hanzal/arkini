@@ -26,15 +26,18 @@ describe("editor MCP project validation", () => {
 						...editorTestPayload.config.meta,
 						id: "invalid-project",
 					},
-					start: {
-						...editorTestPayload.config.start,
-						board: [
-							{
-								...editorTestPayload.config.start.board[0],
-								itemId: "missing-item",
-							},
-						],
-					},
+					templates: [
+						{
+							...editorTestPayload.config.templates![0],
+							board: [
+								{
+									x: 0,
+									y: 0,
+									itemId: "missing-item",
+								},
+							],
+						},
+					],
 				},
 				resources: [
 					...editorTestPayload.resources,
@@ -59,8 +62,8 @@ describe("editor MCP project validation", () => {
 		if (text?.type !== "text") throw new Error("Missing validation text.");
 		expect(text.text).toContain("Project validation");
 		expect(text.text).toContain("Errors:");
-		expect(text.text).toContain("Path: start.board.0.itemId");
-		expect(text.text).toContain("Initial board references missing item missing-item.");
+		expect(text.text).toContain("Path: templates.0.board.0.itemId");
+		expect(text.text).toContain("Template Initial references missing item missing-item.");
 		expect(text.text).toContain("[warning]");
 		expect(() => JSON.parse(text.text)).toThrow();
 

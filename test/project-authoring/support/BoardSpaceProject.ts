@@ -16,21 +16,44 @@ export const boardSpaceProject = {
 	revision: 0,
 	config: {
 		...editorTestPayload.config,
+		templates: [
+			{
+				uid: "first",
+				title: "First",
+				width: 3,
+				height: 3,
+				board: [
+					{
+						itemId: "water",
+						x: 0,
+						y: 0,
+					},
+				],
+			},
+			{
+				uid: "second",
+				title: "Second",
+				width: 4,
+				height: 2,
+				board: [
+					{
+						itemId: "water",
+						x: 1,
+						y: 1,
+					},
+				],
+			},
+		],
 		start: {
-			...editorTestPayload.config.start,
 			currentSpace: 0,
-			board: [
+			spaces: [
 				{
-					itemId: "water",
 					space: 0,
-					x: 0,
-					y: 0,
+					templateUid: "first",
 				},
 				{
-					itemId: "water",
 					space: 1,
-					x: 1,
-					y: 1,
+					templateUid: "second",
 				},
 			],
 		},

@@ -46,6 +46,7 @@ describe("fromStateFx job material invariants", () => {
 				speedUpGameplay: false,
 			},
 			currentSpace: 0,
+			templateUidBySpace: {},
 			items: [
 				owner,
 				consumedRoot,
@@ -78,6 +79,7 @@ describe("fromStateFx job material invariants", () => {
 				speedUpGameplay: false,
 			},
 			currentSpace: 0,
+			templateUidBySpace: {},
 			items: [
 				owner,
 				consumedRoot,
@@ -132,6 +134,7 @@ describe("fromStateFx job material invariants", () => {
 				speedUpGameplay: false,
 			},
 			currentSpace: 0,
+			templateUidBySpace: {},
 			items: [
 				owner,
 				consumedRoot,
@@ -208,6 +211,7 @@ describe("fromStateFx job material invariants", () => {
 				speedUpGameplay: false,
 			},
 			currentSpace: 0,
+			templateUidBySpace: {},
 			items: [
 				owner,
 				consumedRoot,
@@ -288,6 +292,7 @@ it("hydrates one stateful reserved instance with its passive owned subtree intac
 			speedUpGameplay: false,
 		},
 		currentSpace: 0,
+		templateUidBySpace: {},
 		items: [
 			owner,
 			{

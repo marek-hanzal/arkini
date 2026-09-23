@@ -149,8 +149,9 @@ describe("filesystem Editor project lifecycle", () => {
 					},
 					start: {
 						...editorTestPayload.config.start,
-						board: [],
+						spaces: [],
 					},
+					templates: [],
 					items: {},
 				},
 				resources: editorTestPayload.resources.filter(({ id }) => id === "hero"),

@@ -16,6 +16,42 @@ import {
 } from "./packDirectoryFx.test/gameProjectFixture";
 
 describe("packDirectoryFx game-project contract", () => {
+	it.effect("rejects a build with no template assigned to the initial space", () =>
+		Effect.gen(function* () {
+			const fileSystem = yield* FileSystem.FileSystem;
+			const path = yield* Path.Path;
+			const input = yield* writeGameProjectFixtureFx();
+			const gamePath = path.join(input, "game.json");
+			const game = JSON.parse(yield* fileSystem.readFileString(gamePath));
+			yield* fileSystem.writeFileString(
+				gamePath,
+				JSON.stringify({
+					...game,
+					start: {
+						currentSpace: 0,
+						spaces: [],
+					},
+				}),
+			);
+			const result = yield* Effect.result(
+				packDirectoryFx({
+					input,
+				}),
+			);
+			expect(result).toMatchObject({
+				_tag: "Failure",
+				failure: {
+					_tag: "GameValidationError",
+					diagnostics: expect.arrayContaining([
+						expect.objectContaining({
+							failureTag: "InitialSpaceUnassigned",
+						}),
+					]),
+				},
+			});
+		}).pipe(Effect.provide(NodeServices.layer)),
+	);
+
 	it.effect("preserves independent template dimensions and placements in the packed config", () =>
 		Effect.gen(function* () {
 			const fileSystem = yield* FileSystem.FileSystem;
@@ -42,6 +78,15 @@ describe("packDirectoryFx game-project contract", () => {
 				gamePath,
 				JSON.stringify({
 					...game,
+					start: {
+						...game.start,
+						spaces: [
+							{
+								space: 0,
+								templateUid: "template",
+							},
+						],
+					},
 					templates,
 				}),
 			);
@@ -57,7 +102,15 @@ describe("packDirectoryFx game-project contract", () => {
 				width: 2,
 				height: 2,
 			});
-			expect(payload.config.start).toEqual(game.start);
+			expect(payload.config.start).toEqual({
+				...game.start,
+				spaces: [
+					{
+						space: 0,
+						templateUid: "template",
+					},
+				],
+			});
 		}).pipe(Effect.provide(NodeServices.layer)),
 	);
 

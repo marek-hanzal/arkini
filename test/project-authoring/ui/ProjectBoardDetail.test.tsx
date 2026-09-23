@@ -6,6 +6,11 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+vi.mock("~/ui/ui/LinkButton", () => ({
+	LinkButtonLink: ({ children }: { children: import("react").ReactNode }) =>
+		createElement("span", null, children),
+}));
+
 vi.mock("~/board-authoring/ui/BoardGrid", () => ({
 	BoardGrid: ({
 		cells,
@@ -79,7 +84,7 @@ describe("project Board detail", () => {
 				...boardSpaceProject.config,
 				start: {
 					...boardSpaceProject.config.start,
-					board: boardSpaceProject.config.start.board.map((entry) => ({
+					spaces: boardSpaceProject.config.start.spaces.map((entry) => ({
 						...entry,
 						space: entry.space === 1 ? 4 : entry.space,
 					})),

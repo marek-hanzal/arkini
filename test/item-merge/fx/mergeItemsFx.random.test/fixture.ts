@@ -32,6 +32,7 @@ export const initialState = StateSchema.parse({
 		speedUpGameplay: false,
 	},
 	currentSpace: 0,
+	templateUidBySpace: {},
 	jobs: [],
 	jobQueue: [],
 	items: [

@@ -20,6 +20,7 @@ const config = GameConfigSchema.parse({
 	},
 	start: {
 		currentSpace: 0,
+		spaces: [],
 	},
 	items: {
 		stone: {
@@ -74,6 +75,7 @@ const runtime = (item: (typeof config.items)["stone"] | (typeof config.items)["m
 			speedUpGameplay: false,
 		},
 		currentSpace: 0,
+		templateUidBySpace: {},
 		items: [
 			{
 				id: "runtime:target",

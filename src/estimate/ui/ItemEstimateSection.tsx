@@ -28,6 +28,10 @@ const formatQuantityFn = (quantity: number) =>
 
 const diagnosticTextFn = (diagnostic: ItemEstimateDiagnostic, textFn: (key: string) => string) => {
 	switch (diagnostic.kind) {
+		case "template-reset-unsupported":
+			return textFn(
+				"{routeId} replaces its owner space with a template, which static Estimate cannot simulate.",
+			).replace("{routeId}", diagnostic.routeId);
 		case "weighted-clock-pool-unsupported":
 			return textFn(
 				"{routeId} depends on weighted Clock alternatives whose shared pulse timing static Estimate cannot resolve.",

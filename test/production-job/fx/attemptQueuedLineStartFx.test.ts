@@ -53,6 +53,7 @@ describe("attemptQueuedLineStartFx", () => {
 				speedUpGameplay: false,
 			},
 			currentSpace: 0,
+			templateUidBySpace: {},
 			items: [
 				owner,
 			],
@@ -81,6 +82,7 @@ describe("attemptQueuedLineStartFx", () => {
 				speedUpGameplay: false,
 			},
 			currentSpace: 0,
+			templateUidBySpace: {},
 			items: [
 				owner,
 			],
@@ -114,6 +116,7 @@ describe("attemptQueuedLineStartFx", () => {
 				speedUpGameplay: false,
 			},
 			currentSpace: 0,
+			templateUidBySpace: {},
 			items: [],
 			jobs: [],
 			jobQueue: [
@@ -143,6 +146,7 @@ describe("attemptQueuedLineStartFx", () => {
 				speedUpGameplay: false,
 			},
 			currentSpace: 0,
+			templateUidBySpace: {},
 			items: [
 				owner,
 			],

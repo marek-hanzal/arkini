@@ -1,21 +1,15 @@
 import { checkRuntimeItemSchedulesFn } from "~/item-schedule/fn/checkRuntimeItemSchedulesFn";
 import { Effect } from "effect";
 
-import { GameConfigFx } from "~/game-config/context/GameConfigFx";
-import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { DuplicateItemIdIssueSchema } from "~/game-runtime/schema/DuplicateItemIdIssueSchema";
 import { ItemUnitsIssueReasonEnumSchema } from "~/game-runtime/schema/ItemUnitsIssueReasonEnumSchema";
 import type { ItemUnitsIssueSchema } from "~/game-runtime/schema/ItemUnitsIssueSchema";
 import type { LocationOccupiedIssueSchema } from "~/game-runtime/schema/LocationOccupiedIssueSchema";
-import type { LocationOutOfBoundsIssueSchema } from "~/game-runtime/schema/LocationOutOfBoundsIssueSchema";
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckIssueEnumSchema";
 import type { RuntimeCheckResultSchema } from "~/game-runtime/schema/RuntimeCheckResultSchema";
 import { indexGridLocationClaimsFn } from "~/item-location/fn/indexGridLocationClaimsFn";
 import { readGridLocationClaimsFn } from "~/item-location/fn/readGridLocationClaimsFn";
-import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
-import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { checkRuntimeDeliveriesFn } from "~/production-delivery/fn/checkRuntimeDeliveriesFn";
 import { checkRuntimeInputLocationsFn } from "~/production-input/fn/checkRuntimeInputLocationsFn";
 import { checkRuntimeJobsFn } from "~/production-job/fn/checkRuntimeJobsFn";
@@ -90,39 +84,9 @@ const checkRuntimeItemIdsFn = (runtime: RuntimeSchema.Type) => {
 	return issues;
 };
 
-const checkRuntimeLocationsFn = (config: GameConfigSchema.Type, runtime: RuntimeSchema.Type) => {
-	const items: {
-		readonly item: RuntimeItemSchema.Type;
-		readonly location: BoardLocationSchema.Type;
-	}[] = [];
-	for (const item of runtime.items) {
-		if (item.location.scope === LocationScopeEnumSchema.enum.Board) {
-			items.push({
-				item,
-				location: item.location,
-			});
-		} else if (item.location.scope === LocationScopeEnumSchema.enum.Delivery) {
-			items.push({
-				item,
-				location: item.location.origin,
-			});
-		}
-	}
-	const boundsIssues: LocationOutOfBoundsIssueSchema.Type[] = [];
+/** Existing saved coordinates need not fit the current authored dimensions; occupancy remains invariant. */
+const checkRuntimeLocationsFn = (runtime: RuntimeSchema.Type) => {
 	const occupancyIssues: LocationOccupiedIssueSchema.Type[] = [];
-
-	for (const { item, location } of items) {
-		const size = config.meta.board;
-		if (location.position.x >= size.width || location.position.y >= size.height) {
-			boundsIssues.push({
-				itemId: item.id,
-				location,
-				size,
-				type: RuntimeCheckIssueEnumSchema.enum.LocationOutOfBounds,
-			});
-		}
-	}
-
 	const claimsByLocation = indexGridLocationClaimsFn(
 		readGridLocationClaimsFn({
 			runtime,
@@ -138,17 +102,13 @@ const checkRuntimeLocationsFn = (config: GameConfigSchema.Type, runtime: Runtime
 		});
 	}
 
-	return [
-		...boundsIssues,
-		...occupancyIssues,
-	];
+	return occupancyIssues;
 };
 
 /** Runs every explicit invariant checker against one candidate runtime. */
 export const checkRuntimeFx = Effect.fn("checkRuntimeFx")(function* ({
 	runtime,
 }: CheckRuntimeProps) {
-	const config = yield* GameConfigFx;
 	const itemUnitIssues = checkRuntimeItemUnitsFn(runtime);
 	const itemIdIssues = checkRuntimeItemIdsFn(runtime);
 	const defaultLineIssues = checkRuntimeDefaultLinesFn({
@@ -163,7 +123,7 @@ export const checkRuntimeFx = Effect.fn("checkRuntimeFx")(function* ({
 	const jobIssues = checkRuntimeJobsFn({
 		runtime,
 	});
-	const locationIssues = checkRuntimeLocationsFn(config, runtime);
+	const locationIssues = checkRuntimeLocationsFn(runtime);
 
 	return {
 		issues: [

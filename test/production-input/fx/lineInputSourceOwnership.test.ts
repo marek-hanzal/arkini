@@ -54,6 +54,7 @@ const config = GameConfigSchema.parse({
 	},
 	start: {
 		currentSpace: 0,
+		spaces: [],
 	},
 	items: {
 		[workerItemId]: {
@@ -166,6 +167,7 @@ const state = ({
 			speedUpGameplay: false,
 		},
 		currentSpace: 0,
+		templateUidBySpace: {},
 		items: [
 			item(workerOwnerItemId, workerItemId, 0),
 			item(upgradeOwnerItemId, upgradeItemId, 3),

@@ -1,3 +1,5 @@
+import { createProducerItem } from "~test/game-config-validation/support/gameValidationTestSource";
+import { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
 // @vitest-environment jsdom
 import { Effect } from "effect";
 import { createEditorUnsavedChangesOwnerFx } from "~/authoring-session/fx/createEditorUnsavedChangesOwnerFx";
@@ -25,6 +27,10 @@ const state = vi.hoisted(() => ({
 	save: vi.fn(),
 	unsaved: undefined as EditorUnsavedChangesSession | undefined,
 	navigate: vi.fn().mockResolvedValue(undefined),
+}));
+vi.mock("~/ui/ui/LinkButton", () => ({
+	LinkButtonLink: ({ children }: { children: ReactNode }) =>
+		createElement("span", null, children),
 }));
 vi.mock("~/template-authoring/ui/TemplateSectionBar", () => ({
 	TemplateSectionBar: () => null,
@@ -449,4 +455,45 @@ describe("template draft and deletion settlement", () => {
 		await act(async () => resolveFn());
 		expect(state.navigate).not.toHaveBeenCalled();
 	});
+});
+
+it("blocks template deletion while an authored outcome references its UID", async () => {
+	const project = projectFn(1);
+	state.project = {
+		...project,
+		config: {
+			...project.config,
+			items: {
+				...project.config.items,
+				portal: createProducerItem({
+					id: "portal",
+					outcome: OutcomeTableSchema.parse({
+						set: [
+							{
+								rules: [],
+								roll: [
+									{
+										type: "guaranteed",
+										outcome: [
+											{
+												type: "template",
+												templateUid: "template",
+												rules: [],
+											},
+										],
+									},
+								],
+							},
+						],
+					}),
+				}),
+			},
+		},
+	};
+	await beginDeleteFn();
+	expect(state.save).not.toHaveBeenCalled();
+	expect(
+		container.querySelectorAll("button").item(container.querySelectorAll("button").length - 1)
+			.disabled,
+	).toBe(true);
 });

@@ -40,7 +40,7 @@ export const OutcomeDetail = ({
 			{outcome?.set.length === 1 ? <div className="mb-3 border-t border-line" /> : null}
 			<Outcomes
 				emptyLabel={emptyLabel ?? translator.textFn("No outcome configured.")}
-				outcome={projectAuthoredOutcomeFn(outcome, items)}
+				outcome={projectAuthoredOutcomeFn(outcome, items, project.config.templates)}
 				renderItemDetailFn={(item) =>
 					item.rules.length === 0 ? null : (
 						<div className="ml-24">

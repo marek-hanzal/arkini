@@ -91,7 +91,7 @@ const spawnFx = Effect.gen(function* () {
 		});
 });
 
-it("delivers universe material from another board space through ordinary settlement", () => {
+it("keeps universe autofill on the producer board even when only remote stock exists", () => {
 	const config = configFn([
 		{
 			distance: "universe" as const,
@@ -118,15 +118,14 @@ it("delivers universe material from another board space through ordinary settlem
 					...target,
 					inputIndex: 0,
 				}),
-			).toBe(1);
+			).toBe(0);
 			yield* runTickRuntimeByFx({
 				elapsedMs: 1000,
 			});
 			const runtime = yield* readRuntimeFx();
 			expect(runtime.items.find((item) => item.id === "remote")?.location).toMatchObject({
-				scope: "input",
-				ownerItemId: "owner",
-				inputIndex: 0,
+				scope: "board",
+				space: 1,
 			});
 			expect(runtime.jobs).toEqual([]);
 		}).pipe(
@@ -168,7 +167,6 @@ it.each([
 			"close",
 			"near",
 			"far",
-			"remote",
 		],
 	],
 ] satisfies Array<

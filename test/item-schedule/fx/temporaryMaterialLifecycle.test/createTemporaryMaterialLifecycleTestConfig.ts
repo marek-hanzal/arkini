@@ -54,6 +54,7 @@ export const createTemporaryMaterialLifecycleTestConfig = (runtimeMs = 1_000) =>
 		},
 		start: {
 			currentSpace: 0,
+			spaces: [],
 		},
 		items: {
 			owner: {

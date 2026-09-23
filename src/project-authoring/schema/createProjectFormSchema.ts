@@ -45,45 +45,35 @@ export const createProjectFormSchema = (project: Pick<Project, "config" | "resou
 			seenAvatars.add(avatar);
 		});
 
-		const validateItemFn = (itemId: string, path: (string | number)[]) => {
-			const item = project.config.items[itemId];
-			if (item === undefined) {
+		const templateUids = new Set(value.templates.map((template) => template.uid));
+		value.start.spaces.forEach((entry, index) => {
+			if (!templateUids.has(entry.templateUid))
 				context.addIssue({
 					code: "custom",
-					message: `Initial item ${itemId} does not exist in this project.`,
-					path,
-				});
-				return;
-			}
-		};
-
-		const boardLocations = new Set<string>();
-		value.start.board.forEach((startItem, index) => {
-			const path = [
-				"start",
-				"board",
-				index,
-			];
-			validateItemFn(startItem.itemId, path);
-			if (startItem.x >= value.board.width || startItem.y >= value.board.height) {
-				context.addIssue({
-					code: "custom",
-					message: `Initial board item ${startItem.itemId} at ${startItem.x}, ${startItem.y} does not fit inside the board.`,
+					message: "Select an existing template.",
 					path: [
-						"board",
-						startItem.x >= value.board.width ? "width" : "height",
+						"start",
+						"spaces",
+						index,
+						"templateUid",
 					],
 				});
-			}
-			const key = `${startItem.space}:${startItem.x}:${startItem.y}`;
-			if (boardLocations.has(key)) {
-				context.addIssue({
-					code: "custom",
-					message: `Initial board slot ${startItem.x}, ${startItem.y} in space ${startItem.space} is used more than once.`,
-					path,
-				});
-			}
-			boardLocations.add(key);
+		});
+		value.templates.forEach((template, index) => {
+			template.board.forEach((cell, cellIndex) => {
+				if (project.config.items[cell.itemId] === undefined)
+					context.addIssue({
+						code: "custom",
+						message: `Item ${cell.itemId} does not exist in this project.`,
+						path: [
+							"templates",
+							index,
+							"board",
+							cellIndex,
+							"itemId",
+						],
+					});
+			});
 		});
 	});
 };

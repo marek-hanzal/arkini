@@ -1,3 +1,6 @@
+import { applyBoardTemplateRuntimeFx } from "~/board-template/fx/applyBoardTemplateRuntimeFx";
+import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
+import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 import type { ResolvedOutcomeRoll } from "~/outcome/type/ResolvedOutcomeRoll";
@@ -16,6 +19,7 @@ export namespace applyOutcomeRollFx {
 	}
 	export interface Result {
 		readonly runtime: RuntimeSchema.Type;
+		readonly events: readonly GameEventSchema.Type[];
 		readonly item: readonly applyItemOutcomeFx.Placement[];
 		readonly discarded: readonly planBestEffortDropPlacementFx.Discarded[];
 	}
@@ -29,6 +33,7 @@ export const applyOutcomeRollFx = Effect.fn("applyOutcomeRollFx")(function* ({
 	excludedLocations,
 }: applyOutcomeRollFx.Props) {
 	let draft = runtime;
+	const events: GameEventSchema.Type[] = [];
 	const item: applyItemOutcomeFx.Placement[] = [];
 	const discarded: planBestEffortDropPlacementFx.Discarded[] = [];
 	for (const outcome of roll.outcome) {
@@ -63,10 +68,28 @@ export const applyOutcomeRollFx = Effect.fn("applyOutcomeRollFx")(function* ({
 						});
 					}),
 			)
+			.with(
+				{
+					type: "template",
+				},
+				(outcome) =>
+					Effect.gen(function* () {
+						const snapshot = yield* RuntimeFx;
+						const applied = yield* applyBoardTemplateRuntimeFx({
+							runtime: draft,
+							ownershipRuntime: yield* snapshot.read,
+							space: roll.origin.space,
+							templateUid: outcome.templateUid,
+						});
+						draft = applied.runtime;
+						events.push(...applied.events);
+					}),
+			)
 			.exhaustive();
 	}
 	return {
 		runtime: draft,
+		events,
 		item,
 		discarded,
 	} satisfies applyOutcomeRollFx.Result;

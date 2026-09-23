@@ -57,6 +57,7 @@ it("publishes one committed item:merged event with pre-merge identities", async 
 				speedUpGameplay: false,
 			},
 			currentSpace: 0,
+			templateUidBySpace: {},
 			items: [
 				{
 					id: "runtime:source",
@@ -154,6 +155,7 @@ it("publishes exact merge output placement facts after the merge outcome", async
 				speedUpGameplay: false,
 			},
 			currentSpace: 0,
+			templateUidBySpace: {},
 			items: [
 				{
 					id: "runtime:source",

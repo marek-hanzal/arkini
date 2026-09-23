@@ -56,6 +56,7 @@ const makeState = (): StateSchema.Type => ({
 		speedUpGameplay: false,
 	},
 	currentSpace: 0,
+	templateUidBySpace: {},
 	items: [
 		boardItem("runtime:source", "source", 0),
 		boardItem("runtime:target", "target", 3),

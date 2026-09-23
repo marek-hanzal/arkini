@@ -1,3 +1,4 @@
+import { TemplateUidBySpaceSchema } from "~/game-runtime/schema/TemplateUidBySpaceSchema";
 import { z } from "zod";
 import { CheatStateSchema } from "~/game-runtime/schema/CheatStateSchema";
 import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
@@ -11,6 +12,7 @@ export const StateSchema = z
 		currentSpace: NonNegativeIntegerSchema.describe(
 			"The persistent board space currently presented to the player.",
 		),
+		templateUidBySpace: TemplateUidBySpaceSchema,
 		items: z.array(StateItemSchema),
 		jobs: z.array(JobSchema),
 		jobQueue: z.array(JobQueueRequestSchema),

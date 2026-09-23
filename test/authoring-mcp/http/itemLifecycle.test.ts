@@ -97,7 +97,7 @@ describe("editor MCP item lifecycle", () => {
 				],
 			},
 		});
-		expect(project?.config.start.board[0]?.itemId).toBe("fresh-water");
+		expect(project?.config.templates![0]!.board[0]?.itemId).toBe("fresh-water");
 
 		expect(project.revision).toBeGreaterThan(created.revision);
 		expect(await readFile(join(root, "artwork/fresh-water.png"))).toEqual(originalBytes);
@@ -118,7 +118,7 @@ describe("editor MCP item lifecycle", () => {
 		if (impactContent?.type !== "text") throw new Error("Missing delete impact text.");
 		expect(impactContent.text).toContain(`Revision: ${project.revision}`);
 		expect(impactContent.text).toContain("Safe delete: no");
-		expect(impactContent.text).toContain("start.board.0.itemId");
+		expect(impactContent.text).toContain("templates.0.board.0.itemId");
 		expect(() => JSON.parse(impactContent.text)).toThrow();
 
 		const safe = await client.callTool({
@@ -151,7 +151,7 @@ describe("editor MCP item lifecycle", () => {
 		project = await Effect.runPromise(repository.readProjectFx("item-lifecycle"));
 		expect(project?.revision).toBeGreaterThan(renamedRevision);
 		expect(project?.config.items["fresh-water"]).toBeUndefined();
-		expect(project?.config.start.board).toEqual([]);
+		expect(project?.config.templates![0]!.board).toEqual([]);
 		expect(notifyProjectChanged).toHaveBeenCalledTimes(2);
 		const notes = await Effect.runPromise(repository.listNotesFx("item-lifecycle"));
 		expect(notes).toEqual([

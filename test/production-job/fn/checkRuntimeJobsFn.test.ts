@@ -51,6 +51,7 @@ describe("checkRuntimeJobsFn", () => {
 				speedUpGameplay: false,
 			},
 			currentSpace: 0,
+			templateUidBySpace: {},
 			items: [
 				invalidOwner,
 				{
@@ -128,6 +129,7 @@ describe("checkRuntimeJobsFn", () => {
 				speedUpGameplay: false,
 			},
 			currentSpace: 0,
+			templateUidBySpace: {},
 			items: [
 				owner,
 			],
@@ -173,6 +175,7 @@ it("reports owned runtime state beneath one consumed job material root", () => {
 			speedUpGameplay: false,
 		},
 		currentSpace: 0,
+		templateUidBySpace: {},
 		items: [
 			owner,
 			consumedRoot,

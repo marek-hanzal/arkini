@@ -25,15 +25,23 @@ export namespace OutcomeProjection {
 		readonly rules?: readonly OutcomeRuleSchema.Type[];
 	}
 
+	export interface Template {
+		readonly type: "template";
+		readonly templateUid: string;
+		readonly title?: string;
+		readonly activeRuleHints: readonly string[];
+		readonly rules?: readonly OutcomeRuleSchema.Type[];
+	}
+
 	export type Roll<Item> =
 		| {
 				readonly kind: "guaranteed";
-				readonly outcome: readonly (Item | Space)[];
+				readonly outcome: readonly (Item | Space | Template)[];
 		  }
 		| {
 				readonly kind: "chance";
 				readonly chance: number;
-				readonly outcome: readonly (Item | Space)[];
+				readonly outcome: readonly (Item | Space | Template)[];
 		  };
 
 	export interface Set<Item> {

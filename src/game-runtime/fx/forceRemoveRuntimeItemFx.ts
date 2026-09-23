@@ -99,6 +99,7 @@ export const forceRemoveRuntimeItemFx = Effect.fn("forceRemoveRuntimeItemFx")(fu
 		events.push(...reconciled.events);
 	}
 	for (const buffer of buffers) {
+		if (!draft.items.some((candidate) => candidate.id === buffer.id)) continue;
 		const placed = yield* placeRuntimeItemBestEffortFx({
 			itemId: buffer.id,
 			origin,

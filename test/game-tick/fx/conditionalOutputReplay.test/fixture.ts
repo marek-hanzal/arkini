@@ -53,6 +53,23 @@ export const createConfig = (path: OutputPath, markerDuration = 500) => {
 	const line = producer.lines[0];
 	return GameConfigSchema.parse({
 		...base,
+		templates: [
+			{
+				uid: "start",
+				title: "Start",
+				...base.meta.board,
+				board: [],
+			},
+		],
+		start: {
+			currentSpace: 0,
+			spaces: [
+				{
+					space: 0,
+					templateUid: "start",
+				},
+			],
+		},
 		items: {
 			...base.items,
 			temporaryPlain: {

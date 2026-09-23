@@ -136,6 +136,7 @@ export const fixtureFn = (width = 2) => {
 			speedUpGameplay: false,
 		},
 		currentSpace: 0,
+		templateUidBySpace: {},
 		items: [
 			owner,
 			blocker,

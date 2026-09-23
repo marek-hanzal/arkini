@@ -74,11 +74,7 @@ export const expireItemRuntimeFx = Effect.fn("expireItemRuntimeFx")(function* ({
 				ownerItemId: item.id,
 				origin,
 				outcome,
-			}).pipe(
-				Effect.provideService(RuntimeFx, {
-					read: Effect.succeed(runtime),
-				}),
-			);
+			});
 			if (resolved.roll.length === 0)
 				return {
 					runtime: draft,
@@ -111,7 +107,12 @@ export const expireItemRuntimeFx = Effect.fn("expireItemRuntimeFx")(function* ({
 				],
 				replacementPlaced: placementEvents.length > 0,
 			};
-		}).pipe(Random.withSeed(randomSeed));
+		}).pipe(
+			Effect.provideService(RuntimeFx, {
+				read: Effect.succeed(runtime),
+			}),
+			Random.withSeed(randomSeed),
+		);
 		draft = placed.runtime;
 		events.push(...placed.events);
 		replacementPlaced = placed.replacementPlaced;

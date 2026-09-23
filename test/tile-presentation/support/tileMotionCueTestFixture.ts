@@ -17,20 +17,32 @@ const config = GameConfigSchema.parse({
 			height: 1,
 		},
 	},
+	templates: [
+		{
+			uid: "start",
+			title: "Start",
+			width: 3,
+			height: 1,
+			board: [
+				{
+					itemId: "water",
+					x: 0,
+					y: 0,
+				},
+				{
+					itemId: "water",
+					x: 2,
+					y: 0,
+				},
+			],
+		},
+	],
 	start: {
 		currentSpace: 0,
-		board: [
+		spaces: [
 			{
-				itemId: "water",
 				space: 0,
-				x: 0,
-				y: 0,
-			},
-			{
-				itemId: "water",
-				space: 0,
-				x: 2,
-				y: 0,
+				templateUid: "start",
 			},
 		],
 	},

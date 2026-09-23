@@ -13,6 +13,16 @@ import { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
 
 import { GameEventEnumSchema } from "./GameEventEnumSchema";
 
+const boardTemplateAppliedEventSchema = z
+	.object({
+		type: GameEventEnumSchema.extract([
+			"BoardTemplateApplied",
+		]),
+		space: NonNegativeIntegerSchema,
+		templateUid: IdSchema,
+	})
+	.strict();
+
 const currentSpaceChangedEventSchema = z
 	.object({
 		type: GameEventEnumSchema.extract([
@@ -272,6 +282,7 @@ const itemRemovedEventSchema = z
  * never encode choreography into the authoritative event vocabulary.
  */
 export const GameEventSchema = z.discriminatedUnion("type", [
+	boardTemplateAppliedEventSchema,
 	itemRemovedEventSchema,
 	currentSpaceChangedEventSchema,
 	jobQueuedEventSchema,

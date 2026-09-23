@@ -14,7 +14,8 @@ describe("readDeleteBlockersFn", () => {
 		expect(blockers).toEqual([
 			expect.objectContaining({
 				path: [
-					"start",
+					"templates",
+					0,
 					"board",
 					0,
 					"itemId",
@@ -34,10 +35,12 @@ describe("readDeleteBlockersFn", () => {
 		};
 		const config = GameConfigSchema.parse({
 			...editorTestConfig,
-			start: {
-				...editorTestConfig.start,
-				board: [],
-			},
+			templates: [
+				{
+					...editorTestConfig.templates![0]!,
+					board: [],
+				},
+			],
 			items: {
 				water: {
 					...editorTestConfig.items.water,

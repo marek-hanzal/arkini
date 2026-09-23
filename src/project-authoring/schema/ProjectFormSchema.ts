@@ -1,10 +1,10 @@
 import { z } from "zod";
 
 import { IdSchema } from "~/game-value/schema/IdSchema";
-import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 import { TitleSchema } from "~/game-value/schema/TitleSchema";
 import { SizeSchema } from "~/item-location/schema/SizeSchema";
-import { BoardItemSchema } from "~/game-start/schema/BoardItemSchema";
+import { StartSchema } from "~/game-start/schema/StartSchema";
+import { TemplateSchema } from "~/board-template/schema/TemplateSchema";
 
 export const ProjectAvatarKeys = [
 	"avatar-01",
@@ -30,12 +30,8 @@ export const ProjectFormBaseSchema = z
 		hero: IdSchema,
 		avatars: z.array(IdSchema).max(ProjectAvatarKeys.length),
 		board: EditorProjectSizeSchema,
-		start: z
-			.object({
-				currentSpace: NonNegativeIntegerSchema,
-				board: z.array(BoardItemSchema),
-			})
-			.strict(),
+		templates: z.array(TemplateSchema),
+		start: StartSchema,
 	})
 	.strict();
 

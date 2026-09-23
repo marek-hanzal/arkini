@@ -1,3 +1,4 @@
+import { commitMoveDropFx } from "~/item-interaction/fx/commitMoveDropFx";
 import { readGameAudioCuesFn } from "~/game-audio/fn/readGameAudioCuesFn";
 import { describe, expect, it } from "vitest";
 import { Effect } from "effect";
@@ -209,4 +210,39 @@ describe("dropItemFx / move storage and swap", () => {
 			sourceLocation,
 		);
 	});
+});
+
+it("rejects a new move outside configured bounds at commit without rejecting existing saved coordinates", () => {
+	const result = run(
+		Effect.gen(function* () {
+			const source = yield* spawnItemFx({
+				id: "runtime:water",
+				itemId: "water",
+				location: sourceLocation,
+			});
+			const before = yield* readRuntimeFx();
+			const outcome = yield* commitMoveDropFx({
+				sourceItemId: source.id,
+				sourceRevision: source.revision,
+				sourceLocation,
+				targetLocation: {
+					...emptyLocation,
+					position: {
+						x: config.meta.board.width,
+						y: 0,
+					},
+				},
+			});
+			return {
+				before,
+				after: yield* readRuntimeFx(),
+				outcome,
+			};
+		}),
+	);
+	expect(result.outcome).toMatchObject({
+		kind: DropItemResultKind.Reject,
+		reason: DropItemRejectedReason.InvalidTarget,
+	});
+	expect(result.after).toBe(result.before);
 });

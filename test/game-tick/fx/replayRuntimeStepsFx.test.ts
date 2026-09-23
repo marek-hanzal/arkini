@@ -21,6 +21,7 @@ const summarizeRuntime = (runtime: RuntimeSchema.Type) => ({
 		speedUpGameplay: false,
 	},
 	currentSpace: 0,
+	templateUidBySpace: {},
 	items: runtime.items
 		.map((item) => ({
 			itemId: item.item.id,

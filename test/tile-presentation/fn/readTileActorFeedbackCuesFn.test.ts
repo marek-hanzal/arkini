@@ -86,6 +86,7 @@ describe("readTileActorFeedbackCuesFn", () => {
 					speedUpGameplay: false,
 				},
 				currentSpace: 0,
+				templateUidBySpace: {},
 				items: [],
 				jobs: [],
 

@@ -1,3 +1,4 @@
+import { readBoardSizeFn } from "~/game-runtime/fn/readBoardSizeFn";
 import { Effect } from "effect";
 import { Container, Graphics } from "pixi.js";
 
@@ -46,10 +47,15 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 			let palette = initialPalette;
 			let latestTransition = game.getTransitionSnapshotFn();
 			let layoutRevision = 0;
+			const initialSize = readBoardSizeFn({
+				config: game.config,
+				runtime: latestTransition.runtime,
+				space: latestTransition.runtime.currentSpace,
+			});
 			let layout: MainLayout = readMainLayoutFn({
 				fixedCellSize: 512,
-				boardHeight: game.config.meta.board.height,
-				boardWidth: game.config.meta.board.width,
+				boardHeight: initialSize.height,
+				boardWidth: initialSize.width,
 				height: application.app.screen.height,
 				width: application.app.screen.width,
 			});
@@ -204,10 +210,15 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 				),
 				redrawFx: Effect.gen(function* () {
 					layoutRevision += 1;
+					const size = readBoardSizeFn({
+						config: game.config,
+						runtime: latestTransition.runtime,
+						space: latestTransition.runtime.currentSpace,
+					});
 					layout = readMainLayoutFn({
 						fixedCellSize: 512,
-						boardHeight: game.config.meta.board.height,
-						boardWidth: game.config.meta.board.width,
+						boardHeight: size.height,
+						boardWidth: size.width,
 						height: application.app.screen.height,
 						width: application.app.screen.width,
 					});

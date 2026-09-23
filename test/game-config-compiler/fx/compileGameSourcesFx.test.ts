@@ -17,6 +17,27 @@ const compile = (...sources: GameSourceFileSchema.Type[]) =>
 	Effect.runPromise(compileGameSourcesFx(sources));
 
 describe("compileGameSourcesFx", () => {
+	it("blocks builds without a template assignment for the selected initial space", async () => {
+		const root = createRootSource({
+			start: {
+				currentSpace: 4,
+				spaces: [],
+			},
+		});
+		const result = await compile(root);
+		expect(result.diagnostics).toContainEqual(
+			expect.objectContaining({
+				code: DiagnosticCodeEnumSchema.enum.StartInvalid,
+				failureTag: "InitialSpaceUnassigned",
+				path: [
+					"start",
+					"currentSpace",
+				],
+				source: root.path,
+			}),
+		);
+	});
+
 	it("reports missing template item references at their exact authored path", async () => {
 		const root = createRootSource();
 		const result = await compile({
@@ -348,9 +369,23 @@ describe("compileGameSourcesFx", () => {
 							height: 1,
 						},
 					},
+					templates: [
+						{
+							uid: "initial",
+							title: "Initial",
+							width: 1,
+							height: 1,
+							board: [],
+						},
+					],
 					start: {
 						currentSpace: 0,
-						board: [],
+						spaces: [
+							{
+								space: 0,
+								templateUid: "initial",
+							},
+						],
 					},
 				},
 			}),

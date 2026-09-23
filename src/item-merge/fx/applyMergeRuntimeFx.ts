@@ -324,23 +324,32 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 				source,
 			});
 	// Resolve the target against the draft after source side effects.
-	const currentTarget = yield* readBoardRuntimeItemByIdFx({
-		itemId: target.id,
-		runtime: sourceAction.runtime,
-	});
-	const targetEffect = yield* applyMergeTargetEffectFx({
-		actionId: `merge:${ruleIndex}:target:${owner.mergeSequence ?? 0}`,
-		ownerItemId: owner.id,
-		rule,
-		runtime: sourceAction.runtime,
-		target: currentTarget,
-	});
+	const currentTarget = sourceAction.runtime.items.some((item) => item.id === target.id)
+		? yield* readBoardRuntimeItemByIdFx({
+				itemId: target.id,
+				runtime: sourceAction.runtime,
+			})
+		: undefined;
+	const targetEffect =
+		currentTarget === undefined
+			? {
+					runtime: sourceAction.runtime,
+					events: [],
+				}
+			: yield* applyMergeTargetEffectFx({
+					actionId: `merge:${ruleIndex}:target:${owner.mergeSequence ?? 0}`,
+					ownerItemId: owner.id,
+					rule,
+					runtime: sourceAction.runtime,
+					target: currentTarget,
+				});
 	let draft = targetEffect.runtime;
 	const events = [
 		...sourceAction.events,
 		...targetEffect.events,
 	];
-	const targetDisappeared = rule.effect === TargetEffectSchema.enum.Remove;
+	const targetDisappeared =
+		currentTarget !== undefined && rule.effect === TargetEffectSchema.enum.Remove;
 
 	if (rule.outcome === undefined) {
 		if (targetDisappeared) {

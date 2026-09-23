@@ -1,3 +1,4 @@
+import { readBoardSizeFn } from "~/game-runtime/fn/readBoardSizeFn";
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
@@ -6,7 +7,8 @@ import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { StateSchema } from "~/game-persistence/schema/StateSchema";
 import { fromRuntimeFn } from "~/game-persistence/fn/fromRuntimeFn";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
-import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckIssueEnumSchema";
+import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
+import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 
 const config = GameConfigSchema.parse({
 	resources: {
@@ -22,6 +24,7 @@ const config = GameConfigSchema.parse({
 	},
 	start: {
 		currentSpace: 0,
+		spaces: [],
 	},
 	items: {
 		tree: {
@@ -49,6 +52,7 @@ const state = StateSchema.parse({
 		speedUpGameplay: false,
 	},
 	currentSpace: 0,
+	templateUidBySpace: {},
 	items: [
 		{
 			id: "runtime:board:tree",
@@ -123,6 +127,7 @@ describe("fromStateFx", () => {
 				speedUpGameplay: false,
 			},
 			currentSpace: 0,
+			templateUidBySpace: {},
 			items: state.items.map((item) => {
 				if (item.id !== "runtime:board:tree") {
 					return item;
@@ -157,7 +162,7 @@ describe("fromStateFx", () => {
 		}
 	});
 
-	it("rejects invalid persisted state before it becomes runtime", () => {
+	it("preserves existing positions outside current dimensions without blocking later transitions", () => {
 		const invalidState = StateSchema.parse({
 			...state,
 			items: state.items.map((item) => {
@@ -177,31 +182,43 @@ describe("fromStateFx", () => {
 				};
 			}),
 		});
-		const result = Effect.runSync(
-			Effect.result(
-				fromStateFx({
-					state: invalidState,
-				}),
-			).pipe(
+		const hydrated = Effect.runSync(
+			fromStateFx({
+				state: invalidState,
+			}).pipe(
 				useGameFx({
 					config,
 				}),
 			),
 		);
-
-		expect(Result.isFailure(result)).toBe(true);
-		if (Result.isFailure(result)) {
-			expect(result.failure).toMatchObject({
-				_tag: "RuntimeInvalidError",
-				result: {
-					issues: [
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* modifyRuntimeFx((runtime) =>
+					Effect.succeed([
+						undefined,
 						{
-							type: RuntimeCheckIssueEnumSchema.enum.LocationOutOfBounds,
+							...runtime,
+							cheats: {
+								...runtime.cheats,
+								enabled: true,
+							},
 						},
-					],
-				},
-			});
-		}
+					] as const),
+				);
+				return yield* readRuntimeFx();
+			}).pipe(
+				useGameFx({
+					config,
+					state: fromRuntimeFn({
+						runtime: hydrated,
+					}),
+				}),
+			),
+		);
+		expect(result.items.map((item) => item.location)).toEqual(
+			invalidState.items.map((item) => item.location),
+		);
+		expect(result.cheats.enabled).toBe(true);
 	});
 });
 
@@ -221,4 +238,83 @@ it("builds every runtime item with the original canonical game object", () => {
 
 	expect(boardTree?.item).toBe(canonicalTree);
 	expect(secondTree?.item).toBe(canonicalTree);
+});
+
+it("round-trips the active template identity independently of startup mappings and template contents", () => {
+	const loadedConfig = GameConfigSchema.parse({
+		...config,
+		templates: [
+			{
+				uid: "start",
+				title: "Start",
+				width: 1,
+				height: 1,
+				board: [],
+			},
+			{
+				uid: "active",
+				title: "Active",
+				width: 4,
+				height: 5,
+				board: [],
+			},
+		],
+		start: {
+			currentSpace: 0,
+			spaces: [
+				{
+					space: 0,
+					templateUid: "start",
+				},
+			],
+		},
+	});
+	const saved = {
+		...state,
+		templateUidBySpace: {
+			0: "active",
+		},
+	};
+	const runtime = Effect.runSync(
+		fromStateFx({
+			state: saved,
+		}).pipe(
+			useGameFx({
+				config: loadedConfig,
+			}),
+		),
+	);
+	expect(
+		fromRuntimeFn({
+			runtime,
+		}),
+	).toEqual(saved);
+	expect(
+		readBoardSizeFn({
+			config: loadedConfig,
+			runtime,
+			space: 0,
+		}),
+	).toEqual({
+		width: 4,
+		height: 5,
+	});
+	expect(
+		readBoardSizeFn({
+			config: loadedConfig,
+			runtime,
+			space: 9,
+		}),
+	).toEqual(config.meta.board);
+	expect(
+		runtime.items.map(({ id, location }) => ({
+			id,
+			location,
+		})),
+	).toEqual(
+		saved.items.map(({ id, location }) => ({
+			id,
+			location,
+		})),
+	);
 });

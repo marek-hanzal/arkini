@@ -25,6 +25,7 @@ const config = GameConfigSchema.parse({
 	},
 	start: {
 		currentSpace: 0,
+		spaces: [],
 	},
 	items: {
 		tree: {
@@ -75,6 +76,7 @@ const runtime = ({
 		speedUpGameplay: false,
 	},
 	currentSpace,
+	templateUidBySpace: {},
 	items,
 	jobs: [],
 	jobQueue: [],

@@ -46,15 +46,13 @@ const readProjectFormValidationLocationFn = (
 	const [head, second, third] = path;
 	if (head === "avatars" && typeof second === "number")
 		return textFn("Avatar {index}").replace("{index}", String(second + 1));
-	if (head === "start" && second === "board" && typeof third === "number") {
-		const entry = values.start.board[third];
-		return entry === undefined
-			? textFn("Initial board → item {index}").replace("{index}", String(third + 1))
-			: textFn("Initial board → space {space} → slot {x}, {y}")
-					.replace("{space}", String(entry.space))
-					.replace("{x}", String(entry.x + 1))
-					.replace("{y}", String(entry.y + 1));
+	if (head === "start" && second === "spaces" && typeof third === "number") {
+		const entry = values.start.spaces[third];
+		return entry === undefined ? textFn("Board") : `${textFn("Space")} · ${entry.space}`;
 	}
+	if (head === "templates" && typeof second === "number")
+		return values.templates[second]?.title ?? textFn("Templates");
+
 	const labels = path.flatMap((segment) => {
 		if (typeof segment !== "string") return [];
 		const label =
@@ -98,6 +96,7 @@ const createProjectConfigFn = (
 			...avatarResources,
 		},
 		start: value.start,
+		templates: value.templates,
 	};
 };
 
@@ -116,9 +115,15 @@ const readProjectFormValuesFn = (project: Pick<Project, "config">): ProjectFormS
 	board: {
 		...project.config.meta.board,
 	},
+	templates: (project.config.templates ?? []).map((template) => ({
+		...template,
+		board: template.board.map((cell) => ({
+			...cell,
+		})),
+	})),
 	start: {
 		currentSpace: project.config.start.currentSpace,
-		board: project.config.start.board.map((entry) => ({
+		spaces: project.config.start.spaces.map((entry) => ({
 			...entry,
 		})),
 	},

@@ -1,3 +1,4 @@
+import { readBoardSizeFn } from "~/game-runtime/fn/readBoardSizeFn";
 import { Effect, Option } from "effect";
 
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
@@ -85,7 +86,11 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 			return rejectedFn(DropItemRejectedReason.Occupied);
 		}
 		const config = yield* GameConfigFx;
-		const targetSize = config.meta.board;
+		const targetSize = readBoardSizeFn({
+			runtime,
+			config,
+			space: target.location.space,
+		});
 		if (
 			target.location.position.x >= targetSize.width ||
 			target.location.position.y >= targetSize.height

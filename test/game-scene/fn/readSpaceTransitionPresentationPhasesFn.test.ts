@@ -40,6 +40,7 @@ const runtime = (currentSpace: number, remainingUnits?: number) =>
 			speedUpGameplay: false,
 		},
 		currentSpace,
+		templateUidBySpace: {},
 		items: [
 			{
 				id: "runtime:tree",

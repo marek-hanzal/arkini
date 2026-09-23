@@ -65,6 +65,7 @@ export const createMergeTestConfig = ({
 		},
 		start: {
 			currentSpace: 0,
+			spaces: [],
 		},
 		items: {
 			source: simpleItem({

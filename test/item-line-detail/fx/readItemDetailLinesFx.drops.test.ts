@@ -25,14 +25,27 @@ describe("readItemDetailLinesFx / drops and stale identities", () => {
 					height: 1,
 				},
 			},
+			templates: [
+				{
+					uid: "start",
+					title: "Start",
+					width: 1,
+					height: 1,
+					board: [
+						{
+							itemId: "workshop",
+							x: 0,
+							y: 0,
+						},
+					],
+				},
+			],
 			start: {
 				currentSpace: 0,
-				board: [
+				spaces: [
 					{
-						itemId: "workshop",
 						space: 0,
-						x: 0,
-						y: 0,
+						templateUid: "start",
 					},
 				],
 			},

@@ -224,11 +224,6 @@ Available:
   value: Available
 Available for this job.:
   value: Available for this job.
-Avatar:
-  value: Avatar
-Avatar {index}:
-  value: Avatar {index}
-  dynamic: true
 Base artwork:
   value: Base artwork
 Base tile scale:
@@ -1526,7 +1521,7 @@ Project About avatars help:
   value: |
     Portraits revealed on the **About** page as a small easter egg.
 
-    Choose up to **seven** project Images. Their order here is their order there.
+    Choose project Images for any of the **eight** named slots. Empty slots stay unused; portraits appear on the **About** page in slot order.
 Project ID:
   value: Project ID
 Project ID example:
@@ -1537,7 +1532,7 @@ Project artwork count:
   value: "{count} artwork"
 Project avatars empty help:
   value: |
-    Add up to **seven** portrait Images and arrange the order used on the **About** page.
+    Choose portrait Images for any of the **eight** named slots. Empty slots stay unused on the **About** page.
 Project general help:
   value: |
     Review the project's title, ID and storage sizes.
@@ -1744,6 +1739,8 @@ Search area:
   value: Search area
 Search artwork…:
   value: Search artwork…
+Search images...:
+  value: Search images...
 Search item title or ID…:
   value: Search item title or ID…
 Search item title, ID or type…:

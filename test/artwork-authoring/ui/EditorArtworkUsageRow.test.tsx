@@ -46,7 +46,6 @@ const project = {
 		...editorTestPayload.config,
 		resources: {
 			hero: "hero",
-			"avatar-01": "avatar-one",
 			"avatar-03": "avatar-three",
 		},
 	},
@@ -116,7 +115,7 @@ describe("EditorArtworkUsageRow", () => {
 			sectionId: "images",
 		});
 		expect(JSON.parse(avatar.dataset.search ?? "null")).toEqual({
-			avatar: 1,
+			avatar: 2,
 		});
 	});
 });

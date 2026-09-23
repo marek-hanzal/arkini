@@ -2,7 +2,7 @@ import { Effect, Random } from "effect";
 
 import { describe, expect, it } from "vitest";
 
-import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
+import { bufferInputMaterialForTestFx } from "~test/support/bufferInputMaterialForTestFx";
 
 import { attemptJobCompletionFx } from "~/production-job/fx/attemptJobCompletionFx";
 
@@ -49,7 +49,7 @@ describe("craft completion recovery", () => {
 						},
 					},
 				});
-				yield* storeInputMaterialFx({
+				yield* bufferInputMaterialForTestFx({
 					ownerItemId: owner.id,
 					lineId: "line:craft:reserve",
 					inputIndex: 0,

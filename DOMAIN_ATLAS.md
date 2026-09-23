@@ -93,7 +93,6 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 | `game-scene` | Concrete retained Board scene | [`src/game-scene/README.md`](src/game-scene/README.md) |
 | `item-detail-read` | Shared framework-neutral detail reads | [`src/item-detail-read/fx/readItemDetailQueueFx.ts`](src/item-detail-read/fx/readItemDetailQueueFx.ts) |
 | `item-detail-frame` | Visible detail target and modal lifecycle | [`src/item-detail-frame/fx/createItemDetailControllerFx.ts`](src/item-detail-frame/fx/createItemDetailControllerFx.ts) |
-| `item-line-detail` | Framework-neutral Item Line reads | [`src/item-line-detail/fx/readItemDetailLinesFx.ts`](src/item-line-detail/fx/readItemDetailLinesFx.ts) |
 | `item-detail` | Item Detail shell, live Lines and Info in one scroll | [`src/item-detail/ui/ItemDetailModal.tsx`](src/item-detail/ui/ItemDetailModal.tsx), [`ItemLines.tsx`](src/item-detail/ui/ItemLines.tsx) |
 | `game-presentation` | Mounted-Game React capability and command settlement | [`src/game-presentation/ui/GameEngineProvider.tsx`](src/game-presentation/ui/GameEngineProvider.tsx) |
 | `game-audio` | Streamed random Music, bounded lazy SFX, committed-event cues and direct presentation cues | [`src/game-audio/fx/createGameAudioRuntimeFx.ts`](src/game-audio/fx/createGameAudioRuntimeFx.ts) |

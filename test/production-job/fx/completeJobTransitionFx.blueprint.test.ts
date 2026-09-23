@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
+import { bufferInputMaterialForTestFx } from "~test/support/bufferInputMaterialForTestFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
@@ -74,7 +74,7 @@ describe("blueprint completion placement", () => {
 						},
 					},
 				});
-				yield* storeInputMaterialFx({
+				yield* bufferInputMaterialForTestFx({
 					ownerItemId: owner.id,
 					lineId: "line:blueprint:reserve",
 					inputIndex: 0,

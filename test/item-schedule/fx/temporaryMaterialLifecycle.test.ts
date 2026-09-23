@@ -5,7 +5,7 @@ import { advanceRuntimeStepFx } from "~/game-tick/fx/advanceRuntimeStepFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
+import { bufferInputMaterialForTestFx } from "~test/support/bufferInputMaterialForTestFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
@@ -70,7 +70,7 @@ const storeTemporaryFx = Effect.fn("storeTemporaryMaterialTestItemFx")(function*
 	readonly id: string;
 	readonly revision: string;
 }) {
-	yield* storeInputMaterialFx({
+	yield* bufferInputMaterialForTestFx({
 		ownerItemId: "runtime:owner",
 		lineId: "line:owner",
 		inputIndex: 0,

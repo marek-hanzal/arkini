@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
+import { bufferInputMaterialForTestFx } from "~test/support/bufferInputMaterialForTestFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
@@ -129,7 +129,7 @@ export const prepareJobLineFx = Effect.fn("prepareJobLineFx")(function* () {
 			},
 		});
 		if (index < 3)
-			yield* storeInputMaterialFx({
+			yield* bufferInputMaterialForTestFx({
 				ownerItemId: owner.id,
 				lineId: "line:forge:run",
 				inputIndex: 0,
@@ -151,7 +151,7 @@ export const prepareJobLineFx = Effect.fn("prepareJobLineFx")(function* () {
 			},
 		});
 		if (index === 0)
-			yield* storeInputMaterialFx({
+			yield* bufferInputMaterialForTestFx({
 				ownerItemId: owner.id,
 				lineId: "line:forge:run",
 				inputIndex: 1,

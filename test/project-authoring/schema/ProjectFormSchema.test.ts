@@ -27,7 +27,16 @@ const createValidFormValue = (project: Project): ProjectFormSchema.Type => ({
 	title: project.config.meta.title,
 	introduction: project.config.meta.introduction ?? "",
 	hero: project.config.resources.hero,
-	avatars: [],
+	avatars: {
+		"avatar-01": "",
+		"avatar-02": "",
+		"avatar-03": "",
+		"avatar-04": "",
+		"avatar-05": "",
+		"avatar-06": "",
+		"avatar-07": "",
+		"avatar-08": "",
+	},
 	board: project.config.meta.board,
 	templates: project.config.templates ?? [],
 	start: project.config.start,
@@ -113,10 +122,11 @@ describe("ProjectFormSchema", () => {
 		const result = createProjectFormSchema(project).safeParse({
 			...createValidFormValue(project),
 			hero: "missing",
-			avatars: [
-				"hero",
-				"hero",
-			],
+			avatars: {
+				...createValidFormValue(project).avatars,
+				"avatar-01": "hero",
+				"avatar-03": "hero",
+			},
 		});
 
 		expect(result.success).toBe(false);
@@ -127,7 +137,7 @@ describe("ProjectFormSchema", () => {
 			],
 			[
 				"avatars",
-				1,
+				"avatar-03",
 			],
 		]);
 	});

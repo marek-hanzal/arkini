@@ -317,6 +317,62 @@ describe("Outcome settlement", () => {
 		expect(result.events.map((event) => event.type)).toContain("item:disappeared");
 	});
 
+	it("reports disappearance when a later template erases the expiry Item output", () => {
+		const outcome = tableFn([
+			{
+				...itemOutcome,
+				rules: [],
+			},
+			{
+				type: "template",
+				templateUid: "empty",
+				rules: [],
+			},
+		]);
+		const config = {
+			...configFn(outcome),
+			templates: [
+				{
+					uid: "empty",
+					title: "Empty",
+					width: 3,
+					height: 1,
+					board: [],
+				},
+			],
+		};
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const owner = yield* spawnOwnerFx();
+				yield* modifyRuntimeFx((runtime) =>
+					Effect.gen(function* () {
+						const expired = yield* expireItemRuntimeFx({
+							item: owner,
+							origin,
+							outcome,
+							randomSeed: "expiry-template",
+							runtime,
+						});
+						return [
+							undefined,
+							expired.runtime,
+							expired.events,
+						] as const;
+					}),
+				);
+				return yield* (yield* CommittedTransitionsFx).read;
+			}).pipe(
+				useGameFx({
+					config,
+				}),
+			),
+		);
+		expect(result.runtime.items).toHaveLength(0);
+		expect(result.events.map((event) => event.type)).toContain("board:template-applied");
+		expect(result.events.map((event) => event.type)).toContain("item:disappeared");
+		expect(result.events.map((event) => event.type)).not.toContain("item:spawned");
+	});
+
 	it("does not publish a round-trip Space event or apply rejected Space outcomes", () => {
 		const outcome = tableFn([
 			spaceFn(2),

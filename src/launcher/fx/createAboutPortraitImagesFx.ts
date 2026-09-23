@@ -11,6 +11,7 @@ const avatarRoles = [
 	"avatar-05",
 	"avatar-06",
 	"avatar-07",
+	"avatar-08",
 ] as const;
 
 const readAboutPortraitResourcesFn = (payload: {

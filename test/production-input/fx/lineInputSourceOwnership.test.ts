@@ -4,8 +4,6 @@ import { describe, expect, it } from "vitest";
 import { checkRuntimeFx } from "~/game-runtime/fx/checkRuntimeFx";
 import { useGameFx } from "~test/support/useGameFx";
 import { autofillLineInputsFx } from "~test/support/autofillLineInputsFx";
-import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
-import { readItemDetailMaterialAutofillAvailabilityFx } from "~/item-line-detail/fx/readItemDetailMaterialAutofillAvailabilityFx";
 import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
@@ -37,7 +35,6 @@ const workerRunLineId = "line:worker:run";
 const workerFuelLineId = "line:worker:fuel";
 const upgradeLineId = "line:upgrade:construct";
 const workerRunRequestId = "job:worker:run";
-const workerFuelRequestId = "job:worker:fuel";
 const upgradeRequestId = "job:upgrade";
 
 const config = GameConfigSchema.parse({
@@ -188,65 +185,7 @@ const queueRequest = (id: string, ownerItemId: string, lineId: string) => ({
 });
 
 describe("line input source ownership", () => {
-	it("rejects storing a queue-only source without changing runtime or global FIFO", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				const before = yield* readRuntimeFx();
-				const source = before.items.find(({ id }) => id === workerOwnerItemId);
-				if (source === undefined) {
-					return yield* Effect.die(new Error("Expected the queued source item."));
-				}
-				const stored = yield* Effect.result(
-					storeInputMaterialFx({
-						ownerItemId: upgradeOwnerItemId,
-						lineId: upgradeLineId,
-						inputIndex: 0,
-						sourceItemId: source.id,
-						sourceItemRevision: source.revision,
-					}),
-				);
-				return {
-					after: yield* readRuntimeFx(),
-					before,
-					stored,
-				};
-			}).pipe(
-				useGameFx({
-					config,
-					state: state({
-						jobQueue: [
-							queueRequest(workerFuelRequestId, workerOwnerItemId, workerFuelLineId),
-							queueRequest(upgradeRequestId, upgradeOwnerItemId, upgradeLineId),
-						],
-					}),
-				}),
-			),
-		);
-
-		expect(Result.isFailure(result.stored)).toBe(true);
-		if (Result.isFailure(result.stored)) {
-			expect(result.stored.failure).toMatchObject({
-				_tag: "JobOwnerBusyError",
-				ownerItemId: workerOwnerItemId,
-				jobIds: [],
-				requestIds: [
-					workerFuelRequestId,
-				],
-			});
-		}
-		expect(result.after).toEqual(result.before);
-		expect(result.after.jobQueue).toEqual([
-			queueRequest(workerFuelRequestId, workerOwnerItemId, workerFuelLineId),
-			queueRequest(upgradeRequestId, upgradeOwnerItemId, upgradeLineId),
-		]);
-		expect(result.after.items.find(({ id }) => id === workerOwnerItemId)).toMatchObject({
-			location: {
-				scope: "board",
-			},
-		});
-	});
-
-	it("keeps an active owner out of autofill and rejects a stale direct store", () => {
+	it("keeps an active owner out of autofill", () => {
 		const activeState = state({
 			jobQueue: [
 				queueRequest(upgradeRequestId, upgradeOwnerItemId, upgradeLineId),
@@ -264,40 +203,14 @@ describe("line input source ownership", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const before = yield* readRuntimeFx();
-				const source = before.items.find(({ id }) => id === workerOwnerItemId);
-				if (source === undefined) {
-					return yield* Effect.die(new Error("Expected the active source item."));
-				}
-				const availability = yield* readItemDetailMaterialAutofillAvailabilityFx({
-					ownerItemId: upgradeOwnerItemId,
-					runtime: before,
-					query: {
-						distance: "far" as const,
-						selector: {
-							type: "item",
-							itemUid: workerItemId,
-						},
-					},
-				});
 				const autofill = yield* autofillLineInputsFx({
 					ownerItemId: upgradeOwnerItemId,
 					lineId: upgradeLineId,
 				});
-				const stored = yield* Effect.result(
-					storeInputMaterialFx({
-						ownerItemId: upgradeOwnerItemId,
-						lineId: upgradeLineId,
-						inputIndex: 0,
-						sourceItemId: source.id,
-						sourceItemRevision: source.revision,
-					}),
-				);
 				return {
 					after: yield* readRuntimeFx(),
 					autofill,
-					availability,
 					before,
-					stored,
 				};
 			}).pipe(
 				useGameFx({
@@ -307,19 +220,11 @@ describe("line input source ownership", () => {
 			),
 		);
 
-		expect(result.availability.availableQuantity).toBe(0);
 		expect(result.autofill).toEqual({
 			deliveryItemIds: [],
 			remainingMissingQuantity: 1,
 			scheduledQuantity: 0,
 		});
-		expect(Result.isFailure(result.stored)).toBe(true);
-		if (Result.isFailure(result.stored)) {
-			expect(result.stored.failure).toMatchObject({
-				_tag: "InputMaterialUnavailableError",
-				sourceItemId: workerOwnerItemId,
-			});
-		}
 		expect(result.after).toEqual(result.before);
 	});
 

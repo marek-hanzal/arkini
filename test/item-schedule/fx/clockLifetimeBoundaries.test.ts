@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { advanceItemSchedulesFx } from "~/item-schedule/fx/advanceItemSchedulesFx";
-import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
+import { bufferInputMaterialForTestFx } from "~test/support/bufferInputMaterialForTestFx";
 import { createLine } from "~test/game-config-validation/support/gameValidationTestSource";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { useGameFx } from "~test/support/useGameFx";
@@ -87,7 +87,7 @@ describe("Clock lifetime boundaries", () => {
 
 					location: board(1),
 				});
-				yield* storeInputMaterialFx({
+				yield* bufferInputMaterialForTestFx({
 					ownerItemId: "owner",
 					lineId: "line:owner",
 					inputIndex: 0,
@@ -194,7 +194,7 @@ describe("Clock lifetime boundaries", () => {
 
 					location: board(2),
 				});
-				yield* storeInputMaterialFx({
+				yield* bufferInputMaterialForTestFx({
 					ownerItemId: material.id,
 					lineId: "buffer",
 					inputIndex: 0,
@@ -205,7 +205,7 @@ describe("Clock lifetime boundaries", () => {
 					(item) => item.id === material.id,
 				);
 				if (current === undefined) throw new Error("Missing material owner.");
-				yield* storeInputMaterialFx({
+				yield* bufferInputMaterialForTestFx({
 					ownerItemId: "owner",
 					lineId: "line:owner",
 					inputIndex: 0,
@@ -282,7 +282,7 @@ describe("Clock lifetime boundaries", () => {
 
 					location: board(1),
 				});
-				yield* storeInputMaterialFx({
+				yield* bufferInputMaterialForTestFx({
 					ownerItemId: "owner",
 					lineId: "line:owner",
 					inputIndex: 0,

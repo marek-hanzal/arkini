@@ -28,7 +28,7 @@ export const Route = createFileRoute("/editor/$projectId/project/form/$sectionId
 			case "general":
 				return <ProjectGeneralSection />;
 			case "images":
-				return <ProjectImagesSection initialAvatarIndex={avatar ?? 0} />;
+				return <ProjectImagesSection initialAvatarIndex={avatar} />;
 			case "board":
 				return <ProjectBoardSection />;
 		}

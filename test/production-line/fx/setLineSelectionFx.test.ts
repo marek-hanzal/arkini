@@ -2,8 +2,8 @@ import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/useGameFx";
-import { readItemDetailLinesFx } from "~/item-line-detail/fx/readItemDetailLinesFx";
 import { setLineSelectionFx } from "~/production-line/fx/setLineSelectionFx";
+import { readEffectiveLineFn } from "~/production-line/fn/readEffectiveLineFn";
 import { checkRuntimeFx } from "~/game-runtime/fx/checkRuntimeFx";
 import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
 import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItemIdentityFx";
@@ -97,11 +97,11 @@ describe("setLineSelectionFx", () => {
 				const owner = runtime.items[0];
 				if (owner === undefined) throw new Error("Missing producer.");
 				return {
-					projection: yield* readItemDetailLinesFx({
-						itemId: owner.id,
+					effectiveLine: readEffectiveLineFn({
+						ownerItemId: owner.id,
+						ownerItem: owner.item,
 						runtime,
 					}),
-
 					runtime,
 				};
 			}).pipe(
@@ -112,19 +112,7 @@ describe("setLineSelectionFx", () => {
 		);
 
 		expect(result.runtime.defaultLineByOwnerItemId).toEqual({});
-		expect(result.projection).toMatchObject({
-			kind: "available",
-			line: [
-				{
-					lineId: "line:first",
-					isDefault: true,
-				},
-				{
-					lineId: "line:second",
-					isDefault: false,
-				},
-			],
-		});
+		expect(result.effectiveLine?.id).toBe("line:first");
 	});
 
 	it("persists one exact default without reordering authored lines and makes the owner impure", () => {
@@ -139,10 +127,6 @@ describe("setLineSelectionFx", () => {
 					lineId: "line:second",
 				});
 				const runtime = yield* readRuntimeFx();
-				const projection = yield* readItemDetailLinesFx({
-					itemId: owner.id,
-					runtime,
-				});
 				const state = fromRuntimeFn({
 					runtime,
 				});
@@ -151,7 +135,6 @@ describe("setLineSelectionFx", () => {
 				});
 				return {
 					owner,
-					projection,
 
 					runtime,
 					state,
@@ -173,19 +156,6 @@ describe("setLineSelectionFx", () => {
 		expect(result.restored.defaultLineByOwnerItemId).toEqual(
 			result.runtime.defaultLineByOwnerItemId,
 		);
-		expect(result.projection).toMatchObject({
-			kind: "available",
-			line: [
-				{
-					lineId: "line:first",
-					isDefault: false,
-				},
-				{
-					lineId: "line:second",
-					isDefault: true,
-				},
-			],
-		});
 	});
 
 	it("persists an explicit no-default override instead of restoring the authored fallback", () => {
@@ -205,10 +175,6 @@ describe("setLineSelectionFx", () => {
 					ownerItemId: owner.id,
 				});
 				const runtime = yield* readRuntimeFx();
-				const projection = yield* readItemDetailLinesFx({
-					itemId: owner.id,
-					runtime,
-				});
 				const state = fromRuntimeFn({
 					runtime,
 				});
@@ -216,8 +182,6 @@ describe("setLineSelectionFx", () => {
 					state,
 				});
 				return {
-					projection,
-
 					restored,
 					runtime,
 					state,
@@ -238,19 +202,6 @@ describe("setLineSelectionFx", () => {
 		expect(result.restored.defaultLineByOwnerItemId).toEqual(
 			result.runtime.defaultLineByOwnerItemId,
 		);
-		expect(result.projection).toMatchObject({
-			kind: "available",
-			line: [
-				{
-					lineId: "line:first",
-					isDefault: false,
-				},
-				{
-					lineId: "line:second",
-					isDefault: false,
-				},
-			],
-		});
 	});
 
 	it("rejects foreign lines and reports stale persisted selections", () => {

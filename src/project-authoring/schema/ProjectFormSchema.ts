@@ -14,6 +14,7 @@ export const ProjectAvatarKeys = [
 	"avatar-05",
 	"avatar-06",
 	"avatar-07",
+	"avatar-08",
 ] as const;
 
 export const EditorProjectSizeMax = 42;
@@ -28,7 +29,18 @@ export const ProjectFormBaseSchema = z
 		title: TitleSchema,
 		introduction: z.string(),
 		hero: IdSchema,
-		avatars: z.array(IdSchema).max(ProjectAvatarKeys.length),
+		avatars: z
+			.object({
+				"avatar-01": z.string(),
+				"avatar-02": z.string(),
+				"avatar-03": z.string(),
+				"avatar-04": z.string(),
+				"avatar-05": z.string(),
+				"avatar-06": z.string(),
+				"avatar-07": z.string(),
+				"avatar-08": z.string(),
+			})
+			.strict(),
 		board: EditorProjectSizeSchema,
 		templates: z.array(TemplateSchema),
 		start: StartSchema,

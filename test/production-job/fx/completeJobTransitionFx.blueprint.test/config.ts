@@ -242,14 +242,6 @@ export const blueprintConfig = GameConfigSchema.parse({
 				},
 			},
 		},
-		"blueprint:depletion-self-no-outcome": {
-			...blueprintItem({
-				id: "blueprint:depletion-self-no-outcome",
-				lineId: "line:blueprint:depletion-self-no-outcome",
-				outcome: blueprintOutput("blueprint:depletion-self-no-outcome"),
-				reserveTool: true,
-			}),
-		},
 		"item:target": simpleItem({
 			id: "item:target",
 		}),
@@ -407,82 +399,6 @@ export const blueprintConfig = GameConfigSchema.parse({
 							},
 						},
 					],
-					rules: [],
-				},
-			],
-		},
-		"producer:recycler": {
-			uid: "producer:recycler",
-
-			title: "Recycler",
-			description: "Replaces one capped item with one capped item.",
-			artwork: {
-				scale: 0.8,
-				default: [
-					"artwork:producer:recycler",
-				],
-			},
-
-			maxQueueSize: 1,
-			lines: [
-				{
-					id: "line:producer:recycler",
-					title: "Recycle",
-					description: "Consume and replace the same item.",
-					runtimeMs: 200,
-					input: [
-						{
-							type: "materials",
-							query: {
-								distance: "far" as const,
-								selector: {
-									type: "item",
-									itemUid: "item:target",
-								},
-							},
-							quantity: {
-								min: 1,
-								max: 1,
-							},
-						},
-					],
-					outcome: blueprintOutput("item:target"),
-					rules: [],
-				},
-			],
-		},
-		"producer:depleted-owner": {
-			uid: "producer:depleted-owner",
-
-			title: "Finite owner",
-			description: "Replaces the depleted owner.",
-			artwork: {
-				scale: 0.8,
-				default: [
-					"artwork:producer:depleted-owner",
-				],
-			},
-
-			maxQueueSize: 1,
-			units: {
-				amount: 1,
-			},
-			lines: [
-				{
-					id: "line:producer:depleted-owner",
-					title: "Renew one",
-					description: "Spend the final owner unit and replace one owner.",
-					runtimeMs: 200,
-					input: [
-						{
-							type: "simple",
-							units: {
-								from: "self",
-								cost: 1,
-							},
-						},
-					],
-					outcome: blueprintOutput("producer:depleted-owner"),
 					rules: [],
 				},
 			],

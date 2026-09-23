@@ -44,8 +44,7 @@ const readProjectFormValidationLocationFn = (
 	textFn: (key: string) => string,
 ) => {
 	const [head, second, third] = path;
-	if (head === "avatars" && typeof second === "number")
-		return textFn("Avatar {index}").replace("{index}", String(second + 1));
+	if (head === "avatars" && typeof second === "string") return second;
 	if (head === "start" && second === "spaces" && typeof third === "number") {
 		const entry = values.start.spaces[third];
 		return entry === undefined ? textFn("Board") : `${textFn("Space")} · ${entry.space}`;
@@ -71,13 +70,13 @@ const createProjectConfigFn = (
 	value: ProjectFormSchema.Type,
 ): GameConfigSchema.Type => {
 	const avatarResources = Object.fromEntries(
-		ProjectAvatarKeys.flatMap((key, index) => {
-			const resourceUid = value.avatars[index];
-			return resourceUid === undefined
+		ProjectAvatarKeys.flatMap((slot) => {
+			const resourceUid = value.avatars[slot];
+			return resourceUid === ""
 				? []
 				: [
 						[
-							key,
+							slot,
 							resourceUid,
 						],
 					];
@@ -92,8 +91,8 @@ const createProjectConfigFn = (
 			board: value.board,
 		},
 		resources: {
-			hero: value.hero,
 			...avatarResources,
+			hero: value.hero,
 		},
 		start: value.start,
 		templates: value.templates,
@@ -104,14 +103,12 @@ const readProjectFormValuesFn = (project: Pick<Project, "config">): ProjectFormS
 	title: project.config.meta.title,
 	introduction: project.config.meta.introduction ?? "",
 	hero: project.config.resources.hero,
-	avatars: ProjectAvatarKeys.flatMap((key) => {
-		const resourceUid = project.config.resources[key];
-		return resourceUid === undefined
-			? []
-			: [
-					resourceUid,
-				];
-	}),
+	avatars: Object.fromEntries(
+		ProjectAvatarKeys.map((slot) => [
+			slot,
+			project.config.resources[slot] ?? "",
+		]),
+	) as ProjectFormSchema.Type["avatars"],
 	board: {
 		...project.config.meta.board,
 	},

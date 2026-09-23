@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/useGameFx";
-import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
+import { bufferInputMaterialForTestFx } from "~test/support/bufferInputMaterialForTestFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { setLineSelectionFx } from "~/production-line/fx/setLineSelectionFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
@@ -171,21 +171,21 @@ const prepareNestedConsumeFx = Effect.fn("prepareNestedConsumeFx")(function* () 
 		ownerItemId: inner.id,
 		lineId: "line:inner:load",
 	});
-	yield* storeInputMaterialFx({
+	yield* bufferInputMaterialForTestFx({
 		ownerItemId: middle.id,
 		lineId: "line:middle:load",
 		inputIndex: 0,
 		sourceItemId: payload.id,
 		sourceItemRevision: payload.revision,
 	});
-	yield* storeInputMaterialFx({
+	yield* bufferInputMaterialForTestFx({
 		ownerItemId: inner.id,
 		lineId: "line:inner:load",
 		inputIndex: 0,
 		sourceItemId: middle.id,
 		sourceItemRevision: middle.revision,
 	});
-	yield* storeInputMaterialFx({
+	yield* bufferInputMaterialForTestFx({
 		ownerItemId: converter.id,
 		lineId: "line:converter:run",
 		inputIndex: 0,

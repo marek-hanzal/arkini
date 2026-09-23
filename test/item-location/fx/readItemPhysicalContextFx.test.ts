@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { readItemPhysicalContextFx } from "~/item-location/fx/readItemPhysicalContextFx";
-import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
+import { bufferInputMaterialForTestFx } from "~test/support/bufferInputMaterialForTestFx";
 import { createLine } from "~test/game-config-validation/support/gameValidationTestSource";
 import { createTemporaryMaterialLifecycleTestConfig } from "~test/item-schedule/fx/temporaryMaterialLifecycle.test/createTemporaryMaterialLifecycleTestConfig";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
@@ -88,7 +88,7 @@ describe("readItemPhysicalContextFx", () => {
 
 					location: boardFn(2),
 				});
-				yield* storeInputMaterialFx({
+				yield* bufferInputMaterialForTestFx({
 					ownerItemId: material.id,
 					lineId: "buffer",
 					inputIndex: 0,
@@ -100,7 +100,7 @@ describe("readItemPhysicalContextFx", () => {
 				);
 				if (storedMaterial === undefined)
 					return yield* Effect.die(new Error("Missing material."));
-				yield* storeInputMaterialFx({
+				yield* bufferInputMaterialForTestFx({
 					ownerItemId: "owner",
 					lineId: "line:owner",
 					inputIndex: 0,

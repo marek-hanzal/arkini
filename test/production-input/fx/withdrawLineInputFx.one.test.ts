@@ -13,7 +13,7 @@ import {
 	ownerItemId,
 	prepareQueuedBufferedLineFx,
 	queuedInputTestConfig,
-} from "~test/production-input/fx/withdrawLineInputsFx.queue.test/prepareQueuedBufferedLineFx";
+} from "~test/production-input/fx/withdrawLineInputFx.queue.test/prepareQueuedBufferedLineFx";
 
 it("returns exactly one piece per click, retaining other identities and the queue", () => {
 	Effect.runSync(

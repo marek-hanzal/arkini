@@ -10,7 +10,6 @@ import { useGameFx } from "~test/support/useGameFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { advanceRuntimeElapsedFx } from "~/game-tick/fx/advanceRuntimeElapsedFx";
-import { readItemDetailMaterialAutofillAvailabilityFx } from "~/item-line-detail/fx/readItemDetailMaterialAutofillAvailabilityFx";
 import { clearItemJobQueueFx } from "~/production-job/fx/clearItemJobQueueFx";
 import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
 
@@ -75,18 +74,6 @@ it("keeps queued material identities intact, uses idle alternatives, and retries
 			});
 			const blocked = yield* readRuntimeFx();
 			expect(blocked).toEqual(before);
-			const availability = yield* readItemDetailMaterialAutofillAvailabilityFx({
-				ownerItemId: "receiver",
-				runtime: blocked,
-				query: {
-					distance: "far" as const,
-					selector: {
-						type: "item",
-						itemUid: "workshop",
-					},
-				},
-			});
-			expect(availability.availableQuantity).toBe(0);
 
 			yield* spawnItemFx({
 				id: "idle",

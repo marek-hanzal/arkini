@@ -3,10 +3,7 @@ import { Plus, PanelsTopLeft, SearchX, ArrowRight } from "lucide-react";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
-import {
-	EditorSectionBar,
-	EditorSectionShortcutNavigation,
-} from "~/authoring-shell/ui/EditorSectionBar";
+import { EditorSectionBar } from "~/authoring-shell/ui/EditorSectionBar";
 import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
 import { Mx } from "~/translation/ui/Mx";
 import { ButtonLink, PrimaryButtonLink } from "~/ui/ui/Button";
@@ -62,21 +59,7 @@ export const Templates = () => {
 							content={<Mx label="Templates help" />}
 						/>
 					}
-				>
-					<EditorSectionShortcutNavigation
-						dataUi="TemplateFilter"
-						value="all"
-						onChangeFn={() => undefined}
-						options={[
-							{
-								value: "all",
-								label: translator.textFn("All"),
-								shortcut: "a",
-								icon: PanelsTopLeft,
-							},
-						]}
-					/>
-				</EditorSectionBar>
+				/>
 			}
 		>
 			<div

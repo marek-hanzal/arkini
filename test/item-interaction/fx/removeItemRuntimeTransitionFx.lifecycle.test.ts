@@ -5,7 +5,7 @@ import { removeCheatItemFx } from "~/game-cheat/fx/removeCheatItemFx";
 import { setCheatEnabledFx } from "~/game-cheat/fx/setCheatEnabledFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { useGameFx } from "~test/support/useGameFx";
-import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
+import { bufferInputMaterialForTestFx } from "~test/support/bufferInputMaterialForTestFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
@@ -44,7 +44,7 @@ const prepareIdleOwnerInputsFx = Effect.fn("prepareIdleOwnerInputsFx")(function*
 				},
 			},
 		});
-		yield* storeInputMaterialFx({
+		yield* bufferInputMaterialForTestFx({
 			ownerItemId: owner.id,
 			lineId: startProps.lineId,
 			inputIndex: 0,
@@ -65,7 +65,7 @@ const prepareIdleOwnerInputsFx = Effect.fn("prepareIdleOwnerInputsFx")(function*
 			},
 		},
 	});
-	yield* storeInputMaterialFx({
+	yield* bufferInputMaterialForTestFx({
 		ownerItemId: owner.id,
 		lineId: startProps.lineId,
 		inputIndex: 1,

@@ -105,7 +105,9 @@ export const expireItemRuntimeFx = Effect.fn("expireItemRuntimeFx")(function* ({
 						}),
 					),
 				],
-				replacementPlaced: placementEvents.length > 0,
+				replacementPlaced: placement.item.some(
+					({ placement: { spawn } }) => spawn.length > 0,
+				),
 			};
 		}).pipe(
 			Effect.provideService(RuntimeFx, {

@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/useGameFx";
 import type { GameLayerFx } from "~test/support/GameLayerFx";
-import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
+import { bufferInputMaterialForTestFx } from "~test/support/bufferInputMaterialForTestFx";
 import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
@@ -365,7 +365,7 @@ describe("job completion unit lifecycle", () => {
 						},
 					},
 				});
-				yield* storeInputMaterialFx({
+				yield* bufferInputMaterialForTestFx({
 					ownerItemId: owner.id,
 					lineId: "line:trader:trade",
 					inputIndex: 0,

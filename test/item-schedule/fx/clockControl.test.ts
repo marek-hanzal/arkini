@@ -4,7 +4,6 @@ import { fillDefaultLineQueueFx } from "~/production-job/fx/fillDefaultLineQueue
 import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
 import { enqueueDefaultLineFx } from "~/production-job/fx/enqueueDefaultLineFx";
 import { setLineSelectionFx } from "~/production-line/fx/setLineSelectionFx";
-import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import {
 	createLine,
@@ -25,32 +24,11 @@ it("rejects player production commands atomically for simple UI owners while aut
 				}),
 				runtimeMs: 400,
 			},
-			createLine({
-				id: "material",
-				input: [
-					{
-						type: "materials",
-						query: {
-							distance: "far",
-							selector: {
-								type: "item",
-								itemUid: "permit",
-							},
-						},
-						quantity: {
-							min: 1,
-							max: 1,
-						},
-						mode: "consume",
-					},
-				],
-			}),
 		],
 	});
 	const result = Effect.runSync(
 		Effect.gen(function* () {
 			const owner = yield* spawnClockItemFx();
-			const material = yield* spawnClockItemFx("permit", 5);
 			const before = yield* readRuntimeFx();
 			const enqueue = yield* Effect.result(
 				enqueueLineFx({
@@ -62,16 +40,7 @@ it("rejects player production commands atomically for simple UI owners while aut
 				setLineSelectionFx({
 					selection: "default",
 					ownerItemId: owner.id,
-					lineId: "material",
-				}),
-			);
-			const store = yield* Effect.result(
-				storeInputMaterialFx({
-					ownerItemId: owner.id,
-					lineId: "material",
-					inputIndex: 0,
-					sourceItemId: material.id,
-					sourceItemRevision: material.revision,
+					lineId: "a",
 				}),
 			);
 			const after = yield* readRuntimeFx();
@@ -81,7 +50,6 @@ it("rejects player production commands atomically for simple UI owners while aut
 				after,
 				enqueue,
 				setDefault,
-				store,
 				automatic,
 			};
 		}).pipe(
@@ -104,12 +72,6 @@ it("rejects player production commands atomically for simple UI owners while aut
 			_tag: "ItemProductionControlUnavailableError",
 			reason: "simple",
 			ownerItemId: "runtime:clock",
-		},
-	});
-	expect(result.store).toMatchObject({
-		_tag: "Failure",
-		failure: {
-			_tag: "LineInputClosedError",
 		},
 	});
 	expect(result.after).toEqual(result.before);

@@ -155,6 +155,9 @@
 				},
 				"avatar-07": {
 					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
+				},
+				"avatar-08": {
+					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
 				}
 			},
 			"required": [

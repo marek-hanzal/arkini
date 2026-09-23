@@ -1,5 +1,8 @@
 import type { Project } from "~/project-authoring/type/Project";
-import { ProjectFormBaseSchema } from "~/project-authoring/schema/ProjectFormSchema";
+import {
+	ProjectAvatarKeys,
+	ProjectFormBaseSchema,
+} from "~/project-authoring/schema/ProjectFormSchema";
 
 /** Adds project-local resource and authored-start invariants to canonical field schemas. */
 export const createProjectFormSchema = (project: Pick<Project, "config" | "resources">) => {
@@ -21,29 +24,31 @@ export const createProjectFormSchema = (project: Pick<Project, "config" | "resou
 			});
 		}
 		const seenAvatars = new Set<string>();
-		value.avatars.forEach((avatar, index) => {
-			if (resourceTypes.get(avatar) !== "image") {
+		for (const slot of ProjectAvatarKeys) {
+			const resourceUid = value.avatars[slot];
+			if (resourceUid === "") continue;
+			if (resourceTypes.get(resourceUid) !== "image") {
 				context.addIssue({
 					code: "custom",
-					message: `Avatar image ${avatar} does not exist in this project.`,
+					message: `Avatar image ${resourceUid} does not exist in this project.`,
 					path: [
 						"avatars",
-						index,
+						slot,
 					],
 				});
 			}
-			if (seenAvatars.has(avatar)) {
+			if (seenAvatars.has(resourceUid)) {
 				context.addIssue({
 					code: "custom",
-					message: `Avatar image ${avatar} is already selected.`,
+					message: `Avatar image ${resourceUid} is already selected.`,
 					path: [
 						"avatars",
-						index,
+						slot,
 					],
 				});
 			}
-			seenAvatars.add(avatar);
-		});
+			seenAvatars.add(resourceUid);
+		}
 
 		const templateUids = new Set(value.templates.map((template) => template.uid));
 		value.start.spaces.forEach((entry, index) => {

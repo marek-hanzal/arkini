@@ -502,9 +502,6 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 						return;
 					}
 					event.stopPropagation();
-					if (gestureMode === "drag") {
-						RendererRuntime.runSync(animator.cancelFx(actor.item.id));
-					}
 					try {
 						application.app.canvas.setPointerCapture(event.pointerId);
 					} catch {

@@ -160,6 +160,7 @@ import type { Project } from "~/project-authoring/type/Project";
 import { Route as EditorProjectFormRouteDefinition } from "~/@routes/editor/$projectId/project/form";
 import { ProjectBoardSection } from "~/project-authoring/ui/ProjectBoardSection";
 import { ProjectGeneralSection } from "~/project-authoring/ui/ProjectGeneralSection";
+import { ProjectImagesSection } from "~/project-authoring/ui/ProjectImagesSection";
 import { useProjectFormSession } from "~/project-authoring/ui/ProjectFormContext";
 import {
 	editorTestResources,
@@ -378,7 +379,7 @@ describe("project section form session", () => {
 		);
 	});
 
-	it("submits one complete config without losing unrelated facts or exact start stacks", async () => {
+	it("submits one complete config without renumbering sparse avatar roles or start stacks", async () => {
 		const project = {
 			...boardSpaceProject,
 			resources: [
@@ -441,7 +442,7 @@ describe("project section form session", () => {
 		expect(config.items).toEqual(project.config.items);
 		expect(config.resources).toEqual({
 			hero: "hero",
-			"avatar-01": "avatar-three",
+			"avatar-03": "avatar-three",
 		});
 		expect(config.start).toEqual(project.config.start);
 		expect(state.navigate).toHaveBeenCalledWith({
@@ -451,6 +452,116 @@ describe("project section form session", () => {
 				sectionId: "general",
 			},
 			replace: true,
+		});
+	});
+
+	it("edits one of eight named avatars through Spotlight without shifting other roles", async () => {
+		const project = {
+			...boardSpaceProject,
+			resources: [
+				...boardSpaceProject.resources,
+				{
+					uid: "avatar-three",
+					title: "Avatar three",
+					type: "image",
+					size: 1,
+					version: "1",
+				},
+				{
+					uid: "avatar-four",
+					title: "Avatar four",
+					type: "image",
+					size: 1,
+					version: "1",
+				},
+			],
+			config: {
+				...boardSpaceProject.config,
+				resources: {
+					hero: "hero",
+					"avatar-03": "avatar-three",
+				},
+			},
+		} satisfies Project;
+		state.project = project;
+		state.sectionId = "images";
+		let session: ReturnType<typeof useProjectFormSession> | undefined;
+		const Probe = () => {
+			session = useProjectFormSession();
+			return null;
+		};
+		state.section = (
+			<>
+				<ProjectImagesSection />
+				<Probe />
+			</>
+		);
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => {
+			root.render(
+				<TranslationTestProvider>
+					{createElement(EditorProjectForm)}
+				</TranslationTestProvider>,
+			);
+		});
+		expect(container.querySelectorAll('[data-ui="EditorProjectAvatarSlot"]')).toHaveLength(8);
+		expect(session?.form.state.values.avatars["avatar-03"]).toBe("avatar-three");
+		expect(session?.form.state.values.avatars["avatar-01"]).toBe("");
+		expect(session?.form.state.values.avatars["avatar-08"]).toBe("");
+		const selectSlotFn = async (slot: string) => {
+			const button = container.querySelector<HTMLButtonElement>(
+				`[data-ui="EditorProjectAvatarSelect"][data-avatar-slot="${slot}"]`,
+			);
+			if (button === null) throw new Error(`Missing ${slot} box.`);
+			await act(async () => button.click());
+		};
+		await selectSlotFn("avatar-03");
+		expect(container.querySelector('[data-ui="EditorProjectAvatarPicker"]')).not.toBeNull();
+		const newImage = container.querySelector<HTMLButtonElement>(
+			'[data-ui="ItemSpotlightOption"][data-item-uid="avatar-four"]',
+		);
+		if (newImage === null) throw new Error("Missing Image picker option.");
+		await act(async () => newImage.click());
+		expect(container.querySelector('[data-ui="EditorProjectAvatarPicker"]')).toBeNull();
+		expect(session?.form.state.values.avatars["avatar-03"]).toBe("avatar-four");
+
+		await selectSlotFn("avatar-01");
+		const backdrop = container.querySelector('[data-ui="EditorProjectAvatarPickerBackdrop"]');
+		if (backdrop === null) throw new Error("Missing Image picker backdrop.");
+		await act(async () =>
+			backdrop.dispatchEvent(
+				new Event("pointerdown", {
+					bubbles: true,
+				}),
+			),
+		);
+		expect(container.querySelector('[data-ui="EditorProjectAvatarPicker"]')).toBeNull();
+		expect(session?.form.state.values.avatars["avatar-01"]).toBe("");
+
+		await selectSlotFn("avatar-01");
+		const heroOption = container.querySelector<HTMLButtonElement>(
+			'[data-ui="ItemSpotlightOption"][data-item-uid="hero"]',
+		);
+		if (heroOption === null) throw new Error("Missing Hero Image option.");
+		await act(async () => heroOption.click());
+		expect(session?.form.state.values.avatars["avatar-01"]).toBe("hero");
+		const clear = container.querySelector<HTMLButtonElement>(
+			'[data-ui="EditorProjectAvatarClear"][data-avatar-slot="avatar-01"]',
+		);
+		if (clear === null) throw new Error("Missing Clear avatar action.");
+		await act(async () => clear.click());
+		expect(session?.form.state.values.avatars["avatar-01"]).toBe("");
+		expect(session?.form.state.values.avatars["avatar-03"]).toBe("avatar-four");
+		await act(async () => {
+			await session?.saveFn();
+		});
+		expect(state.saveConfig).toHaveBeenCalledOnce();
+		expect(state.saveConfig.mock.calls[0]?.[0].config.resources).toEqual({
+			hero: "hero",
+			"avatar-03": "avatar-four",
 		});
 	});
 

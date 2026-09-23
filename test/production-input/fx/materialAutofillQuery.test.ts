@@ -14,9 +14,8 @@ import type { QuerySchema } from "~/item-query/schema/QuerySchema";
 import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { planLineInputAutofillFx } from "~/production-input/fx/planLineInputAutofillFx";
 import { autofillLineInputFx } from "~/production-input/fx/autofillLineInputFx";
-import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
+import { bufferInputMaterialForTestFx } from "~test/support/bufferInputMaterialForTestFx";
 import { readItemLineInputsFx } from "~/item-detail-read/fx/readItemLineInputsFx";
-import { readItemDetailMaterialAutofillAvailabilityFx } from "~/item-line-detail/fx/readItemDetailMaterialAutofillAvailabilityFx";
 
 const target = {
 	ownerItemId: "owner",
@@ -184,12 +183,6 @@ it.each([
 				runtime,
 			});
 			expect(plan.entry.map((entry) => entry.sourceItemId)).toEqual(expected);
-			const availability = yield* readItemDetailMaterialAutofillAvailabilityFx({
-				ownerItemId: "owner",
-				runtime,
-				query,
-			});
-			expect(availability.availableQuantity).toBe(expected.length);
 			const detail = yield* readItemLineInputsFx({
 				ownerItemId: "owner",
 				runtime,
@@ -285,25 +278,8 @@ it("excludes an in-flight identity from availability and accepts manual material
 			expect(runtime.items.find((item) => item.id === "close")?.location.scope).toBe(
 				"delivery",
 			);
-			expect(
-				(yield* readItemDetailMaterialAutofillAvailabilityFx({
-					ownerItemId: "owner",
-					runtime,
-					query,
-				})).availableQuantity,
-			).toBe(0);
-			expect(
-				(yield* readItemDetailMaterialAutofillAvailabilityFx({
-					ownerItemId: "owner",
-					runtime,
-					query: {
-						distance: "far" as const,
-						selector,
-					},
-				})).availableQuantity,
-			).toBe(2);
 			const source = runtime.items.find((item) => item.id === "far")!;
-			yield* storeInputMaterialFx({
+			yield* bufferInputMaterialForTestFx({
 				...target,
 				inputIndex: 1,
 				sourceItemId: source.id,

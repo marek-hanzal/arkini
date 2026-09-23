@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
-import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
+import { bufferInputMaterialForTestFx } from "~test/support/bufferInputMaterialForTestFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { createTemporaryMaterialLifecycleTestConfig } from "../temporaryMaterialLifecycle.test/createTemporaryMaterialLifecycleTestConfig";
@@ -27,7 +27,7 @@ export const prepareMaterialOwnerFx = Effect.fn("prepareMaterialOwnerFx")(functi
 
 		location: boardFn(1),
 	});
-	yield* storeInputMaterialFx({
+	yield* bufferInputMaterialForTestFx({
 		ownerItemId: "owner",
 		lineId: "line:owner",
 		inputIndex: 0,

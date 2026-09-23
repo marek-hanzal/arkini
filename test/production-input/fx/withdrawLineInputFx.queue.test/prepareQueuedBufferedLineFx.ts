@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
+import { bufferInputMaterialForTestFx } from "~test/support/bufferInputMaterialForTestFx";
 import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
 import { getItemFx } from "~test/support/getItemFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
@@ -49,7 +49,7 @@ export const prepareQueuedBufferedLineFx = Effect.fn("prepareQueuedBufferedLineF
 		const water = yield* getItemFx({
 			itemId: `runtime:queued-water:${index}`,
 		});
-		yield* storeInputMaterialFx({
+		yield* bufferInputMaterialForTestFx({
 			ownerItemId,
 			lineId,
 			inputIndex: 0,

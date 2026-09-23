@@ -17,7 +17,6 @@ export const ItemLineInputs = ({
 	ownerItemId,
 	line,
 	idle,
-	work,
 	disabled,
 }: Omit<readItemLineInputsFx.Props, "runtime"> & {
 	readonly idle: boolean;
@@ -37,7 +36,6 @@ export const ItemLineInputs = ({
 					ownerItemId,
 					line,
 					runtime,
-					work,
 				}),
 			);
 			if (Exit.isFailure(result)) throw result.cause;
@@ -53,8 +51,6 @@ export const ItemLineInputs = ({
 			game,
 			ownerItemId,
 			line,
-			work?.kind,
-			work?.id,
 		],
 	);
 	const inputs = useRuntimeSelector(game, selectorFn, Equal.equals);

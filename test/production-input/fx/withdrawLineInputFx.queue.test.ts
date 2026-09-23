@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/useGameFx";
 import { withdrawLineInputFx } from "~/production-input/fx/withdrawLineInputFx";
-import { withdrawLineInputsFx } from "~/production-input/fx/withdrawLineInputsFx";
 import { readItemDetailQueueFx } from "~/item-detail-read/fx/readItemDetailQueueFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -12,7 +11,7 @@ import {
 	ownerItemId,
 	prepareQueuedBufferedLineFx,
 	queuedInputTestConfig,
-} from "~test/production-input/fx/withdrawLineInputsFx.queue.test/prepareQueuedBufferedLineFx";
+} from "~test/production-input/fx/withdrawLineInputFx.queue.test/prepareQueuedBufferedLineFx";
 
 const assertPreservedBlockedQueue = ({
 	after,
@@ -48,35 +47,6 @@ const assertPreservedBlockedQueue = ({
 };
 
 describe("line input withdrawal queue contract", () => {
-	it("preserves queued IDs and global FIFO order when withdrawing all line inputs", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				const requests = yield* prepareQueuedBufferedLineFx();
-				const before = yield* readRuntimeFx();
-				yield* withdrawLineInputsFx({
-					lineId,
-					ownerItemId,
-				});
-				const after = yield* readRuntimeFx();
-				return {
-					after,
-					before,
-					...requests,
-					queue: yield* readItemDetailQueueFx({
-						itemId: ownerItemId,
-						runtime: after,
-					}),
-				};
-			}).pipe(
-				useGameFx({
-					config: queuedInputTestConfig,
-				}),
-			),
-		);
-
-		assertPreservedBlockedQueue(result);
-	});
-
 	it("preserves queued IDs and global FIFO order when withdrawing one input", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {

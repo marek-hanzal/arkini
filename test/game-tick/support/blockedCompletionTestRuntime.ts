@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
+import { bufferInputMaterialForTestFx } from "~test/support/bufferInputMaterialForTestFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
@@ -131,7 +131,7 @@ export const prepareBlockedCompletionRuntimeFx = Effect.fn("prepareBlockedComple
 					},
 				},
 			});
-			yield* storeInputMaterialFx({
+			yield* bufferInputMaterialForTestFx({
 				ownerItemId: blockedOwner.id,
 				lineId: "line:blocked-forge:run",
 				inputIndex: 0,
@@ -152,7 +152,7 @@ export const prepareBlockedCompletionRuntimeFx = Effect.fn("prepareBlockedComple
 			},
 		});
 
-		yield* storeInputMaterialFx({
+		yield* bufferInputMaterialForTestFx({
 			ownerItemId: blockedOwner.id,
 			lineId: "line:blocked-forge:run",
 			inputIndex: 1,

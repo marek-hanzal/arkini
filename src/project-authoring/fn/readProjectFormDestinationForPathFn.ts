@@ -1,4 +1,5 @@
 import { readProjectSectionForPathFn } from "~/project-authoring/fn/readProjectSectionForPathFn";
+import { ProjectAvatarKeys } from "~/project-authoring/schema/ProjectFormSchema";
 import type { ProjectSectionId } from "~/project-authoring/type/ProjectSections";
 
 export interface ProjectFormDestination {
@@ -6,19 +7,19 @@ export interface ProjectFormDestination {
 	readonly sectionId: ProjectSectionId;
 }
 
-/** Preserves the collection item that owns one routed Project form validation failure. */
+/** Routes one named avatar validation failure to its fixed Images box. */
 export const readProjectFormDestinationForPathFn = (
 	path: ReadonlyArray<PropertyKey>,
 ): ProjectFormDestination => {
 	const sectionId = readProjectSectionForPathFn(path);
 	const [head, second] = path;
-	return sectionId === "images" &&
-		head === "avatars" &&
-		typeof second === "number" &&
-		Number.isInteger(second) &&
-		second >= 0
+	const avatar =
+		head === "avatars" && typeof second === "string"
+			? ProjectAvatarKeys.findIndex((slot) => slot === second)
+			: -1;
+	return sectionId === "images" && avatar >= 0
 		? {
-				avatar: second,
+				avatar,
 				sectionId,
 			}
 		: {

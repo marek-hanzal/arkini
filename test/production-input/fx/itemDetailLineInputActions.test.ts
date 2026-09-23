@@ -3,10 +3,8 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/useGameFx";
 import { autofillLineInputsFx } from "~test/support/autofillLineInputsFx";
-import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
+import { bufferInputMaterialForTestFx } from "~test/support/bufferInputMaterialForTestFx";
 import { withdrawLineInputFx } from "~/production-input/fx/withdrawLineInputFx";
-import { withdrawLineInputsFx } from "~/production-input/fx/withdrawLineInputsFx";
-import { readItemDetailLinesFx } from "~/item-line-detail/fx/readItemDetailLinesFx";
 import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
 import { getItemFx } from "~test/support/getItemFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
@@ -313,13 +311,8 @@ describe("Item Detail line input actions", () => {
 					lineId,
 				});
 				const runtime = yield* readRuntimeFx();
-				const lines = yield* readItemDetailLinesFx({
-					itemId: ownerItemId,
-					runtime,
-				});
 				return {
 					autofilled,
-					lines,
 					runtime,
 				};
 			}).pipe(
@@ -343,95 +336,6 @@ describe("Item Detail line input actions", () => {
 				}),
 			}),
 		);
-		expect(result.lines).toMatchObject({
-			kind: "available",
-			line: [
-				{
-					actions: {
-						canWithdraw: false,
-					},
-				},
-			],
-		});
-	});
-
-	it("withdraws stored input through canonical placement", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				yield* spawnOwnerFx();
-				yield* spawnWaterFx({
-					id: "runtime:required-water",
-					location: sourceLocation(1),
-				});
-				const requiredWater = yield* getItemFx({
-					itemId: "runtime:required-water",
-				});
-				yield* storeInputMaterialFx({
-					ownerItemId,
-					lineId,
-					inputIndex: 0,
-					sourceItemId: requiredWater.id,
-					sourceItemRevision: requiredWater.revision,
-				});
-				const withdrawn = yield* withdrawLineInputsFx({
-					ownerItemId,
-					lineId,
-				});
-				const runtime = yield* readRuntimeFx();
-				const lines = yield* readItemDetailLinesFx({
-					itemId: ownerItemId,
-					runtime,
-				});
-				return {
-					lines,
-					runtime,
-					withdrawn,
-				};
-			}).pipe(
-				useGameFx({
-					config: inputRuntimeTestConfig,
-				}),
-			),
-		);
-
-		expect(result.withdrawn).toEqual({
-			withdrawnItemCount: 1,
-		});
-		expect(result.runtime.items).not.toContainEqual(
-			expect.objectContaining({
-				location: expect.objectContaining({
-					scope: "input",
-					ownerItemId,
-					lineId,
-				}),
-			}),
-		);
-		expect(result.runtime.items).toContainEqual(
-			expect.objectContaining({
-				item: expect.objectContaining({
-					uid: "water",
-				}),
-
-				location: expect.objectContaining({
-					scope: "board",
-					space: 0,
-				}),
-			}),
-		);
-		expect(result.lines).toMatchObject({
-			kind: "available",
-			line: [
-				{
-					actions: {
-						canWithdraw: false,
-					},
-					availability: {
-						kind: "available",
-						readiness: "inputs",
-					},
-				},
-			],
-		});
 	});
 
 	it("withdraws one exact input completely while preserving its buffered sibling", () => {
@@ -456,7 +360,7 @@ describe("Item Detail line input actions", () => {
 							itemUid,
 							location: sourceLocation(1),
 						});
-						yield* storeInputMaterialFx({
+						yield* bufferInputMaterialForTestFx({
 							ownerItemId,
 							lineId,
 							inputIndex,
@@ -466,20 +370,12 @@ describe("Item Detail line input actions", () => {
 					}
 				}
 
-				const before = yield* readItemDetailLinesFx({
-					itemId: ownerItemId,
-					runtime: yield* readRuntimeFx(),
-				});
 				const withdrawn = yield* withdrawLineInputFx({
 					ownerItemId,
 					lineId,
 					inputIndex: 0,
 				});
 				const runtime = yield* readRuntimeFx();
-				const after = yield* readItemDetailLinesFx({
-					itemId: ownerItemId,
-					runtime,
-				});
 				const stale = yield* Effect.exit(
 					withdrawLineInputFx({
 						ownerItemId,
@@ -492,15 +388,8 @@ describe("Item Detail line input actions", () => {
 					lineId,
 					inputIndex: 1,
 				});
-				const afterBoth = yield* readItemDetailLinesFx({
-					itemId: ownerItemId,
-					runtime: yield* readRuntimeFx(),
-				});
 
 				return {
-					after,
-					afterBoth,
-					before,
 					runtime,
 					stale,
 					withdrawn,
@@ -513,25 +402,6 @@ describe("Item Detail line input actions", () => {
 			),
 		);
 
-		expect(result.before).toMatchObject({
-			kind: "available",
-			line: [
-				{
-					input: [
-						{
-							inputIndex: 0,
-							storedQuantity: 3,
-							canWithdraw: true,
-						},
-						{
-							inputIndex: 1,
-							storedQuantity: 2,
-							canWithdraw: true,
-						},
-					],
-				},
-			],
-		});
 		expect(result.withdrawn).toEqual({
 			withdrawnItemCount: 3,
 		});
@@ -547,46 +417,8 @@ describe("Item Detail line input actions", () => {
 				},
 			}),
 		);
-		expect(result.after).toMatchObject({
-			kind: "available",
-			line: [
-				{
-					input: [
-						{
-							inputIndex: 0,
-							storedQuantity: 0,
-							canWithdraw: false,
-						},
-						{
-							inputIndex: 1,
-							storedQuantity: 2,
-							canWithdraw: true,
-						},
-					],
-				},
-			],
-		});
 		expect(result.withdrawnSibling).toEqual({
 			withdrawnItemCount: 2,
-		});
-		expect(result.afterBoth).toMatchObject({
-			kind: "available",
-			line: [
-				{
-					input: [
-						{
-							inputIndex: 0,
-							storedQuantity: 0,
-							canWithdraw: false,
-						},
-						{
-							inputIndex: 1,
-							storedQuantity: 0,
-							canWithdraw: false,
-						},
-					],
-				},
-			],
 		});
 		expect(Exit.isFailure(result.stale)).toBe(true);
 		if (Exit.isFailure(result.stale)) {
@@ -616,7 +448,7 @@ it("leaves the exact input and its queue unchanged when canonical placement fail
 			const water = yield* getItemFx({
 				itemId: "runtime:water",
 			});
-			yield* storeInputMaterialFx({
+			yield* bufferInputMaterialForTestFx({
 				ownerItemId,
 				lineId,
 				inputIndex: 0,

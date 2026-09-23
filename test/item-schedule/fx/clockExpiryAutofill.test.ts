@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
-import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
+import { bufferInputMaterialForTestFx } from "~test/support/bufferInputMaterialForTestFx";
 import { createLine } from "~test/game-config-validation/support/gameValidationTestSource";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { useGameFx } from "~test/support/useGameFx";
@@ -10,7 +10,7 @@ const runRangePulseFx = (durationMs: number) =>
 	Effect.gen(function* () {
 		yield* spawnClockItemFx();
 		const material = yield* spawnClockItemFx("permit", 1);
-		yield* storeInputMaterialFx({
+		yield* bufferInputMaterialForTestFx({
 			ownerItemId: "runtime:clock",
 			lineId: "range",
 			inputIndex: 0,

@@ -121,7 +121,9 @@ export const settleJobRuntimeFx = Effect.fn("settleJobRuntimeFx")(function* (
 					}),
 				),
 			);
-			depletionReplacementPlaced = placementEvents.length > 0;
+			depletionReplacementPlaced = placement.item.some(
+				({ placement: { spawn } }) => spawn.length > 0,
+			);
 			draft = withDepletionOutcome;
 		}
 	}

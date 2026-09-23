@@ -34,42 +34,15 @@ export namespace planLineInputAutofillFx {
 	}
 }
 
-const candidateRankFn = ({
-	candidate,
-	owner,
-}: {
-	readonly candidate: BoardRuntimeItemSchema.Type;
-	readonly owner: BoardRuntimeItemSchema.Type;
-}) => {
-	return {
-		scope: candidate.location.space === owner.location.space ? 0 : 1,
-		distance:
-			candidate.location.scope === LocationScopeEnumSchema.enum.Board &&
-			candidate.location.space === owner.location.space
-				? Math.abs(candidate.location.position.x - owner.location.position.x) +
-					Math.abs(candidate.location.position.y - owner.location.position.y)
-				: 0,
-		space: candidate.location.scope === "board" ? candidate.location.space : 0,
-		position: candidate.location.position.y * 10_000 + candidate.location.position.x,
-	};
-};
-
 const compareCandidatesFn = (owner: BoardRuntimeItemSchema.Type) => {
 	return (left: BoardRuntimeItemSchema.Type, right: BoardRuntimeItemSchema.Type) => {
-		const leftRank = candidateRankFn({
-			candidate: left,
-			owner,
-		});
-		const rightRank = candidateRankFn({
-			candidate: right,
-			owner,
-		});
-
 		return (
-			leftRank.scope - rightRank.scope ||
-			leftRank.distance - rightRank.distance ||
-			leftRank.space - rightRank.space ||
-			leftRank.position - rightRank.position ||
+			Math.abs(left.location.position.x - owner.location.position.x) +
+				Math.abs(left.location.position.y - owner.location.position.y) -
+				(Math.abs(right.location.position.x - owner.location.position.x) +
+					Math.abs(right.location.position.y - owner.location.position.y)) ||
+			left.location.position.y - right.location.position.y ||
+			left.location.position.x - right.location.position.x ||
 			left.id.localeCompare(right.id)
 		);
 	};
@@ -78,7 +51,7 @@ const compareCandidatesFn = (owner: BoardRuntimeItemSchema.Type) => {
 /**
  * Plans deterministic automatic material delivery for one exact line.
  *
- * Each input applies its query. Sources prefer the owner's board space by distance, then other board spaces in stable slot order.
+ * Each input applies its query. Sources in the owner's Board space sort by distance and stable slot order.
  * Required minima are allocated across every slot before compatible range inputs receive optional
  * top-ups toward their maximum. The planner does not mutate runtime truth itself.
  */

@@ -110,7 +110,7 @@ export const useBoardGridDrag = ({
 			if (drag === undefined || event.pointerId !== drag.pointerId) return;
 			if (drag.phase === "dragging") {
 				event.preventDefault();
-				const target = readTargetFn(event.target) ?? drag.target;
+				const target = readTargetFn(event.target);
 				if (
 					commit &&
 					target !== undefined &&

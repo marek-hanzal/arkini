@@ -3,7 +3,6 @@ import { Effect, Result, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/useGameFx";
-import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
 import { resolveLineRunFx } from "~/production-line/fx/resolveLineRunFx";
 import { mergeItemsFx } from "~/item-merge/fx/mergeItemsFx";
 import { queryFx } from "~/item-query/fx/queryFx";
@@ -319,15 +318,6 @@ describe("multi-space spatial isolation", () => {
 						targetRevision: target.revision,
 					}),
 				);
-				const stored = yield* Effect.result(
-					storeInputMaterialFx({
-						ownerItemId: owner.id,
-						lineId: "line:workshop:material",
-						inputIndex: 0,
-						sourceItemId: movable.id,
-						sourceItemRevision: movable.revision,
-					}),
-				);
 				const after = yield* readRuntimeFx();
 
 				return {
@@ -335,7 +325,6 @@ describe("multi-space spatial isolation", () => {
 					before,
 					merged,
 					moved,
-					stored,
 					swapped,
 				};
 			}).pipe(useTestGame),
@@ -352,12 +341,6 @@ describe("multi-space spatial isolation", () => {
 		expect(Result.isFailure(result.merged)).toBe(true);
 		if (Result.isFailure(result.merged)) {
 			expect(result.merged.failure).toMatchObject({
-				_tag: "CrossSpaceBoardOperationError",
-			});
-		}
-		expect(Result.isFailure(result.stored)).toBe(true);
-		if (Result.isFailure(result.stored)) {
-			expect(result.stored.failure).toMatchObject({
 				_tag: "CrossSpaceBoardOperationError",
 			});
 		}

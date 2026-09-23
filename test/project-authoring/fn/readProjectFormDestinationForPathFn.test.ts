@@ -3,11 +3,11 @@ import { describe, expect, it } from "vitest";
 import { readProjectFormDestinationForPathFn } from "~/project-authoring/fn/readProjectFormDestinationForPathFn";
 
 describe("readProjectFormDestinationForPathFn", () => {
-	it("preserves the invalid avatar index for the routed Artwork editor", () => {
+	it("routes an invalid named avatar to its fixed Images box", () => {
 		expect(
 			readProjectFormDestinationForPathFn([
 				"avatars",
-				3,
+				"avatar-04",
 			]),
 		).toEqual({
 			avatar: 3,

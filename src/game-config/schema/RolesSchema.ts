@@ -18,6 +18,7 @@ export const RolesSchema = z
 		"avatar-05": IdSchema.optional(),
 		"avatar-06": IdSchema.optional(),
 		"avatar-07": IdSchema.optional(),
+		"avatar-08": IdSchema.optional(),
 	})
 	.strict()
 	.meta({

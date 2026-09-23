@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { advanceRuntimeStepFx } from "~/game-tick/fx/advanceRuntimeStepFx";
 import { modifyRuntimeWithTransitionFx } from "~/game-runtime/fx/modifyRuntimeWithTransitionFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
-import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
+import { bufferInputMaterialForTestFx } from "~test/support/bufferInputMaterialForTestFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { useGameFx } from "~test/support/useGameFx";
@@ -92,7 +92,7 @@ describe("kill-switch material expiry", () => {
 						reserve,
 					],
 				] as const) {
-					yield* storeInputMaterialFx({
+					yield* bufferInputMaterialForTestFx({
 						ownerItemId: "owner",
 						lineId: "line:owner",
 						inputIndex,

@@ -1,6 +1,6 @@
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
-import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
+import { bufferInputMaterialForTestFx } from "~test/support/bufferInputMaterialForTestFx";
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
@@ -149,7 +149,7 @@ describe("committed material expiry settlement", () => {
 
 					location: boardFn(1),
 				});
-				yield* storeInputMaterialFx({
+				yield* bufferInputMaterialForTestFx({
 					ownerItemId: "owner",
 					lineId: "line:owner",
 					inputIndex: 1,

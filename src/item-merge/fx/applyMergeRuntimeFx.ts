@@ -379,7 +379,10 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 		placement,
 	});
 	events.push(...placementEvents);
-	if (targetDisappeared && placementEvents.length === 0) {
+	if (
+		targetDisappeared &&
+		placement.item.every(({ placement: { spawn } }) => spawn.length === 0)
+	) {
 		events.push({
 			type: GameEventEnumSchema.enum.ItemDisappeared,
 			itemId: target.id,

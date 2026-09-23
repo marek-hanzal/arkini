@@ -59,12 +59,6 @@ export const EditorArtworkUsageRow = ({
 
 	const role = usage.path[1];
 	const roleIndex = ProjectAvatarKeys.findIndex((key) => key === role);
-	const avatarIndex =
-		roleIndex < 0
-			? undefined
-			: ProjectAvatarKeys.slice(0, roleIndex + 1).filter(
-					(key) => project.config.resources[key] !== undefined,
-				).length - 1;
 	return (
 		<ButtonLink
 			to="/editor/$projectId/project/form/$sectionId"
@@ -73,10 +67,10 @@ export const EditorArtworkUsageRow = ({
 				sectionId: "images",
 			}}
 			search={
-				avatarIndex === undefined
+				roleIndex < 0
 					? {}
 					: {
-							avatar: avatarIndex,
+							avatar: roleIndex,
 						}
 			}
 			className={className}

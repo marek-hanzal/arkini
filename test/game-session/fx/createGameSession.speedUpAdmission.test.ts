@@ -5,7 +5,7 @@ import { createTestGameSession } from "~test/support/createTestGameSession";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 import { setCheatEnabledFx } from "~/game-cheat/fx/setCheatEnabledFx";
 import { setSpeedUpGameplayFx } from "~/game-cheat/fx/setSpeedUpGameplayFx";
-import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
+import { bufferInputMaterialForTestFx } from "~test/support/bufferInputMaterialForTestFx";
 import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
@@ -46,7 +46,7 @@ const prepareOwnerFx = Effect.fn("prepareOwnerFx")(function* ({
 				},
 			},
 		});
-		yield* storeInputMaterialFx({
+		yield* bufferInputMaterialForTestFx({
 			ownerItemId: owner.id,
 			lineId,
 			inputIndex: 0,
@@ -66,7 +66,7 @@ const prepareOwnerFx = Effect.fn("prepareOwnerFx")(function* ({
 			},
 		},
 	});
-	yield* storeInputMaterialFx({
+	yield* bufferInputMaterialForTestFx({
 		ownerItemId: owner.id,
 		lineId,
 		inputIndex: 1,

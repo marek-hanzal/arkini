@@ -212,6 +212,7 @@ describe("validateGameResourcesFn", () => {
 						"avatar-05",
 						"avatar-06",
 						"avatar-07",
+						"avatar-08",
 					].includes(diagnostic.resourceUid),
 			),
 		).toBe(false);

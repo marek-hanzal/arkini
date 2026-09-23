@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { useGameFx } from "~test/support/useGameFx";
-import { storeInputMaterialFx } from "~/production-input/fx/storeInputMaterialFx";
+import { bufferInputMaterialForTestFx } from "~test/support/bufferInputMaterialForTestFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { RuntimeStoreFx } from "~/game-runtime/context/RuntimeStoreFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
@@ -170,7 +170,7 @@ const reserveWorkerFx = Effect.fn("reserveWorkerFx")(function* ({
 	if (worker === undefined) {
 		return yield* Effect.die(new Error("Worker is missing."));
 	}
-	yield* storeInputMaterialFx({
+	yield* bufferInputMaterialForTestFx({
 		ownerItemId: employerId,
 		lineId: "line:employer:run",
 		inputIndex: 0,
@@ -277,7 +277,7 @@ describe("reserved material lifecycle", () => {
 					itemUid: "item:payload",
 					location: board(2),
 				});
-				yield* storeInputMaterialFx({
+				yield* bufferInputMaterialForTestFx({
 					ownerItemId: worker.id,
 					lineId: "line:worker:reserve",
 					inputIndex: 0,
@@ -350,7 +350,7 @@ it("keeps the whole completion blocked when an impure reservation has no exclusi
 				itemUid: "item:payload",
 				location: board(2),
 			});
-			yield* storeInputMaterialFx({
+			yield* bufferInputMaterialForTestFx({
 				ownerItemId: worker.id,
 				lineId: "line:worker:reserve",
 				inputIndex: 0,

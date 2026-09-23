@@ -59,6 +59,10 @@ const projectRoles = [
 		id: "avatar-07",
 		label: "Avatar 7",
 	},
+	{
+		id: "avatar-08",
+		label: "Avatar 8",
+	},
 ] as const;
 
 /** Projects every canonical config-to-resource reference in deterministic presentation order. */

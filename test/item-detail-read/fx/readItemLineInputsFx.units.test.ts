@@ -61,13 +61,12 @@ const payer: RuntimeItemSchema.Type = {
 		},
 	},
 };
-const readFn = (runtime: RuntimeSchema.Type, work?: readItemLineInputsFx.Props["work"]) =>
+const readFn = (runtime: RuntimeSchema.Type) =>
 	Effect.runSync(
 		readItemLineInputsFx({
 			ownerItemId: owner.id,
 			line,
 			runtime,
-			work,
 		}).pipe(Effect.provideService(GameConfigFx, lineRunTestConfig)),
 	);
 
@@ -168,7 +167,7 @@ it("does not promise the same unit twice across a line's input requirements", ()
 	]);
 });
 
-it("keeps a running job's paid requirement satisfied without lending it to the next request", () => {
+it("shows a running job's paid requirement as committed", () => {
 	const runtime: RuntimeSchema.Type = {
 		...base,
 		items: [
@@ -183,43 +182,9 @@ it("keeps a running job's paid requirement satisfied without lending it to the n
 				remainingMs: 500,
 			},
 		],
-		jobQueue: [
-			{
-				id: "next",
-				ownerItemId: owner.id,
-				lineId: line.id,
-			},
-		],
 	};
-	expect(
-		readFn(runtime, {
-			kind: "active",
-			id: "active",
-		})[0],
-	).toMatchObject({
-		filled: 1,
-		committed: true,
-	});
 	expect(readFn(runtime)[0]).toMatchObject({
 		filled: 1,
 		committed: true,
-	});
-	expect(
-		readFn(runtime, {
-			kind: "queued",
-			id: "next",
-		})[0],
-	).toMatchObject({
-		filled: 0,
-		committed: false,
-		available: false,
-	});
-	expect(
-		readFn(runtime, {
-			kind: "active",
-			id: "stale",
-		})[0],
-	).toMatchObject({
-		committed: false,
 	});
 });

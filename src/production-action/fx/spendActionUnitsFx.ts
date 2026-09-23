@@ -163,7 +163,7 @@ export const spendActionUnitsFx = Effect.fn("spendActionUnitsFx")(function* ({
 				itemUid: item.item.uid,
 				location: item.location,
 			} satisfies GameEventSchema.Type,
-			...(placementEvents.length === 0
+			...(placement.item.every(({ placement: { spawn } }) => spawn.length === 0)
 				? [
 						{
 							type: GameEventEnumSchema.enum.ItemDisappeared,

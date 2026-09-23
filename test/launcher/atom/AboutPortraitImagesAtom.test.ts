@@ -28,6 +28,7 @@ const payload = {
 			"avatar-01": "avatar:two",
 			"avatar-03": "avatar:missing",
 			"avatar-05": "avatar:one",
+			"avatar-08": "avatar:eight",
 		},
 		meta: {
 			id: "game:about-portraits",
@@ -58,6 +59,11 @@ const payload = {
 			uid: "avatar:two",
 			type: "image",
 			url: "serakki://game/resource/avatar-two",
+		},
+		{
+			uid: "avatar:eight",
+			type: "image",
+			url: "serakki://game/resource/avatar-eight",
 		},
 	],
 };
@@ -132,6 +138,7 @@ describe("AboutPortraitImagesAtom", () => {
 				JSON.stringify([
 					"serakki://game/resource/avatar-two",
 					"serakki://game/resource/avatar-one",
+					"serakki://game/resource/avatar-eight",
 				]),
 			),
 		);

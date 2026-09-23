@@ -4,10 +4,11 @@ import { Effect, Random } from "effect";
 import type { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
 import { resolveOutcomeTableFx } from "~/outcome/fx/resolveOutcomeTableFx";
 import { applyOutcomeTableFx } from "~/outcome/fx/applyOutcomeTableFx";
+import type { AppliedOutcome } from "~/outcome/type/AppliedOutcome";
 import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItemIdentityFx";
-import { readOutcomePlacementItemEventsFx } from "~/game-event/fx/readOutcomePlacementItemEventsFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
+import type { EngineFact } from "~/game-event/type/EngineFact";
 import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
@@ -41,17 +42,9 @@ export const expireItemRuntimeFx = Effect.fn("expireItemRuntimeFx")(function* ({
 					item,
 					runtime,
 				});
+	const removalFacts = "facts" in removal ? removal.facts : removal.events;
 	let draft = removal.runtime;
-	let replacementPlaced = false;
-	const events: GameEventSchema.Type[] = [
-		...removal.events,
-		{
-			type: GameEventEnumSchema.enum.ItemExpired,
-			itemId: item.id,
-			itemUid: item.item.uid,
-			location: origin,
-		},
-	];
+	let abortedFacts: readonly EngineFact[] = [];
 	if (
 		removalMode !== "kill-switch" &&
 		(item.location.scope === "job" || item.location.scope === "reserved")
@@ -66,47 +59,39 @@ export const expireItemRuntimeFx = Effect.fn("expireItemRuntimeFx")(function* ({
 			}),
 		);
 		draft = aborted.runtime;
-		events.push(...aborted.events);
+		abortedFacts = aborted.facts;
 	}
+	let outcomeEffects: readonly AppliedOutcome[] = [];
+	let outcomeDiscarded: readonly GameEventSchema.Type[] = [];
 	if (outcome !== undefined) {
 		const placed = yield* Effect.gen(function* () {
 			const resolved = yield* resolveOutcomeTableFx({
-				ownerItemId: item.id,
 				origin,
 				outcome,
 			});
 			if (resolved.roll.length === 0)
 				return {
 					runtime: draft,
-					events: [] as GameEventSchema.Type[],
-					replacementPlaced: false,
+					effects: [] as readonly AppliedOutcome[],
+					discarded: [] as readonly GameEventSchema.Type[],
 				};
 			const [placement, withOutcome] = yield* applyOutcomeTableFx({
 				overflow: removalMode === "kill-switch" ? "discard" : undefined,
 				outcome: resolved,
 				runtime: draft,
 			});
-			const placementEvents = yield* readOutcomePlacementItemEventsFx({
-				originItemId: item.id,
-				placement,
-			});
 			return {
 				runtime: withOutcome,
-				events: [
-					...placementEvents,
-					...(placement.discarded ?? []).map(
-						(loss): GameEventSchema.Type => ({
-							type: GameEventEnumSchema.enum.ItemDiscarded,
-							ownerItemId: item.id,
-							itemUid: loss.itemUid,
-							quantity: loss.quantity,
-							source: "expiry-outcome",
-							reason: loss.reason,
-						}),
-					),
-				],
-				replacementPlaced: placement.item.some(
-					({ placement: { spawn } }) => spawn.length > 0,
+				effects: placement.effects,
+				discarded: (placement.discarded ?? []).map(
+					(loss): GameEventSchema.Type => ({
+						type: GameEventEnumSchema.enum.ItemDiscarded,
+						ownerItemId: item.id,
+						itemUid: loss.itemUid,
+						quantity: loss.quantity,
+						source: "expiry-outcome",
+						reason: loss.reason,
+					}),
 				),
 			};
 		}).pipe(
@@ -116,20 +101,37 @@ export const expireItemRuntimeFx = Effect.fn("expireItemRuntimeFx")(function* ({
 			Random.withSeed(randomSeed),
 		);
 		draft = placed.runtime;
-		events.push(...placed.events);
-		replacementPlaced = placed.replacementPlaced;
+		outcomeEffects = placed.effects;
+		outcomeDiscarded = placed.discarded;
 	}
 	const itemWasVisible = item.location.scope === LocationScopeEnumSchema.enum.Board;
-	if (itemWasVisible && !replacementPlaced) {
-		events.push({
-			type: GameEventEnumSchema.enum.ItemDisappeared,
-			itemId: item.id,
-			itemUid: item.item.uid,
-			location: origin,
-		});
-	}
+	const replacementItemIds = outcomeEffects.flatMap((effect) =>
+		effect.type === "item" ? effect.placement.spawn.map((spawned) => spawned.id) : [],
+	);
 	return {
 		runtime: draft,
-		events,
+		facts: [
+			...removalFacts,
+			{
+				type: "lifecycle:settled",
+				cause: "expired",
+				itemId: item.id,
+				itemUid: item.item.uid,
+				location: origin,
+				visible: itemWasVisible,
+				replacementItemIds,
+			} satisfies EngineFact,
+			...abortedFacts,
+			...(outcomeEffects.length > 0
+				? [
+						{
+							type: "outcome:applied",
+							originItemId: item.id,
+							effects: outcomeEffects,
+						} satisfies EngineFact,
+					]
+				: []),
+			...outcomeDiscarded,
+		],
 	};
 });

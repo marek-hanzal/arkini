@@ -69,7 +69,7 @@ export const advanceRuntimeElapsedFx: (
 					stableRuntime: replay.isStable ? replay.runtime : null,
 				} satisfies AdvanceRuntimeElapsedResult,
 				replay.runtime,
-				replay.events,
+				replay.facts,
 			] as const;
 		}),
 	);

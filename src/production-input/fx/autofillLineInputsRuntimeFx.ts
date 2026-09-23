@@ -2,10 +2,10 @@ import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
+import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 import { readDeliveryTravelDurationMsFn } from "~/production-delivery/fn/readDeliveryTravelDurationMsFn";
 import { DeliveryPhaseEnumSchema } from "~/production-delivery/schema/DeliveryPhaseEnumSchema";
-import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
-import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
+import type { EngineFact } from "~/game-event/type/EngineFact";
 import { detachLineInputSourceFx } from "~/production-input/fx/detachLineInputSourceFx";
 import { planLineInputAutofillFx } from "~/production-input/fx/planLineInputAutofillFx";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
@@ -22,9 +22,8 @@ export namespace autofillLineInputsRuntimeFx {
 	}
 
 	export interface Result {
-		readonly events: readonly GameEventSchema.Type[];
+		readonly facts: readonly EngineFact[];
 		readonly result: {
-			readonly deliveryItemIds: readonly IdSchema.Type[];
 			readonly scheduledQuantity: number;
 			readonly remainingMissingQuantity: number;
 		};
@@ -47,9 +46,8 @@ export const autofillLineInputsRuntimeFx = Effect.fn("autofillLineInputsRuntimeF
 	});
 	if (plan.entry.length === 0) {
 		return {
-			events: [],
+			facts: [],
 			result: {
-				deliveryItemIds: [],
 				scheduledQuantity: 0,
 				remainingMissingQuantity: plan.remainingMissingQuantity,
 			},
@@ -58,7 +56,10 @@ export const autofillLineInputsRuntimeFx = Effect.fn("autofillLineInputsRuntimeF
 	}
 
 	let deliveryRuntime = runtime;
-	const deliveryItemIds: IdSchema.Type[] = [];
+	const admittedDeliveries: {
+		id: IdSchema.Type;
+		revision: RevisionSchema.Type;
+	}[] = [];
 	let scheduledQuantity = 0;
 	let skippedQuantity = 0;
 	for (const { sourceItemId, inputIndex } of plan.entry) {
@@ -109,27 +110,29 @@ export const autofillLineInputsRuntimeFx = Effect.fn("autofillLineInputsRuntimeF
 				...detached.runtime.items.slice(detached.insertionIndex),
 			],
 		} satisfies RuntimeSchema.Type;
-		deliveryItemIds.push(delivery.id);
+		admittedDeliveries.push({
+			id: delivery.id,
+			revision: delivery.revision,
+		});
 		scheduledQuantity += 1;
 	}
-	const events: GameEventSchema.Type[] = [];
+	const facts: EngineFact[] = [];
 	if (scheduledQuantity > 0) {
 		const owner = yield* readRuntimeItemByIdFx({
 			itemId: ownerItemId,
 			runtime,
 		});
-		events.push({
-			type: GameEventEnumSchema.enum.LineInputAutofillStarted,
+		facts.push({
+			type: "autofill:admitted",
 			ownerItemId,
 			itemUid: owner.item.uid,
 			lineId,
-			scheduledQuantity,
+			deliveries: admittedDeliveries,
 		});
 	}
 	return {
-		events,
+		facts,
 		result: {
-			deliveryItemIds,
 			scheduledQuantity,
 			remainingMissingQuantity: plan.remainingMissingQuantity + skippedQuantity,
 		},

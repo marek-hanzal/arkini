@@ -4,6 +4,8 @@ import { expect, it } from "vitest";
 import { useGameFx } from "~test/support/useGameFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { advanceRuntimeStepFx } from "~/game-tick/fx/advanceRuntimeStepFx";
+import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
+import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 import {
 	boardFn,
 	createContendedQueueConfigFn,
@@ -89,7 +91,7 @@ it("does not announce Autofill erased by a later payer Template reset in the sam
 					itemFn("tool", "tool", boardFn(4)),
 				],
 			);
-			return yield* advanceRuntimeStepFx({
+			const step = yield* advanceRuntimeStepFx({
 				...prepared,
 				items: prepared.items.map((item) => ({
 					...item,
@@ -98,6 +100,17 @@ it("does not announce Autofill erased by a later payer Template reset in the sam
 					]!,
 				})),
 			});
+			yield* modifyRuntimeFx(() =>
+				Effect.succeed([
+					undefined,
+					step.runtime,
+					step.facts,
+				] as const),
+			);
+			return {
+				runtime: step.runtime,
+				transition: yield* (yield* CommittedTransitionsFx).read,
+			};
 		}).pipe(
 			useGameFx({
 				config,
@@ -108,6 +121,10 @@ it("does not announce Autofill erased by a later payer Template reset in the sam
 	expect(result.runtime.items).toEqual([]);
 	expect(result.runtime.jobQueue).toEqual([]);
 	expect(result.runtime.templateUidBySpace[0]).toBe("empty");
-	expect(result.events.some((event) => event.type === "board:template-applied")).toBe(true);
-	expect(result.events.some((event) => event.type === "line-input:autofill-started")).toBe(false);
+	expect(result.transition.events.some((event) => event.type === "board:template-applied")).toBe(
+		true,
+	);
+	expect(
+		result.transition.events.some((event) => event.type === "line-input:autofill-started"),
+	).toBe(false);
 });

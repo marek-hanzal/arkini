@@ -8,7 +8,7 @@ import type { JobSchema } from "~/production-job/schema/JobSchema";
 import { LineRunUnavailableError } from "~/production-line/error/LineRunUnavailableError";
 import type { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
+import type { EngineFact } from "~/game-event/type/EngineFact";
 import { autofillLineInputsRuntimeFx } from "~/production-input/fx/autofillLineInputsRuntimeFx";
 import { startQueuedLineRuntimeFx } from "./startQueuedLineRuntimeFx";
 
@@ -34,13 +34,12 @@ export namespace attemptQueuedLineStartFx {
 		  }
 		| {
 				type: "delivery-scheduled";
-				deliveryItemIds: readonly IdSchema.Type[];
-				events: readonly GameEventSchema.Type[];
+				facts: readonly EngineFact[];
 				runtime: RuntimeSchema.Type;
 		  }
 		| {
 				type: "started";
-				events: readonly GameEventSchema.Type[];
+				facts: readonly EngineFact[];
 				job: JobSchema.Type;
 				runtime: RuntimeSchema.Type;
 		  };
@@ -64,17 +63,9 @@ export const attemptQueuedLineStartFx = Effect.fn("attemptQueuedLineStartFx")(fu
 		} satisfies attemptQueuedLineStartFx.Result;
 	return yield* Effect.gen(function* () {
 		const result = yield* startQueuedLineRuntimeFx({
-			ownerItemId: request.ownerItemId,
-			lineId: request.lineId,
-			queueRequestId: request.id,
+			request,
 			runtime,
 		});
-		if (result.type === "queue-request-unavailable") {
-			return {
-				type: "empty",
-				runtime,
-			} satisfies attemptQueuedLineStartFx.Result;
-		}
 		if (result.type === "incomplete") {
 			const owner = runtime.items.find((item) => item.id === request.ownerItemId);
 			if (owner !== undefined && !isItemProductionAdmissionOpenFn(owner))
@@ -94,8 +85,7 @@ export const attemptQueuedLineStartFx = Effect.fn("attemptQueuedLineStartFx")(fu
 			if (autofill.result.scheduledQuantity > 0) {
 				return {
 					type: "delivery-scheduled",
-					deliveryItemIds: autofill.result.deliveryItemIds,
-					events: autofill.events,
+					facts: autofill.facts,
 					runtime: autofill.runtime,
 				} satisfies attemptQueuedLineStartFx.Result;
 			}
@@ -110,7 +100,7 @@ export const attemptQueuedLineStartFx = Effect.fn("attemptQueuedLineStartFx")(fu
 		}
 		return {
 			type: "started",
-			events: result.events,
+			facts: result.facts,
 			job: result.job,
 			runtime: result.runtime,
 		} satisfies attemptQueuedLineStartFx.Result;

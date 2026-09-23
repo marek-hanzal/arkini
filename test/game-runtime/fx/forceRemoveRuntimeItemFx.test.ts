@@ -35,7 +35,7 @@ describe("forceRemoveRuntimeItemFx", () => {
 				expect(result.runtime.jobs).toEqual([]);
 				expect(result.runtime.jobQueue).toEqual([]);
 				expect(result.runtime.defaultLineByOwnerItemId).toEqual({});
-				expect(result.events).toEqual(
+				expect(result.facts).toEqual(
 					expect.arrayContaining([
 						expect.objectContaining({
 							type: "job:aborted",
@@ -131,7 +131,7 @@ describe("forceRemoveRuntimeItemFx", () => {
 					"buffer-a",
 					"existing",
 				]);
-				expect(result.events.filter((event) => event.type === "item:discarded")).toEqual([
+				expect(result.facts.filter((event) => event.type === "item:discarded")).toEqual([
 					expect.objectContaining({
 						itemUid: "water",
 						quantity: 1,

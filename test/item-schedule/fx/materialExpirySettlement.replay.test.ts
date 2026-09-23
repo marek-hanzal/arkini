@@ -120,7 +120,7 @@ describe("aborted job depletion replay", () => {
 			expect(result.constrained.runtime.items.some((item) => item.id === "owner")).toBe(
 				false,
 			);
-			expect(result.constrained.events).toContainEqual(
+			expect(result.constrained.facts).toContainEqual(
 				expect.objectContaining({
 					type: "item:discarded",
 					source: "depletion-outcome",

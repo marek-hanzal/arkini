@@ -8,7 +8,7 @@ import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnu
 import { advanceDeliveriesRuntimeFx } from "~/production-delivery/fx/advanceDeliveriesRuntimeFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
-import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
+import type { EngineFact } from "~/game-event/type/EngineFact";
 import { attemptJobCompletionFx } from "~/production-job/fx/attemptJobCompletionFx";
 import { attemptQueuedLineStartFx } from "~/production-job/fx/attemptQueuedLineStartFx";
 import { resolveJobRunnableFx } from "~/production-job/fx/resolveJobRunnableFx";
@@ -17,22 +17,8 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { SimulationStepMs } from "~/simulation-time/constant/SimulationStepMs";
 
 interface RuntimeStepResult {
-	readonly events: readonly GameEventSchema.Type[];
+	readonly facts: readonly EngineFact[];
 	readonly runtime: RuntimeSchema.Type;
-}
-
-interface AutofillAdmission {
-	readonly event: Extract<
-		GameEventSchema.Type,
-		{
-			type: "line-input:autofill-started";
-		}
-	>;
-	readonly deliveryItemIds: readonly IdSchema.Type[];
-}
-
-interface QueueDispatchResult extends RuntimeStepResult {
-	readonly autofillAdmissions: readonly AutofillAdmission[];
 }
 
 const sortJobsFn = (jobs: readonly JobSchema.Type[]) =>
@@ -70,15 +56,6 @@ const dispatchQueueRequestFx = Effect.fn("dispatchQueueRequestFx")(function* (
 		runtime,
 	});
 	if (attempt.type !== "started") return attempt;
-	// A payer's depletion outcome may reset its space after start admission,
-	// removing the new job before this transition publishes any events.
-	if (!attempt.runtime.jobs.some((job) => job.id === attempt.job.id)) {
-		return {
-			type: "settled",
-			events: attempt.events,
-			runtime: attempt.runtime,
-		} as const;
-	}
 	const owner = yield* readRuntimeItemByIdFx({
 		itemId: attempt.job.ownerItemId,
 		runtime,
@@ -86,15 +63,15 @@ const dispatchQueueRequestFx = Effect.fn("dispatchQueueRequestFx")(function* (
 
 	return {
 		type: "started",
-		events: [
+		facts: [
 			{
-				type: GameEventEnumSchema.enum.JobStarted,
+				type: "job:admitted",
 				jobId: attempt.job.id,
 				ownerItemId: attempt.job.ownerItemId,
 				itemUid: owner.item.uid,
 				lineId: attempt.job.lineId,
-			} satisfies GameEventSchema.Type,
-			...attempt.events,
+			} satisfies EngineFact,
+			...attempt.facts,
 		],
 		runtime: attempt.runtime,
 	} as const;
@@ -108,8 +85,7 @@ const dispatchIdleQueueRequestsFx = Effect.fn("dispatchIdleQueueRequestsFx")(fun
 	const queueSnapshot = runtime.jobQueue;
 
 	let draft = runtime;
-	const events: GameEventSchema.Type[] = [];
-	const autofillAdmissions: AutofillAdmission[] = [];
+	const facts: EngineFact[] = [];
 	for (const request of queueSnapshot) {
 		if (handledOwnerItemIds.has(request.ownerItemId)) continue;
 		const owner = draft.items.find((item) => item.id === request.ownerItemId);
@@ -120,31 +96,16 @@ const dispatchIdleQueueRequestsFx = Effect.fn("dispatchIdleQueueRequestsFx")(fun
 			continue;
 
 		const dispatched = yield* dispatchQueueRequestFx(request.id, draft);
-		if (
-			dispatched.type !== "started" &&
-			dispatched.type !== "settled" &&
-			dispatched.type !== "delivery-scheduled"
-		)
-			continue;
+		if (dispatched.type !== "started" && dispatched.type !== "delivery-scheduled") continue;
 		handledOwnerItemIds.add(request.ownerItemId);
 		draft = dispatched.runtime;
-		events.push(...dispatched.events);
-		if (dispatched.type === "delivery-scheduled") {
-			for (const event of dispatched.events) {
-				if (event.type === GameEventEnumSchema.enum.LineInputAutofillStarted)
-					autofillAdmissions.push({
-						event,
-						deliveryItemIds: dispatched.deliveryItemIds,
-					});
-			}
-		}
+		facts.push(...dispatched.facts);
 	}
 
 	return {
-		events,
-		autofillAdmissions,
+		facts,
 		runtime: draft,
-	} satisfies QueueDispatchResult;
+	} satisfies RuntimeStepResult;
 });
 
 /**
@@ -189,12 +150,9 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 		});
 	}
 
-	const events: GameEventSchema.Type[] = [
-		...boundaryStart.events,
+	const facts: EngineFact[] = [
+		...boundaryStart.facts,
 		...deliveryStart.events,
-	];
-	const autofillAdmissions: AutofillAdmission[] = [
-		...boundaryStart.autofillAdmissions,
 	];
 	const completedOwnerItemIds: IdSchema.Type[] = [];
 	for (const job of jobs) {
@@ -215,14 +173,14 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 			runtime: draft,
 		});
 		draft = completion.runtime;
-		events.push({
+		facts.push({
 			type: GameEventEnumSchema.enum.JobCompleted,
 			jobId: liveJob.id,
 			ownerItemId: liveJob.ownerItemId,
 			itemUid: completedOwner.item.uid,
 			lineId: liveJob.lineId,
 		});
-		events.push(...completion.events);
+		facts.push(...completion.facts);
 		completedOwnerItemIds.push(liveJob.ownerItemId);
 	}
 
@@ -231,83 +189,23 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 		runtime: draft,
 	});
 	draft = scheduled.runtime;
-	events.push(...scheduled.events);
+	facts.push(...scheduled.facts);
 	if (completedOwnerItemIds.length > 0 || scheduled.dispatched) {
 		const dispatched = yield* dispatchIdleQueueRequestsFx(draft);
 		draft = dispatched.runtime;
-		events.push(...dispatched.events);
-		autofillAdmissions.push(...dispatched.autofillAdmissions);
+		facts.push(...dispatched.facts);
 	}
 
 	const expired = yield* expireIdleScheduledItemsFx(draft);
 	draft = expired.runtime;
-	events.push(...expired.events);
-	if (expired.events.length > 0) {
+	facts.push(...expired.facts);
+	if (expired.facts.length > 0) {
 		const dispatched = yield* dispatchIdleQueueRequestsFx(draft);
 		draft = dispatched.runtime;
-		events.push(...dispatched.events);
-		autofillAdmissions.push(...dispatched.autofillAdmissions);
-	}
-	const finalItemsById = new Map(
-		draft.items.map(
-			(item) =>
-				[
-					item.id,
-					item,
-				] as const,
-		),
-	);
-	const survivingAutofillByEvent = new Map(
-		autofillAdmissions.map(
-			({ event, deliveryItemIds }) =>
-				[
-					event,
-					deliveryItemIds.filter((id) => {
-						const item = finalItemsById.get(id);
-						return (
-							item?.location.scope === LocationScopeEnumSchema.enum.Delivery &&
-							item.location.phase === "outbound" &&
-							item.location.target.kind === "line-input" &&
-							item.location.target.ownerItemId === event.ownerItemId &&
-							item.location.target.lineId === event.lineId
-						);
-					}).length,
-				] as const,
-		),
-	);
-	const liveOrSettledJobIds = new Set(draft.jobs.map((job) => job.id));
-	for (const event of events) {
-		if (
-			event.type === GameEventEnumSchema.enum.JobCompleted ||
-			event.type === GameEventEnumSchema.enum.JobAborted
-		)
-			liveOrSettledJobIds.add(event.jobId);
+		facts.push(...dispatched.facts);
 	}
 	return {
-		// A later outcome in this step may erase an admitted job before publication.
-		events: events.flatMap((event) => {
-			if (
-				event.type === GameEventEnumSchema.enum.JobStarted &&
-				!liveOrSettledJobIds.has(event.jobId)
-			)
-				return [];
-			if (event.type === GameEventEnumSchema.enum.LineInputAutofillStarted) {
-				const survivingQuantity = survivingAutofillByEvent.get(event);
-				if (survivingQuantity !== undefined) {
-					return survivingQuantity > 0
-						? [
-								{
-									...event,
-									scheduledQuantity: survivingQuantity,
-								},
-							]
-						: [];
-				}
-			}
-			return [
-				event,
-			];
-		}),
+		facts,
 		runtime: draft,
 	} satisfies RuntimeStepResult;
 });

@@ -20,7 +20,7 @@ describe("startLineRuntimeFx", () => {
 					return yield* Effect.die(new Error("Expected stored water input."));
 				}
 
-				const [job, runtime, events] = yield* startLineRuntimeFx({
+				const [job, runtime, facts] = yield* startLineRuntimeFx({
 					ownerItemId: "runtime:forge",
 					lineId: "line:forge:run",
 					runtime: before,
@@ -28,7 +28,7 @@ describe("startLineRuntimeFx", () => {
 
 				return {
 					consumedSource,
-					events,
+					facts,
 					job,
 					runtime,
 				};
@@ -62,7 +62,7 @@ describe("startLineRuntimeFx", () => {
 				scope: "reserved",
 			},
 		});
-		expect(result.events).toContainEqual({
+		expect(result.facts).toContainEqual({
 			type: GameEventEnumSchema.enum.ItemConsumed,
 			sourceItemId: result.consumedSource.id,
 			itemUid: "water",

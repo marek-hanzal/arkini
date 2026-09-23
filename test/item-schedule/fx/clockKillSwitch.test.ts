@@ -1,8 +1,10 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 import { advanceRuntimeStepFx } from "~/game-tick/fx/advanceRuntimeStepFx";
+import { projectCommittedEngineFactsFx } from "~/game-event/fx/projectCommittedEngineFactsFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
+import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { expireItemRuntimeFx } from "~/item-expiry/fx/expireItemRuntimeFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
@@ -75,6 +77,20 @@ const fillBoardFx = Effect.fn("fillKillTestBoardFx")(function* () {
 		});
 });
 
+const advanceWithEventsFx = Effect.fn("advanceKillTestStepFx")(function* (
+	previousRuntime: RuntimeSchema.Type,
+) {
+	const step = yield* advanceRuntimeStepFx(previousRuntime);
+	return {
+		runtime: step.runtime,
+		events: yield* projectCommittedEngineFactsFx({
+			previousRuntime,
+			runtime: step.runtime,
+			facts: step.facts,
+		}),
+	};
+});
+
 describe("Clock kill switch", () => {
 	it.each([
 		"kill-switch",
@@ -89,7 +105,7 @@ describe("Clock kill switch", () => {
 				});
 				yield* fillBoardFx();
 				const before = yield* readRuntimeFx();
-				const step = yield* advanceRuntimeStepFx(before);
+				const step = yield* advanceWithEventsFx(before);
 				return {
 					before,
 					step,
@@ -156,7 +172,7 @@ describe("Clock kill switch", () => {
 					lineId: "a",
 				});
 				const before = yield* readRuntimeFx();
-				return yield* advanceRuntimeStepFx({
+				const previousRuntime = {
 					...before,
 					jobQueue: [
 						{
@@ -165,7 +181,8 @@ describe("Clock kill switch", () => {
 							lineId: "a",
 						},
 					],
-				});
+				};
+				return yield* advanceWithEventsFx(previousRuntime);
 			}).pipe(
 				useGameFx({
 					config: configFn("kill-switch"),
@@ -191,7 +208,7 @@ describe("Clock kill switch", () => {
 					ownerItemId: "runtime:clock",
 					lineId: "a",
 				});
-				return yield* advanceRuntimeStepFx(yield* readRuntimeFx());
+				return yield* advanceWithEventsFx(yield* readRuntimeFx());
 			}).pipe(
 				useGameFx({
 					config: configFn("kill-switch", 1000),
@@ -237,7 +254,7 @@ describe("Clock kill switch", () => {
 							return [
 								undefined,
 								removed.runtime,
-								removed.events,
+								removed.facts,
 							] as const;
 						}),
 					),

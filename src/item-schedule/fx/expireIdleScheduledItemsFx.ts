@@ -2,14 +2,14 @@ import { readItemScheduleFn } from "~/item-schedule/fn/readItemScheduleFn";
 import { Effect } from "effect";
 import { attemptScheduledItemExpiryFx } from "~/item-schedule/fx/attemptScheduledItemExpiryFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
+import type { EngineFact } from "~/game-event/type/EngineFact";
 
 /** Settles exhausted identities in stable order after accepted work has had its dispatch pass. */
 export const expireIdleScheduledItemsFx = Effect.fn("expireIdleScheduledItemsFx")(function* (
 	runtime: RuntimeSchema.Type,
 ) {
 	let draft = runtime;
-	const events: GameEventSchema.Type[] = [];
+	const facts: EngineFact[] = [];
 	const ids = runtime.items
 		.filter((item) => item.schedule?.remainingDurationMs === 0)
 		.map((item) => item.id)
@@ -28,10 +28,10 @@ export const expireIdleScheduledItemsFx = Effect.fn("expireIdleScheduledItemsFx"
 		});
 		if (attempt.type === "blocked") continue;
 		draft = attempt.runtime;
-		events.push(...attempt.events);
+		facts.push(...attempt.facts);
 	}
 	return {
 		runtime: draft,
-		events,
+		facts,
 	};
 });

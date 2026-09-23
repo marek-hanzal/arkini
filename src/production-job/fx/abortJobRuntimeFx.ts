@@ -4,6 +4,7 @@ import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { Effect, Option } from "effect";
 
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
+import type { EngineFact } from "~/game-event/type/EngineFact";
 import type { JobRuntimeItemSchema } from "~/game-runtime/schema/JobRuntimeItemSchema";
 import type { ReservedRuntimeItemSchema } from "~/game-runtime/schema/ReservedRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -23,7 +24,7 @@ export namespace abortJobRuntimeFx {
 	}
 
 	export interface Result {
-		readonly events: readonly GameEventSchema.Type[];
+		readonly facts: readonly EngineFact[];
 		readonly runtime: RuntimeSchema.Type;
 	}
 }
@@ -91,9 +92,9 @@ export const abortJobRuntimeFx = Effect.fn("abortJobRuntimeFx")(function* ({
 		}),
 	});
 	return {
-		events: [
+		facts: [
 			...events,
-			...released.events,
+			...released.facts,
 		],
 		runtime: released.runtime,
 	} satisfies abortJobRuntimeFx.Result;

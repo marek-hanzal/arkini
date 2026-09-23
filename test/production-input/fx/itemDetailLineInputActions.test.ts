@@ -191,12 +191,6 @@ describe("Item Detail line input actions", () => {
 		);
 
 		expect(result.autofilled).toEqual({
-			deliveryItemIds: [
-				"runtime:water",
-				"runtime:water:2",
-				"runtime:water:3",
-				"runtime:water:4",
-			],
 			remainingMissingQuantity: 0,
 			scheduledQuantity: 4,
 		});
@@ -272,11 +266,6 @@ describe("Item Detail line input actions", () => {
 		);
 
 		expect(result.autofilled).toEqual({
-			deliveryItemIds: [
-				"runtime:water",
-				"runtime:water:2",
-				"runtime:water:3",
-			],
 			remainingMissingQuantity: 0,
 			scheduledQuantity: 3,
 		});
@@ -323,7 +312,6 @@ describe("Item Detail line input actions", () => {
 		);
 
 		expect(result.autofilled).toEqual({
-			deliveryItemIds: [],
 			remainingMissingQuantity: 3,
 			scheduledQuantity: 0,
 		});

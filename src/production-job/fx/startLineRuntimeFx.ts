@@ -189,7 +189,7 @@ export const startLineRuntimeFx = Effect.fn("startLineRuntimeFx")(function* ({
 		reconciledRuntime,
 		[
 			...inputTransition.events,
-			...spent.events,
+			...spent.facts,
 		],
 	] as const;
 });

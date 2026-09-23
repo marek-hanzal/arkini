@@ -14,6 +14,7 @@ import {
 } from "~test/production-job/support/randomCompletionTestRuntime";
 import { completeJobRuntimeForTestFx } from "~test/production-job/support/completeJobRuntimeForTestFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
+import { projectCommittedEngineFactsFx } from "~/game-event/fx/projectCommittedEngineFactsFx";
 
 describe("job completion transition", () => {
 	it("replays one stable completion outcome across blocking, retry and restore", () => {
@@ -94,7 +95,7 @@ describe("job completion transition", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const prepared = yield* prepareRandomCompletionRuntimeFx();
-				return yield* attemptJobCompletionFx({
+				const completion = yield* attemptJobCompletionFx({
 					jobId: prepared.job.id,
 					runtime: prepared.freeRuntime,
 				}).pipe(
@@ -105,6 +106,10 @@ describe("job completion transition", () => {
 						]),
 					),
 				);
+				return {
+					completion,
+					previousRuntime: prepared.freeRuntime,
+				};
 			}).pipe(
 				useGameFx({
 					config,
@@ -112,13 +117,20 @@ describe("job completion transition", () => {
 			),
 		);
 
-		if (result.type !== "completed") throw new Error("Expected completed job.");
-		const outputs = result.runtime.items.filter(
+		if (result.completion.type !== "completed") throw new Error("Expected completed job.");
+		const events = Effect.runSync(
+			projectCommittedEngineFactsFx({
+				previousRuntime: result.previousRuntime,
+				runtime: result.completion.runtime,
+				facts: result.completion.facts,
+			}),
+		);
+		const outputs = result.completion.runtime.items.filter(
 			(item) => item.item.uid === "outputA" || item.item.uid === "outputB",
 		);
 		expect(outputs).not.toEqual([]);
 		for (const item of outputs) {
-			expect(result.events).toContainEqual({
+			expect(events).toContainEqual({
 				type: GameEventEnumSchema.enum.ItemSpawned,
 				itemId: item.id,
 				itemUid: item.item.uid,

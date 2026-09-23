@@ -1,10 +1,9 @@
-import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { Effect } from "effect";
 import type { resolveOutcomeTableFx } from "./resolveOutcomeTableFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { planBestEffortDropPlacementFx } from "~/item-placement/fx/planBestEffortDropPlacementFx";
-import type { applyItemOutcomeFx } from "./applyItemOutcomeFx";
 import { applyOutcomeRollFx } from "./applyOutcomeRollFx";
+import type { AppliedOutcome } from "~/outcome/type/AppliedOutcome";
 
 export namespace applyOutcomeTableFx {
 	export interface Props {
@@ -13,8 +12,7 @@ export namespace applyOutcomeTableFx {
 		readonly overflow?: "discard";
 	}
 	export interface Result {
-		readonly events?: readonly GameEventSchema.Type[];
-		readonly item: readonly applyItemOutcomeFx.Placement[];
+		readonly effects: readonly AppliedOutcome[];
 		readonly discarded?: readonly planBestEffortDropPlacementFx.Discarded[];
 	}
 }
@@ -26,8 +24,7 @@ export const applyOutcomeTableFx = Effect.fn("applyOutcomeTableFx")(function* ({
 	overflow,
 }: applyOutcomeTableFx.Props) {
 	let draft = runtime;
-	const events: GameEventSchema.Type[] = [];
-	const item: applyItemOutcomeFx.Placement[] = [];
+	const effects: AppliedOutcome[] = [];
 	const discarded: planBestEffortDropPlacementFx.Discarded[] = [];
 	for (const roll of outcome.roll) {
 		const result = yield* applyOutcomeRollFx({
@@ -36,24 +33,12 @@ export const applyOutcomeTableFx = Effect.fn("applyOutcomeTableFx")(function* ({
 			overflow,
 		});
 		draft = result.runtime;
-		events.push(...result.events);
-		item.push(...result.item);
+		effects.push(...result.effects);
 		discarded.push(...result.discarded);
 	}
-	const survivingIds = new Set(draft.items.map((entry) => entry.id));
 	return [
 		{
-			item: item.map((entry) => ({
-				...entry,
-				placement: {
-					spawn: entry.placement.spawn.filter((spawn) => survivingIds.has(spawn.id)),
-				},
-			})),
-			...(events.length === 0
-				? {}
-				: {
-						events,
-					}),
+			effects,
 			...(overflow === "discard"
 				? {
 						discarded,

@@ -28,7 +28,7 @@ export const startFx = Effect.fn("startFx")(function* () {
 			return [
 				result.runtime,
 				result.runtime,
-				result.events,
+				result.facts,
 			] as const;
 		});
 	});

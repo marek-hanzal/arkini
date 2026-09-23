@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 import { TemplateNotFoundError } from "~/board-template/error/TemplateNotFoundError";
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
-import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { createRuntimeItemFx } from "~/game-runtime/fx/createRuntimeItemFx";
 import { createRuntimeItemIdFx } from "~/game-runtime/fx/createRuntimeItemIdFx";
 import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
@@ -21,7 +20,7 @@ export namespace applyBoardTemplateRuntimeFx {
 	}
 	export interface Result {
 		readonly runtime: RuntimeSchema.Type;
-		readonly events: readonly GameEventSchema.Type[];
+		readonly removed: readonly RuntimeItemSchema.Type[];
 	}
 }
 
@@ -96,12 +95,7 @@ export const applyBoardTemplateRuntimeFx = Effect.fn("applyBoardTemplateRuntimeF
 		},
 		space,
 	);
-	const events: GameEventSchema.Type[] = runtime.items
-		.filter((item) => discarded.itemIds.has(item.id))
-		.map((snapshot) => ({
-			type: "item:removed",
-			snapshot,
-		}));
+	const removed = runtime.items.filter((item) => discarded.itemIds.has(item.id));
 	const items: RuntimeItemSchema.Type[] = [];
 	for (const item of runtime.items) {
 		if (discarded.itemIds.has(item.id)) continue;
@@ -154,11 +148,6 @@ export const applyBoardTemplateRuntimeFx = Effect.fn("applyBoardTemplateRuntimeF
 			}),
 		);
 	}
-	events.push({
-		type: "board:template-applied",
-		space,
-		templateUid,
-	});
 	const result: applyBoardTemplateRuntimeFx.Result = {
 		runtime: {
 			...runtime,
@@ -177,7 +166,7 @@ export const applyBoardTemplateRuntimeFx = Effect.fn("applyBoardTemplateRuntimeF
 				),
 			),
 		},
-		events,
+		removed,
 	};
 	return result;
 });

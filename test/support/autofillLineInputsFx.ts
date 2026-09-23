@@ -11,7 +11,6 @@ export namespace autofillLineInputsFx {
 	}
 
 	export interface Result {
-		readonly deliveryItemIds: readonly IdSchema.Type[];
 		readonly scheduledQuantity: number;
 		readonly remainingMissingQuantity: number;
 	}
@@ -38,7 +37,7 @@ export const autofillLineInputsFx = Effect.fn("autofillLineInputsFx")(function* 
 			return [
 				autofill.result,
 				autofill.runtime,
-				autofill.events,
+				autofill.facts,
 			] as const;
 		}),
 	);

@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/useGameFx";
+import { projectCommittedEngineFactsFx } from "~/game-event/fx/projectCommittedEngineFactsFx";
 import { advanceRuntimeStepFx } from "~/game-tick/fx/advanceRuntimeStepFx";
 import {
 	boardFn,
@@ -33,6 +34,16 @@ describe("Tick queue progress priority", () => {
 				);
 				const bypassed = yield* advanceRuntimeStepFx(prepared);
 				const active = yield* advanceRuntimeStepFx(bypassed.runtime);
+				const bypassedEvents = yield* projectCommittedEngineFactsFx({
+					previousRuntime: prepared,
+					runtime: bypassed.runtime,
+					facts: bypassed.facts,
+				});
+				const activeEvents = yield* projectCommittedEngineFactsFx({
+					previousRuntime: bypassed.runtime,
+					runtime: active.runtime,
+					facts: active.facts,
+				});
 				// Deliver the missing buffered unit while the younger job is still active.
 				let draft = {
 					...active.runtime,
@@ -46,7 +57,9 @@ describe("Tick queue progress priority", () => {
 				}
 				return {
 					bypassed,
+					bypassedEvents,
 					active,
+					activeEvents,
 					restored: draft,
 				};
 			}).pipe(
@@ -68,7 +81,7 @@ describe("Tick queue progress priority", () => {
 			last,
 		]);
 		expect(result.bypassed.runtime.items.find((item) => item.id === buffer.id)).toEqual(buffer);
-		expect(result.bypassed.events).toMatchObject([
+		expect(result.bypassedEvents).toMatchObject([
 			{
 				type: "job:started",
 				lineId: "line:later",
@@ -79,7 +92,7 @@ describe("Tick queue progress priority", () => {
 			last,
 		]);
 		expect(result.active.runtime.items.find((item) => item.id === buffer.id)).toEqual(buffer);
-		expect(result.active.events).toEqual([]);
+		expect(result.activeEvents).toEqual([]);
 		expect(result.restored.jobs).toMatchObject([
 			{
 				ownerItemId: "owner:a",
@@ -213,7 +226,7 @@ describe("Tick queue progress priority", () => {
 				const prepared = yield* prepareQueueFx(queue, [
 					itemFn("owner:b", "forge", boardFn(2)),
 				]);
-				return yield* advanceRuntimeStepFx({
+				const before = {
 					...prepared,
 					items: [
 						...prepared.items.map((item) => ({
@@ -225,7 +238,16 @@ describe("Tick queue progress priority", () => {
 							item: config.items.payer!,
 						},
 					],
-				});
+				};
+				const step = yield* advanceRuntimeStepFx(before);
+				return {
+					runtime: step.runtime,
+					events: yield* projectCommittedEngineFactsFx({
+						previousRuntime: before,
+						runtime: step.runtime,
+						facts: step.facts,
+					}),
+				};
 			}).pipe(
 				useGameFx({
 					config,

@@ -52,8 +52,9 @@ describe("output placement transition", () => {
 			),
 		);
 
-		expect(result.placement.item[0]?.placement.spawn).toHaveLength(2);
-		expect(result.placement.item[1]?.placement.spawn).toHaveLength(1);
+		const itemEffects = result.placement.effects.filter((effect) => effect.type === "item");
+		expect(itemEffects[0]?.placement.spawn).toHaveLength(2);
+		expect(itemEffects[1]?.placement.spawn).toHaveLength(1);
 		const logs = result.runtime.items.filter((item) => item.item.uid === "log");
 		expect(logs.map((item) => item.location)).toEqual([
 			boardLocation(1),
@@ -126,7 +127,7 @@ it("resolves output rules from the same snapshot that it commits", () => {
 		),
 	);
 
-	expect(result.placement.item).toEqual([]);
+	expect(result.placement.effects).toEqual([]);
 	expect(result.runtime.items.some((item) => item.item.uid === "log")).toBe(false);
 });
 

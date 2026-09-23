@@ -2,14 +2,46 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
+import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import { mergeItemsFx } from "~/item-merge/fx/mergeItemsFx";
 import { makeDropActorRejectedResultFn } from "~/item-interaction/fn/makeDropActorRejectedResultFn";
 import { makeDropRejectedResultFn } from "~/item-interaction/fn/makeDropRejectedResultFn";
-import { projectDropActorCurrentFn } from "~/item-interaction/fn/projectDropActorCurrentFn";
-import { projectDropTransferActorFn } from "~/item-interaction/fn/projectDropTransferActorFn";
 import { DropItemRejectedReason } from "~/item-interaction/type/DropItemResult";
 import type { DropItemResult } from "~/item-interaction/type/DropItemResult";
 import { DropItemResultKind } from "~/item-interaction/type/DropItemResult";
+
+interface DropTransferActor {
+	readonly id: string;
+	readonly item: {
+		readonly uid: string;
+	};
+	readonly revision: string;
+	readonly location: BoardLocationSchema.Type;
+}
+
+const projectDropActorCurrentFn = (item: DropTransferActor | undefined) =>
+	item === undefined
+		? null
+		: {
+				itemId: item.id,
+				itemUid: item.item.uid,
+				revision: item.revision,
+				location: item.location,
+			};
+
+const projectDropTransferActorFn = ({
+	after,
+	before,
+}: {
+	readonly after: DropTransferActor | undefined;
+	readonly before: DropTransferActor;
+}) => ({
+	itemId: before.id,
+	itemUid: before.item.uid,
+	previousRevision: before.revision,
+	previousLocation: before.location,
+	current: projectDropActorCurrentFn(after),
+});
 
 export namespace commitMergeDropFx {
 	export interface Props {

@@ -2,9 +2,9 @@ import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
-import { readOutcomePlacementItemEventsFx } from "~/game-event/fx/readOutcomePlacementItemEventsFx";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
+import type { EngineFact } from "~/game-event/type/EngineFact";
 import { releaseOwnerInputsFx } from "~/production-input/fx/releaseOwnerInputsFx";
 import { ItemUnitsUnavailableError } from "~/production-action/error/ItemUnitsUnavailableError";
 import { ItemNotOnGridError } from "~/item-location/error/ItemNotOnGridError";
@@ -29,7 +29,7 @@ export namespace spendActionUnitsFx {
 	}
 
 	export interface Result {
-		readonly events: readonly GameEventSchema.Type[];
+		readonly facts: readonly EngineFact[];
 		readonly runtime: RuntimeSchema.Type;
 	}
 }
@@ -83,7 +83,7 @@ export const spendActionUnitsFx = Effect.fn("spendActionUnitsFx")(function* ({
 			),
 		} satisfies RuntimeSchema.Type;
 		return {
-			events: [
+			facts: [
 				...(nextRemainingUnits === 0
 					? []
 					: [
@@ -115,7 +115,7 @@ export const spendActionUnitsFx = Effect.fn("spendActionUnitsFx")(function* ({
 	const removalEvents = removed.events;
 
 	let placement: applyOutcomeTableFx.Result = {
-		item: [],
+		effects: [],
 	};
 	const depletionOutcome = item.item.units?.outcome;
 	if (depletionOutcome !== undefined) {
@@ -126,7 +126,6 @@ export const spendActionUnitsFx = Effect.fn("spendActionUnitsFx")(function* ({
 			ownerItemId,
 			program: Effect.gen(function* () {
 				const outcome = yield* resolveOutcomeTableFx({
-					ownerItemId: item.id,
 					origin: item.location,
 					outcome: depletionOutcome,
 				});
@@ -151,30 +150,30 @@ export const spendActionUnitsFx = Effect.fn("spendActionUnitsFx")(function* ({
 		releasedInputEvents = releasedInputs.events;
 		draft = releasedInputs.runtime;
 	}
-	const placementEvents = yield* readOutcomePlacementItemEventsFx({
-		originItemId: item.id,
-		placement,
-	});
+	const replacementItemIds = placement.effects.flatMap((effect) =>
+		effect.type === "item" ? effect.placement.spawn.map((spawned) => spawned.id) : [],
+	);
 	return {
-		events: [
+		facts: [
 			{
-				type: GameEventEnumSchema.enum.ItemDepleted,
+				type: "lifecycle:settled",
+				cause: "depleted",
 				itemId: item.id,
 				itemUid: item.item.uid,
 				location: item.location,
-			} satisfies GameEventSchema.Type,
-			...(placement.item.every(({ placement: { spawn } }) => spawn.length === 0)
+				visible: true,
+				replacementItemIds,
+			} satisfies EngineFact,
+			...removalEvents,
+			...(placement.effects.length > 0
 				? [
 						{
-							type: GameEventEnumSchema.enum.ItemDisappeared,
-							itemId: item.id,
-							itemUid: item.item.uid,
-							location: item.location,
-						} satisfies GameEventSchema.Type,
+							type: "outcome:applied",
+							originItemId: item.id,
+							effects: placement.effects,
+						} satisfies EngineFact,
 					]
 				: []),
-			...removalEvents,
-			...placementEvents,
 			...releasedInputEvents,
 		],
 		runtime: draft,

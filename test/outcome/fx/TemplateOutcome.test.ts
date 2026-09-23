@@ -7,7 +7,6 @@ import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import { RuntimeStoreFx } from "~/game-runtime/context/RuntimeStoreFx";
 import { applyOutcomeTableFx } from "~/outcome/fx/applyOutcomeTableFx";
 import { resolveOutcomeTableFx } from "~/outcome/fx/resolveOutcomeTableFx";
-import { readOutcomePlacementItemEventsFx } from "~/game-event/fx/readOutcomePlacementItemEventsFx";
 import { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
 import type { OutcomeSchema } from "~/outcome/schema/OutcomeSchema";
 
@@ -70,7 +69,6 @@ const applyFx = (outcome: OutcomeSchema.Type[]) =>
 				},
 			};
 			const resolved = yield* resolveOutcomeTableFx({
-				ownerItemId: "source",
 				origin,
 				outcome: OutcomeTableSchema.parse({
 					set: [
@@ -91,14 +89,16 @@ const applyFx = (outcome: OutcomeSchema.Type[]) =>
 				outcome: resolved,
 				runtime,
 			});
-			const events = yield* readOutcomePlacementItemEventsFx({
-				originItemId: "source",
-				placement,
-			});
 			return [
 				next,
 				next,
-				events,
+				[
+					{
+						type: "outcome:applied",
+						originItemId: "source",
+						effects: placement.effects,
+					},
+				] as const,
 			] as const;
 		}),
 	);

@@ -1,7 +1,7 @@
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import { Effect } from "effect";
 
-import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
+import type { EngineFact } from "~/game-event/type/EngineFact";
 import { discardRuntimeItemTreeFx } from "~/game-runtime/fx/discardRuntimeItemTreeFx";
 import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItemIdentityFx";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
@@ -19,7 +19,7 @@ export namespace forceRemoveRuntimeItemFx {
 
 	export interface Result {
 		readonly runtime: RuntimeSchema.Type;
-		readonly events: readonly GameEventSchema.Type[];
+		readonly facts: readonly EngineFact[];
 	}
 }
 
@@ -43,7 +43,7 @@ export const forceRemoveRuntimeItemFx = Effect.fn("forceRemoveRuntimeItemFx")(fu
 		(candidate) =>
 			candidate.location.scope === "input" && candidate.location.ownerItemId === item.id,
 	);
-	const events: GameEventSchema.Type[] = jobs.map((job) => ({
+	const facts: EngineFact[] = jobs.map((job) => ({
 		type: "job:aborted",
 		jobId: job.id,
 		ownerItemId: item.id,
@@ -65,14 +65,14 @@ export const forceRemoveRuntimeItemFx = Effect.fn("forceRemoveRuntimeItemFx")(fu
 			runtime: draft,
 		});
 		draft = discarded.runtime;
-		events.push(...discarded.events);
+		facts.push(...discarded.events);
 	}
 	const removed = yield* removeRuntimeItemIdentityFx({
 		item,
 		runtime: draft,
 	});
 	draft = removed.runtime;
-	events.push(...removed.events);
+	facts.push(...removed.events);
 	for (const reservation of reservations) {
 		const placed = yield* placeRuntimeItemBestEffortFx({
 			itemId: reservation.id,
@@ -82,7 +82,7 @@ export const forceRemoveRuntimeItemFx = Effect.fn("forceRemoveRuntimeItemFx")(fu
 			runtime: draft,
 		});
 		draft = placed.runtime;
-		events.push(...placed.events);
+		facts.push(...placed.events);
 	}
 	if (item.location.scope === "job" || item.location.scope === "reserved") {
 		const reconciled = yield* abortJobRuntimeFx({
@@ -96,7 +96,7 @@ export const forceRemoveRuntimeItemFx = Effect.fn("forceRemoveRuntimeItemFx")(fu
 			}),
 		);
 		draft = reconciled.runtime;
-		events.push(...reconciled.events);
+		facts.push(...reconciled.facts);
 	}
 	for (const buffer of buffers) {
 		if (!draft.items.some((candidate) => candidate.id === buffer.id)) continue;
@@ -108,10 +108,10 @@ export const forceRemoveRuntimeItemFx = Effect.fn("forceRemoveRuntimeItemFx")(fu
 			runtime: draft,
 		});
 		draft = placed.runtime;
-		events.push(...placed.events);
+		facts.push(...placed.events);
 	}
 	return {
 		runtime: draft,
-		events,
+		facts,
 	} satisfies forceRemoveRuntimeItemFx.Result;
 });

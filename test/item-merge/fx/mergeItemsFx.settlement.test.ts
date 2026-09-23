@@ -38,6 +38,160 @@ const spawnParticipantsFx = Effect.gen(function* () {
 });
 
 describe("merge settlement against the evolving draft", () => {
+	it("restores source disappearance when target Template erases its depletion replacement", () => {
+		const config = createMergeTestConfig({
+			rule: {
+				target: {
+					type: "item",
+					itemUid: "target",
+				},
+				action: "spend",
+				effect: "spend",
+			},
+			sourceUnits: {
+				amount: 1,
+				outcome: guaranteedMergeOutput(),
+			},
+			targetUnits: {
+				amount: 1,
+				outcome: {
+					set: [
+						{
+							weight: 1,
+							rules: [],
+							roll: [
+								{
+									type: "guaranteed",
+									outcome: [
+										{
+											type: "template",
+											templateUid: "empty",
+											rules: [],
+										},
+									],
+								},
+							],
+						},
+					],
+				},
+			},
+		});
+		config.templates = [
+			{
+				uid: "empty",
+				title: "Empty",
+				width: 4,
+				height: 2,
+				board: [],
+			},
+		];
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const { source, target } = yield* spawnParticipantsFx;
+				yield* mergeItemsFx({
+					sourceItemId: source.id,
+					sourceRevision: source.revision,
+					targetItemId: target.id,
+					targetRevision: target.revision,
+				});
+				return {
+					runtime: yield* readRuntimeFx(),
+					transition: yield* (yield* CommittedTransitionsFx).read,
+				};
+			}).pipe(
+				useGameFx({
+					config,
+				}),
+			),
+		);
+		expect(result.runtime.items).toEqual([]);
+		expect(result.transition.events.some((event) => event.type === "item:spawned")).toBe(false);
+		for (const itemId of [
+			"source",
+			"target",
+		]) {
+			expect(result.transition.events).toContainEqual(
+				expect.objectContaining({
+					type: "item:disappeared",
+					itemId,
+				}),
+			);
+		}
+	});
+
+	it("publishes disappearance when a merge Template erases the target's depletion spawn", () => {
+		const config = createMergeTestConfig({
+			rule: {
+				target: {
+					type: "item",
+					itemUid: "target",
+				},
+				action: "use",
+				effect: "spend",
+				outcome: {
+					set: [
+						{
+							weight: 1,
+							rules: [],
+							roll: [
+								{
+									type: "guaranteed",
+									outcome: [
+										{
+											type: "template",
+											templateUid: "empty",
+											rules: [],
+										},
+									],
+								},
+							],
+						},
+					],
+				},
+			},
+			targetUnits: {
+				amount: 1,
+				outcome: guaranteedMergeOutput(),
+			},
+		});
+		config.templates = [
+			{
+				uid: "empty",
+				title: "Empty",
+				width: 4,
+				height: 2,
+				board: [],
+			},
+		];
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const { source, target } = yield* spawnParticipantsFx;
+				yield* mergeItemsFx({
+					sourceItemId: source.id,
+					sourceRevision: source.revision,
+					targetItemId: target.id,
+					targetRevision: target.revision,
+				});
+				return {
+					runtime: yield* readRuntimeFx(),
+					transition: yield* (yield* CommittedTransitionsFx).read,
+				};
+			}).pipe(
+				useGameFx({
+					config,
+				}),
+			),
+		);
+		expect(result.runtime.items).toEqual([]);
+		expect(result.transition.events.some((event) => event.type === "item:spawned")).toBe(false);
+		expect(result.transition.events).toContainEqual(
+			expect.objectContaining({
+				type: "item:disappeared",
+				itemId: "target",
+			}),
+		);
+	});
+
 	it.each([
 		"remove",
 		"replace",

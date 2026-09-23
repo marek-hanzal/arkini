@@ -5,6 +5,7 @@ import { useGameFx } from "~test/support/useGameFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { createTemporaryLifetimeTestConfig } from "~test/item-schedule/fx/temporaryLifetime.test/createTemporaryLifetimeTestConfig";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
+import { projectCommittedEngineFactsFx } from "~/game-event/fx/projectCommittedEngineFactsFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { advanceRuntimeStepFx } from "~/game-tick/fx/advanceRuntimeStepFx";
 import { enqueueLineFx } from "~/production-job/fx/enqueueLineFx";
@@ -108,7 +109,16 @@ it("does not announce a job erased by its payer's template outcome", () => {
 				ownerItemId: "runtime:forge",
 				lineId: "line:forge:run",
 			});
-			return yield* advanceRuntimeStepFx(yield* readRuntimeFx());
+			const before = yield* readRuntimeFx();
+			const step = yield* advanceRuntimeStepFx(before);
+			return {
+				runtime: step.runtime,
+				events: yield* projectCommittedEngineFactsFx({
+					previousRuntime: before,
+					runtime: step.runtime,
+					facts: step.facts,
+				}),
+			};
 		}).pipe(
 			useGameFx({
 				config,
@@ -207,7 +217,7 @@ it("does not announce a queued job erased by another job's template outcome in t
 				lineId: "line:forge:run",
 			});
 			const runtime = yield* readRuntimeFx();
-			return yield* advanceRuntimeStepFx({
+			const before = {
 				...runtime,
 				jobs: [
 					{
@@ -218,7 +228,16 @@ it("does not announce a queued job erased by another job's template outcome in t
 						remainingMs: 0,
 					},
 				],
-			});
+			};
+			const step = yield* advanceRuntimeStepFx(before);
+			return {
+				runtime: step.runtime,
+				events: yield* projectCommittedEngineFactsFx({
+					previousRuntime: before,
+					runtime: step.runtime,
+					facts: step.facts,
+				}),
+			};
 		}).pipe(
 			useGameFx({
 				config,

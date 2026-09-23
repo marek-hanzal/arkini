@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { attemptQueuedLineStartFx } from "~/production-job/fx/attemptQueuedLineStartFx";
 import { advanceRuntimeStepFx } from "~/game-tick/fx/advanceRuntimeStepFx";
+import { projectCommittedEngineFactsFx } from "~/game-event/fx/projectCommittedEngineFactsFx";
 import { useGameFx } from "~test/support/useGameFx";
 import {
 	createBlockedQueueFixture,
@@ -67,7 +68,7 @@ describe("queued blocked probes", () => {
 					},
 				});
 				expect(attempt.runtime).toBe(runtime);
-				expect(attempt).not.toHaveProperty("events");
+				expect(attempt).not.toHaveProperty("facts");
 			}
 			expect(runtime).toEqual(snapshot);
 			expect(result.random).toBe(expectedRandom);
@@ -90,6 +91,13 @@ describe("queued blocked probes", () => {
 				}),
 			),
 		);
+		const events = Effect.runSync(
+			projectCommittedEngineFactsFx({
+				previousRuntime: runtime,
+				runtime: result.runtime,
+				facts: result.facts,
+			}),
+		);
 		expect(result.runtime.jobs).toMatchObject([
 			{
 				ownerItemId: request.ownerItemId,
@@ -100,7 +108,7 @@ describe("queued blocked probes", () => {
 			request,
 		]);
 		expect(result.runtime.items).toEqual(runtime.items);
-		expect(result.events).toMatchObject([
+		expect(events).toMatchObject([
 			{
 				type: "job:started",
 				lineId: "ready",

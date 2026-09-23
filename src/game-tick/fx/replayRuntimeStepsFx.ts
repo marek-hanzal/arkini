@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
+import type { EngineFact } from "~/game-event/type/EngineFact";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { SimulationStepMs } from "~/simulation-time/constant/SimulationStepMs";
 import { advanceRuntimeStepFx } from "~/game-tick/fx/advanceRuntimeStepFx";
@@ -11,7 +11,7 @@ interface ReplayRuntimeStepsProps {
 }
 
 interface ReplayRuntimeStepsResult {
-	readonly events: readonly GameEventSchema.Type[];
+	readonly facts: readonly EngineFact[];
 	readonly isStable: boolean;
 	readonly processedSteps: number;
 	readonly runtime: RuntimeSchema.Type;
@@ -21,7 +21,7 @@ interface ReplayRuntimeStepsResult {
 /**
  * Replays a whole fixed-step budget over one locked runtime draft.
  *
- * An event-free same-reference step is stable while the runtime transaction is
+ * A fact-free same-reference step is stable while the runtime transaction is
  * still locked: the next fixed step would receive the exact same state and must
  * produce the same no-op result. The remaining backlog can therefore be
  * consumed without repeating identical domain work.
@@ -38,24 +38,24 @@ export const replayRuntimeStepsFx = Effect.fn("replayRuntimeStepsFx")(function* 
 
 	const totalSteps = elapsedMs / SimulationStepMs;
 	let draft = runtime;
-	const events: GameEventSchema.Type[] = [];
+	const facts: EngineFact[] = [];
 	let processedSteps = 0;
 	let isStable = false;
 
 	for (let stepIndex = 0; stepIndex < totalSteps; stepIndex += 1) {
 		const step = yield* advanceRuntimeStepFx(draft);
 		processedSteps = stepIndex + 1;
-		const isStableNoOp = step.runtime === draft && step.events.length === 0;
+		const isStableNoOp = step.runtime === draft && step.facts.length === 0;
 		if (isStableNoOp) {
 			isStable = true;
 			break;
 		}
 		draft = step.runtime;
-		events.push(...step.events);
+		facts.push(...step.facts);
 	}
 
 	return {
-		events,
+		facts,
 		isStable,
 		processedSteps,
 		runtime: draft,

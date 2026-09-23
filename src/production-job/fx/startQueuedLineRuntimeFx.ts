@@ -1,12 +1,12 @@
 import { Effect } from "effect";
 
-import type { IdSchema } from "~/game-value/schema/IdSchema";
-import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
+import type { EngineFact } from "~/game-event/type/EngineFact";
 import { readLineInputAutofillCoverageFx } from "~/production-input/fx/readLineInputAutofillCoverageFx";
 import { startLineRuntimeFx } from "~/production-job/fx/startLineRuntimeFx";
 import { assertLineEnqueueConditionsFx } from "~/production-job/fx/assertLineEnqueueConditionsFx";
 import { resolveLineStartFx } from "~/production-job/fx/resolveLineStartFx";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
+import type { JobQueueRequestSchema } from "~/production-job/schema/JobQueueRequestSchema";
 import { JobOwnerBusyError } from "~/production-job/error/JobOwnerBusyError";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
@@ -14,9 +14,7 @@ import { isItemProductionAdmissionOpenFn } from "~/production-line/fn/isItemProd
 
 export namespace startQueuedLineRuntimeFx {
 	export interface Props {
-		readonly lineId: IdSchema.Type;
-		readonly ownerItemId: IdSchema.Type;
-		readonly queueRequestId: IdSchema.Type;
+		readonly request: JobQueueRequestSchema.Type;
 		readonly runtime: RuntimeSchema.Type;
 	}
 
@@ -26,13 +24,8 @@ export namespace startQueuedLineRuntimeFx {
 				readonly runtime: RuntimeSchema.Type;
 		  }
 		| {
-				readonly type: "queue-request-unavailable";
-				readonly reason: "missing" | "wrong-line";
-				readonly runtime: RuntimeSchema.Type;
-		  }
-		| {
 				readonly type: "started";
-				readonly events: readonly GameEventSchema.Type[];
+				readonly facts: readonly EngineFact[];
 				readonly job: JobSchema.Type;
 				readonly runtime: RuntimeSchema.Type;
 		  };
@@ -46,28 +39,10 @@ export namespace startQueuedLineRuntimeFx {
  * but never applied here; material travels through Delivery before becoming startable.
  */
 export const startQueuedLineRuntimeFx = Effect.fn("startQueuedLineRuntimeFx")(function* ({
-	lineId,
-	ownerItemId,
-	queueRequestId,
+	request,
 	runtime,
 }: startQueuedLineRuntimeFx.Props) {
-	const request = runtime.jobQueue.find((candidate) => {
-		return candidate.id === queueRequestId;
-	});
-	if (request === undefined) {
-		return {
-			type: "queue-request-unavailable",
-			reason: "missing",
-			runtime,
-		} satisfies startQueuedLineRuntimeFx.Result;
-	}
-	if (request.ownerItemId !== ownerItemId || request.lineId !== lineId) {
-		return {
-			type: "queue-request-unavailable",
-			reason: "wrong-line",
-			runtime,
-		} satisfies startQueuedLineRuntimeFx.Result;
-	}
+	const { id: queueRequestId, ownerItemId, lineId } = request;
 	const jobIds = runtime.jobs
 		.filter((job) => job.ownerItemId === ownerItemId)
 		.map((job) => job.id);
@@ -121,14 +96,14 @@ export const startQueuedLineRuntimeFx = Effect.fn("startQueuedLineRuntimeFx")(fu
 			return request.id !== queueRequestId;
 		}),
 	};
-	const [job, startedRuntime, startEvents] = yield* startLineRuntimeFx({
+	const [job, startedRuntime, startFacts] = yield* startLineRuntimeFx({
 		lineId,
 		ownerItemId,
 		runtime: candidate,
 	});
 	return {
 		type: "started",
-		events: startEvents,
+		facts: startFacts,
 		job,
 		runtime: startedRuntime,
 	} satisfies startQueuedLineRuntimeFx.Result;

@@ -2,9 +2,7 @@ import { relocateBoardItemFx } from "~/item-placement/fx/relocateBoardItemFx";
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import { readOutcomePlacementItemEventsFx } from "~/game-event/fx/readOutcomePlacementItemEventsFx";
-import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
-import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
+import type { EngineFact } from "~/game-event/type/EngineFact";
 import { ItemStatefulError } from "~/game-runtime/error/ItemStatefulError";
 import { resolveItemFx } from "~/item-resolution/fx/resolveItemFx";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
@@ -80,10 +78,10 @@ const applyMergeSourceActionFx = Effect.fn("applyMergeSourceActionFx")(function*
 			runtime,
 		});
 		return {
-			events: spent.events,
+			facts: spent.facts,
 			runtime: spent.runtime,
 		} satisfies {
-			readonly events: readonly GameEventSchema.Type[];
+			readonly facts: readonly EngineFact[];
 			readonly runtime: RuntimeSchema.Type;
 		};
 	}
@@ -104,7 +102,7 @@ const applyMergeSourceActionFx = Effect.fn("applyMergeSourceActionFx")(function*
 
 	if (action === SourceActionSchema.enum.Use)
 		return {
-			events: [],
+			facts: [],
 			runtime,
 		};
 	const withoutOwnedState =
@@ -128,11 +126,11 @@ const applyMergeSourceActionFx = Effect.fn("applyMergeSourceActionFx")(function*
 	];
 
 	return {
-		events,
+		facts: events,
 
 		runtime: draft,
 	} satisfies {
-		readonly events: readonly GameEventSchema.Type[];
+		readonly facts: readonly EngineFact[];
 		readonly runtime: RuntimeSchema.Type;
 	};
 });
@@ -223,7 +221,7 @@ const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(function*
 			},
 			() =>
 				Effect.succeed({
-					events: [],
+					facts: [],
 					runtime,
 				}),
 		)
@@ -237,10 +235,14 @@ const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(function*
 						ownerItemId: target.id,
 						runtime,
 					});
-					return yield* removeRuntimeItemFx({
+					const removed = yield* removeRuntimeItemFx({
 						item: target,
 						runtime,
 					});
+					return {
+						facts: removed.events,
+						runtime: removed.runtime,
+					};
 				}),
 		)
 		.with(
@@ -272,7 +274,7 @@ const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(function*
 						mergeSequence: target.mergeSequence,
 					};
 					return {
-						events: [],
+						facts: [],
 						runtime: {
 							...runtime,
 							items: runtime.items.map((item) =>
@@ -294,7 +296,7 @@ interface ApplyMergeRuntimeProps {
 }
 
 interface ApplyMergeRuntimeResult {
-	readonly events: readonly GameEventSchema.Type[];
+	readonly facts: readonly EngineFact[];
 	readonly runtime: RuntimeSchema.Type;
 }
 
@@ -308,14 +310,20 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 }: ApplyMergeRuntimeProps) {
 	const owner = rule.action === "space" ? target : source;
 	const sourceAction = yield* rule.action === "space"
-		? relocateBoardItemFx({
-				itemId: source.id,
-				originItemId: owner.id,
-				runtime,
-				origin: {
-					...owner.location,
-					space: rule.space,
-				},
+		? Effect.gen(function* () {
+				const moved = yield* relocateBoardItemFx({
+					itemId: source.id,
+					originItemId: owner.id,
+					runtime,
+					origin: {
+						...owner.location,
+						space: rule.space,
+					},
+				});
+				return {
+					facts: moved.events,
+					runtime: moved.runtime,
+				};
 			})
 		: applyMergeSourceActionFx({
 				action: rule.action,
@@ -336,54 +344,51 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 		target: currentTarget,
 	});
 	let draft = targetEffect.runtime;
-	const events = [
-		...sourceAction.events,
-		...targetEffect.events,
+	const targetDepleted = targetEffect.facts.some(
+		(event) =>
+			event.type === "lifecycle:settled" &&
+			event.cause === "depleted" &&
+			event.itemId === target.id,
+	);
+	const facts: EngineFact[] = [
+		...sourceAction.facts,
+		...targetEffect.facts,
 	];
-	const targetDisappeared = rule.effect === TargetEffectSchema.enum.Remove;
-
-	if (rule.outcome === undefined) {
-		if (targetDisappeared) {
-			events.push({
-				type: GameEventEnumSchema.enum.ItemDisappeared,
-				itemId: target.id,
-				itemUid: target.item.uid,
-				location: target.location,
-			});
-		}
-		return {
-			events,
+	let mergeReplacementItemIds: string[] = [];
+	if (rule.outcome !== undefined) {
+		const outcome = yield* resolveOutcomeTableFx({
+			origin: owner.location,
+			outcome: rule.outcome,
+		});
+		const [placement, withOutcome] = yield* applyOutcomeTableFx({
+			outcome,
 			runtime: draft,
-		} satisfies ApplyMergeRuntimeResult;
+		});
+		if (placement.effects.length > 0)
+			facts.push({
+				type: "outcome:applied",
+				originItemId: owner.id,
+				effects: placement.effects,
+			});
+		if (rule.effect === TargetEffectSchema.enum.Remove)
+			mergeReplacementItemIds = placement.effects.flatMap((effect) =>
+				effect.type === "item" ? effect.placement.spawn.map((spawned) => spawned.id) : [],
+			);
+		draft = withOutcome;
 	}
-	const outcome = yield* resolveOutcomeTableFx({
-		ownerItemId: owner.id,
-		origin: owner.location,
-		outcome: rule.outcome,
-	});
-	const [placement, withOutcome] = yield* applyOutcomeTableFx({
-		outcome,
-		runtime: draft,
-	});
-	const placementEvents = yield* readOutcomePlacementItemEventsFx({
-		originItemId: owner.id,
-		placement,
-	});
-	events.push(...placementEvents);
-	if (
-		targetDisappeared &&
-		placement.item.every(({ placement: { spawn } }) => spawn.length === 0)
-	) {
-		events.push({
-			type: GameEventEnumSchema.enum.ItemDisappeared,
+	if (rule.effect === TargetEffectSchema.enum.Remove && !targetDepleted) {
+		facts.push({
+			type: "lifecycle:settled",
+			cause: "removed",
 			itemId: target.id,
 			itemUid: target.item.uid,
 			location: target.location,
+			visible: true,
+			replacementItemIds: mergeReplacementItemIds,
 		});
 	}
-	draft = withOutcome;
 	return {
-		events,
+		facts,
 		runtime: draft,
 	} satisfies ApplyMergeRuntimeResult;
 });

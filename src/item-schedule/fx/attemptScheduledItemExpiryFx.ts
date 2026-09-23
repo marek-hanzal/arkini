@@ -2,7 +2,7 @@ import { expireItemRuntimeFx } from "~/item-expiry/fx/expireItemRuntimeFx";
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
-import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
+import type { EngineFact } from "~/game-event/type/EngineFact";
 import { readItemPhysicalContextFx } from "~/item-location/fx/readItemPhysicalContextFx";
 import { readItemScheduleFn } from "~/item-schedule/fn/readItemScheduleFn";
 import { releaseOwnerInputsFx } from "~/production-input/fx/releaseOwnerInputsFx";
@@ -22,12 +22,12 @@ type AttemptScheduledItemExpiryResult =
 	  }
 	| {
 			type: "expired";
-			events: readonly GameEventSchema.Type[];
+			facts: readonly EngineFact[];
 			runtime: RuntimeSchema.Type;
 	  };
 
 interface CompleteScheduledItemExpiryTransitionResult {
-	readonly events: readonly GameEventSchema.Type[];
+	readonly facts: readonly EngineFact[];
 	readonly runtime: RuntimeSchema.Type;
 }
 
@@ -76,8 +76,8 @@ const completeScheduledItemExpiryTransitionFx = Effect.fn(
 			});
 
 	return {
-		events: [
-			...expiry.events,
+		facts: [
+			...expiry.facts,
 			...release.events,
 		],
 		runtime: release.runtime,
@@ -97,7 +97,7 @@ export const attemptScheduledItemExpiryFx = Effect.fn("attemptScheduledItemExpir
 			(completion) =>
 				({
 					type: "expired",
-					events: completion.events,
+					facts: completion.facts,
 					runtime: completion.runtime,
 				}) satisfies AttemptScheduledItemExpiryResult,
 		),

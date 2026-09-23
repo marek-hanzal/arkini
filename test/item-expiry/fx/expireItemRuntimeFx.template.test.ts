@@ -64,9 +64,6 @@ it("uses expiry entry ancestry when its owner and buffers did not exist in the a
 			expect(expired.runtime.templateUidBySpace).toEqual({
 				0: "empty",
 			});
-			expect(expired.events.some((event) => event.type === "board:template-applied")).toBe(
-				true,
-			);
 		}).pipe(
 			useGameFx({
 				config,

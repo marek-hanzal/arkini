@@ -117,7 +117,6 @@ const settleFx = (outcome: OutcomeTableSchema.Type) =>
 	modifyRuntimeFx((runtime) =>
 		Effect.gen(function* () {
 			const resolved = yield* resolveOutcomeTableFx({
-				ownerItemId: "owner-live",
 				origin,
 				outcome,
 			});
@@ -146,7 +145,6 @@ describe("Outcome settlement", () => {
 			Effect.gen(function* () {
 				yield* spawnOwnerFx();
 				const resolved = yield* resolveOutcomeTableFx({
-					ownerItemId: "owner-live",
 					origin,
 					outcome,
 				});
@@ -163,7 +161,6 @@ describe("Outcome settlement", () => {
 		);
 		expect(result.resolved.roll).toEqual([
 			{
-				ownerItemId: "owner-live",
 				origin,
 				outcome: [
 					{
@@ -301,7 +298,7 @@ describe("Outcome settlement", () => {
 						return [
 							undefined,
 							expired.runtime,
-							expired.events,
+							expired.facts,
 						] as const;
 					}),
 				);
@@ -356,7 +353,7 @@ describe("Outcome settlement", () => {
 						return [
 							undefined,
 							expired.runtime,
-							expired.events,
+							expired.facts,
 						] as const;
 					}),
 				);

@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
-import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
+import type { EngineFact } from "~/game-event/type/EngineFact";
 import { completeJobTransitionFx } from "~/production-job/fx/completeJobTransitionFx";
 import type { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -20,7 +20,7 @@ export namespace attemptJobCompletionFx {
 		  }
 		| {
 				type: "completed";
-				events: readonly GameEventSchema.Type[];
+				facts: readonly EngineFact[];
 				runtime: RuntimeSchema.Type;
 		  };
 }
@@ -38,7 +38,7 @@ export const attemptJobCompletionFx = Effect.fn("attemptJobCompletionFx")(functi
 			(completion) =>
 				({
 					type: "completed",
-					events: completion.events,
+					facts: completion.facts,
 					runtime: completion.runtime,
 				}) satisfies attemptJobCompletionFx.Result,
 		),

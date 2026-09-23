@@ -140,7 +140,7 @@ describe("committed runtime removal snapshots", () => {
 								[
 									undefined,
 									step.runtime,
-									step.events,
+									step.facts,
 								] as const,
 						),
 					),
@@ -214,7 +214,7 @@ describe("committed runtime removal snapshots", () => {
 			),
 		);
 		expect(step.runtime.items).toEqual([]);
-		expect(step.events).toContainEqual(
+		expect(step.facts).toContainEqual(
 			expect.objectContaining({
 				type: "job:completed",
 				ownerItemId: "runtime:clock",

@@ -15,10 +15,6 @@ export namespace applyItemOutcomeFx {
 		readonly origin: BoardLocationSchema.Type;
 		readonly runtime: RuntimeSchema.Type;
 	}
-	export interface Placement {
-		readonly outcome: ResolvedOutcome.Item;
-		readonly placement: PlacementPlan;
-	}
 }
 
 /** Item settlement owns placement and its explicit overflow policy. */
@@ -85,11 +81,8 @@ export const applyItemOutcomeFx = Effect.fn("applyItemOutcomeFx")(function* ({
 
 	return [
 		{
-			outcome: drop,
-			placement: {
-				spawn: placement.results.flatMap(({ spawn }) => spawn),
-			},
-		} satisfies applyItemOutcomeFx.Placement,
+			spawn: placement.results.flatMap(({ spawn }) => spawn),
+		} satisfies PlacementPlan,
 		placement.draft,
 		placement.discarded,
 	] as const;

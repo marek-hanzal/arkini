@@ -111,7 +111,7 @@ describe("kill-switch material expiry", () => {
 						return [
 							undefined,
 							step.runtime,
-							step.events,
+							step.facts,
 						] as const;
 					}),
 				);

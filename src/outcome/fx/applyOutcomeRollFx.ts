@@ -1,6 +1,5 @@
 import { applyBoardTemplateRuntimeFx } from "~/board-template/fx/applyBoardTemplateRuntimeFx";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
-import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 import type { ResolvedOutcomeRoll } from "~/outcome/type/ResolvedOutcomeRoll";
@@ -8,6 +7,7 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { applyItemOutcomeFx } from "./applyItemOutcomeFx";
 import { applySpaceOutcomeFn } from "~/outcome/fn/applySpaceOutcomeFn";
 import type { planBestEffortDropPlacementFx } from "~/item-placement/fx/planBestEffortDropPlacementFx";
+import type { AppliedOutcome } from "~/outcome/type/AppliedOutcome";
 
 export namespace applyOutcomeRollFx {
 	export interface Props {
@@ -17,8 +17,7 @@ export namespace applyOutcomeRollFx {
 	}
 	export interface Result {
 		readonly runtime: RuntimeSchema.Type;
-		readonly events: readonly GameEventSchema.Type[];
-		readonly item: readonly applyItemOutcomeFx.Placement[];
+		readonly effects: readonly AppliedOutcome[];
 		readonly discarded: readonly planBestEffortDropPlacementFx.Discarded[];
 	}
 }
@@ -30,8 +29,7 @@ export const applyOutcomeRollFx = Effect.fn("applyOutcomeRollFx")(function* ({
 	overflow,
 }: applyOutcomeRollFx.Props) {
 	let draft = runtime;
-	const events: GameEventSchema.Type[] = [];
-	const item: applyItemOutcomeFx.Placement[] = [];
+	const effects: AppliedOutcome[] = [];
 	const discarded: planBestEffortDropPlacementFx.Discarded[] = [];
 	for (const outcome of roll.outcome) {
 		yield* match(outcome)
@@ -48,7 +46,10 @@ export const applyOutcomeRollFx = Effect.fn("applyOutcomeRollFx")(function* ({
 							overflow,
 						});
 						draft = next;
-						item.push(placement);
+						effects.push({
+							type: "item",
+							placement,
+						});
 						discarded.push(...loss);
 					}),
 			)
@@ -78,15 +79,19 @@ export const applyOutcomeRollFx = Effect.fn("applyOutcomeRollFx")(function* ({
 							templateUid: outcome.templateUid,
 						});
 						draft = applied.runtime;
-						events.push(...applied.events);
+						effects.push({
+							type: "template",
+							space: roll.origin.space,
+							templateUid: outcome.templateUid,
+							removed: applied.removed,
+						});
 					}),
 			)
 			.exhaustive();
 	}
 	return {
 		runtime: draft,
-		events,
-		item,
+		effects,
 		discarded,
 	} satisfies applyOutcomeRollFx.Result;
 });

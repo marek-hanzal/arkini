@@ -112,9 +112,9 @@ export const completeJobTransitionFx = Effect.fn("completeJobTransitionFx")(func
 		),
 	});
 	return {
-		events: [
+		facts: [
 			...removalEvents,
-			...completion.events,
+			...completion.facts,
 		],
 		runtime: completion.runtime,
 	};

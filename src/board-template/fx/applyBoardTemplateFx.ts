@@ -19,7 +19,17 @@ export const applyBoardTemplateFx = Effect.fn("applyBoardTemplateFx")(function* 
 			return [
 				result.runtime,
 				result.runtime,
-				result.events,
+				[
+					{
+						type: "template:applied",
+						effect: {
+							type: "template",
+							space: runtime.currentSpace,
+							templateUid,
+							removed: result.removed,
+						},
+					},
+				] as const,
 			] as const;
 		}),
 	);

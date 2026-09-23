@@ -36,5 +36,5 @@ export const placeDropForTestFx = Effect.fn("placeDropForTestFx")(function* ({
 			],
 		} satisfies OutcomeTableSchema.Type,
 	});
-	return output.item[0];
+	return output.effects.find((effect) => effect.type === "item");
 });

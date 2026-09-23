@@ -14,6 +14,7 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { fromRuntimeFn } from "~/game-persistence/fn/fromRuntimeFn";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { advanceRuntimeStepFx } from "~/game-tick/fx/advanceRuntimeStepFx";
+import { projectCommittedEngineFactsFx } from "~/game-event/fx/projectCommittedEngineFactsFx";
 import { createTemporaryLifetimeTestConfig } from "~test/item-schedule/fx/temporaryLifetime.test/createTemporaryLifetimeTestConfig";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
@@ -100,6 +101,11 @@ describe("temporary item lifetime", () => {
 					fourth,
 					fifth,
 					sixth,
+					sixthEvents: yield* projectCommittedEngineFactsFx({
+						previousRuntime: fifth.runtime,
+						runtime: sixth.runtime,
+						facts: sixth.facts,
+					}),
 				};
 			}).pipe(
 				useGameFx({
@@ -116,7 +122,7 @@ describe("temporary item lifetime", () => {
 		expect(result.fourth.runtime.items[0]?.schedule?.remainingDurationMs).toBe(200);
 		expect(result.fifth.runtime.items[0]?.schedule?.remainingDurationMs).toBe(100);
 		expect(result.sixth.runtime.items).toEqual([]);
-		expect(result.sixth.events).toEqual([
+		expect(result.sixthEvents).toEqual([
 			{
 				type: GameEventEnumSchema.enum.ItemRemoved,
 				snapshot: {
@@ -124,6 +130,7 @@ describe("temporary item lifetime", () => {
 					schedule: {
 						...result.spawned.schedule,
 						remainingDurationMs: 0,
+						pulseSequence: undefined,
 					},
 				},
 			},
@@ -315,6 +322,11 @@ describe("temporary item lifetime", () => {
 					outcome,
 					temporary,
 					expiry: sixth,
+					expiryEvents: yield* projectCommittedEngineFactsFx({
+						previousRuntime: fifth.runtime,
+						runtime: sixth.runtime,
+						facts: sixth.facts,
+					}),
 				};
 			}).pipe(
 				useGameFx({
@@ -323,7 +335,7 @@ describe("temporary item lifetime", () => {
 			),
 		);
 
-		expect(result.expiry.events).toEqual([
+		expect(result.expiryEvents).toEqual([
 			{
 				type: GameEventEnumSchema.enum.ItemRemoved,
 				snapshot: {
@@ -331,6 +343,7 @@ describe("temporary item lifetime", () => {
 					schedule: {
 						...result.temporary.schedule,
 						remainingDurationMs: 0,
+						pulseSequence: undefined,
 					},
 				},
 			},
@@ -349,7 +362,7 @@ describe("temporary item lifetime", () => {
 			},
 		]);
 		expect(
-			result.expiry.events.some(
+			result.expiryEvents.some(
 				(event) => event.type === GameEventEnumSchema.enum.ItemDisappeared,
 			),
 		).toBe(false);

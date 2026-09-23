@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 
-import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
+import { projectCommittedEngineFactsFx } from "~/game-event/fx/projectCommittedEngineFactsFx";
+import type { EngineFact } from "~/game-event/type/EngineFact";
 import { assertRuntimeFx } from "~/game-runtime/fx/assertRuntimeFx";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import type { CommittedTransitionSchema } from "~/game-runtime/schema/CommittedTransitionSchema";
@@ -15,7 +16,7 @@ type RuntimeUpdateResult<Result> =
 	| readonly [
 			Result,
 			RuntimeSchema.Type,
-			readonly GameEventSchema.Type[],
+			readonly EngineFact[],
 	  ];
 
 export namespace modifyRuntimeWithTransitionFx {
@@ -29,32 +30,6 @@ interface RuntimeModification<Value> {
 	/** Exact transition committed by this mutation, or null when it changed no runtime facts. */
 	readonly transition: CommittedTransitionSchema.Type | null;
 }
-
-/** Only identities present before the write can have a committed removal; the last capture wins. */
-const readCommittedEventsFn = (
-	previousRuntime: RuntimeSchema.Type,
-	nextRuntime: RuntimeSchema.Type,
-	events: readonly GameEventSchema.Type[],
-): GameEventSchema.Type[] => {
-	const previousIds = new Set(previousRuntime.items.map((item) => item.id));
-	const survivingIds = new Set(nextRuntime.items.map((item) => item.id));
-	const capturedIds = new Set<string>();
-	const result: GameEventSchema.Type[] = [];
-	for (let index = events.length - 1; index >= 0; index--) {
-		const event = events[index];
-		if (event.type === "item:removed") {
-			if (
-				!previousIds.has(event.snapshot.id) ||
-				survivingIds.has(event.snapshot.id) ||
-				capturedIds.has(event.snapshot.id)
-			)
-				continue;
-			capturedIds.add(event.snapshot.id);
-		}
-		result.push(event);
-	}
-	return result.reverse();
-};
 
 /** Mutates the serialized runtime and returns the exact optional transition from the same lock. */
 export const modifyRuntimeWithTransitionFx = Effect.fn("modifyRuntimeWithTransitionFx")(function* <
@@ -75,36 +50,33 @@ export const modifyRuntimeWithTransitionFx = Effect.fn("modifyRuntimeWithTransit
 					runtime: nextRuntime,
 				});
 			}),
-			Effect.map(([result, nextRuntime, emittedEvents = []]) => {
-				const events: GameEventSchema.Type[] = readCommittedEventsFn(
-					transition.runtime,
-					nextRuntime,
-					emittedEvents,
-				).filter((event) => event.type !== "current-space:changed");
-				if (transition.runtime.currentSpace !== nextRuntime.currentSpace)
-					events.push({
-						type: "current-space:changed",
-						previousSpace: transition.runtime.currentSpace,
-						currentSpace: nextRuntime.currentSpace,
-					});
-				const changed = nextRuntime !== transition.runtime || events.length > 0;
-				const nextTransition = changed
-					? {
-							sequence: transition.sequence + 1,
-							previousRuntime: transition.runtime,
-							runtime: nextRuntime,
-							events,
-						}
-					: transition;
+			Effect.flatMap(([result, nextRuntime, facts = []]) =>
+				projectCommittedEngineFactsFx({
+					previousRuntime: transition.runtime,
+					runtime: nextRuntime,
+					facts,
+				}).pipe(
+					Effect.map((events) => {
+						const changed = nextRuntime !== transition.runtime || events.length > 0;
+						const nextTransition = changed
+							? {
+									sequence: transition.sequence + 1,
+									previousRuntime: transition.runtime,
+									runtime: nextRuntime,
+									events,
+								}
+							: transition;
 
-				return [
-					{
-						result,
-						transition: changed ? nextTransition : null,
-					} satisfies RuntimeModification<Result>,
-					nextTransition,
-				] as const;
-			}),
+						return [
+							{
+								result,
+								transition: changed ? nextTransition : null,
+							} satisfies RuntimeModification<Result>,
+							nextTransition,
+						] as const;
+					}),
+				),
+			),
 		),
 	);
 });

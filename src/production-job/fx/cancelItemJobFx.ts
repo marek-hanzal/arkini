@@ -39,7 +39,7 @@ export const cancelItemJobFx = Effect.fn("cancelItemJobFx")(function* ({
 			return [
 				undefined,
 				aborted.runtime,
-				aborted.events,
+				aborted.facts,
 			] as const;
 		}),
 	);

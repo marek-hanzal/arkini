@@ -29,7 +29,7 @@ describe("rollFx", () => {
 			}),
 		);
 
-		expect(result.outcome).toEqual([
+		expect(result).toEqual([
 			logDrop,
 		]);
 	});
@@ -67,7 +67,7 @@ describe("rollFx", () => {
 			),
 		);
 
-		expect(result.outcome).toEqual(
+		expect(result).toEqual(
 			passed
 				? [
 						logDrop,

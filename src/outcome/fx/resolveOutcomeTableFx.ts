@@ -2,7 +2,6 @@ import { resolveOutcomeRulesEnabledFx } from "./resolveOutcomeRulesEnabledFx";
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 import type { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
-import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
 import type { ResolvedOutcome } from "~/outcome/type/ResolvedOutcome";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
@@ -14,7 +13,6 @@ import { resolveSpaceOutcomeFx } from "./resolveSpaceOutcomeFx";
 
 export namespace resolveOutcomeTableFx {
 	export interface Props {
-		readonly ownerItemId: IdSchema.Type;
 		readonly origin: BoardLocationSchema.Type;
 		readonly outcome: OutcomeTableSchema.Type;
 	}
@@ -25,7 +23,6 @@ export namespace resolveOutcomeTableFx {
 
 /** Resolves each complete roll against the caller's pinned snapshot without applying it. */
 export const resolveOutcomeTableFx = Effect.fn("resolveOutcomeTableFx")(function* ({
-	ownerItemId,
 	origin,
 	outcome,
 }: resolveOutcomeTableFx.Props) {
@@ -43,7 +40,7 @@ export const resolveOutcomeTableFx = Effect.fn("resolveOutcomeTableFx")(function
 			roll,
 		});
 		const results = yield* Effect.forEach(
-			selectedOutcomes.outcome,
+			selectedOutcomes,
 			(entry): Effect.Effect<ResolvedOutcome | undefined, never, RuntimeFx> =>
 				match(entry)
 					.with(
@@ -88,7 +85,6 @@ export const resolveOutcomeTableFx = Effect.fn("resolveOutcomeTableFx")(function
 					.exhaustive(),
 		);
 		rolls.push({
-			ownerItemId,
 			origin,
 			outcome: results.filter((result) => result !== undefined),
 		});

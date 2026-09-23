@@ -2,6 +2,8 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { advanceRuntimeStepFx } from "~/game-tick/fx/advanceRuntimeStepFx";
+import { projectCommittedEngineFactsFx } from "~/game-event/fx/projectCommittedEngineFactsFx";
+import type { EngineFact } from "~/game-event/type/EngineFact";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
@@ -29,14 +31,18 @@ const advanceStepsFx = Effect.fn("advanceTemporaryMaterialTestStepsFx")(function
 	readonly runtime: RuntimeSchema.Type;
 }) {
 	let draft = runtime;
-	const events = [];
+	const facts: EngineFact[] = [];
 	for (let index = 0; index < count; index += 1) {
 		const step = yield* advanceRuntimeStepFx(draft);
 		draft = step.runtime;
-		events.push(...step.events);
+		facts.push(...step.facts);
 	}
 	return {
-		events,
+		events: yield* projectCommittedEngineFactsFx({
+			previousRuntime: runtime,
+			runtime: draft,
+			facts,
+		}),
 		runtime: draft,
 	};
 });

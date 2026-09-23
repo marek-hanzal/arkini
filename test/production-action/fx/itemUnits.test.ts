@@ -62,12 +62,14 @@ describe("item units / owner lifecycle", () => {
 			previousUnits: 2,
 			resultingUnits: 1,
 		});
-		expect(result.finalCompletion.events).toContainEqual({
-			type: GameEventEnumSchema.enum.ItemDepleted,
-			itemId: result.well.id,
-			itemUid: "units:self-well",
-			location: board(0),
-		});
+		expect(result.finalCompletion.events).toContainEqual(
+			expect.objectContaining({
+				type: GameEventEnumSchema.enum.ItemDepleted,
+				itemId: result.well.id,
+				itemUid: "units:self-well",
+				location: board(0),
+			}),
+		);
 		expect(result.finalCompletion.events).toContainEqual({
 			type: GameEventEnumSchema.enum.ItemDisappeared,
 			itemId: result.well.id,

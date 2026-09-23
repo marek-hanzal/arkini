@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
-import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
+import type { EngineFact } from "~/game-event/type/EngineFact";
 import type { InputRun } from "~/production-input/type/InputRun";
 import { readItemRemainingUnitsFn } from "~/production-action/fn/readItemRemainingUnitsFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
@@ -67,7 +67,7 @@ export const settleActionUnitsFx = Effect.fn("settleActionUnitsFx")(function* ({
 	return yield* Effect.reduce(
 		orderedSpends,
 		() => ({
-			events: [] as GameEventSchema.Type[],
+			facts: [] as EngineFact[],
 			runtime,
 		}),
 		(state, spend) =>
@@ -81,9 +81,9 @@ export const settleActionUnitsFx = Effect.fn("settleActionUnitsFx")(function* ({
 					runtime: state.runtime,
 				});
 				return {
-					events: [
-						...state.events,
-						...result.events,
+					facts: [
+						...state.facts,
+						...result.facts,
 					],
 					runtime: result.runtime,
 				};

@@ -1,4 +1,4 @@
-import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
+import type { EngineFact } from "~/game-event/type/EngineFact";
 import { Effect } from "effect";
 import { applyBoardTemplateRuntimeFx } from "~/board-template/fx/applyBoardTemplateRuntimeFx";
 import { assertRuntimeFx } from "~/game-runtime/fx/assertRuntimeFx";
@@ -17,19 +17,27 @@ export const planStartFx = Effect.fn("planStartFx")(function* ({
 		...runtime,
 		currentSpace: start.currentSpace,
 	};
-	const events: GameEventSchema.Type[] = [];
+	const facts: EngineFact[] = [];
 	for (const assignment of start.spaces) {
 		const applied = yield* applyBoardTemplateRuntimeFx({
 			runtime: draft,
 			...assignment,
 		});
 		draft = applied.runtime;
-		events.push(...applied.events);
+		facts.push({
+			type: "template:applied",
+			effect: {
+				type: "template",
+				space: assignment.space,
+				templateUid: assignment.templateUid,
+				removed: applied.removed,
+			},
+		});
 	}
 	return {
 		runtime: yield* assertRuntimeFx({
 			runtime: draft,
 		}),
-		events,
+		facts,
 	};
 });

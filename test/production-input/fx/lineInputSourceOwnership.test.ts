@@ -221,7 +221,6 @@ describe("line input source ownership", () => {
 		);
 
 		expect(result.autofill).toEqual({
-			deliveryItemIds: [],
 			remainingMissingQuantity: 1,
 			scheduledQuantity: 0,
 		});

@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
+import type { EngineFact } from "~/game-event/type/EngineFact";
 import { readItemScheduleFn } from "~/item-schedule/fn/readItemScheduleFn";
 import { resolveItemScheduleEnabledFx } from "~/item-schedule/fx/resolveItemScheduleEnabledFx";
 import { selectClockLineFx } from "~/item-schedule/fx/selectClockLineFx";
@@ -16,7 +16,7 @@ export const advanceItemSchedulesFx = Effect.fn("advanceItemSchedulesFx")(functi
 	readonly runtime: RuntimeSchema.Type;
 }) {
 	let draft = runtime;
-	const events: GameEventSchema.Type[] = [];
+	const facts: EngineFact[] = [];
 	let dispatched = false;
 	const owners = stepStart.items
 		.filter((item) => item.schedule !== undefined)
@@ -67,7 +67,7 @@ export const advanceItemSchedulesFx = Effect.fn("advanceItemSchedulesFx")(functi
 			);
 			if (attempt !== undefined) {
 				draft = attempt.runtime;
-				events.push(...attempt.events);
+				facts.push(...attempt.events);
 			}
 			dispatched = true;
 		}
@@ -101,7 +101,7 @@ export const advanceItemSchedulesFx = Effect.fn("advanceItemSchedulesFx")(functi
 	}
 	return {
 		runtime: draft,
-		events,
+		facts,
 		dispatched,
 	};
 });

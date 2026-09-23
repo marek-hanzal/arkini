@@ -230,7 +230,7 @@ export const mergeItemsFx = Effect.fn("mergeItemsFx")(function* ({
 				nextRuntime,
 				[
 					event,
-					...mergeTransition.events,
+					...mergeTransition.facts,
 				],
 			] as const;
 		}),

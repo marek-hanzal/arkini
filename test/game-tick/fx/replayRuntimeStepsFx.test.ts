@@ -7,8 +7,20 @@ import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { advanceRuntimeStepFx } from "~/game-tick/fx/advanceRuntimeStepFx";
 import { replayRuntimeStepsFx } from "~/game-tick/fx/replayRuntimeStepsFx";
+import { projectCommittedEngineFactsFx } from "~/game-event/fx/projectCommittedEngineFactsFx";
 import { SimulationStepMs } from "~/simulation-time/constant/SimulationStepMs";
 import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";
+import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
+import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
+import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
+import { advanceRuntimeElapsedFx } from "~/game-tick/fx/advanceRuntimeElapsedFx";
+import {
+	boardFn,
+	itemFn,
+	prepareQueueFx,
+	queueConfig,
+	requestFn,
+} from "./advanceRuntimeStepFx.queue.test/queueRuntime";
 
 const hourMs = 60 * 60 * 1_000;
 const ownerItemId = "runtime:forge";
@@ -48,6 +60,154 @@ const replayLiterallyFx = Effect.fn("replayLiterallyFx")(function* (
 });
 
 describe("replayRuntimeStepsFx", () => {
+	it("omits a started job erased by a Template in a later step of the same commit", () => {
+		const config = GameConfigSchema.parse({
+			...queueConfig,
+			templates: [
+				{
+					uid: "empty",
+					title: "Empty",
+					width: 5,
+					height: 2,
+					board: [],
+				},
+			],
+			items: {
+				...queueConfig.items,
+				forge: {
+					...queueConfig.items.forge,
+					lines: queueConfig.items.forge!.lines.map((line) =>
+						line.id === "line:later"
+							? {
+									...line,
+									outcome: {
+										set: [
+											{
+												weight: 1,
+												rules: [],
+												roll: [
+													{
+														type: "guaranteed",
+														outcome: [
+															{
+																type: "template",
+																templateUid: "empty",
+																rules: [],
+															},
+														],
+													},
+												],
+											},
+										],
+									},
+								}
+							: line,
+					),
+				},
+			},
+		});
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const prepared = yield* prepareQueueFx(
+					[
+						requestFn("request:start", "line:later"),
+					],
+					[
+						itemFn("owner:b", "forge", boardFn(1)),
+					],
+				);
+				yield* modifyRuntimeFx(() =>
+					Effect.succeed([
+						undefined,
+						{
+							...prepared,
+							items: prepared.items.map((item) => ({
+								...item,
+								item: config.items.forge!,
+							})),
+							jobs: [
+								{
+									id: "job:b",
+									ownerItemId: "owner:b",
+									lineId: "line:later",
+									durationMs: 1_000,
+									remainingMs: 200,
+								},
+							],
+						},
+					] as const),
+				);
+				yield* advanceRuntimeElapsedFx({
+					elapsedMs: 200,
+				});
+				return {
+					runtime: yield* readRuntimeFx(),
+					transition: yield* (yield* CommittedTransitionsFx).read,
+				};
+			}).pipe(
+				useGameFx({
+					config,
+				}),
+			),
+		);
+		expect(result.runtime.items).toEqual([]);
+		expect(result.transition.events).toContainEqual(
+			expect.objectContaining({
+				type: "job:completed",
+				jobId: "job:b",
+			}),
+		);
+		expect(result.transition.events.some((event) => event.type === "job:started")).toBe(false);
+	});
+
+	it("keeps Autofill only while its exact admitted delivery is outbound at replay publication", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const runtime = yield* prepareQueueFx(
+					[
+						requestFn("request:older", "line:older"),
+					],
+					[
+						itemFn("source:tool", "tool", boardFn(4)),
+					],
+				);
+				const outbound = yield* replayRuntimeStepsFx({
+					elapsedMs: 200,
+					runtime,
+				});
+				const settled = yield* replayRuntimeStepsFx({
+					elapsedMs: 600,
+					runtime,
+				});
+				return {
+					outboundEvents: yield* projectCommittedEngineFactsFx({
+						previousRuntime: runtime,
+						runtime: outbound.runtime,
+						facts: outbound.facts,
+					}),
+					settledEvents: yield* projectCommittedEngineFactsFx({
+						previousRuntime: runtime,
+						runtime: settled.runtime,
+						facts: settled.facts,
+					}),
+				};
+			}).pipe(
+				useGameFx({
+					config: queueConfig,
+				}),
+			),
+		);
+		expect(result.outboundEvents).toContainEqual(
+			expect.objectContaining({
+				type: "line-input:autofill-started",
+				scheduledQuantity: 1,
+			}),
+		);
+		expect(
+			result.settledEvents.some((event) => event.type === "line-input:autofill-started"),
+		).toBe(false);
+	});
+
 	it("fast-forwards an empty one-hour backlog after one stable no-op step", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
@@ -68,7 +228,7 @@ describe("replayRuntimeStepsFx", () => {
 		);
 
 		expect(result.replay.runtime).toBe(result.runtime);
-		expect(result.replay.events).toEqual([]);
+		expect(result.replay.facts).toEqual([]);
 		expect(result.replay.isStable).toBe(true);
 		expect(result.replay.processedSteps).toBe(1);
 		expect(result.replay.skippedSteps).toBe(hourMs / SimulationStepMs - 1);

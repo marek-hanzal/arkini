@@ -66,7 +66,7 @@ export const autofillLineInputFx = Effect.fn("autofillLineInputFx")(function* (
 			return [
 				autofill.result.scheduledQuantity,
 				autofill.runtime,
-				autofill.events,
+				autofill.facts,
 			] as const;
 		}),
 	);

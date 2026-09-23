@@ -160,15 +160,6 @@ export const projectCommittedEngineFactsFx = Effect.fn("projectCommittedEngineFa
 		committed.push(candidate);
 	}
 	committed.reverse();
-	const committedSpawnIds = new Set(
-		committed.flatMap((candidate) =>
-			candidate.type === GameEventEnumSchema.enum.ItemSpawned
-				? [
-						candidate.itemId,
-					]
-				: [],
-		),
-	);
 	const events: GameEventSchema.Type[] = [];
 	for (const candidate of committed) {
 		if (candidate.type !== "lifecycle:settled") {
@@ -189,7 +180,7 @@ export const projectCommittedEngineFactsFx = Effect.fn("projectCommittedEngineFa
 		if (
 			candidate.visible &&
 			!finalItemsById.has(candidate.itemId) &&
-			!candidate.replacementItemIds.some((id) => committedSpawnIds.has(id))
+			!candidate.replacementItemIds.some((id) => finalItemsById.has(id))
 		)
 			events.push({
 				type: GameEventEnumSchema.enum.ItemDisappeared,

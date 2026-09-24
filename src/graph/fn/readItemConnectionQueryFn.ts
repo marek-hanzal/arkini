@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import type { GraphQuerySchema } from "~/graph/schema/GraphQuerySchema";
 import type { ItemConnectionFilterSchema } from "~/graph/schema/ItemConnectionFilterSchema";
 
@@ -10,41 +11,36 @@ export const readItemConnectionQueryFn = (
 	kind: "connections",
 	from: `item:${itemUid}`,
 	to,
-	direction:
-		filter === "all"
-			? "both"
-			: filter === "accepts-merge" ||
-					filter === "inputs" ||
-					filter === "produced-by" ||
-					filter === "referenced-by"
-				? "in"
-				: "out",
-	kinds:
-		filter === "all"
-			? undefined
-			: filter === "merges-into" || filter === "accepts-merge"
-				? [
-						"merge-target",
-					]
-				: filter === "references" || filter === "referenced-by"
-					? [
-							"rule-reference",
-						]
-					: filter === "inputs" || filter === "required-by"
-						? [
-								"line-material",
-								"line-unit-selector",
-								"line-unit-cost",
-							]
-						: [
-								"line-item-outcome",
-								"merge-replacement",
-								"merge-item-outcome",
-								"clock-item-outcome",
-								"depletion-item-outcome",
-								"space-outcome",
-								"template-outcome",
-							],
+	direction: match(filter)
+		.returnType<GraphQuerySchema.Type["direction"]>()
+		.with("all", () => "both")
+		.with("accepts-merge", "inputs", "produced-by", "referenced-by", () => "in")
+		.with("merges-into", "required-by", "produces", "references", () => "out")
+		.exhaustive(),
+	kinds: match(filter)
+		.returnType<GraphQuerySchema.Type["kinds"]>()
+		.with("all", () => undefined)
+		.with("merges-into", "accepts-merge", () => [
+			"merge-target",
+		])
+		.with("references", "referenced-by", () => [
+			"rule-reference",
+		])
+		.with("inputs", "required-by", () => [
+			"line-material",
+			"line-unit-selector",
+			"line-unit-cost",
+		])
+		.with("produces", "produced-by", () => [
+			"line-item-outcome",
+			"merge-replacement",
+			"merge-item-outcome",
+			"clock-item-outcome",
+			"depletion-item-outcome",
+			"space-outcome",
+			"template-outcome",
+		])
+		.exhaustive(),
 	maxDepth: 1,
 	detail: "full",
 	limit: 100,

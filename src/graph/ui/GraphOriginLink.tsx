@@ -1,4 +1,5 @@
 import { ArrowUpRight } from "lucide-react";
+import { match } from "ts-pattern";
 import type { GraphEdge, GraphOperation } from "~/graph/type/GraphFacts";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { useTranslator } from "~/translation/ui/useTranslator";
@@ -23,21 +24,40 @@ export const GraphOriginLink = ({
 			? project.config.items[ownerUid]
 			: undefined;
 		if (owner === undefined) return null;
-		const sectionId =
-			operation.kind === "line"
-				? "production"
-				: operation.kind === "merge"
-					? "merges"
-					: operation.kind === "clock"
-						? "clock"
-						: "units";
+		const sectionId = match(operation.kind)
+			.with("line", () => "production" as const)
+			.with("merge", () => "merges" as const)
+			.with("clock", () => "clock" as const)
+			.with("depletion", () => "units" as const)
+			.exhaustive();
 		const location = [
 			owner.title,
-			operation.kind === "line"
-				? operation.data.title
-				: operation.kind === "merge"
-					? `${translator.textFn("Merge")} ${Number(operation.source[3]) + 1}`
-					: translator.textFn(operation.kind === "clock" ? "Clock" : "Units"),
+			match(operation)
+				.with(
+					{
+						kind: "line",
+					},
+					({ data }) => data.title,
+				)
+				.with(
+					{
+						kind: "merge",
+					},
+					({ source }) => `${translator.textFn("Merge")} ${Number(source[3]) + 1}`,
+				)
+				.with(
+					{
+						kind: "clock",
+					},
+					() => translator.textFn("Clock"),
+				)
+				.with(
+					{
+						kind: "depletion",
+					},
+					() => translator.textFn("Units"),
+				)
+				.exhaustive(),
 		];
 		for (const [label, index] of [
 			[

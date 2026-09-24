@@ -1,3 +1,4 @@
+import { match, P } from "ts-pattern";
 import { ArrowRight } from "lucide-react";
 import type { GraphEdge, GraphNode, GraphOperation } from "~/graph/type/GraphFacts";
 import { GraphNodeReference } from "~/graph/ui/GraphNodeReference";
@@ -30,6 +31,236 @@ const KindLabels = {
 	"start-space": "Starting space",
 } as const satisfies Record<GraphEdge["kind"], string>;
 
+const GraphOperationDetails = ({
+	operation,
+	nodes,
+}: {
+	readonly operation: GraphOperation;
+	readonly nodes: readonly GraphNode[];
+}) => {
+	const translator = useTranslator();
+	return match(operation)
+		.with(
+			{
+				kind: "line",
+			},
+			(operation) => (
+				<DetailFacts columns={3}>
+					<DetailFact
+						label={translator.textFn("Line duration")}
+						value={formatDurationFn(operation.data.runtimeMs)}
+					/>
+					<DetailFact
+						label={translator.textFn("Clock")}
+						value={translator.textFn(operation.data.clock ? "Enabled" : "Disabled")}
+					/>
+					{operation.data.clock ? (
+						<DetailFact
+							label={translator.textFn("Clock weight")}
+							value={operation.data.clockWeight}
+						/>
+					) : null}
+					<DetailFact
+						label={translator.textFn("Default")}
+						value={translator.textFn(operation.data.default ? "Yes" : "No")}
+					/>
+					<DetailFact
+						label={translator.textFn("Availability")}
+						value={translator.textFn(operation.data.enable ? "Enabled" : "Disabled")}
+					/>
+					<DetailFact
+						label={translator.textFn("Visibility")}
+						value={translator.textFn(operation.data.show ? "Visible" : "Hidden")}
+					/>
+				</DetailFacts>
+			),
+		)
+		.with(
+			{
+				kind: "merge",
+			},
+			(operation) => (
+				<div className="grid gap-2">
+					<dl
+						className="grid grid-cols-3 gap-3"
+						data-ui="EditorGraphMergeParticipants"
+					>
+						<div>
+							<dt className="mb-1 text-muted">
+								{translator.textFn(
+									operation.data.action === "space" ? "Receiver" : "Source",
+								)}
+							</dt>
+							<dd>
+								<GraphNodeReference
+									id={operation.owner}
+									node={nodes.find((node) => node.id === operation.owner)}
+								/>
+							</dd>
+						</div>
+						{match(operation.data)
+							.with(
+								{
+									action: "space",
+								},
+								(merge) => (
+									<>
+										<div>
+											<dt className="mb-1 text-muted">
+												{translator.textFn("Incoming item")}
+											</dt>
+											<dd>
+												{translator.textFn("Any transported incoming item")}
+											</dd>
+										</div>
+										<div>
+											<dt className="mb-1 text-muted">
+												{translator.textFn("Destination")}
+											</dt>
+											<dd>
+												<GraphNodeReference id={`space:${merge.space}`} />
+											</dd>
+										</div>
+									</>
+								),
+							)
+							.with(
+								{
+									action: P.union("use", "consume", "spend"),
+								},
+								(merge) => (
+									<div>
+										<dt className="mb-1 text-muted">
+											{translator.textFn("Target")}
+										</dt>
+										<dd>
+											<GraphNodeReference
+												id={`item:${merge.target.itemUid}`}
+												node={nodes.find(
+													(node) =>
+														node.id === `item:${merge.target.itemUid}`,
+												)}
+											/>
+										</dd>
+									</div>
+								),
+							)
+							.exhaustive()}
+						{match(operation.data)
+							.with(
+								{
+									effect: "replace",
+								},
+								(merge) => (
+									<div>
+										<dt className="mb-1 text-muted">
+											{translator.textFn("Replacement")}
+										</dt>
+										<dd>
+											<GraphNodeReference
+												id={`item:${merge.result}`}
+												node={nodes.find(
+													(node) => node.id === `item:${merge.result}`,
+												)}
+											/>
+										</dd>
+									</div>
+								),
+							)
+							.with(
+								{
+									effect: P.union("keep", "remove", "spend"),
+								},
+								() => null,
+							)
+							.exhaustive()}
+					</dl>
+					<DetailFacts>
+						<DetailFact
+							label={translator.textFn("Source action")}
+							value={translator.textFn(
+								{
+									use: "Use",
+									consume: "Consume",
+									spend: "Spend one unit",
+									space: "Transport incoming item",
+								}[operation.data.action],
+							)}
+						/>
+						<DetailFact
+							label={translator.textFn(
+								operation.data.action === "space"
+									? "Receiver effect"
+									: "Target effect",
+							)}
+							value={translator.textFn(
+								{
+									keep: "Keep",
+									remove: "Remove",
+									replace: "Replace",
+									spend: "Spend one unit",
+								}[operation.data.effect],
+							)}
+						/>
+					</DetailFacts>
+				</div>
+			),
+		)
+		.with(
+			{
+				kind: "clock",
+			},
+			(operation) => (
+				<DetailFacts columns={3}>
+					<DetailFact
+						label={translator.textFn("Clock interval")}
+						value={
+							operation.data.intervalMs === undefined
+								? translator.textFn("None")
+								: formatDurationFn(operation.data.intervalMs)
+						}
+					/>
+					<DetailFact
+						label={translator.textFn("Lifetime")}
+						value={
+							operation.data.durationMs === undefined
+								? translator.textFn("Unlimited")
+								: formatDurationFn(operation.data.durationMs)
+						}
+					/>
+					<DetailFact
+						label={translator.textFn("Timer")}
+						value={translator.textFn(operation.data.enable ? "Enabled" : "Disabled")}
+					/>
+					{operation.data.durationMs === undefined ? null : (
+						<DetailFact
+							label={translator.textFn("Expiry mode")}
+							value={translator.textFn(
+								operation.data.expiryMode === "kill-switch"
+									? "Kill switch"
+									: "Loose-kill",
+							)}
+						/>
+					)}
+				</DetailFacts>
+			),
+		)
+		.with(
+			{
+				kind: "depletion",
+			},
+			(operation) => (
+				<DetailFacts>
+					<DetailFact
+						label={translator.textFn("Initial units")}
+						value={operation.data.amount}
+					/>
+				</DetailFacts>
+			),
+		)
+		.exhaustive();
+};
+
 /** One row per authored occurrence; same endpoints never hide distinct roles or source paths. */
 export const GraphEdgeRow = ({
 	edge,
@@ -47,15 +278,43 @@ export const GraphEdgeRow = ({
 	const unitPayer =
 		annotations.input?.units === undefined || operation === undefined
 			? undefined
-			: annotations.input.units.from === "self" || annotations.input.type === "simple"
-				? operation.owner
-				: `item:${annotations.input.query.selector.itemUid}`;
-	const quantity =
-		annotations.outcome?.type === "item"
-			? annotations.outcome.quantity
-			: annotations.input?.type === "materials"
-				? annotations.input.quantity
-				: undefined;
+			: match(annotations.input)
+					.with(
+						{
+							units: {
+								from: "self",
+							},
+						},
+						{
+							type: "simple",
+						},
+						() => operation.owner,
+					)
+					.with(
+						{
+							type: P.union("materials", "units"),
+						},
+						({ query }) => `item:${query.selector.itemUid}`,
+					)
+					.exhaustive();
+	const quantity = match(annotations)
+		.with(
+			{
+				outcome: {
+					type: "item",
+				},
+			},
+			({ outcome }) => outcome.quantity,
+		)
+		.with(
+			{
+				input: {
+					type: "materials",
+				},
+			},
+			({ input }) => input.quantity,
+		)
+		.otherwise(() => undefined);
 	return (
 		<article
 			className="ak-list-row min-w-0 p-3"
@@ -133,197 +392,10 @@ export const GraphEdgeRow = ({
 						{translator.textFn("Details")}
 					</summary>
 					<div className="mt-2 grid gap-3">
-						{operation?.kind === "line" ? (
-							<DetailFacts columns={3}>
-								<DetailFact
-									label={translator.textFn("Line duration")}
-									value={formatDurationFn(operation.data.runtimeMs)}
-								/>
-								<DetailFact
-									label={translator.textFn("Clock")}
-									value={translator.textFn(
-										operation.data.clock ? "Enabled" : "Disabled",
-									)}
-								/>
-								{operation.data.clock ? (
-									<DetailFact
-										label={translator.textFn("Clock weight")}
-										value={operation.data.clockWeight}
-									/>
-								) : null}
-								<DetailFact
-									label={translator.textFn("Default")}
-									value={translator.textFn(operation.data.default ? "Yes" : "No")}
-								/>
-								<DetailFact
-									label={translator.textFn("Availability")}
-									value={translator.textFn(
-										operation.data.enable ? "Enabled" : "Disabled",
-									)}
-								/>
-								<DetailFact
-									label={translator.textFn("Visibility")}
-									value={translator.textFn(
-										operation.data.show ? "Visible" : "Hidden",
-									)}
-								/>
-							</DetailFacts>
-						) : null}
-						{operation?.kind === "merge" ? (
-							<div className="grid gap-2">
-								<dl
-									className="grid grid-cols-3 gap-3"
-									data-ui="EditorGraphMergeParticipants"
-								>
-									<div>
-										<dt className="mb-1 text-muted">
-											{translator.textFn(
-												operation.data.action === "space"
-													? "Receiver"
-													: "Source",
-											)}
-										</dt>
-										<dd>
-											<GraphNodeReference
-												id={operation.owner}
-												node={nodes.find(
-													(node) => node.id === operation.owner,
-												)}
-											/>
-										</dd>
-									</div>
-									{operation.data.action === "space" ? (
-										<>
-											<div>
-												<dt className="mb-1 text-muted">
-													{translator.textFn("Incoming item")}
-												</dt>
-												<dd>
-													{translator.textFn(
-														"Any transported incoming item",
-													)}
-												</dd>
-											</div>
-											<div>
-												<dt className="mb-1 text-muted">
-													{translator.textFn("Destination")}
-												</dt>
-												<dd>
-													<GraphNodeReference
-														id={`space:${operation.data.space}`}
-													/>
-												</dd>
-											</div>
-										</>
-									) : (
-										<div>
-											<dt className="mb-1 text-muted">
-												{translator.textFn("Target")}
-											</dt>
-											<dd>
-												<GraphNodeReference
-													id={`item:${operation.data.target.itemUid}`}
-													node={nodes.find(
-														(node) =>
-															node.id ===
-															`item:${operation.data.action !== "space" ? operation.data.target.itemUid : ""}`,
-													)}
-												/>
-											</dd>
-										</div>
-									)}
-									{operation.data.effect === "replace" ? (
-										<div>
-											<dt className="mb-1 text-muted">
-												{translator.textFn("Replacement")}
-											</dt>
-											<dd>
-												<GraphNodeReference
-													id={`item:${operation.data.result}`}
-													node={nodes.find(
-														(node) =>
-															node.id ===
-															`item:${operation.data.effect === "replace" ? operation.data.result : ""}`,
-													)}
-												/>
-											</dd>
-										</div>
-									) : null}
-								</dl>
-								<DetailFacts>
-									<DetailFact
-										label={translator.textFn("Source action")}
-										value={translator.textFn(
-											{
-												use: "Use",
-												consume: "Consume",
-												spend: "Spend one unit",
-												space: "Transport incoming item",
-											}[operation.data.action],
-										)}
-									/>
-									<DetailFact
-										label={translator.textFn(
-											operation.data.action === "space"
-												? "Receiver effect"
-												: "Target effect",
-										)}
-										value={translator.textFn(
-											{
-												keep: "Keep",
-												remove: "Remove",
-												replace: "Replace",
-												spend: "Spend one unit",
-											}[operation.data.effect],
-										)}
-									/>
-								</DetailFacts>
-							</div>
-						) : null}
-						{operation?.kind === "clock" ? (
-							<DetailFacts columns={3}>
-								<DetailFact
-									label={translator.textFn("Clock interval")}
-									value={
-										operation.data.intervalMs === undefined
-											? translator.textFn("None")
-											: formatDurationFn(operation.data.intervalMs)
-									}
-								/>
-								<DetailFact
-									label={translator.textFn("Lifetime")}
-									value={
-										operation.data.durationMs === undefined
-											? translator.textFn("Unlimited")
-											: formatDurationFn(operation.data.durationMs)
-									}
-								/>
-								<DetailFact
-									label={translator.textFn("Timer")}
-									value={translator.textFn(
-										operation.data.enable ? "Enabled" : "Disabled",
-									)}
-								/>
-								{operation.data.durationMs === undefined ? null : (
-									<DetailFact
-										label={translator.textFn("Expiry mode")}
-										value={translator.textFn(
-											operation.data.expiryMode === "kill-switch"
-												? "Kill switch"
-												: "Loose-kill",
-										)}
-									/>
-								)}
-							</DetailFacts>
-						) : null}
-						{operation?.kind === "depletion" ? (
-							<DetailFacts>
-								<DetailFact
-									label={translator.textFn("Initial units")}
-									value={operation.data.amount}
-								/>
-							</DetailFacts>
-						) : null}
+						<GraphOperationDetails
+							operation={operation}
+							nodes={nodes}
+						/>
 						{unitPayer === undefined ? null : (
 							<DetailFacts>
 								<DetailFact

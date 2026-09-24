@@ -2098,8 +2098,6 @@ blocking errors:
   value: errors
 chance:
   value: chance
-clock:
-  value: clock
 conditions:
   value: conditions
 consume:

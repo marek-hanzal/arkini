@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { GraphEdge, GraphFacts, GraphNode, GraphOperation } from "~/graph/type/GraphFacts";
 import type { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
@@ -44,12 +45,11 @@ export const compileGraphFactsFn = (config: GameConfigSchema.Type): GraphFacts =
 				id,
 				kind,
 				title: item?.title ?? template?.title ?? (kind === "space" ? `Space ${key}` : key),
-				missing:
-					kind === "item"
-						? item === undefined
-						: kind === "template"
-							? template === undefined
-							: false,
+				missing: match(kind)
+					.with("item", () => item === undefined)
+					.with("template", () => template === undefined)
+					.with("space", "start", () => false)
+					.exhaustive(),
 				source:
 					kind === "item" && item !== undefined
 						? [
@@ -188,53 +188,53 @@ export const compileGraphFactsFn = (config: GameConfigSchema.Type): GraphFacts =
 						outcome,
 						boardLocal: outcome.type !== "space",
 					};
-					switch (outcome.type) {
-						case "item": {
-							const source = [
-								...outcomePath,
-								"itemUid",
-							];
-							edgeFn(
-								owner,
-								nodeFn("item", outcome.itemUid, source),
-								itemKind,
-								source,
-								operationId,
-								annotations,
-							);
-							break;
-						}
-						case "space": {
-							const source = [
-								...outcomePath,
-								"space",
-							];
-							edgeFn(
-								owner,
-								nodeFn("space", String(outcome.space), source),
-								"space-outcome",
-								source,
-								operationId,
-								annotations,
-							);
-							break;
-						}
-						case "template": {
-							const source = [
-								...outcomePath,
-								"templateUid",
-							];
-							edgeFn(
-								owner,
-								nodeFn("template", outcome.templateUid, source),
-								"template-outcome",
-								source,
-								operationId,
-								annotations,
-							);
-							break;
-						}
-					}
+					const target = match(outcome)
+						.with(
+							{
+								type: "item",
+							},
+							({ itemUid }) => ({
+								kind: "item" as const,
+								key: itemUid,
+								field: "itemUid",
+								edgeKind: itemKind,
+							}),
+						)
+						.with(
+							{
+								type: "space",
+							},
+							({ space }) => ({
+								kind: "space" as const,
+								key: String(space),
+								field: "space",
+								edgeKind: "space-outcome" as const,
+							}),
+						)
+						.with(
+							{
+								type: "template",
+							},
+							({ templateUid }) => ({
+								kind: "template" as const,
+								key: templateUid,
+								field: "templateUid",
+								edgeKind: "template-outcome" as const,
+							}),
+						)
+						.exhaustive();
+					const source = [
+						...outcomePath,
+						target.field,
+					];
+					edgeFn(
+						owner,
+						nodeFn(target.kind, target.key, source),
+						target.edgeKind,
+						source,
+						operationId,
+						annotations,
+					);
 					rulesFn(
 						owner,
 						operationId,
@@ -316,12 +316,31 @@ export const compileGraphFactsFn = (config: GameConfigSchema.Type): GraphFacts =
 						"units",
 						"from",
 					];
-					const payer =
-						input.units.from === "self"
-							? owner
-							: input.type !== "simple"
-								? nodeFn("item", input.query.selector.itemUid, ref)
-								: undefined;
+					const payer = match(input)
+						.with(
+							{
+								units: {
+									from: "self",
+								},
+							},
+							() => owner,
+						)
+						.with(
+							{
+								type: "simple",
+							},
+							() => undefined,
+						)
+						.with(
+							{
+								type: "materials",
+							},
+							{
+								type: "units",
+							},
+							({ query }) => nodeFn("item", query.selector.itemUid, ref),
+						)
+						.exhaustive();
 					if (payer !== undefined)
 						edgeFn(payer, owner, "line-unit-cost", ref, id, annotations);
 				}

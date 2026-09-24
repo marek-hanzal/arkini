@@ -46,9 +46,9 @@ export const GraphQuerySchema = z
 			});
 	})
 	.meta({
-		$id: "urn:serakki:schema:mcp:graph-query-input",
-		title: "Graph query",
-		description: "Bounded read-only queries over the authored project graph.",
+		$id: "urn:serakki:schema:graph:editor-query-input",
+		title: "Editor graph query",
+		description: "Internal bounded queries for Editor relationship details and counts.",
 	});
 export type GraphQuerySchema = typeof GraphQuerySchema;
 export namespace GraphQuerySchema {

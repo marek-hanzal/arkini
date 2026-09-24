@@ -1,3 +1,4 @@
+import { registerGraphToolsFn } from "./registerGraphToolsFn";
 import { formatVersionFn } from "~/game-version/fn/formatVersionFn";
 import { McpServer } from "@modelcontextprotocol/server";
 import { Effect } from "effect";
@@ -9,12 +10,8 @@ import type { ProjectRepositoryService } from "~/project-authoring/service/Proje
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { ArtworkCollectionInputSchema } from "./ArtworkCollectionInputSchema";
-import { GraphDetailSchema } from "./GraphDetailSchema";
 import { createProjectGraphFx } from "~/graph/fx/createProjectGraphFx";
-import { readItemChainQueryFn } from "~/graph/fn/readItemChainQueryFn";
 import type { ProjectGraph } from "~/graph/type/ProjectGraph";
-import { GraphQuerySchema } from "~/graph/schema/GraphQuerySchema";
-import { readGraphSchemaTextFn } from "./fn/readGraphSchemaTextFn";
 import { CreateItemInputSchema } from "./CreateItemInputSchema";
 import { EditItemLinesInputSchema } from "./EditItemLinesInputSchema";
 import { editLinesFx } from "~/item-authoring/fx/editLinesFx";
@@ -146,48 +143,6 @@ const ItemConfigsInputSchema = z
 		$id: "urn:serakki:schema:mcp:item-configs-input",
 		title: "Item configurations tool input",
 		description: "Read canonical item configurations from one project snapshot and revision.",
-	});
-
-const itemRelationInputSchemaFn = (role: "input" | "output") =>
-	z
-		.object({
-			itemUid: IdSchema.describe("The exact root item UID returned by item_collection."),
-			detail: GraphDetailSchema.default("full"),
-			level: z
-				.number()
-				.int()
-				.positive()
-				.max(12)
-				.default(1)
-				.describe("Relationship-hop depth; defaults to 1."),
-		})
-		.strict()
-		.meta({
-			$id: `urn:serakki:schema:mcp:item-${role === "input" ? "input" : "outcome"}-relation`,
-			title: `Item ${role} relation tool input`,
-			description: `The root item and traversal depth for the item ${role} relation tool.`,
-		});
-
-const ItemChainInputSchema = z
-	.object({
-		itemUid: IdSchema.describe("The exact starting item UID returned by item_collection."),
-		detail: GraphDetailSchema.default("full").describe(
-			"Summary retains typed edges and operation identities; full includes authored operation configuration and context.",
-		),
-		maxDepth: z
-			.number()
-			.int()
-			.min(1)
-			.max(12)
-			.default(5)
-			.describe("Maximum relationship-hop depth; defaults to 5."),
-	})
-	.strict()
-	.meta({
-		$id: "urn:serakki:schema:mcp:item-chain-input",
-		title: "Item Chain tool input",
-		description:
-			"The starting item, detail level and bounded traversal depth for the Chain projection.",
 	});
 
 const SchemaDetailInputSchema = z
@@ -824,108 +779,12 @@ const createServerFn = (
 				),
 			),
 	);
-	server.registerTool(
-		"graph_schema",
-		{
-			description:
-				"Discover the authored graph vocabulary, stable node identities, edge directions, operation context, result semantics and bounded query JSON Schema. Available without an open project.",
-			inputSchema: z.object({}).strict().meta({
-				$id: "urn:serakki:schema:mcp:graph-schema-input",
-				title: "Graph schema discovery input",
-				description: "Graph schema discovery accepts no arguments.",
-			}),
-			annotations: {
-				readOnlyHint: true,
-			},
-		},
-		async () => runToolFn(Effect.succeed(readGraphSchemaTextFn())),
-	);
-	server.registerTool(
-		"graph_query",
-		{
-			description:
-				"Query the current project's immutable authored graph snapshot. Supports node lookup, direct connections, traversal and from-to paths with typed edge filters and explicit limits. Returns canonical graph JSON with project revision, nodes, edges, operation context and truncation. Read graph_schema first. No executable EDN or arbitrary query code is accepted.",
-			inputSchema: GraphQuerySchema,
-			annotations: {
-				readOnlyHint: true,
-			},
-		},
-		async (input) =>
-			runToolFn(
-				readProjectFx().pipe(
-					Effect.flatMap((project) => graph.queryFx(project, input)),
-					Effect.map((result) => JSON.stringify(result)),
-				),
-			),
-	);
-	for (const role of [
-		"input",
-		"output",
-	] as const) {
-		const name = role === "input" ? "item_input" : "item_outcome";
-		server.registerTool(
-			name,
-			{
-				description:
-					role === "input"
-						? "Find where this item is used as a line material, unit selector or unit cost. Uses outgoing typed input edges in the shared graph; level is relationship-hop depth (1–12). Returns canonical graph JSON. Use graph_query for all other relationships."
-						: "Find operations that produce this item through lines, merge outcomes/replacement, Clock or depletion. Uses incoming typed output edges in the shared graph; level is relationship-hop depth (1–12). Returns canonical graph JSON. Use graph_query for all other relationships.",
-				inputSchema: itemRelationInputSchemaFn(role),
-				annotations: {
-					readOnlyHint: true,
-				},
-			},
-			async ({ itemUid, level, detail }) =>
-				runToolFn(
-					readProjectFx().pipe(
-						Effect.flatMap((project) =>
-							graph.queryFx(project, {
-								kind: level === 1 ? "connections" : "traverse",
-								from: `item:${itemUid}`,
-								direction: role === "input" ? "out" : "in",
-								kinds:
-									role === "input"
-										? [
-												"line-material",
-												"line-unit-selector",
-												"line-unit-cost",
-											]
-										: [
-												"line-item-outcome",
-												"merge-item-outcome",
-												"merge-replacement",
-												"clock-item-outcome",
-												"depletion-item-outcome",
-											],
-								maxDepth: level,
-								detail,
-							}),
-						),
-						Effect.map((result) => JSON.stringify(result)),
-					),
-				),
-		);
-	}
-	server.registerTool(
-		"item_chain",
-		{
-			description:
-				"Traverse outgoing authored consequences: line outcomes, merge replacement and outcomes, Clock, depletion, space and template outcomes and template placements. Retains every authored branch and source identity in the shared graph. Returns canonical graph JSON. maxDepth counts relationship hops (1–12, default 5). Use graph_query to include other edge kinds or change direction.",
-			inputSchema: ItemChainInputSchema,
-			annotations: {
-				readOnlyHint: true,
-			},
-		},
-		async ({ itemUid, detail, maxDepth }) =>
-			runToolFn(
-				readProjectFx().pipe(
-					Effect.flatMap((project) =>
-						graph.queryFx(project, readItemChainQueryFn(itemUid, maxDepth, detail)),
-					),
-					Effect.map((result) => JSON.stringify(result)),
-				),
-			),
-	);
+	registerGraphToolsFn({
+		server,
+		graph,
+		readProjectFx,
+		runToolFn,
+	});
 	return server;
 };
 

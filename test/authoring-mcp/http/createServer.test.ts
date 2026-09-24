@@ -69,6 +69,8 @@ describe("editor MCP server", () => {
 			"item_line_config",
 			"graph_schema",
 			"graph_query",
+			"graph_query_batch",
+			"graph_operation_configs",
 			"item_input",
 			"item_outcome",
 			"item_chain",

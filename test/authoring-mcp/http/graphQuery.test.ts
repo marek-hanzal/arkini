@@ -3,7 +3,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { afterEach, expect, it } from "vitest";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import type { GraphResult } from "~/graph/type/GraphResult";
+import type { GraphDiscoveryResult } from "~/graph/type/GraphDiscoveryResult";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 import {
 	cleanupMcpHarnesses,
@@ -13,7 +13,7 @@ import {
 
 afterEach(cleanupMcpHarnesses);
 
-const graphResultFn = (result: { content?: unknown; isError?: unknown }): GraphResult => {
+const graphResultFn = (result: { content?: unknown; isError?: unknown }): GraphDiscoveryResult => {
 	expect(result.isError).not.toBe(true);
 	const content = result.content as {
 		type: string;
@@ -62,103 +62,96 @@ it("keeps MCP convenience queries on the canonical graph with exact edge identit
 	ownership.setProjectContextFn("graph-tools");
 	await Effect.runPromise(ownership.startLocalFx);
 	const client = await connectMcpClient(port);
-	for (const detail of [
-		"summary",
-		"full",
-	] as const) {
-		for (const entry of [
-			{
-				name: "item_input",
-				itemUid: "water",
-				direction: "out",
-				kinds: [
-					"line-material",
-					"line-unit-selector",
-					"line-unit-cost",
-				],
-			},
-			{
-				name: "item_outcome",
-				itemUid: "tool",
-				direction: "in",
-				kinds: [
-					"line-item-outcome",
-					"merge-item-outcome",
-					"merge-replacement",
-					"clock-item-outcome",
-					"depletion-item-outcome",
-				],
-			},
-		]) {
-			const direct = graphResultFn(
-				await client.callTool({
-					name: "graph_query",
-					arguments: {
-						kind: "connections",
-						from: `item:${entry.itemUid}`,
-						direction: entry.direction,
-						kinds: entry.kinds,
-						maxDepth: 1,
-						detail,
-					},
-				}),
-			);
-			const convenience = graphResultFn(
-				await client.callTool({
-					name: entry.name,
-					arguments: {
-						itemUid: entry.itemUid,
-						detail,
-					},
-				}),
-			);
-			expect(convenience).toEqual(direct);
-			expect(convenience.edges.length).toBeGreaterThan(0);
-		}
+
+	for (const entry of [
+		{
+			name: "item_input",
+			itemUid: "water",
+			direction: "out",
+			kinds: [
+				"line-material",
+				"line-unit-selector",
+				"line-unit-cost",
+			],
+		},
+		{
+			name: "item_outcome",
+			itemUid: "tool",
+			direction: "in",
+			kinds: [
+				"line-item-outcome",
+				"merge-item-outcome",
+				"merge-replacement",
+				"clock-item-outcome",
+				"depletion-item-outcome",
+			],
+		},
+	]) {
 		const direct = graphResultFn(
 			await client.callTool({
 				name: "graph_query",
 				arguments: {
-					kind: "traverse",
-					from: "item:forge",
-					kinds: [
-						"line-item-outcome",
-						"merge-replacement",
-						"merge-target-replacement",
-						"merge-item-outcome",
-						"clock-item-outcome",
-						"depletion-item-outcome",
-						"merge-space",
-						"space-outcome",
-						"template-outcome",
-						"start-template",
-						"template-item",
-					],
-					maxDepth: 5,
-					detail,
+					kind: "connections",
+					from: `item:${entry.itemUid}`,
+					direction: entry.direction,
+					kinds: entry.kinds,
+					maxDepth: 1,
 				},
 			}),
 		);
-		const chain = graphResultFn(
+		const convenience = graphResultFn(
 			await client.callTool({
-				name: "item_chain",
+				name: entry.name,
 				arguments: {
-					itemUid: "forge",
-					detail,
+					itemUid: entry.itemUid,
 				},
 			}),
 		);
-		expect(chain).toEqual(direct);
-		expect(chain.edges).toEqual(
-			expect.arrayContaining([
-				expect.objectContaining({
-					from: "item:forge",
-					to: "item:tool",
-					kind: "merge-replacement",
-				}),
-			]),
-		);
+		expect(convenience).toEqual(direct);
+		expect(convenience.edges.length).toBeGreaterThan(0);
 	}
+	const direct = graphResultFn(
+		await client.callTool({
+			name: "graph_query",
+			arguments: {
+				kind: "traverse",
+				from: "item:forge",
+				direction: "out",
+				kinds: [
+					"line-item-outcome",
+					"merge-replacement",
+					"merge-target-replacement",
+					"merge-item-outcome",
+					"clock-item-outcome",
+					"depletion-item-outcome",
+					"merge-space",
+					"space-outcome",
+					"template-outcome",
+					"start-template",
+					"template-item",
+				],
+				maxDepth: 5,
+			},
+		}),
+	);
+	const chain = graphResultFn(
+		await client.callTool({
+			name: "item_chain",
+			arguments: {
+				itemUid: "forge",
+			},
+		}),
+	);
+	expect(chain).toEqual(direct);
+	expect(chain.edges).toEqual(
+		expect.arrayContaining([
+			expect.objectContaining({
+				from: "item:forge",
+				to: "item:tool",
+				kind: "merge-replacement",
+			}),
+		]),
+	);
 });
 
 it("refreshes graph results after writes and project switches, rejecting stale revisions", async () => {
@@ -286,6 +279,16 @@ it("admits only bounded graph requests and exposes discovery without project con
 		)[0]!.text,
 	);
 	expect(discovery.querySchema.properties).toHaveProperty("maxExpansions");
+	expect(discovery.querySchema.properties).not.toHaveProperty("detail");
+	expect(discovery.querySchema.properties.kind.enum).toContain("operations");
+	expect(discovery.batchSchema.properties.queries.maxItems).toBe(8);
+	expect(discovery.operationReadSchema.required).toEqual(
+		expect.arrayContaining([
+			"revision",
+			"snapshotId",
+			"operationIds",
+		]),
+	);
 	const noProject = await client.callTool({
 		name: "graph_query",
 		arguments: {
@@ -308,13 +311,18 @@ it("admits only bounded graph requests and exposes discovery without project con
 	ownership.setProjectContextFn(config.meta.id);
 	for (const query of [
 		{
+			kind: "node",
+			from: "item:water",
+			detail: "full",
+		},
+		{
 			kind: "path",
 			from: "item:water",
 		},
 		{
 			kind: "connections",
 			from: "item:water",
-			limit: 1001,
+			limit: 201,
 		},
 		{
 			kind: "traverse",
@@ -340,6 +348,17 @@ it("admits only bounded graph requests and exposes discovery without project con
 				})
 			).isError,
 		).toBe(true);
+	expect(
+		(
+			await client.callTool({
+				name: "item_input",
+				arguments: {
+					itemUid: "water",
+					detail: "full",
+				},
+			})
+		).isError,
+	).toBe(true);
 	const limited = graphResultFn(
 		await client.callTool({
 			name: "graph_query",

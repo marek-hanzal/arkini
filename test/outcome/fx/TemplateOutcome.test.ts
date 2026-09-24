@@ -69,6 +69,7 @@ const applyFx = (outcome: OutcomeSchema.Type[]) =>
 				},
 			};
 			const resolved = yield* resolveOutcomeTableFx({
+				ownerItemId: "test-outcome-owner",
 				origin,
 				outcome: OutcomeTableSchema.parse({
 					set: [

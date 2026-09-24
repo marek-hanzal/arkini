@@ -1,4 +1,4 @@
-import type { SpaceDestinationSchema } from "~/game-value/schema/SpaceDestinationSchema";
+import type { SpaceDestinationSchema } from "~/space/schema/SpaceDestinationSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { QuantitySchema } from "~/item-definition/schema/QuantitySchema";
 import type { PlacementSchema } from "~/item-placement/schema/PlacementSchema";
@@ -22,6 +22,7 @@ export namespace OutcomeProjection {
 	export interface Space {
 		readonly type: "space";
 		readonly space: SpaceDestinationSchema.Type;
+		readonly templateTitle?: string;
 		readonly activeRuleHints: readonly string[];
 		readonly rules?: readonly OutcomeRuleSchema.Type[];
 	}

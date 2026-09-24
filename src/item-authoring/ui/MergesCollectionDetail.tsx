@@ -1,3 +1,4 @@
+import { readSpaceDestinationLabelFn } from "~/space/fn/readSpaceDestinationLabelFn";
 import { MergeOption } from "~/item-authoring/ui/MergeOption";
 import { Combine } from "lucide-react";
 
@@ -36,9 +37,11 @@ export const MergesCollectionDetail = ({ item }: { readonly item: ItemSchema.Typ
 					itemLabelFn={(index) => {
 						const merge = merges[index];
 						if (merge.action === "space")
-							return merge.space === "previous"
-								? translator.textFn("Previous Space")
-								: `${translator.textFn("Space")} ${merge.space}`;
+							return readSpaceDestinationLabelFn(
+								merge.space,
+								translator.textFn,
+								project.config.templates,
+							);
 						const targetId = merge.target.itemUid;
 						return `${translator.textFn("Merge")} ${index + 1} — ${project.config.items[targetId]?.title || targetId}`;
 					}}
@@ -52,7 +55,7 @@ export const MergesCollectionDetail = ({ item }: { readonly item: ItemSchema.Typ
 					itemSearchTermsFn={(index) => [
 						"target" in merges[index]
 							? merges[index].target.itemUid
-							: String(merges[index].space),
+							: readSpaceDestinationLabelFn(merges[index].space, translator.textFn),
 						merges[index].action,
 						merges[index].effect,
 					]}

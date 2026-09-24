@@ -110,7 +110,7 @@ export const MergeField = ({
 					{merge.action === "space" ? (
 						<SpaceDestinationControl
 							error={readEditorFormValidationErrorFn(validationIssues, "space")}
-							description={<Mx label="Previous Space transport help" />}
+							description={<Mx label="Space destination transport help" />}
 							value={merge.space}
 							onChangeFn={(space) =>
 								onChangeFn({

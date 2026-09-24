@@ -1,3 +1,4 @@
+import { readGraphSpaceDestinationIdFn } from "~/graph/fn/readGraphSpaceDestinationIdFn";
 import { match, P } from "ts-pattern";
 import { ArrowRight } from "lucide-react";
 import type { GraphEdge, GraphNode, GraphOperation } from "~/graph/type/GraphFacts";
@@ -118,7 +119,9 @@ const GraphOperationDetails = ({
 												{translator.textFn("Destination")}
 											</dt>
 											<dd>
-												<GraphNodeReference id={`space:${merge.space}`} />
+												<GraphNodeReference
+													id={readGraphSpaceDestinationIdFn(merge.space)}
+												/>
 											</dd>
 										</div>
 									</>

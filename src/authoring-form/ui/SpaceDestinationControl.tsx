@@ -1,5 +1,7 @@
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
+import { TemplateSelector } from "~/template-authoring/ui/TemplateSelector";
 import type { ReactNode } from "react";
-import type { SpaceDestinationSchema } from "~/game-value/schema/SpaceDestinationSchema";
+import type { SpaceDestinationSchema } from "~/space/schema/SpaceDestinationSchema";
 import { EditorChoiceControl, EditorNumberControl } from "~/editor-control/ui/EditorValueControls";
 import { useTranslator } from "~/translation/ui/useTranslator";
 
@@ -18,6 +20,7 @@ export const SpaceDestinationControl = ({
 	readonly trailing?: ReactNode;
 }) => {
 	const translator = useTranslator();
+	const project = useEditorProject();
 	return (
 		<div
 			className="grid gap-1.5"
@@ -27,7 +30,13 @@ export const SpaceDestinationControl = ({
 				label={translator.textFn("Target space")}
 				description={description}
 				error={value === "previous" ? error : undefined}
-				value={value === "previous" ? "previous" : "exact"}
+				value={
+					typeof value === "object"
+						? "generated"
+						: value === "previous"
+							? "previous"
+							: "exact"
+				}
 				options={[
 					{
 						value: "exact",
@@ -37,14 +46,42 @@ export const SpaceDestinationControl = ({
 						value: "previous",
 						label: translator.textFn("Previous Space"),
 					},
+					{
+						value: "generated",
+						label: translator.textFn("Generated Space"),
+					},
 				]}
 				onChangeFn={(destination) =>
 					onChangeFn(
-						destination === "previous" ? "previous" : value === "previous" ? 0 : value,
+						destination === "previous"
+							? "previous"
+							: destination === "generated"
+								? {
+										type: "generated",
+										templateUid:
+											typeof value === "object"
+												? value.templateUid
+												: (project.config.templates?.[0]?.uid ?? ""),
+									}
+								: typeof value === "number"
+									? value
+									: 0,
 					)
 				}
 			/>
-			{value === "previous" ? null : (
+			{typeof value === "object" ? (
+				<TemplateSelector
+					templates={project.config.templates ?? []}
+					value={value.templateUid}
+					onChangeFn={(templateUid) =>
+						onChangeFn({
+							type: "generated",
+							templateUid,
+						})
+					}
+					error={error}
+				/>
+			) : value === "previous" ? null : (
 				<EditorNumberControl
 					label={translator.textFn("Target space")}
 					labelVisible={false}

@@ -6,6 +6,33 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 
+vi.mock("~/authoring-session/ui/useEditorProject", () => ({
+	useEditorProject: () => ({
+		config: {
+			templates: [
+				{
+					uid: "interior",
+					title: "Interior",
+					width: 2,
+					height: 2,
+					board: [],
+				},
+			],
+		},
+	}),
+}));
+
+vi.mock("~/template-authoring/ui/TemplateSelector", () => ({
+	TemplateSelector: ({ onChangeFn }: { onChangeFn: (uid: string) => void }) => (
+		<button
+			data-template="other"
+			onClick={() => onChangeFn("other")}
+		>
+			Select other
+		</button>
+	),
+}));
+
 vi.mock("~/item-authoring/ui/useFormValidationIssues", () => ({
 	useFormValidationIssues: () => [],
 }));
@@ -55,6 +82,57 @@ const merge = {
 } satisfies MergeSchema.Type;
 
 describe("MergeField", () => {
+	it("selects an instance-owned destination and changes its exact template without losing receiver effects", async () => {
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		const onChangeFn = vi.fn();
+		const transport = {
+			action: "space",
+			effect: "replace",
+			result: "replacement",
+			space: 17,
+		} satisfies MergeSchema.Type;
+		const renderFn = async (value: MergeSchema.Type) => {
+			await act(async () =>
+				root.render(
+					<MergeField
+						merge={value}
+						onChangeFn={onChangeFn}
+						sourceUnitsEnabled={false}
+						targetUnitsEnabled={false}
+					/>,
+				),
+			);
+		};
+		await renderFn(transport);
+		await act(async () =>
+			container
+				.querySelector<HTMLButtonElement>('button[data-ui-value="generated"]')!
+				.click(),
+		);
+		const generated = {
+			...transport,
+			space: {
+				type: "generated" as const,
+				templateUid: "interior",
+			},
+		};
+		expect(onChangeFn).toHaveBeenLastCalledWith(generated);
+		await renderFn(generated);
+		await act(async () =>
+			container.querySelector<HTMLButtonElement>('button[data-template="other"]')!.click(),
+		);
+		expect(onChangeFn).toHaveBeenLastCalledWith({
+			...generated,
+			space: {
+				type: "generated",
+				templateUid: "other",
+			},
+		});
+	});
+
 	it("preserves transport destination on reselect and target replacement while changing action", async () => {
 		const container = document.createElement("div");
 		document.body.append(container);

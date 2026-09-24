@@ -43,6 +43,7 @@ export const applyInputMaterialConsumeRunPlanFx = Effect.fn("applyInputMaterialC
 			}),
 			(state, allocation) =>
 				Effect.gen(function* () {
+					if (!state.runtime.jobs.some((job) => job.id === jobId)) return state;
 					const item = yield* readInputRunItemFx({
 						ownerItemId,
 						lineUid,
@@ -60,6 +61,18 @@ export const applyInputMaterialConsumeRunPlanFx = Effect.fn("applyInputMaterialC
 						ownerItemId: item.id,
 						runtime: state.runtime,
 					});
+					if (
+						!discardedRuntime.runtime.items.some(
+							(candidate) => candidate.id === item.id,
+						)
+					)
+						return {
+							events: [
+								...state.events,
+								...discardedRuntime.events,
+							],
+							runtime: discardedRuntime.runtime,
+						};
 					const consumedItem = yield* reviseRuntimeItemFx({
 						item: {
 							...item,

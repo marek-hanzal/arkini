@@ -1,3 +1,5 @@
+import { GameConfigFx } from "~/game-config/context/GameConfigFx";
+import { checkGeneratedSpacesFn } from "~/space/fn/checkGeneratedSpacesFn";
 import { checkRuntimeItemSchedulesFn } from "~/item-schedule/fn/checkRuntimeItemSchedulesFn";
 import { Effect } from "effect";
 
@@ -109,6 +111,7 @@ const checkRuntimeLocationsFn = (runtime: RuntimeSchema.Type) => {
 export const checkRuntimeFx = Effect.fn("checkRuntimeFx")(function* ({
 	runtime,
 }: CheckRuntimeProps) {
+	const config = yield* GameConfigFx;
 	const itemUnitIssues = checkRuntimeItemUnitsFn(runtime);
 	const itemIdIssues = checkRuntimeItemIdsFn(runtime);
 	const defaultLineIssues = checkRuntimeDefaultLinesFn({
@@ -127,6 +130,10 @@ export const checkRuntimeFx = Effect.fn("checkRuntimeFx")(function* ({
 
 	return {
 		issues: [
+			...checkGeneratedSpacesFn({
+				runtime,
+				config,
+			}),
 			...itemUnitIssues,
 			...itemIdIssues,
 			...checkRuntimeItemSchedulesFn(runtime),

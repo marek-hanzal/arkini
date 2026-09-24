@@ -1,3 +1,4 @@
+import { readItemTemplateReferencesFn } from "~/game-config-validation/fn/readItemTemplateReferencesFn";
 import { match } from "ts-pattern";
 
 import type { GameSourceProvenanceSchema } from "~/game-config-source/schema/GameSourceProvenanceSchema";
@@ -209,24 +210,6 @@ const validateOutcomeFn = ({
 		});
 	}
 
-	if (
-		drop.type === "template" &&
-		!config.templates?.some((template) => template.uid === drop.templateUid)
-	) {
-		diagnostics.push({
-			code: DiagnosticCodeEnumSchema.enum.ConfigMissingReference,
-			severity: DiagnosticSeverityEnumSchema.enum.Error,
-			path: [
-				...path,
-				"templateUid",
-			],
-			source,
-			message: `Template outcome references missing template ${drop.templateUid}.`,
-			reference: DiagnosticRecordEntityEnumSchema.enum.Template,
-			referenceId: drop.templateUid,
-		});
-	}
-
 	const ruleDiagnostics = drop.rules.map((rule, ruleIndex) =>
 		rule.when.map((when, whenIndex) =>
 			validateWhenReferenceFn({
@@ -395,6 +378,22 @@ export const validateConfigReferencesFn = ({
 					source,
 				}),
 			);
+		}
+		for (const reference of readItemTemplateReferencesFn(item)) {
+			if (config.templates?.some(({ uid }) => uid === reference.templateUid)) continue;
+			diagnostics.push({
+				code: DiagnosticCodeEnumSchema.enum.ConfigMissingReference,
+				severity: DiagnosticSeverityEnumSchema.enum.Error,
+				path: [
+					"items",
+					itemUid,
+					...reference.path,
+				],
+				source,
+				message: `Item references missing template ${reference.templateUid}.`,
+				reference: DiagnosticRecordEntityEnumSchema.enum.Template,
+				referenceId: reference.templateUid,
+			});
 		}
 		for (const [mergeIndex, merge] of (item.merge ?? []).entries()) {
 			if (merge.action !== "space")

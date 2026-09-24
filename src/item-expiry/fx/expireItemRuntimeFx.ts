@@ -47,7 +47,12 @@ export const expireItemRuntimeFx = Effect.fn("expireItemRuntimeFx")(function* ({
 	let abortedFacts: readonly EngineFact[] = [];
 	if (
 		removalMode !== "kill-switch" &&
-		(item.location.scope === "job" || item.location.scope === "reserved")
+		(item.location.scope === "job" || item.location.scope === "reserved") &&
+		draft.jobs.some(
+			(job) =>
+				(item.location.scope === "job" || item.location.scope === "reserved") &&
+				job.id === item.location.jobId,
+		)
 	) {
 		const aborted = yield* abortJobRuntimeFx({
 			reason: "material-expired",
@@ -66,6 +71,7 @@ export const expireItemRuntimeFx = Effect.fn("expireItemRuntimeFx")(function* ({
 	if (outcome !== undefined) {
 		const placed = yield* Effect.gen(function* () {
 			const resolved = yield* resolveOutcomeTableFx({
+				ownerItemId: item.id,
 				origin,
 				outcome,
 			});

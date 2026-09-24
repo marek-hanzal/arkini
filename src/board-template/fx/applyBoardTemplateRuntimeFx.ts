@@ -1,3 +1,4 @@
+import { destroyGeneratedSpacesFx } from "~/space/fx/destroyGeneratedSpacesFx";
 import { Effect } from "effect";
 import { TemplateNotFoundError } from "~/board-template/error/TemplateNotFoundError";
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
@@ -168,5 +169,16 @@ export const applyBoardTemplateRuntimeFx = Effect.fn("applyBoardTemplateRuntimeF
 		},
 		removed,
 	};
-	return result;
+	const destroyed = yield* destroyGeneratedSpacesFx({
+		removedItems: removed,
+		runtime: result.runtime,
+		ownershipRuntime,
+	});
+	return {
+		runtime: destroyed.runtime,
+		removed: [
+			...removed,
+			...destroyed.removed,
+		],
+	} satisfies applyBoardTemplateRuntimeFx.Result;
 });

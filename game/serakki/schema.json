@@ -891,9 +891,26 @@
 				{
 					"type": "string",
 					"const": "previous"
+				},
+				{
+					"type": "object",
+					"properties": {
+						"type": {
+							"type": "string",
+							"const": "generated"
+						},
+						"templateUid": {
+							"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
+						}
+					},
+					"required": [
+						"type",
+						"templateUid"
+					],
+					"additionalProperties": false
 				}
 			],
-			"description": "An exact Board space or the space the player last left successfully."
+			"description": "An exact Board space, previous navigation destination, or a template-initialized space owned by the live item instance."
 		},
 		"TemplateOutcomeSchema": {
 			"type": "object",

@@ -39,10 +39,17 @@ const projectOutcomeFn = (
 			{
 				type: "space",
 			},
-			(outcome) => ({
+			({ space, rules }) => ({
 				type: "space",
-				space: outcome.space,
-				rules: outcome.rules,
+				space,
+				...(typeof space === "object"
+					? {
+							templateTitle: templates.find(
+								(template) => template.uid === space.templateUid,
+							)?.title,
+						}
+					: {}),
+				rules,
 				activeRuleHints: [],
 			}),
 		)

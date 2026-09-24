@@ -1,3 +1,4 @@
+import { readGraphSpaceDestinationIdFn } from "~/graph/fn/readGraphSpaceDestinationIdFn";
 import { match } from "ts-pattern";
 import type { GraphOperation } from "~/graph/type/GraphFacts";
 import type { GraphDiscoveryOperation } from "~/graph/type/GraphDiscoveryResult";
@@ -46,7 +47,7 @@ export const readGraphOperationSummaryFn = (
 				ownership: data.action === "space" ? "receiver" : "source",
 				...(data.action === "space"
 					? {
-							destination: `space:${data.space}`,
+							destination: readGraphSpaceDestinationIdFn(data.space),
 						}
 					: {
 							target: `item:${data.target.itemUid}`,

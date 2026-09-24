@@ -1,3 +1,4 @@
+import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import { Effect } from "effect";
 
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
@@ -44,6 +45,11 @@ export namespace settleJobRuntimeFx {
 export const settleJobRuntimeFx = Effect.fn("settleJobRuntimeFx")(function* (
 	context: settleJobRuntimeFx.Props,
 ) {
+	if (!context.runtime.items.some((item) => item.id === context.owner.id))
+		return {
+			runtime: context.runtime,
+			facts: [],
+		} satisfies settleJobRuntimeFx.Result;
 	const depleted = context.owner.item.units !== undefined && context.owner.remainingUnits === 0;
 	let draft = context.runtime;
 	let removalEvents: readonly GameEventSchema.Type[] = [];
@@ -57,6 +63,7 @@ export const settleJobRuntimeFx = Effect.fn("settleJobRuntimeFx")(function* (
 			jobQueue: draft.jobQueue.filter((request) => request.ownerItemId !== context.owner.id),
 		};
 		const removed = yield* removeRuntimeItemIdentityFx({
+			ownershipRuntime: yield* (yield* RuntimeFx).read,
 			item: context.owner,
 			runtime: withoutDepletedOwnerQueue,
 		});
@@ -68,6 +75,7 @@ export const settleJobRuntimeFx = Effect.fn("settleJobRuntimeFx")(function* (
 		context.lineOutcome === undefined
 			? emptyOutcome
 			: yield* resolveOutcomeTableFx({
+					ownerItemId: context.owner.id,
 					origin: context.owner.location,
 					outcome: context.lineOutcome,
 				});
@@ -85,6 +93,7 @@ export const settleJobRuntimeFx = Effect.fn("settleJobRuntimeFx")(function* (
 			itemId: context.owner.id,
 			job: context.job,
 			program: resolveOutcomeTableFx({
+				ownerItemId: context.owner.id,
 				origin: context.owner.location,
 				outcome: context.owner.item.units.outcome,
 			}),

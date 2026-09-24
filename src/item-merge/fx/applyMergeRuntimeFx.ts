@@ -1,3 +1,4 @@
+import { resolveGeneratedSpaceFx } from "~/space/fx/resolveGeneratedSpaceFx";
 import { PreviousSpaceUnavailableError } from "~/item-merge/error/PreviousSpaceUnavailableError";
 import { relocateBoardItemFx } from "~/item-placement/fx/relocateBoardItemFx";
 import { Effect } from "effect";
@@ -273,6 +274,7 @@ const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(function*
 					const replacementWithSequence = {
 						...replacement,
 						mergeSequence: target.mergeSequence,
+						generatedSpace: target.generatedSpace,
 					};
 					return {
 						facts: [],
@@ -312,19 +314,42 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 	const owner = rule.action === "space" ? target : source;
 	const sourceAction = yield* rule.action === "space"
 		? Effect.gen(function* () {
-				const space = rule.space === "previous" ? runtime.previousSpace : rule.space;
+				const generated =
+					typeof rule.space === "object"
+						? yield* resolveGeneratedSpaceFx({
+								ownerItemId: owner.id,
+								templateUid: rule.space.templateUid,
+								runtime,
+							})
+						: undefined;
+				const space =
+					typeof rule.space === "object"
+						? generated?.space
+						: rule.space === "previous"
+							? runtime.previousSpace
+							: rule.space;
 				if (space === undefined) return yield* new PreviousSpaceUnavailableError();
 				const moved = yield* relocateBoardItemFx({
 					itemId: source.id,
 					originItemId: owner.id,
-					runtime,
+					runtime: generated?.runtime ?? runtime,
 					origin: {
 						...owner.location,
 						space,
 					},
 				});
 				return {
-					facts: moved.events,
+					facts: [
+						...(generated?.initialization === undefined
+							? []
+							: [
+									{
+										type: "template:applied",
+										effect: generated.initialization,
+									} satisfies EngineFact,
+								]),
+						...moved.events,
+					],
 					runtime: moved.runtime,
 				};
 			})
@@ -360,6 +385,7 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 	let mergeReplacementItemIds: string[] = [];
 	if (rule.outcome !== undefined) {
 		const outcome = yield* resolveOutcomeTableFx({
+			ownerItemId: owner.id,
 			origin: owner.location,
 			outcome: rule.outcome,
 		});

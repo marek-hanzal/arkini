@@ -90,7 +90,9 @@ export const completeJobTransitionFx = Effect.fn("completeJobTransitionFx")(func
 	} satisfies RuntimeSchema.Type;
 	const removalEvents: GameEventSchema.Type[] = [];
 	for (const consumedItem of consumedItems) {
+		if (!completionRuntime.items.some((item) => item.id === consumedItem.id)) continue;
 		const removed = yield* removeRuntimeItemIdentityFx({
+			ownershipRuntime: runtime,
 			item: consumedItem,
 			runtime: completionRuntime,
 		});

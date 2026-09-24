@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { SpaceDestinationSchema } from "~/game-value/schema/SpaceDestinationSchema";
+import { SpaceDestinationSchema } from "~/space/schema/SpaceDestinationSchema";
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
 import { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";

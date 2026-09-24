@@ -1,3 +1,4 @@
+import { destroyGeneratedSpacesFx } from "~/space/fx/destroyGeneratedSpacesFx";
 import { Effect } from "effect";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 
@@ -11,6 +12,7 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 interface DiscardRuntimeItemOwnedStateProps {
 	ownerItemId: IdSchema.Type;
 	runtime: RuntimeSchema.Type;
+	ownershipRuntime?: RuntimeSchema.Type;
 }
 
 /**
@@ -20,7 +22,11 @@ interface DiscardRuntimeItemOwnedStateProps {
  * anywhere in the complete ownership tree is a strict precondition failure.
  */
 export const discardRuntimeItemOwnedStateFx = Effect.fn("discardRuntimeItemOwnedStateFx")(
-	function* ({ ownerItemId, runtime }: DiscardRuntimeItemOwnedStateProps) {
+	function* ({
+		ownerItemId,
+		runtime,
+		ownershipRuntime = runtime,
+	}: DiscardRuntimeItemOwnedStateProps) {
 		const owned = readRuntimeItemOwnedStateFn({
 			ownerItemId,
 			runtime,
@@ -47,9 +53,17 @@ export const discardRuntimeItemOwnedStateFx = Effect.fn("discardRuntimeItemOwned
 		const reconciledRuntime = yield* reconcileOutboundDeliveriesRuntimeFx({
 			runtime: withoutIdentityState,
 		});
-		return {
+		const destroyed = yield* destroyGeneratedSpacesFx({
+			ownershipRuntime,
+			removedItems: owned.inputItems,
 			runtime: reconciledRuntime,
-			events: owned.inputItems.map(
+		});
+		return {
+			runtime: destroyed.runtime,
+			events: [
+				...owned.inputItems,
+				...destroyed.removed,
+			].map(
 				(snapshot): GameEventSchema.Type => ({
 					type: "item:removed",
 					snapshot,

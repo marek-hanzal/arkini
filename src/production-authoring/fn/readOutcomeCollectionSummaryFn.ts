@@ -1,3 +1,4 @@
+import { readSpaceDestinationLabelFn } from "~/space/fn/readSpaceDestinationLabelFn";
 import { match } from "ts-pattern";
 import type { OutcomeSchema } from "~/outcome/schema/OutcomeSchema";
 import type { TemplateSchema } from "~/board-template/schema/TemplateSchema";
@@ -51,14 +52,14 @@ export const readOutcomeCollectionSummaryFn = ({
 				},
 				(outcome) => {
 					return {
-						label:
-							outcome.space === "previous"
-								? textFn("Previous Space")
-								: `${textFn("Space")} ${outcome.space}`,
+						label: readSpaceDestinationLabelFn(outcome.space, textFn, templates),
 						searchTerms: [
-							outcome.space === "previous"
-								? "Previous Space"
-								: `Space ${outcome.space}`,
+							readSpaceDestinationLabelFn(outcome.space, (key) => key, templates),
+							...(typeof outcome.space === "object"
+								? [
+										outcome.space.templateUid,
+									]
+								: []),
 						],
 					};
 				},

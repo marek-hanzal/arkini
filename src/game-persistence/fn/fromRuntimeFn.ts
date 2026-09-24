@@ -6,6 +6,11 @@ const fromRuntimeItemFn = ({ item }: { readonly item: RuntimeItemSchema.Type }) 
 	id: item.id,
 	itemUid: item.item.uid,
 	location: item.location,
+	...(item.generatedSpace === undefined
+		? {}
+		: {
+				generatedSpace: item.generatedSpace,
+			}),
 	...(item.mergeSequence === undefined
 		? {}
 		: {

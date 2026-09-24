@@ -1,3 +1,4 @@
+import { readSpaceDestinationLabelFn } from "~/space/fn/readSpaceDestinationLabelFn";
 import { PanelsTopLeft } from "lucide-react";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import type { OutcomeSchema } from "~/outcome/schema/OutcomeSchema";
@@ -44,9 +45,11 @@ export const OutcomeOption = ({
 						key={`space:${index}`}
 						className="text-xs"
 					>
-						{outcome.space === "previous"
-							? translator.textFn("Previous Space")
-							: `${translator.textFn("Space")} ${outcome.space}`}
+						{readSpaceDestinationLabelFn(
+							outcome.space,
+							translator.textFn,
+							project.config.templates,
+						)}
 					</span>
 				))}
 			{outcomes

@@ -591,6 +591,11 @@ export const createProjectGraphFx = Effect.fn("createProjectGraphFx")(
 							id: node.id,
 							title: node.title,
 							kind: node.kind,
+							...(node.templateUid === undefined
+								? {}
+								: {
+										templateUid: node.templateUid,
+									}),
 							...(node.clock === undefined
 								? {}
 								: {

@@ -66,6 +66,7 @@ export const releaseOwnerInputsFx = Effect.fn("releaseOwnerInputsFx")(function* 
 	};
 
 	for (const bufferedItem of bufferedItems) {
+		if (!state.runtime.items.some((item) => item.id === bufferedItem.id)) continue;
 		const placement = yield* overflow === "discard"
 			? placeRuntimeItemBestEffortFx({
 					itemId: bufferedItem.id,

@@ -1,3 +1,4 @@
+import { readGraphSpaceDestinationIdFn } from "~/graph/fn/readGraphSpaceDestinationIdFn";
 import { match } from "ts-pattern";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { GraphEdge, GraphFacts, GraphNode, GraphOperation } from "~/graph/type/GraphFacts";
@@ -37,10 +38,21 @@ export const compileGraphFactsFn = (config: GameConfigSchema.Type): GraphFacts =
 		if (!nodes.has(id)) {
 			const item =
 				kind === "item" && Object.hasOwn(config.items, key) ? config.items[key] : undefined;
+			const generatedTemplateUid =
+				kind === "space" && key.startsWith("generated:") ? key.slice(10) : undefined;
 			const template = kind === "template" ? templates.get(key) : undefined;
+			const generatedTemplate =
+				generatedTemplateUid === undefined
+					? undefined
+					: templates.get(generatedTemplateUid);
 			nodes.set(id, {
 				id,
 				kind,
+				...(generatedTemplateUid === undefined
+					? {}
+					: {
+							templateUid: generatedTemplateUid,
+						}),
 				...(item?.clock === undefined
 					? {}
 					: {
@@ -61,14 +73,20 @@ export const compileGraphFactsFn = (config: GameConfigSchema.Type): GraphFacts =
 					item?.title ??
 					template?.title ??
 					(kind === "space"
-						? key === "previous"
-							? "Previous Space"
-							: `Space ${key}`
+						? generatedTemplateUid !== undefined
+							? `Generated Space · ${generatedTemplate?.title ?? generatedTemplateUid}`
+							: key === "previous"
+								? "Previous Space"
+								: `Space ${key}`
 						: key),
 				missing: match(kind)
 					.with("item", () => item === undefined)
 					.with("template", () => template === undefined)
-					.with("space", "start", () => false)
+					.with(
+						"space",
+						() => generatedTemplateUid !== undefined && generatedTemplate === undefined,
+					)
+					.with("start", () => false)
 					.exhaustive(),
 				source:
 					kind === "item" && item !== undefined
@@ -226,7 +244,7 @@ export const compileGraphFactsFn = (config: GameConfigSchema.Type): GraphFacts =
 							},
 							({ space }) => ({
 								kind: "space" as const,
-								key: String(space),
+								key: readGraphSpaceDestinationIdFn(space).slice(6),
 								field: "space",
 								edgeKind: "space-outcome" as const,
 							}),
@@ -246,6 +264,11 @@ export const compileGraphFactsFn = (config: GameConfigSchema.Type): GraphFacts =
 					const source = [
 						...outcomePath,
 						target.field,
+						...(outcome.type === "space" && typeof outcome.space === "object"
+							? [
+									"templateUid",
+								]
+							: []),
 					];
 					edgeFn(
 						owner,
@@ -403,10 +426,22 @@ export const compileGraphFactsFn = (config: GameConfigSchema.Type): GraphFacts =
 				const ref = [
 					...source,
 					"space",
+					...(typeof merge.space === "object"
+						? [
+								"templateUid",
+							]
+						: []),
 				];
-				edgeFn(owner, nodeFn("space", String(merge.space), ref), "merge-space", ref, id, {
-					role,
-				});
+				edgeFn(
+					owner,
+					nodeFn("space", readGraphSpaceDestinationIdFn(merge.space).slice(6), ref),
+					"merge-space",
+					ref,
+					id,
+					{
+						role,
+					},
+				);
 			} else {
 				const ref = [
 					...source,

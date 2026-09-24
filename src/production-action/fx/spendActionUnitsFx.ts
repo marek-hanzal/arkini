@@ -127,6 +127,7 @@ export const spendActionUnitsFx = Effect.fn("spendActionUnitsFx")(function* ({
 			ownerItemId,
 			program: Effect.gen(function* () {
 				const outcome = yield* resolveOutcomeTableFx({
+					ownerItemId: item.id,
 					origin: item.location,
 					outcome: depletionOutcome,
 				});

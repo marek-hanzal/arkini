@@ -1,3 +1,4 @@
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import { Effect } from "effect";
 import type { SpaceOutcomeSchema } from "~/outcome/schema/SpaceOutcomeSchema";
@@ -7,8 +8,10 @@ import { resolveOutcomeRulesEnabledFx } from "./resolveOutcomeRulesEnabledFx";
 
 export const resolveSpaceOutcomeFx = Effect.fn("resolveSpaceOutcomeFx")(function* ({
 	outcome,
+	ownerItemId,
 	origin,
 }: {
+	readonly ownerItemId: IdSchema.Type;
 	readonly outcome: SpaceOutcomeSchema.Type;
 	readonly origin: BoardLocationSchema.Type;
 }) {
@@ -19,6 +22,12 @@ export const resolveSpaceOutcomeFx = Effect.fn("resolveSpaceOutcomeFx")(function
 		}))
 	)
 		return undefined;
+	if (typeof outcome.space === "object")
+		return {
+			type: "generated-space",
+			ownerItemId,
+			templateUid: outcome.space.templateUid,
+		} satisfies ResolvedOutcome.GeneratedSpace;
 	const space =
 		outcome.space === "previous"
 			? (yield* (yield* RuntimeFx).read).previousSpace

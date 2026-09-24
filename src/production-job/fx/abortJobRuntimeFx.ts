@@ -71,7 +71,9 @@ export const abortJobRuntimeFx = Effect.fn("abortJobRuntimeFx")(function* ({
 		},
 	];
 	for (const consumedItem of consumedItems) {
+		if (!draft.items.some((item) => item.id === consumedItem.id)) continue;
 		const discarded = yield* discardRuntimeItemTreeFx({
+			ownershipRuntime: runtime,
 			item: consumedItem,
 			ownerItemId: owner.id,
 			source: "consumed-input",

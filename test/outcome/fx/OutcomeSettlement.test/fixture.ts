@@ -6,7 +6,7 @@ import { resolveOutcomeTableFx } from "~/outcome/fx/resolveOutcomeTableFx";
 import { applyOutcomeTableFx } from "~/outcome/fx/applyOutcomeTableFx";
 import { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
 import type { OutcomeSchema } from "~/outcome/schema/OutcomeSchema";
-import type { SpaceDestinationSchema } from "~/game-value/schema/SpaceDestinationSchema";
+import type { SpaceDestinationSchema } from "~/space/schema/SpaceDestinationSchema";
 
 export const origin = {
 	scope: "board" as const,
@@ -111,6 +111,7 @@ export const settleFx = (outcome: OutcomeTableSchema.Type) =>
 	modifyRuntimeFx((runtime) =>
 		Effect.gen(function* () {
 			const resolved = yield* resolveOutcomeTableFx({
+				ownerItemId: "test-outcome-owner",
 				origin,
 				outcome,
 			});

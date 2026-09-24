@@ -32,6 +32,7 @@ describe("Outcome settlement", () => {
 			Effect.gen(function* () {
 				yield* spawnOwnerFx();
 				const resolved = yield* resolveOutcomeTableFx({
+					ownerItemId: "test-outcome-owner",
 					origin,
 					outcome,
 				});

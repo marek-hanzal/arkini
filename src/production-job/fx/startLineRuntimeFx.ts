@@ -85,22 +85,24 @@ const applyLineRunPlanFx = Effect.fn("applyLineRunPlanFx")(function* ({
 			runtime,
 		}),
 		(state, input, inputIndex) =>
-			applyInputRunPlanFx({
-				jobId: job.id,
-				ownerItemId: plan.ownerItemId,
-				lineUid: plan.lineUid,
-				inputIndex,
-				plan: input,
-				runtime: state.runtime,
-			}).pipe(
-				Effect.map((result) => ({
-					events: [
-						...state.events,
-						...result.events,
-					],
-					runtime: result.runtime,
-				})),
-			),
+			!state.runtime.jobs.some((entry) => entry.id === job.id)
+				? Effect.succeed(state)
+				: applyInputRunPlanFx({
+						jobId: job.id,
+						ownerItemId: plan.ownerItemId,
+						lineUid: plan.lineUid,
+						inputIndex,
+						plan: input,
+						runtime: state.runtime,
+					}).pipe(
+						Effect.map((result) => ({
+							events: [
+								...state.events,
+								...result.events,
+							],
+							runtime: result.runtime,
+						})),
+					),
 	);
 });
 
@@ -113,6 +115,11 @@ const applyLineUnitPlansFx = Effect.fn("applyLineUnitPlansFx")(function* ({
 	readonly plan: LineRun.Plan;
 	readonly runtime: RuntimeSchema.Type;
 }) {
+	if (!runtime.jobs.some((entry) => entry.id === job.id))
+		return {
+			runtime,
+			facts: [],
+		};
 	return yield* settleActionUnitsFx({
 		actionId: job.lineUid,
 		units: plan.input.flatMap(({ units }) =>

@@ -688,6 +688,8 @@ General:
   value: General
 General PNG images keep their original dimensions.:
   value: General PNG images keep their original dimensions.
+Generated Space:
+  value: Generated Space
 Global playlist:
   value: Global playlist
 Gone:
@@ -1409,16 +1411,6 @@ Preparing editor game…:
   value: Preparing editor game…
 Previous Space:
   value: Previous Space
-Previous Space outcome help:
-  value: |
-    **Space** navigates to an exact space number. **Previous Space** returns the player to the space they last left successfully, using history when the outcome settles.
-
-    A new game has no previous space: this outcome then does nothing, while other outcomes settle normally. Returning updates history, so the next return goes back the other way.
-Previous Space transport help:
-  value: |
-    **Space** sends the dropped item to an exact space number. **Previous Space** sends it to the space the player last left successfully, preserving its identity and state.
-
-    The player stays here and navigation history does not change. Before the first navigation, the drop is rejected without changing either item or applying merge effects and outcomes.
 Produced by:
   value: Produced by
   dynamic: true
@@ -1811,6 +1803,20 @@ Space:
 Space changed:
   value: Space changed
   dynamic: true
+Space destination outcome help:
+  value: |
+    **Space** navigates to an exact space number. **Previous Space** returns the player to the space they last left successfully, using history when the outcome settles.
+
+    A new game has no previous space: this outcome then does nothing, while other outcomes settle normally. Returning updates history, so the next return goes back the other way.
+
+    **Generated Space** opens this item instance’s private room, initialized from the selected template on its first successful use. Later uses return to that same room. Destroying the owner also destroys its room and everything inside.
+Space destination transport help:
+  value: |
+    **Space** sends the dropped item to an exact space number. **Previous Space** sends it to the space the player last left successfully, preserving its identity and state.
+
+    The player stays here and navigation history does not change. Before the first navigation, the drop is rejected without changing either item or applying merge effects and outcomes.
+
+    **Generated Space** sends the item into this receiver instance’s private room. The selected template initializes it only on first successful use; navigation and transport share that room. Destroying the receiver destroys its room and everything inside.
 Space output:
   value: Space output
   dynamic: true

@@ -57,7 +57,9 @@ export const forceRemoveRuntimeItemFx = Effect.fn("forceRemoveRuntimeItemFx")(fu
 		jobQueue: runtime.jobQueue.filter((request) => request.ownerItemId !== item.id),
 	};
 	for (const consumedItem of consumed) {
+		if (!draft.items.some((candidate) => candidate.id === consumedItem.id)) continue;
 		const discarded = yield* discardRuntimeItemTreeFx({
+			ownershipRuntime: runtime,
 			item: consumedItem,
 			ownerItemId: item.id,
 			source: "consumed-input",
@@ -68,12 +70,14 @@ export const forceRemoveRuntimeItemFx = Effect.fn("forceRemoveRuntimeItemFx")(fu
 		facts.push(...discarded.events);
 	}
 	const removed = yield* removeRuntimeItemIdentityFx({
+		ownershipRuntime: runtime,
 		item,
 		runtime: draft,
 	});
 	draft = removed.runtime;
 	facts.push(...removed.events);
 	for (const reservation of reservations) {
+		if (!draft.items.some((candidate) => candidate.id === reservation.id)) continue;
 		const placed = yield* placeRuntimeItemBestEffortFx({
 			itemId: reservation.id,
 			origin,
@@ -84,7 +88,14 @@ export const forceRemoveRuntimeItemFx = Effect.fn("forceRemoveRuntimeItemFx")(fu
 		draft = placed.runtime;
 		facts.push(...placed.events);
 	}
-	if (item.location.scope === "job" || item.location.scope === "reserved") {
+	if (
+		(item.location.scope === "job" || item.location.scope === "reserved") &&
+		draft.jobs.some(
+			(job) =>
+				(item.location.scope === "job" || item.location.scope === "reserved") &&
+				job.id === item.location.jobId,
+		)
+	) {
 		const reconciled = yield* abortJobRuntimeFx({
 			reason: "material-expired",
 			jobId: item.location.jobId,

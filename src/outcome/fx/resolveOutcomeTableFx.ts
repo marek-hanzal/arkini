@@ -1,3 +1,4 @@
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { resolveOutcomeRulesEnabledFx } from "./resolveOutcomeRulesEnabledFx";
 import { Effect } from "effect";
 import { match } from "ts-pattern";
@@ -13,6 +14,7 @@ import { resolveSpaceOutcomeFx } from "./resolveSpaceOutcomeFx";
 
 export namespace resolveOutcomeTableFx {
 	export interface Props {
+		readonly ownerItemId: IdSchema.Type;
 		readonly origin: BoardLocationSchema.Type;
 		readonly outcome: OutcomeTableSchema.Type;
 	}
@@ -25,6 +27,7 @@ export namespace resolveOutcomeTableFx {
 export const resolveOutcomeTableFx = Effect.fn("resolveOutcomeTableFx")(function* ({
 	origin,
 	outcome,
+	ownerItemId,
 }: resolveOutcomeTableFx.Props) {
 	const selected = yield* selectRollSetFx({
 		set: outcome.set,
@@ -59,6 +62,7 @@ export const resolveOutcomeTableFx = Effect.fn("resolveOutcomeTableFx")(function
 						},
 						(outcome) =>
 							resolveSpaceOutcomeFx({
+								ownerItemId,
 								outcome,
 								origin,
 							}),

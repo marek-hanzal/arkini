@@ -126,6 +126,7 @@ Do not commit its exhaustive output into this Atlas. Generated edges answer “w
 
 | Domain | Role | First read |
 | --- | --- | --- |
+| `space` | Authored destinations, instance-owned generated rooms and destructive lifetime | [`src/space/fx/resolveGeneratedSpaceFx.ts`](src/space/fx/resolveGeneratedSpaceFx.ts) |
 | `board-template` | Portable space-less board templates with independent dimensions | [`src/board-template/schema/TemplateSchema.ts`](src/board-template/schema/TemplateSchema.ts) |
 | `board-authoring` | Shared board preview, placement picker and editing gestures | [`src/board-authoring/ui/BoardGrid.tsx`](src/board-authoring/ui/BoardGrid.tsx) |
 | `template-authoring` | Editor template catalog, UID routes and revision-pinned drafts | [`src/template-authoring/ui/Templates.tsx`](src/template-authoring/ui/Templates.tsx) |

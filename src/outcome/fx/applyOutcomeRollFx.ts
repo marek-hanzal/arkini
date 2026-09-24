@@ -1,3 +1,5 @@
+import { isSpaceRetainedFn } from "~/space/fn/isSpaceRetainedFn";
+import { resolveGeneratedSpaceFx } from "~/space/fx/resolveGeneratedSpaceFx";
 import { applyBoardTemplateRuntimeFx } from "~/board-template/fx/applyBoardTemplateRuntimeFx";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import { Effect } from "effect";
@@ -27,10 +29,19 @@ export const applyOutcomeRollFx = Effect.fn("applyOutcomeRollFx")(function* ({
 	runtime,
 	overflow,
 }: applyOutcomeRollFx.Props) {
+	const previousRuntime = yield* (yield* RuntimeFx).read;
 	let draft = runtime;
 	const effects: AppliedOutcome[] = [];
 	const discarded: planBestEffortDropPlacementFx.Discarded[] = [];
 	for (const outcome of roll.outcome) {
+		if (
+			!isSpaceRetainedFn({
+				space: roll.origin.space,
+				previousRuntime,
+				runtime: draft,
+			})
+		)
+			break;
 		yield* match(outcome)
 			.with(
 				{
@@ -58,12 +69,40 @@ export const applyOutcomeRollFx = Effect.fn("applyOutcomeRollFx")(function* ({
 				},
 				(outcome) =>
 					Effect.gen(function* () {
+						if (
+							!isSpaceRetainedFn({
+								space: outcome.space,
+								previousRuntime,
+								runtime: draft,
+							})
+						)
+							return;
 						// Navigation stays in the draft; publication reads only the final space.
 						if (draft.currentSpace !== outcome.space)
 							draft = {
 								...draft,
 								currentSpace: outcome.space,
 							};
+					}),
+			)
+			.with(
+				{
+					type: "generated-space",
+				},
+				(outcome) =>
+					Effect.gen(function* () {
+						const resolved = yield* resolveGeneratedSpaceFx({
+							ownerItemId: outcome.ownerItemId,
+							templateUid: outcome.templateUid,
+							runtime: draft,
+						});
+						if (resolved === undefined) return;
+						draft = {
+							...resolved.runtime,
+							currentSpace: resolved.space,
+						};
+						if (resolved.initialization !== undefined)
+							effects.push(resolved.initialization);
 					}),
 			)
 			.with(

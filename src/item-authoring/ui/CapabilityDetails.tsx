@@ -1,3 +1,4 @@
+import { readSpaceDestinationLabelFn } from "~/space/fn/readSpaceDestinationLabelFn";
 import { match } from "ts-pattern";
 import { Tx } from "~/translation/ui/Tx";
 import { DisabledCapabilityDetail } from "~/item-authoring/ui/DisabledCapabilityDetail";
@@ -102,10 +103,10 @@ export const MergeDetail = ({
 					description={<Mx label="Authored merge target summary help" />}
 					value={
 						merge.action === "space" ? (
-							merge.space === "previous" ? (
-								translator.textFn("Previous Space")
-							) : (
-								`${translator.textFn("Space")} ${merge.space}`
+							readSpaceDestinationLabelFn(
+								merge.space,
+								translator.textFn,
+								project.config.templates,
 							)
 						) : (
 							<SelectorDetail selector={merge.target} />

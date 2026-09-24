@@ -1,3 +1,4 @@
+import { readSpaceDestinationLabelFn } from "~/space/fn/readSpaceDestinationLabelFn";
 import { SpaceDestinationControl } from "~/authoring-form/ui/SpaceDestinationControl";
 import { readOutcomeCollectionSummaryFn } from "~/production-authoring/fn/readOutcomeCollectionSummaryFn";
 import { TemplateSelector } from "~/template-authoring/ui/TemplateSelector";
@@ -47,7 +48,7 @@ const readOutcomeSummaryFn = (outcome: OutcomeSchema.Type, textFn: (key: string)
 	const rules = outcome.rules.length;
 	const ruleSummary = rules === 0 ? "" : ` · ${rules} ${textFn(rules === 1 ? "rule" : "rules")}`;
 	if (outcome.type === "space")
-		return `${outcome.space === "previous" ? textFn("Previous Space") : `${textFn("Space")} ${outcome.space}`}${ruleSummary}`;
+		return `${readSpaceDestinationLabelFn(outcome.space, textFn)}${ruleSummary}`;
 	if (outcome.type === "template") return `${textFn("Template")}${ruleSummary}`;
 	const { min, max } = outcome.quantity;
 	const quantity = min === max ? `×${min}` : `×${min}–${max}`;
@@ -214,7 +215,7 @@ const OutcomeFields = ({
 					(value) => (
 						<SpaceDestinationControl
 							error={readEditorFormValidationErrorFn(validationIssues, "space")}
-							description={<Mx label="Previous Space outcome help" />}
+							description={<Mx label="Space destination outcome help" />}
 							value={value.space}
 							onChangeFn={(space) =>
 								onChangeFn({

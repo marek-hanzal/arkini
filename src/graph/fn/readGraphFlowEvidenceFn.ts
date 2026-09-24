@@ -1,3 +1,4 @@
+import { readGraphSpaceDestinationIdFn } from "~/graph/fn/readGraphSpaceDestinationIdFn";
 import { match, P } from "ts-pattern";
 import type { GraphEdge, GraphNode, GraphOperation } from "~/graph/type/GraphFacts";
 import type { GraphFlowStep } from "~/graph/type/GraphFlow";
@@ -117,7 +118,7 @@ export const readGraphFlowEvidenceFn = (
 			({ data }) => [
 				`Merge action=${data.action}; effect=${data.effect}; ownership=${data.action === "space" ? "receiver" : "source"}`,
 				data.action === "space"
-					? `Transport destination: ${labelFn(nodes, `space:${data.space}`)}; incoming item identity is unspecified`
+					? `Transport destination: ${labelFn(nodes, readGraphSpaceDestinationIdFn(data.space))}; incoming item identity is unspecified`
 					: `Target: ${labelFn(nodes, `item:${data.target.itemUid}`)}`,
 				...(data.effect === "replace"
 					? [

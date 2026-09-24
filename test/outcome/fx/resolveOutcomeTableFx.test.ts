@@ -147,6 +147,7 @@ describe("resolveOutcomeTableFx", () => {
 				const origin = yield* createOriginFx();
 
 				return yield* resolveOutcomeTableFx({
+					ownerItemId: "test-outcome-owner",
 					origin: {
 						scope: "board",
 						space: 0,
@@ -220,6 +221,7 @@ describe("resolveOutcomeTableFx", () => {
 				const origin = yield* createOriginFx();
 
 				return yield* resolveOutcomeTableFx({
+					ownerItemId: "test-outcome-owner",
 					origin: {
 						scope: "board",
 						space: 0,
@@ -300,6 +302,7 @@ describe("resolveOutcomeTableFx", () => {
 			Effect.gen(function* () {
 				const origin = yield* createOriginFx();
 				const table = yield* resolveOutcomeTableFx({
+					ownerItemId: "test-outcome-owner",
 					origin: {
 						scope: "board",
 						space: 0,
@@ -377,6 +380,7 @@ describe("resolveOutcomeTableFx", () => {
 			Effect.gen(function* () {
 				const origin = yield* createOriginFx();
 				const table = yield* resolveOutcomeTableFx({
+					ownerItemId: "test-outcome-owner",
 					origin: {
 						scope: "board",
 						space: 0,

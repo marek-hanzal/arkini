@@ -26,6 +26,7 @@ export const placeOutputForTestFx = Effect.fn("placeOutputForTestFx")(function* 
 				runtime,
 			});
 			const resolved = yield* resolveOutcomeTableFx({
+				ownerItemId: "test-outcome-owner",
 				origin: origin.location,
 				outcome: output,
 			});

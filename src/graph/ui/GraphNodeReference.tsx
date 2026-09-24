@@ -19,9 +19,13 @@ export const GraphNodeReference = ({
 		id.startsWith("item:") && Object.hasOwn(project.config.items, id.slice(5))
 			? project.config.items[id.slice(5)]
 			: undefined;
-	const template = id.startsWith("template:")
-		? project.config.templates?.find((entry) => entry.uid === id.slice(9))
-		: undefined;
+	const generatedTemplateUid = id.startsWith("space:generated:") ? id.slice(16) : undefined;
+	const template =
+		generatedTemplateUid !== undefined
+			? project.config.templates?.find((entry) => entry.uid === generatedTemplateUid)
+			: id.startsWith("template:")
+				? project.config.templates?.find((entry) => entry.uid === id.slice(9))
+				: undefined;
 	const className =
 		"min-h-0 min-w-0 justify-start gap-2 border-0 bg-transparent p-0 text-left text-sm shadow-none hover:bg-transparent hover:text-accent";
 	if (item !== undefined)
@@ -55,9 +59,19 @@ export const GraphNodeReference = ({
 				}}
 			>
 				<span>
-					{translator.textFn("Template")} · {template.title}
+					{translator.textFn(
+						generatedTemplateUid === undefined ? "Template" : "Generated Space",
+					)}{" "}
+					· {template.title}
 				</span>
 			</ButtonLink>
+		);
+	if (generatedTemplateUid !== undefined)
+		return (
+			<span className="break-words text-sm">
+				{translator.textFn("Generated Space")} · {generatedTemplateUid} ·{" "}
+				{translator.textFn("Missing reference")}
+			</span>
 		);
 	if (id === "space:previous")
 		return <span className="break-words text-sm">{translator.textFn("Previous Space")}</span>;

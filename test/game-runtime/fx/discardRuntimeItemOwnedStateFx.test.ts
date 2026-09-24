@@ -1,3 +1,4 @@
+import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { Effect, Result } from "effect";
 import { expect, it } from "vitest";
 
@@ -61,7 +62,7 @@ it("discards passive input descendants and default-line intent while preserving 
 		discardRuntimeItemOwnedStateFx({
 			ownerItemId: root.id,
 			runtime,
-		}),
+		}).pipe(Effect.provideService(GameConfigFx, config)),
 	);
 
 	expect(result.events).toEqual([
@@ -139,7 +140,7 @@ it("rejects active or queued work anywhere beneath the discarded ownership tree"
 				discardRuntimeItemOwnedStateFx({
 					ownerItemId: root.id,
 					runtime,
-				}),
+				}).pipe(Effect.provideService(GameConfigFx, config)),
 			),
 		);
 

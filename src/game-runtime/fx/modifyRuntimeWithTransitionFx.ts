@@ -1,3 +1,4 @@
+import { isSpaceRetainedFn } from "~/space/fn/isSpaceRetainedFn";
 import { Effect } from "effect";
 
 import { projectCommittedEngineFactsFx } from "~/game-event/fx/projectCommittedEngineFactsFx";
@@ -49,7 +50,12 @@ export const modifyRuntimeWithTransitionFx = Effect.fn("modifyRuntimeWithTransit
 					[
 						result,
 						// Only the final committed transition records history, never draft hops.
-						nextRuntime.currentSpace === transition.runtime.currentSpace
+						nextRuntime.currentSpace === transition.runtime.currentSpace ||
+						!isSpaceRetainedFn({
+							space: transition.runtime.currentSpace,
+							previousRuntime: transition.runtime,
+							runtime: nextRuntime,
+						})
 							? nextRuntime
 							: {
 									...nextRuntime,

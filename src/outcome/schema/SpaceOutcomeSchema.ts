@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { OutcomeEnumSchema } from "./OutcomeEnumSchema";
 import { OutcomeRuleSchema } from "./OutcomeRuleSchema";
-import { SpaceDestinationSchema } from "~/game-value/schema/SpaceDestinationSchema";
+import { SpaceDestinationSchema } from "~/space/schema/SpaceDestinationSchema";
 export const SpaceOutcomeSchema = z
 	.object({
 		type: OutcomeEnumSchema.extract([

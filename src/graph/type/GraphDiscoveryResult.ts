@@ -12,6 +12,7 @@ export interface GraphDiscoveryNode {
 	readonly title: string;
 	readonly missing?: boolean;
 	readonly clock?: GraphNode["clock"];
+	readonly templateUid?: string;
 }
 
 /** Explicit scalar whitelist; authored documents belong to hydration readers. */

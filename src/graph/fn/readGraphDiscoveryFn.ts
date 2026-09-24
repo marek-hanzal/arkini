@@ -223,6 +223,11 @@ export const readGraphDiscoveryFn = (
 				id: node.id,
 				kind: node.kind,
 				title: node.title,
+				...(node.templateUid === undefined
+					? {}
+					: {
+							templateUid: node.templateUid,
+						}),
 				...(node.clock === undefined
 					? {}
 					: {

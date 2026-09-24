@@ -1,3 +1,4 @@
+import { destroyGeneratedSpacesFx } from "~/space/fx/destroyGeneratedSpacesFx";
 import { Effect } from "effect";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 
@@ -11,13 +12,16 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 interface RemoveRuntimeItemIdentityProps {
 	item: RuntimeItemSchema.Type;
 	runtime: RuntimeSchema.Type;
+	ownershipRuntime?: RuntimeSchema.Type;
 }
 
 /** Removes one item identity only when it owns no active or queued work. */
 export const removeRuntimeItemIdentityFx = Effect.fn("removeRuntimeItemIdentityFx")(function* ({
 	item,
 	runtime,
+	ownershipRuntime = runtime,
 }: RemoveRuntimeItemIdentityProps) {
+	const liveItem = runtime.items.find((candidate) => candidate.id === item.id) ?? item;
 	const jobIds = runtime.jobs.filter((job) => job.ownerItemId === item.id).map((job) => job.id);
 	if (jobIds.length > 0) {
 		return yield* Effect.fail(
@@ -52,13 +56,26 @@ export const removeRuntimeItemIdentityFx = Effect.fn("removeRuntimeItemIdentityF
 		returnFromByOwnerItemId,
 		runtime: removedRuntime,
 	});
-	return {
+	const destroyed = yield* destroyGeneratedSpacesFx({
+		ownershipRuntime,
+		removedItems: [
+			liveItem,
+		],
 		runtime: reconciledRuntime,
+	});
+	return {
+		runtime: destroyed.runtime,
 		events: [
 			{
 				type: "item:removed",
 				snapshot: item,
 			} satisfies GameEventSchema.Type,
+			...destroyed.removed.map(
+				(snapshot): GameEventSchema.Type => ({
+					type: "item:removed",
+					snapshot,
+				}),
+			),
 		],
 	};
 });

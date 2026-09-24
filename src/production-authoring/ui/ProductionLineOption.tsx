@@ -1,4 +1,5 @@
-import type { SpaceDestinationSchema } from "~/game-value/schema/SpaceDestinationSchema";
+import { readSpaceDestinationLabelFn } from "~/space/fn/readSpaceDestinationLabelFn";
+import type { SpaceDestinationSchema } from "~/space/schema/SpaceDestinationSchema";
 import { match, P } from "ts-pattern";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { ArrowRight, PanelsTopLeft } from "lucide-react";
@@ -14,7 +15,7 @@ import { readDraftRollOutcomesFn } from "~/production-authoring/fn/readDraftRoll
 const readItemSidesFn = (line: LineSchema.Type) => {
 	const inputs = new Set<string>();
 	const outputs = new Set<string>();
-	const spaces = new Set<SpaceDestinationSchema.Type>();
+	const spaces = new Map<string, SpaceDestinationSchema.Type>();
 	const templates = new Set<string>();
 	for (const input of line.input) {
 		match(input)
@@ -56,7 +57,12 @@ const readItemSidesFn = (line: LineSchema.Type) => {
 							type: "space",
 						},
 						({ space }) => {
-							spaces.add(space);
+							spaces.set(
+								typeof space === "object"
+									? `generated:${space.templateUid}`
+									: String(space),
+								space,
+							);
 						},
 					)
 					.with(
@@ -79,7 +85,7 @@ const readItemSidesFn = (line: LineSchema.Type) => {
 			...templates,
 		],
 		spaces: [
-			...spaces,
+			...spaces.values(),
 		],
 		inputs: [
 			...inputs,
@@ -159,12 +165,16 @@ export const ProductionLineOption = ({
 					))}
 					{spaces.map((space) => (
 						<span
-							key={space}
+							key={
+								typeof space === "object" ? `generated:${space.templateUid}` : space
+							}
 							className="text-xs text-subtle"
 						>
-							{space === "previous"
-								? translator.textFn("Previous Space")
-								: `${translator.textFn("Space")} ${space}`}
+							{readSpaceDestinationLabelFn(
+								space,
+								translator.textFn,
+								project.config.templates,
+							)}
 						</span>
 					))}
 					<ItemImages

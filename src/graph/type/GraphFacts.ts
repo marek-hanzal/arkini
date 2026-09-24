@@ -14,6 +14,8 @@ export interface GraphNode {
 	readonly title: string;
 	readonly missing: boolean;
 	readonly source: readonly (string | number)[];
+	/** Initialization recipe for an owner-specific generated destination, not a runtime room. */
+	readonly templateUid?: string;
 	/** Authored item scheduling, converted without rounding or evaluating rules. */
 	readonly clock?: {
 		readonly intervalSeconds?: number;

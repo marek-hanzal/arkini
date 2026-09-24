@@ -101,7 +101,12 @@ const OutcomeRoll = <Item extends OutcomeProjection.Item>({
 							{eyebrow}
 							{item.type === "space" ? (
 								<>
-									{item.space === "previous" ? (
+									{typeof item.space === "object" ? (
+										<>
+											<Tx label="Generated Space" /> ·{" "}
+											{item.templateTitle ?? item.space.templateUid}
+										</>
+									) : item.space === "previous" ? (
 										<Tx label="Previous Space" />
 									) : (
 										<>

@@ -22,6 +22,7 @@ export namespace discardRuntimeItemTreeFx {
 		readonly source: DiscardEvent["source"];
 		readonly reason: DiscardEvent["reason"];
 		readonly runtime: RuntimeSchema.Type;
+		readonly ownershipRuntime?: RuntimeSchema.Type;
 	}
 
 	export interface Result {
@@ -37,16 +38,19 @@ export const discardRuntimeItemTreeFx = Effect.fn("discardRuntimeItemTreeFx")(fu
 	source,
 	reason,
 	runtime,
+	ownershipRuntime = runtime,
 }: discardRuntimeItemTreeFx.Props) {
 	const owned = readRuntimeItemOwnedStateFn({
 		ownerItemId: item.id,
 		runtime,
 	});
 	const detached = yield* discardRuntimeItemOwnedStateFx({
+		ownershipRuntime,
 		ownerItemId: item.id,
 		runtime,
 	});
 	const removed = yield* removeRuntimeItemIdentityFx({
+		ownershipRuntime,
 		item,
 		runtime: detached.runtime,
 	});

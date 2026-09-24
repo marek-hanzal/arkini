@@ -15,6 +15,7 @@ import { OutcomeDetail } from "~/item-authoring/ui/OutcomeDetail";
 import { SelectorDetail } from "~/item-authoring/ui/SelectorDetail";
 import { DetailReference } from "~/item-authoring/ui/DetailReference";
 import { Mx } from "~/translation/ui/Mx";
+import { TemplateDetailReference } from "~/template-authoring/ui/TemplateDetailReference";
 
 /** Presents the optional unit capability or its explicit disabled state. */
 export const UnitsDetail = ({
@@ -103,10 +104,20 @@ export const MergeDetail = ({
 					description={<Mx label="Authored merge target summary help" />}
 					value={
 						merge.action === "space" ? (
-							readSpaceDestinationLabelFn(
-								merge.space,
-								translator.textFn,
-								project.config.templates,
+							typeof merge.space === "object" ? (
+								<TemplateDetailReference templateUid={merge.space.templateUid}>
+									{readSpaceDestinationLabelFn(
+										merge.space,
+										translator.textFn,
+										project.config.templates,
+									)}
+								</TemplateDetailReference>
+							) : (
+								readSpaceDestinationLabelFn(
+									merge.space,
+									translator.textFn,
+									project.config.templates,
+								)
 							)
 						) : (
 							<SelectorDetail selector={merge.target} />

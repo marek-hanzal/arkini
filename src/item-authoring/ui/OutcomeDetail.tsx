@@ -10,6 +10,7 @@ import { useTranslator } from "~/translation/ui/useTranslator";
 import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { Mx } from "~/translation/ui/Mx";
+import { TemplateDetailReference } from "~/template-authoring/ui/TemplateDetailReference";
 
 /** Renders canonical authored outcome through the shared outcome presentation. */
 export const OutcomeDetail = ({
@@ -70,6 +71,11 @@ export const OutcomeDetail = ({
 						</div>
 					)
 				}
+				renderTemplateReferenceFn={(templateUid, label) => (
+					<TemplateDetailReference templateUid={templateUid}>
+						{label}
+					</TemplateDetailReference>
+				)}
 				variant="editor-tree"
 			/>
 		</section>

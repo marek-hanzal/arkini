@@ -60,7 +60,7 @@ const DeleteBlockerLink = ({
 	if (template !== undefined)
 		return (
 			<ButtonLink
-				to="/editor/$projectId/templates/$templateUid/form/$sectionId"
+				to="/editor/$projectId/templates/$templateUid/detail/$sectionId"
 				params={{
 					projectId: project.projectId,
 					templateUid: template.uid,

@@ -85,6 +85,42 @@ afterEach(async () => {
 });
 
 describe("MergesDetail", () => {
+	it("opens an inventory destination at its board-template detail", async () => {
+		const item: ItemSchema.Type = {
+			...editorTestConfig.items.water,
+			merge: [
+				{
+					action: "space",
+					effect: "keep",
+					space: {
+						type: "inventory",
+						templateUid: "initial",
+					},
+				},
+			],
+		};
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+
+		await act(async () => {
+			root.render(<MergesDetail item={item} />);
+		});
+
+		const link = container.querySelector<HTMLAnchorElement>(
+			'[data-ui="TemplateDetailReference"]',
+		);
+		expect(link?.dataset.to).toBe(
+			"/editor/$projectId/templates/$templateUid/detail/$sectionId",
+		);
+		expect(JSON.parse(link?.dataset.params ?? "null")).toEqual({
+			projectId: project.projectId,
+			templateUid: "initial",
+			sectionId: "general",
+		});
+	});
+
 	it("links preview merges to their authored indices", async () => {
 		const item: ItemSchema.Type = {
 			...editorTestConfig.items.water,

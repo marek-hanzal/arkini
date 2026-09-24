@@ -55,13 +55,17 @@ const OutcomeRoll = <Item extends OutcomeProjection.Item>({
 	roll,
 	renderItemDetailFn,
 	renderItemFn,
+	renderTemplateReferenceFn,
 	variant,
 }: {
 	readonly roll: OutcomeProjection.Roll<Item>;
 	readonly renderItemDetailFn?: (item: Item) => ReactNode;
 	readonly renderItemFn: (item: Item, eyebrow?: ReactNode) => ReactNode;
+	readonly renderTemplateReferenceFn?: (templateUid: string, label: ReactNode) => ReactNode;
 	readonly variant: OutcomesVariant;
 }) => {
+	const renderTemplateFn = (templateUid: string, label: ReactNode) =>
+		renderTemplateReferenceFn?.(templateUid, label) ?? label;
 	const eyebrow = (
 		<span className="mb-1 block text-xs font-medium uppercase tracking-[0.08em] text-muted">
 			{match(roll)
@@ -102,10 +106,13 @@ const OutcomeRoll = <Item extends OutcomeProjection.Item>({
 							{item.type === "space" ? (
 								<>
 									{typeof item.space === "object" ? (
-										<>
-											<Tx label="Inventory" /> ·{" "}
-											{item.templateTitle ?? item.space.templateUid}
-										</>
+										renderTemplateFn(
+											item.space.templateUid,
+											<>
+												<Tx label="Inventory" /> ·{" "}
+												{item.templateTitle ?? item.space.templateUid}
+											</>,
+										)
 									) : item.space === "previous" ? (
 										<Tx label="Previous Space" />
 									) : (
@@ -115,9 +122,12 @@ const OutcomeRoll = <Item extends OutcomeProjection.Item>({
 									)}
 								</>
 							) : (
-								<>
-									<Tx label="Template" /> {item.title ?? item.templateUid}
-								</>
+								renderTemplateFn(
+									item.templateUid,
+									<>
+										<Tx label="Template" /> {item.title ?? item.templateUid}
+									</>,
+								)
 							)}
 						</div>
 						{item.activeRuleHints.map((hint, hintIndex) => (
@@ -151,6 +161,7 @@ export const Outcomes = <Item extends OutcomeProjection.Item>({
 	renderItemDetailFn,
 	renderItemFn,
 	renderSetDetailFn,
+	renderTemplateReferenceFn,
 	variant = "compact",
 }: {
 	readonly emptyLabel?: ReactNode;
@@ -158,6 +169,7 @@ export const Outcomes = <Item extends OutcomeProjection.Item>({
 	readonly renderItemDetailFn?: (item: Item) => ReactNode;
 	readonly renderItemFn: (item: Item, eyebrow?: ReactNode) => ReactNode;
 	readonly renderSetDetailFn?: (set: OutcomeProjection.Set<Item>) => ReactNode;
+	readonly renderTemplateReferenceFn?: (templateUid: string, label: ReactNode) => ReactNode;
 	readonly variant?: OutcomesVariant;
 }) => {
 	const totalWeight = outcome.reduce((total, set) => total + set.weight, 0);
@@ -215,6 +227,7 @@ export const Outcomes = <Item extends OutcomeProjection.Item>({
 										roll={roll}
 										renderItemDetailFn={renderItemDetailFn}
 										renderItemFn={renderItemFn}
+										renderTemplateReferenceFn={renderTemplateReferenceFn}
 										variant={variant}
 									/>
 								))}

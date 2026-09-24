@@ -1,10 +1,10 @@
 import { Clock, Effect } from "effect";
 import { expect, it } from "vitest";
 import { compileGraphFactsFn } from "~/graph/fn/compileGraphFactsFn";
-import { compileGraphFlowFn } from "~/graph/fn/compileGraphFlowFn";
+import { compileGraphOperationIndexFn } from "~/graph/fn/compileGraphOperationIndexFn";
 import { queryGraphFlowFx } from "~/graph/fx/queryGraphFlowFx";
 import { GraphFlowQuerySchema } from "~/graph/schema/GraphFlowQuerySchema";
-import type { GraphFlowIndex } from "~/graph/type/GraphFlow";
+import type { GraphOperationIndex } from "~/graph/type/GraphOperationIndex";
 import {
 	configFn,
 	itemFn,
@@ -23,7 +23,7 @@ const materialFn = (itemUid: string) => ({
 	},
 });
 const readFn = (
-	index: GraphFlowIndex,
+	index: GraphOperationIndex,
 	from: string,
 	to: string,
 	options: Record<string, unknown> = {},
@@ -74,7 +74,7 @@ it("keeps each production input bound to its own outputs and never follows owner
 		product: itemFn("product"),
 		marker: itemFn("marker"),
 	});
-	const index = compileGraphFlowFn(compileGraphFactsFn(config));
+	const index = compileGraphOperationIndexFn(compileGraphFactsFn(config));
 	for (const [from, to] of [
 		[
 			"raw",
@@ -158,7 +158,7 @@ it("follows merge replacement and expiry as atomic state changes with the other 
 			],
 		}),
 	});
-	const index = compileGraphFlowFn(compileGraphFactsFn(config));
+	const index = compileGraphOperationIndexFn(compileGraphFactsFn(config));
 	const result = await readFn(index, "item:unlit", "item:ash");
 	expect(result.flows[0].nodes).toEqual([
 		"item:unlit",
@@ -251,7 +251,7 @@ it("excludes statically impossible outcomes while retaining conditional alternat
 		C: itemFn("C"),
 		D: itemFn("D"),
 	});
-	const index = compileGraphFlowFn(compileGraphFactsFn(config));
+	const index = compileGraphOperationIndexFn(compileGraphFactsFn(config));
 	expect((await readFn(index, "item:A", "item:D")).status).toBe("no");
 	const result = await readFn(index, "item:A", "item:B");
 	expect(result.flows.map((flow) => flow.steps[0].evidence.chance)).toEqual([
@@ -288,7 +288,7 @@ it("reports incomplete absence and omitted alternatives under operation depth, e
 		}),
 		C: itemFn("C"),
 	});
-	const index = compileGraphFlowFn(compileGraphFactsFn(config));
+	const index = compileGraphOperationIndexFn(compileGraphFactsFn(config));
 	expect(
 		await readFn(index, "item:A", "item:C", {
 			maxDepth: 1,

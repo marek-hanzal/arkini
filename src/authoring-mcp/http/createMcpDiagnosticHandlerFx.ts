@@ -5,6 +5,7 @@ const MAX_CAPTURE_BYTES = 256 * 1024;
 const MAX_DETAIL_LENGTH = 16 * 1024;
 const graphTools = new Set([
 	"graph_search",
+	"graph_audit",
 	"graph_connections",
 	"graph_operations",
 	"graph_path",
@@ -16,6 +17,7 @@ const graphTools = new Set([
 ]);
 const graphArgumentKeys = new Set([
 	"kind",
+	"audit",
 	"from",
 	"to",
 	"direction",

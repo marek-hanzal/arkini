@@ -1,10 +1,98 @@
 import { match } from "ts-pattern";
 import type { GraphEdge, GraphFacts, GraphOperation } from "~/graph/type/GraphFacts";
 import type {
-	GraphFlowIndex,
-	GraphFlowParticipantEffect,
-	GraphFlowStep,
-} from "~/graph/type/GraphFlow";
+	GraphOperationIndex,
+	GraphIndexedOperation,
+	GraphOperationParticipant,
+	GraphOperationRequirement,
+	GraphOperationOutput,
+	GraphOperationParticipantEffect,
+} from "~/graph/type/GraphOperationIndex";
+
+/** Indexes authored roles, including operations with no edges; guards never become outputs. */
+const participantsFn = (facts: GraphFacts): readonly GraphOperationParticipant[] => {
+	const participants = new Map<string, GraphOperationParticipant>();
+	const addFn = (
+		operationId: string,
+		nodeId: string,
+		role: GraphOperationParticipant["role"],
+		edgeId?: string,
+	) => {
+		participants.set(
+			JSON.stringify([
+				operationId,
+				nodeId,
+				role,
+				edgeId,
+			]),
+			{
+				operationId,
+				nodeId,
+				role,
+				...(edgeId === undefined
+					? {}
+					: {
+							edgeId,
+						}),
+			},
+		);
+	};
+	for (const operation of facts.operations) {
+		addFn(operation.id, operation.owner, "owner");
+		if (operation.kind === "merge") {
+			// Space transport is receiver-owned; its incoming source has no authored identity.
+			addFn(
+				operation.id,
+				operation.data.action === "space"
+					? operation.owner
+					: `item:${operation.data.target.itemUid}`,
+				"target",
+			);
+		}
+	}
+	for (const edge of facts.edges) {
+		if (edge.operationId === undefined) continue;
+		const participant = match(edge.kind)
+			.with("line-material", "line-unit-selector", "line-unit-cost", () => ({
+				nodeId: edge.from,
+				role: "input" as const,
+			}))
+			.with(
+				"merge-replacement",
+				"merge-target-replacement",
+				"line-item-outcome",
+				"merge-item-outcome",
+				"clock-item-outcome",
+				"depletion-item-outcome",
+				"space-outcome",
+				"template-outcome",
+				"merge-space",
+				() => ({
+					nodeId: edge.to,
+					role: "output" as const,
+				}),
+			)
+			.with("rule-reference", () => ({
+				nodeId: edge.to,
+				role: "reference" as const,
+			}))
+			.with(
+				"merge-target",
+				"merge-source-spend",
+				"merge-target-spend",
+				"template-item",
+				"start-template",
+				"start-space",
+				() => undefined,
+			)
+			.exhaustive();
+		if (participant !== undefined)
+			addFn(edge.operationId, participant.nodeId, participant.role, edge.id);
+	}
+	return [
+		...participants.values(),
+	];
+};
 
 type Rules = readonly {
 	readonly type: string;
@@ -51,7 +139,9 @@ const availableOutputFn = (edge: GraphEdge, operation: GraphOperation): boolean 
 	);
 };
 
-const participantEffectsFn = (operation: GraphOperation): readonly GraphFlowParticipantEffect[] => {
+const participantEffectsFn = (
+	operation: GraphOperation,
+): readonly GraphOperationParticipantEffect[] => {
 	const effects = match(operation)
 		.with(
 			{
@@ -62,10 +152,10 @@ const participantEffectsFn = (operation: GraphOperation): readonly GraphFlowPart
 					node: owner,
 					effect: "preserved" as const,
 				},
-				...data.input.flatMap((input): GraphFlowParticipantEffect[] => {
+				...data.input.flatMap((input): GraphOperationParticipantEffect[] => {
 					const target =
 						input.type === "simple" ? owner : `item:${input.query.selector.itemUid}`;
-					const effects: GraphFlowParticipantEffect[] = [];
+					const effects: GraphOperationParticipantEffect[] = [];
 					if (input.type !== "simple")
 						effects.push({
 							node: target,
@@ -89,7 +179,7 @@ const participantEffectsFn = (operation: GraphOperation): readonly GraphFlowPart
 			},
 			({ owner, data }) => {
 				const target = data.action === "space" ? owner : `item:${data.target.itemUid}`;
-				const effects: GraphFlowParticipantEffect[] = [];
+				const effects: GraphOperationParticipantEffect[] = [];
 				if (data.action !== "space")
 					effects.push({
 						node: owner,
@@ -133,7 +223,7 @@ const participantEffectsFn = (operation: GraphOperation): readonly GraphFlowPart
 		removed: 3,
 		replaced: 4,
 	};
-	const byNode = new Map<string, GraphFlowParticipantEffect>();
+	const byNode = new Map<string, GraphOperationParticipantEffect>();
 	// Multiple inputs can mention one canonical participant; preservation cannot undo its retirement.
 	for (const effect of effects) {
 		const previous = byNode.get(effect.node);
@@ -186,7 +276,7 @@ const createdNodesFn = (
 };
 
 /** Potential authored lineage: one transition binds its inputs and output to the same operation. */
-export const compileGraphFlowFn = (facts: GraphFacts): GraphFlowIndex => {
+export const compileGraphOperationIndexFn = (facts: GraphFacts): GraphOperationIndex => {
 	const nodes = new Set(facts.nodes.map((node) => node.id));
 	const present = new Set(facts.nodes.filter((node) => !node.missing).map((node) => node.id));
 	const byOperation = new Map<string, GraphEdge[]>();
@@ -196,16 +286,23 @@ export const compileGraphFlowFn = (facts: GraphFacts): GraphFlowIndex => {
 		edges.push(edge);
 		byOperation.set(edge.operationId, edges);
 	}
-	const outgoing = new Map<string, GraphFlowStep[]>();
+	const authoredParticipants = participantsFn(facts);
+	const participantsByOperation = new Map<string, GraphOperationParticipant[]>();
+	for (const participant of authoredParticipants) {
+		const members = participantsByOperation.get(participant.operationId) ?? [];
+		members.push(participant);
+		participantsByOperation.set(participant.operationId, members);
+	}
+	const operations: GraphIndexedOperation[] = [];
+	const outgoing = new Map<string, GraphIndexedOperation[]>();
 	for (const operation of facts.operations) {
-		if (!present.has(operation.owner) || !availableOperationFn(operation)) continue;
 		const edges = byOperation.get(operation.id) ?? [];
-		const participants = new Map<string, GraphFlowStep["evidence"]["fromRole"]>([
-			[
-				operation.owner,
-				"owner",
-			],
-		]);
+		const participants = new Map<string, GraphOperationRequirement["role"]>();
+		for (const participant of participantsByOperation.get(operation.id) ?? []) {
+			if (participant.role === "output" || participant.role === "reference") continue;
+			if (!participants.has(participant.nodeId))
+				participants.set(participant.nodeId, participant.role);
+		}
 		const prerequisites: string[] = [];
 		const participantEffects = participantEffectsFn(operation);
 		if (operation.kind === "line") {
@@ -215,7 +312,6 @@ export const compileGraphFlowFn = (facts: GraphFacts): GraphFlowIndex => {
 			for (const [index, input] of operation.data.input.entries()) {
 				if (input.type !== "simple") {
 					const id = `item:${input.query.selector.itemUid}`;
-					if (!participants.has(id)) participants.set(id, "input");
 					if (input.type === "materials")
 						prerequisites.push(
 							`Input ${index + 1} (${JSON.stringify(id)}): ${input.mode} ${input.quantity.min}–${input.quantity.max}, distance=${input.query.distance}.`,
@@ -242,8 +338,6 @@ export const compileGraphFlowFn = (facts: GraphFacts): GraphFlowIndex => {
 					"Receiver-owned transport requires an incoming item of unspecified identity; transport admission and target effect must succeed.",
 				);
 			else {
-				const target = `item:${operation.data.target.itemUid}`;
-				if (!participants.has(target)) participants.set(target, "target");
 				prerequisites.push(
 					`Both source and target must be present; source action=${operation.data.action}, target effect=${operation.data.effect}.`,
 				);
@@ -253,12 +347,16 @@ export const compileGraphFlowFn = (facts: GraphFacts): GraphFlowIndex => {
 				"Owner's active lifetime must expire; Clock availability rules and expiry policy apply.",
 			);
 		} else prerequisites.push("Owner's finite units must be exhausted.");
-		if (
-			[
-				...participants.keys(),
-			].some((id) => !present.has(id))
-		)
-			continue;
+		const required: GraphOperationRequirement[] = [
+			...participants,
+		].map(([node, role]) => ({
+			node,
+			role,
+			effect: participantEffects.find((entry) => entry.node === node)?.effect ?? "preserved",
+		}));
+		const outputs: GraphOperationOutput[] = [];
+		const available =
+			availableOperationFn(operation) && required.every(({ node }) => present.has(node));
 		for (const edge of edges) {
 			// Rule mentions inherit outcome annotations too; only actual output edge kinds qualify.
 			const output = match(edge.kind)
@@ -274,6 +372,7 @@ export const compileGraphFlowFn = (facts: GraphFacts): GraphFlowIndex => {
 				)
 				.otherwise(() => undefined);
 			if (
+				!available ||
 				output === undefined ||
 				!present.has(edge.to) ||
 				!availableOutputFn(edge, operation)
@@ -283,58 +382,56 @@ export const compileGraphFlowFn = (facts: GraphFacts): GraphFlowIndex => {
 			const table =
 				operation.kind === "clock" ? operation.data.onExpire : operation.data.outcome;
 			const set = table?.set[edge.annotations.setIndex ?? -1];
-			const outputPrerequisites = [
-				...prerequisites,
-			];
+			const outputPrerequisites: string[] = [];
 			if ((set?.rules.length ?? 0) > 0 || (outcome?.rules.length ?? 0) > 0)
 				outputPrerequisites.push("Outcome set and outcome availability rules must pass.");
 			if (outcome !== undefined)
 				outputPrerequisites.push(
 					"Selected outcome must resolve and fit its placement constraints.",
 				);
-			for (const [from, fromRole] of participants) {
-				const steps = outgoing.get(from) ?? [];
-				steps.push({
-					from,
-					to: edge.to,
-					operationId: operation.id,
-					kind: operation.kind,
-					owner: operation.owner,
-					evidence: {
-						fromRole,
-						participantEffects,
-						createdNodes: createdNodesFn(edge, edges, operation),
-						output,
-						prerequisiteNodes: [
-							...participants.keys(),
-						].filter((id) => id !== from),
-						prerequisites: [
-							...outputPrerequisites,
-						],
-						...(edge.annotations.chance === undefined
-							? {}
-							: {
-									chance: edge.annotations.chance,
-								}),
-						...(edge.annotations.alternative === undefined
-							? {}
-							: {
-									alternative: edge.annotations.alternative,
-								}),
-						...(outcome?.type === "item"
-							? {
-									quantityMin: outcome.quantity.min,
-									quantityMax: outcome.quantity.max,
-								}
-							: {}),
-					},
-				});
-				outgoing.set(from, steps);
-			}
+			outputs.push({
+				edgeId: edge.id,
+				to: edge.to,
+				output,
+				createdNodes: createdNodesFn(edge, edges, operation),
+				prerequisites: outputPrerequisites,
+				...(edge.annotations.chance === undefined
+					? {}
+					: {
+							chance: edge.annotations.chance,
+						}),
+				...(edge.annotations.alternative === undefined
+					? {}
+					: {
+							alternative: edge.annotations.alternative,
+						}),
+				...(outcome?.type === "item"
+					? {
+							quantityMin: outcome.quantity.min,
+							quantityMax: outcome.quantity.max,
+						}
+					: {}),
+			});
+		}
+		const indexed: GraphIndexedOperation = {
+			operation,
+			required,
+			prerequisites,
+			outputs,
+		};
+		operations.push(indexed);
+		if (outputs.length === 0) continue;
+		for (const { node } of required) {
+			const entries = outgoing.get(node) ?? [];
+			entries.push(indexed);
+			outgoing.set(node, entries);
 		}
 	}
+
 	return {
 		nodes,
+		participants: authoredParticipants,
+		operations,
 		outgoing,
 	};
 };

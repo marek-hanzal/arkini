@@ -1,3 +1,4 @@
+import type { GraphAuditResult } from "~/graph/type/GraphAudit";
 import type { GraphFlow } from "~/graph/type/GraphFlow";
 import type { GraphEdge, GraphNode, GraphOperation } from "~/graph/type/GraphFacts";
 import type { GraphResult } from "~/graph/type/GraphResult";
@@ -116,6 +117,7 @@ export interface GraphDiscoveryResult {
 	readonly paths: GraphResult["paths"];
 	readonly flows?: readonly GraphFlow[];
 	readonly aggregation?: GraphOperationAggregation;
+	readonly audit?: GraphAuditResult;
 	readonly nextCursor?: string;
 }
 
@@ -139,6 +141,7 @@ export interface GraphBatchResult {
 		readonly paths: GraphResult["paths"];
 		readonly flows?: readonly GraphFlow[];
 		readonly aggregation?: GraphOperationAggregation;
+		readonly audit?: GraphAuditResult;
 		readonly nextCursor?: string;
 		readonly error?: {
 			readonly reason: string;

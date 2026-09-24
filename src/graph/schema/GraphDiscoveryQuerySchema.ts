@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { GraphAuditQuerySchema } from "./GraphAuditQuerySchema";
 import { GraphSearchQuerySchema } from "./GraphSearchQuerySchema";
 import { GraphConnectionsQuerySchema } from "./GraphConnectionsQuerySchema";
 import { GraphOperationsQuerySchema } from "./GraphOperationsQuerySchema";
@@ -9,6 +10,9 @@ import { GraphTraverseQuerySchema } from "./GraphTraverseQuerySchema";
 /** Batch admission and shared backend dispatch; focused MCP tools expose only their own fields. */
 export const GraphDiscoveryQuerySchema = z
 	.discriminatedUnion("kind", [
+		GraphAuditQuerySchema.safeExtend({
+			kind: z.literal("audit"),
+		}),
 		GraphSearchQuerySchema.safeExtend({
 			kind: z.literal("search"),
 		}),

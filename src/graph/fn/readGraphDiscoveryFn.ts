@@ -1,7 +1,7 @@
 import { match, P } from "ts-pattern";
 import type { GraphEdge, GraphFacts } from "~/graph/type/GraphFacts";
 import { readGraphOperationSummaryFn } from "~/graph/fn/readGraphOperationSummaryFn";
-import type { readGraphOperationParticipantsFn } from "~/graph/fn/readGraphOperationParticipantsFn";
+import type { GraphOperationParticipant } from "~/graph/type/GraphOperationIndex";
 import type { GraphResult } from "~/graph/type/GraphResult";
 import type {
 	GraphDiscoveryEdge,
@@ -146,7 +146,7 @@ export const readGraphDiscoveryFn = (
 	result: GraphResult,
 	snapshotId: string,
 	facts: GraphFacts,
-	participants: readonly readGraphOperationParticipantsFn.Participant[] = [],
+	participants: readonly GraphOperationParticipant[] = [],
 ): GraphDiscoveryResult => {
 	const nodeById = new Map(
 		facts.nodes.map((node) => [

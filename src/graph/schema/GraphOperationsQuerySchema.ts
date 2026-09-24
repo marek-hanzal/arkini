@@ -64,6 +64,7 @@ export const GraphOperationsQuerySchema = GraphDiscoveryBoundsSchema.extend({
 		.max(4)
 		.optional(),
 	owner: IdSchema.optional(),
+
 	participant: IdSchema.optional(),
 	role: z
 		.enum([

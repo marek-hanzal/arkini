@@ -67,6 +67,7 @@ describe("editor MCP server", () => {
 			"item_lines_json",
 			"item_line_json",
 			"graph_schema_json",
+			"graph_audit",
 			"graph_search",
 			"graph_connections",
 			"graph_operations",

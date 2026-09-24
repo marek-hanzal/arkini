@@ -4,6 +4,7 @@ import { Effect } from "effect";
 import { z } from "zod";
 import type { Project } from "~/project-authoring/type/Project";
 import type { ProjectGraph } from "~/graph/type/ProjectGraph";
+import { GraphAuditQuerySchema } from "~/graph/schema/GraphAuditQuerySchema";
 import { GraphSearchQuerySchema } from "~/graph/schema/GraphSearchQuerySchema";
 import { GraphConnectionsQuerySchema } from "~/graph/schema/GraphConnectionsQuerySchema";
 import { GraphOperationsQuerySchema } from "~/graph/schema/GraphOperationsQuerySchema";
@@ -40,6 +41,27 @@ export const registerGraphToolsFn = ({
 			annotations: EditorToolAnnotations.readOnly,
 		},
 		async () => runToolFn(Effect.succeed(readGraphSchemaTextFn())),
+	);
+	server.registerTool(
+		"graph_audit",
+		{
+			description:
+				"Audit authored items directly on one graph snapshot: dangling, no-producer, no-consumer, dead-end (sink), source-only, reference-only, no-owned-operation. Returns titled identities and reasons. Mode count returns only counts. Interrupted scans report lower bounds. Continue frozen result pages with cursor and the same audit/mode plus revision/snapshotId. Read graph_schema_json for exact audit definitions.",
+			inputSchema: GraphAuditQuerySchema,
+			annotations: EditorToolAnnotations.readOnly,
+		},
+		async (input) => {
+			const query = {
+				...input,
+				kind: "audit" as const,
+			};
+			return runToolFn(
+				readProjectFx().pipe(
+					Effect.flatMap((project) => graph.discoveryFx(project, query)),
+					Effect.map((result) => readGraphDiscoveryTextFn(result, query)),
+				),
+			);
+		},
 	);
 	server.registerTool(
 		"graph_search",
@@ -171,7 +193,7 @@ export const registerGraphToolsFn = ({
 		"graph_batch",
 		{
 			description:
-				"Run 1–8 uniquely named focused graph queries (search, connections, operations, path, flow or traverse) against one immutable project snapshot and revision. Returns formatted text with common snapshot metadata and separate named query sections, each with its status, truncation, reasons and exact navigation identities. Use after discovery to expand several interesting branches without repeated graph payloads. Read graph_schema_json for bounds and continuation.",
+				"Run 1–8 uniquely named focused graph queries (search, connections, operations, path, flow, traverse or audit) against one immutable project snapshot and revision. Returns formatted text with common snapshot metadata and separate named query sections, each with its status, truncation, reasons and exact navigation identities. Use after discovery to expand several interesting branches without repeated graph payloads. Read graph_schema_json for bounds and continuation.",
 			inputSchema: GraphBatchQuerySchema,
 			annotations: EditorToolAnnotations.readOnly,
 		},

@@ -2,7 +2,7 @@ import { medicinalItemsFn } from "./graphFlowContinuity.test/fixtures";
 import { Effect } from "effect";
 import { expect, it } from "vitest";
 import { compileGraphFactsFn } from "~/graph/fn/compileGraphFactsFn";
-import { compileGraphFlowFn } from "~/graph/fn/compileGraphFlowFn";
+import { compileGraphOperationIndexFn } from "~/graph/fn/compileGraphOperationIndexFn";
 import { queryGraphFlowFx } from "~/graph/fx/queryGraphFlowFx";
 import { GraphFlowQuerySchema } from "~/graph/schema/GraphFlowQuerySchema";
 import {
@@ -16,7 +16,7 @@ import {
 const readFn = (items: Record<string, unknown>, from: string, to: string, options = {}) =>
 	Effect.runPromise(
 		queryGraphFlowFx(
-			compileGraphFlowFn(compileGraphFactsFn(configFn(items))),
+			compileGraphOperationIndexFn(compileGraphFactsFn(configFn(items))),
 			GraphFlowQuerySchema.parse({
 				from: `item:${from}`,
 				to: `item:${to}`,

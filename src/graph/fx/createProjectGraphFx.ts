@@ -1,3 +1,6 @@
+import { compileGraphAuditFn } from "~/graph/fn/compileGraphAuditFn";
+import { queryGraphAuditFx } from "~/graph/fx/queryGraphAuditFx";
+import type { GraphAuditIndex } from "~/graph/type/GraphAudit";
 import { match } from "ts-pattern";
 import datascript from "datascript";
 import { Clock, Effect, Random } from "effect";
@@ -7,15 +10,15 @@ import { readGraphOperationSummaryFn } from "~/graph/fn/readGraphOperationSummar
 import type { GraphDiscoveryOperation } from "~/graph/type/GraphDiscoveryResult";
 import { compileGraphFactsFn } from "~/graph/fn/compileGraphFactsFn";
 import type { GraphOperationsQuerySchema } from "~/graph/schema/GraphOperationsQuerySchema";
-import { compileGraphFlowFn } from "~/graph/fn/compileGraphFlowFn";
+import { compileGraphOperationIndexFn } from "~/graph/fn/compileGraphOperationIndexFn";
 import { aggregateGraphOperationsFx } from "~/graph/fx/aggregateGraphOperationsFx";
 import { queryGraphFlowFx } from "~/graph/fx/queryGraphFlowFx";
-import type { GraphFlowIndex } from "~/graph/type/GraphFlow";
+import type { GraphOperationIndex } from "~/graph/type/GraphOperationIndex";
 import { GraphDiscoveryQuerySchema } from "~/graph/schema/GraphDiscoveryQuerySchema";
 import { GraphBatchQuerySchema } from "~/graph/schema/GraphBatchQuerySchema";
 import { GraphOperationReadSchema } from "~/graph/schema/GraphOperationReadSchema";
 import { readGraphDiscoveryFn } from "~/graph/fn/readGraphDiscoveryFn";
-import { readGraphOperationParticipantsFn } from "~/graph/fn/readGraphOperationParticipantsFn";
+
 import type {
 	GraphDiscoveryResult,
 	GraphBatchResult,
@@ -45,10 +48,10 @@ interface Snapshot {
 	readonly facts: GraphFacts;
 	readonly db: ReturnType<typeof datascript.init_db>;
 	readonly searchNodesFn: (query: string) => readonly number[];
-	readonly flowIndex: GraphFlowIndex;
+	readonly operationIndex: GraphOperationIndex;
+	readonly auditIndex: GraphAuditIndex;
 	readonly operationReferences: readonly string[];
 	readonly operationByReference: ReadonlyMap<string, number>;
-	readonly operationParticipants: readonly readGraphOperationParticipantsFn.Participant[];
 	readonly operationSummaries: readonly GraphDiscoveryOperation[];
 	readonly searchOperationsFn: (
 		search: NonNullable<GraphOperationsQuerySchema.Type["search"]>,
@@ -66,6 +69,7 @@ interface Continuation {
 	readonly revision: number;
 	readonly filters: string;
 	readonly offset: number;
+	readonly auditAnalysis?: queryGraphAuditFx.Result;
 }
 const ContinuationLimit = 1024;
 const readOperationFilterFn = (
@@ -134,13 +138,17 @@ const readOperationReferencesFn = (
 type PagedQuery = Extract<
 	GraphDiscoveryQuerySchema.Type,
 	{
-		kind: "operations" | "connections";
+		kind: "operations" | "connections" | "audit";
 	}
 >;
-const filterKeyFn = (query: PagedQuery) =>
+const filterKeyFn = (query: PagedQuery): string =>
 	JSON.stringify(
-		query.kind === "connections"
-			? {
+		match(query)
+			.with(
+				{
+					kind: "connections",
+				},
+				(query) => ({
 					kind: query.kind,
 					from: query.from,
 					to: query.to ?? null,
@@ -151,8 +159,13 @@ const filterKeyFn = (query: PagedQuery) =>
 							: [
 									...new Set(query.kinds),
 								].sort(),
-				}
-			: {
+				}),
+			)
+			.with(
+				{
+					kind: "operations",
+				},
+				(query) => ({
 					kind: query.kind,
 					operationKinds:
 						query.operationKinds === undefined
@@ -166,7 +179,19 @@ const filterKeyFn = (query: PagedQuery) =>
 					search: query.search ?? null,
 					filter: query.filter ?? null,
 					aggregate: query.aggregate ?? null,
+				}),
+			)
+			.with(
+				{
+					kind: "audit",
 				},
+				(query) => ({
+					kind: query.kind,
+					audit: query.audit,
+					mode: query.mode,
+				}),
+			)
+			.exhaustive(),
 	);
 
 const readQueryStatusFn = (found: boolean, truncated: boolean): GraphResult["status"] =>
@@ -299,7 +324,8 @@ export const createProjectGraphFx = Effect.fn("createProjectGraphFx")(
 						addIndexFn(operationKinds, operation.kind, index);
 						addIndexFn(owners, operation.owner, index);
 					}
-					const operationParticipants = readGraphOperationParticipantsFn(facts);
+					const operationIndex = compileGraphOperationIndexFn(facts);
+					const operationParticipants = operationIndex.participants;
 					for (const participant of operationParticipants) {
 						const index = operationById.get(participant.operationId)!;
 						addIndexFn(participants, participant.nodeId, index);
@@ -401,10 +427,10 @@ export const createProjectGraphFx = Effect.fn("createProjectGraphFx")(
 								value: index,
 							})),
 						}),
-						flowIndex: compileGraphFlowFn(facts),
+						operationIndex,
+						auditIndex: compileGraphAuditFn(facts, operationIndex),
 						operationReferences,
 						operationByReference,
-						operationParticipants,
 						operationSummaries,
 						searchOperationsFn,
 						operationById,
@@ -625,6 +651,31 @@ export const createProjectGraphFx = Effect.fn("createProjectGraphFx")(
 				);
 			return Effect.void;
 		};
+		const readContinuationFx = Effect.fn("ProjectGraph.readContinuationFx")(function* (
+			captured: Snapshot,
+			token: string | undefined,
+			filters: string,
+		) {
+			if (token === undefined) return undefined;
+			const cursor = continuations.get(token);
+			if (cursor === undefined)
+				return yield* Effect.fail(
+					new GraphQueryError({
+						reason: "invalid-query",
+						message: "Unknown or expired graph continuation cursor. Repeat discovery.",
+					}),
+				);
+			yield* assertPinsFx(captured, cursor);
+			if (cursor.filters !== filters)
+				return yield* Effect.fail(
+					new GraphQueryError({
+						reason: "invalid-query",
+						message: "Graph continuation filters do not match the original query.",
+					}),
+				);
+			return cursor;
+		});
+
 		const queryFx = Effect.fn("ProjectGraph.queryFx")(function* (
 			project: Project,
 			input: unknown,
@@ -685,8 +736,74 @@ export const createProjectGraphFx = Effect.fn("createProjectGraphFx")(
 					paths: [],
 				};
 			}
+			if (query.kind === "audit") {
+				const filters = filterKeyFn(query);
+				const continuation = yield* readContinuationFx(captured, query.cursor, filters);
+				const analysis =
+					continuation?.auditAnalysis ??
+					(yield* queryGraphAuditFx(captured.auditIndex, query));
+				const offset = continuation?.offset ?? 0;
+				const matches =
+					query.mode === "count"
+						? []
+						: analysis.audit.matches.slice(offset, offset + query.limit);
+				const hasMore =
+					query.mode === "list" &&
+					offset + matches.length < analysis.audit.matches.length;
+				const nextCursor = hasMore
+					? yield* issueContinuationFx({
+							snapshotId: captured.snapshotId,
+							revision: captured.revision,
+							filters,
+							offset: offset + matches.length,
+							auditAnalysis: analysis,
+						})
+					: undefined;
+				const selected = new Set(
+					matches.flatMap((entry) => [
+						entry.nodeId,
+						...entry.relatedNodeIds,
+					]),
+				);
+				return {
+					projectId: captured.projectId,
+					revision: captured.revision,
+					snapshotId: captured.snapshotId,
+					status: readQueryStatusFn(analysis.audit.count > 0, !analysis.audit.complete),
+					truncated: hasMore || !analysis.audit.complete,
+					reasons: [
+						...analysis.reasons,
+						...(hasMore
+							? [
+									"limit" as const,
+								]
+							: []),
+					],
+					expansions: analysis.expansions,
+					nodes: captured.facts.nodes
+						.filter((node) => selected.has(node.id))
+						.map((node) => ({
+							id: node.id,
+							title: node.title,
+							kind: node.kind,
+							missing: node.missing,
+						})),
+					edges: [],
+					operations: [],
+					paths: [],
+					audit: structuredClone({
+						...analysis.audit,
+						matches,
+					}),
+					...(nextCursor === undefined
+						? {}
+						: {
+								nextCursor,
+							}),
+				};
+			}
 			if (query.kind === "flow") {
-				const result = yield* queryGraphFlowFx(captured.flowIndex, query);
+				const result = yield* queryGraphFlowFx(captured.operationIndex, query);
 				const nodes = new Set([
 					query.from,
 					query.to,
@@ -761,27 +878,8 @@ export const createProjectGraphFx = Effect.fn("createProjectGraphFx")(
 					);
 			}
 			const filters = filterKeyFn(query);
-			let offset = 0;
-			if (query.cursor !== undefined) {
-				const cursor = continuations.get(query.cursor);
-				if (cursor === undefined)
-					return yield* Effect.fail(
-						new GraphQueryError({
-							reason: "invalid-query",
-							message:
-								"Unknown or expired graph continuation cursor. Repeat discovery.",
-						}),
-					);
-				yield* assertPinsFx(captured, cursor);
-				if (cursor.filters !== filters)
-					return yield* Effect.fail(
-						new GraphQueryError({
-							reason: "invalid-query",
-							message: "Graph continuation filters do not match the original query.",
-						}),
-					);
-				offset = cursor.offset;
-			}
+			const continuation = yield* readContinuationFx(captured, query.cursor, filters);
+			const offset = continuation?.offset ?? 0;
 			let candidates: readonly number[];
 			if (query.kind === "connections") {
 				candidates = [
@@ -951,7 +1049,7 @@ export const createProjectGraphFx = Effect.fn("createProjectGraphFx")(
 				query.kind !== "operations" ||
 					(query.participant === undefined && query.role === undefined)
 					? []
-					: captured.operationParticipants.filter(
+					: captured.operationIndex.participants.filter(
 							(participant) =>
 								selectedOperationIds.has(participant.operationId) &&
 								(query.participant === undefined ||
@@ -1041,6 +1139,7 @@ export const createProjectGraphFx = Effect.fn("createProjectGraphFx")(
 					operationIds: found.operations.map((operation) => operation.id),
 					paths: found.paths,
 					aggregation: found.aggregation,
+					audit: found.audit,
 					...(found.flows === undefined
 						? {}
 						: {

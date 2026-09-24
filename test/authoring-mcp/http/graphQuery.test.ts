@@ -130,7 +130,7 @@ it("admits only bounded graph requests and exposes discovery without project con
 	const variants = discovery.querySchema.oneOf as {
 		properties: Record<string, unknown>;
 	}[];
-	expect(variants).toHaveLength(6);
+	expect(variants).toHaveLength(7);
 	const operations = variants.find(
 		({ properties }) =>
 			(

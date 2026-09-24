@@ -44,7 +44,7 @@ export const readGraphSchemaTextFn = () =>
 			space: "space:<space number>",
 			start: "start",
 			semantics:
-				"Every node carries id, kind and a required human-readable title; missing authored references remain inspectable. Node identity is distinct from operation identity. Titles travel with references so discovery needs no item lookup just to name an entity.",
+				"Every node carries id, kind and a required human-readable title. Missing authored references remain inspectable. Node identity is distinct from operation identity. Titles travel with references so discovery needs no item lookup just to name an entity.",
 		},
 		edgeKinds,
 		operationKinds: {
@@ -58,6 +58,7 @@ export const readGraphSchemaTextFn = () =>
 		batchSchema: z.toJSONSchema(GraphBatchQuerySchema),
 		operationReadSchema: z.toJSONSchema(GraphOperationReadSchema),
 		tools: {
+			graph_audit: "Snapshot-native design audits with reasons, counts and pinned pages.",
 			graph_search:
 				"Find a node by title or identity; returns title, exact node ID and kind.",
 			graph_connections:
@@ -75,6 +76,27 @@ export const readGraphSchemaTextFn = () =>
 			inputs: "querySchema is the discriminated union for graph_batch entries and backend dispatch. Each focused tool accepts only its matching variant fields with kind omitted. Batch entries are {id, query:{kind, ...focusedFields}}. Unknown fields are rejected; no generic graph_query tool or compatibility aliases exist.",
 			purpose:
 				"Unsuffixed discovery tools return compact formatted text. graph_schema_json and graph_operations_json return one JSON document. Discovery never returns authored configuration bodies; hydrate selected operations only after discovering their references.",
+			audit: {
+				input: "graph_audit requires audit, with optional mode list/count, limit, cursor, revision, snapshotId, maxExpansions and timeoutMs. Only authored present items are audited; missing references stay inspectable through discovery. dead-end is the sole sink category; no redundant sink-only alias exists.",
+				kinds: {
+					dangling:
+						"No authored edge of any kind (including references/placement) and no owned operation.",
+					"no-producer":
+						"No possible atomic gameplay output providing the item and no placement in any authored template. Static disabled/chance-zero/missing-participant producers do not qualify. An authored producer is not proof of start reachability.",
+					"no-consumer":
+						"No participation as an operation owner, merge target, material input, unit provider or unit payer. Outputs, placement and rule references alone are not usage. Authored operations count even if currently disabled or outcome-free.",
+					"dead-end":
+						"Has a possible gameplay producer or authored template placement, but no consumer/owned gameplay interaction. Canonical sink audit; local availability does not prove reachability from start.",
+					"source-only":
+						"Placed in an authored template and has no gameplay producer. A diagnostic source category, not automatically a defect; template may be unassigned at start.",
+					"reference-only":
+						"Has rule-reference connections but no other edge, placement or owned gameplay operation.",
+					"no-owned-operation":
+						"Owns no line, merge, Clock or depletion configuration. Diagnostic, not automatically a defect.",
+				},
+				pagination:
+					"Audit scans the snapshot item index and pages a frozen result in exact node-ID order. Cursor binds snapshot, audit kind and mode. Continuation does not recompute the analysis. Interrupted scans report lower bounds; retry without cursor and with larger safety bounds for a new scan. limit bounds returned rows, never the analyzed scope; count mode returns no rows. Completed scans have exact totals even while their result pages are truncated.",
+			},
 			search: "graph_search requires query and optionally nodeKinds (item, template, space, start). It searches human titles and node identities with the canonical Editor exact-first Fuse logic, returning relevance-ordered titled identities. It can inspect unfinished projects with missing referenced nodes. No item_collection lookup is needed before graph navigation.",
 			connections:
 				"graph_connections requires from, optionally to as an exact direct counterpart. direction defaults both; kinds restricts relationship occurrences. Results are relationship-oriented and may group occurrences belonging to the same authored operation without losing distinct facts. limit counts relationship occurrences, not visual groups. Pages may return Cursor for remaining relationships.",
@@ -99,14 +121,41 @@ export const readGraphSchemaTextFn = () =>
 				"status yes means a match was found; no means the selected scope was exhausted without a match; unknown means incomplete exploration found none. Inspect truncated and reasons even when status is yes, because omitted alternatives may exist. Depth, result, expansion and timeout limits can make search incomplete; partial absence is not proof of no relationship or no flow.",
 			limits: "Result limit defaults 50, maximum 200. Path/flow depth defaults 5, traverse depth 1; depth maximum 12. Expansion defaults 10000, maximum 100000; cooperative timeout defaults 1000 ms, maximum 5000 ms. Search only exposes result bounds; connections are direct. Limit counts relationships for connections/traverse, operations for listing or groups for grouping (count ignores result limit), nodes for search, paths for path and transformation sequences for flow. Paths and flows may contain up to maxDepth steps per result. Timeout excludes synchronous snapshot compilation, index lookups, Fuse search and scalar candidate filtering; it is not an end-to-end deadline.",
 			continuation:
-				"Connections and operations may return a compact Cursor. Repeat the same focused query and filters with cursor and returned revision/snapshotId. Tokens bind snapshot, normalized filters including aggregation mode/group key and continuation position; unknown, stale or incompatible tokens fail. The session retains at most 1024 issued continuations in FIFO order; rediscover after expiry. A page with no match but remaining scan is unknown.",
+				"Connections and operations may return a compact Cursor. Repeat the same focused query and filters with cursor and returned revision/snapshotId. Tokens bind snapshot, normalized filters, aggregation mode/group key and continuation position; unknown, stale or incompatible tokens fail. The session retains at most 1024 issued continuations in FIFO order; rediscover after expiry. A page with no match but remaining scan is unknown.",
 			revision:
 				"Each response carries project ID, revision and snapshot ID. Optional revision/snapshotId pin discovery; hydration requires both. Snapshot identity detects external content changes even with an unchanged revision. Session-local tokens expire on graph session restart; rediscover then.",
-			batch: "graph_batch captures one immutable snapshot and accepts 1–8 uniquely named focused queries. Each query object is admitted separately, so invalid fields produce an error only for that query. Text renders shared project/revision/snapshot once, then one query-ID section with that query's presentation, status, truncation, reasons, continuation and match evidence. Internally deduplicated storage never appears as tables. One query's failure or truncation does not contaminate siblings. Batch-level stale revision/snapshot admission fails before queries run.",
+			batch: "graph_batch captures one immutable snapshot and accepts 1–8 uniquely named focused queries. Each query object is admitted separately, so invalid fields produce an error only for that query. Text renders shared project/revision/snapshot once, then one query-ID section with that query's audit/discovery presentation, status, truncation, reasons, continuation and match evidence. Internally deduplicated storage never appears as tables. One query's failure or truncation does not contaminate siblings. Batch-level stale revision/snapshot admission fails before queries run.",
 			hydration:
 				"graph_operations_json requires revision and snapshotId and reads only 1–20 selected operation references. It returns canonical operation configurations, deduplicates repeated references and reports missing ones. items_json and item_lines_json remain available for complete item/line documents; compare their revision before combining reads.",
 		},
 		examples: [
+			{
+				tool: "graph_audit",
+				arguments: {
+					audit: "dangling",
+				},
+			},
+			{
+				tool: "graph_audit",
+				arguments: {
+					audit: "dangling",
+					mode: "count",
+				},
+			},
+			{
+				tool: "graph_audit",
+				arguments: {
+					audit: "source-only",
+				},
+			},
+			{
+				tool: "graph_flow",
+				arguments: {
+					from: "item:A",
+					to: "item:C",
+				},
+			},
+
 			{
 				tool: "graph_operations",
 				arguments: {

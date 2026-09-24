@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { readGraphDiscoveryTextFn } from "~/authoring-mcp/tool/fn/readGraphDiscoveryTextFn";
 import { compileGraphFactsFn } from "~/graph/fn/compileGraphFactsFn";
-import { readGraphOperationParticipantsFn } from "~/graph/fn/readGraphOperationParticipantsFn";
+import { compileGraphOperationIndexFn } from "~/graph/fn/compileGraphOperationIndexFn";
 import { readGraphDiscoveryFn } from "~/graph/fn/readGraphDiscoveryFn";
 import type { GraphFacts } from "~/graph/type/GraphFacts";
 import type { GraphResult } from "~/graph/type/GraphResult";
@@ -273,7 +273,7 @@ it("retains relationship meaning while leaving outcome bookkeeping to hydration"
 it("keeps matching participant occurrences and their quantities separate without hydrating authored data", () => {
 	const facts = compileGraphFactsFn(adversarialConfigFn());
 	const operations = facts.operations.filter((operation) => operation.kind === "line");
-	const participants = readGraphOperationParticipantsFn(facts).filter(
+	const participants = compileGraphOperationIndexFn(facts).participants.filter(
 		(participant) =>
 			participant.role === "output" &&
 			operations.some((operation) => operation.id === participant.operationId),
@@ -326,7 +326,7 @@ it("keeps matching participant occurrences and their quantities separate without
 
 it("attributes material quantity and selection distance to providers instead of the self unit payer", () => {
 	const facts = factsFn(1);
-	const participants = readGraphOperationParticipantsFn(facts).filter(
+	const participants = compileGraphOperationIndexFn(facts).participants.filter(
 		(participant) => participant.role === "input",
 	);
 	const result = readGraphDiscoveryFn(

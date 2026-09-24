@@ -243,6 +243,18 @@ const bodyFn = (result: GraphDiscoveryResult, query: Query): string => {
 		return `${labelFn(start)} ${arrow} ${labelFn(end)}; ${edgeDetailsFn(edge, operation, labelFn)}`;
 	};
 	return match(query.kind)
+		.with("audit", () => {
+			const audit = result.audit;
+			if (audit === undefined) return "";
+			const prefix = audit.complete ? "" : "≥";
+			return [
+				`Audit matches: ${prefix}${audit.count}${audit.complete ? "" : " (incomplete; total unknown)"}`,
+				...audit.matches.map(
+					(entry) =>
+						`- ${labelFn(entry.nodeId)} — ${titleFn(entry.reason)}${entry.relatedNodeIds.length === 0 ? "" : ` Related: ${entry.relatedNodeIds.map(labelFn).join(", ")}`}`,
+				),
+			].join("\n");
+		})
 		.with("operations", () =>
 			result.operations
 				.flatMap((operation) => [
@@ -448,6 +460,7 @@ export const readGraphBatchTextFn = (
 							paths: query.paths,
 							flows: query.flows,
 							aggregation: query.aggregation,
+							audit: query.audit,
 						},
 						parsed.data,
 					)

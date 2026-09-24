@@ -1,6 +1,6 @@
 # Authored relationship graph
 
-The Graph Engine describes the relationships authored in a project. Its primary questions are “who produces this?”, “do A and B have a relationship?” and “which relationships?”. Editor Connections, Chain and MCP consume the same query backend. There is no acquisition planner or numeric Estimate.
+The Graph Engine describes the relationships authored in a project. Its primary questions are “who produces this?”, “do A and B have a relationship?” and “which relationships?”. Editor Connections, Chain and MCP consume the same query backend. Query semantics, audit calculations and snapshot caches belong to this internal Editor core; MCP validates calls and presents its results. There is no numeric acquisition Estimate.
 
 ## Owners
 
@@ -11,10 +11,11 @@ The Graph Engine describes the relationships authored in a project. Its primary 
 | [`GraphQuerySchema`](schema/GraphQuerySchema.ts) | Internal Editor traversal request and rich relationship detail contract |
 | [`GraphDiscoveryQuerySchema`](schema/GraphDiscoveryQuerySchema.ts), [`GraphBatchQuerySchema`](schema/GraphBatchQuerySchema.ts), [`GraphOperationReadSchema`](schema/GraphOperationReadSchema.ts) | Focused discovery dispatch, snapshot-wide batches and pinned selective hydration |
 | [`GraphDiscoveryResult`](type/GraphDiscoveryResult.ts), [`readGraphDiscoveryFn`](fn/readGraphDiscoveryFn.ts) | Explicit compact scalar projection; never authored configuration bodies |
-| [`readGraphOperationParticipantsFn`](fn/readGraphOperationParticipantsFn.ts) | Authored owner/target/input/output/reference membership, indexed when a snapshot is built |
+| [`compileGraphOperationIndexFn`](fn/compileGraphOperationIndexFn.ts), [`GraphOperationIndex`](type/GraphOperationIndex.ts) | One normalized operation index: authored role occurrences, required participants, effects and eligible output branches |
 | [`createProjectGraphFx`](fx/createProjectGraphFx.ts) | Session-local immutable DataScript snapshot keyed by project identity/revision; typed admission, query execution and cancellation |
-| [`compileGraphFlowFn`](fn/compileGraphFlowFn.ts), [`queryGraphFlowFx`](fx/queryGraphFlowFx.ts), [`GraphFlow`](type/GraphFlow.ts) | Atomic authored-operation transitions and bounded causal lineage; no shared-owner hops or runtime inventory solver |
+| [`queryGraphFlowFx`](fx/queryGraphFlowFx.ts), [`GraphFlow`](type/GraphFlow.ts) | Bounded identity lineage over normalized operations; steps are projected lazily, not stored as a participant/output Cartesian product |
 | [`aggregateGraphOperationsFx`](fx/aggregateGraphOperationsFx.ts) | Whole filtered operation counts and ranked group pages; explicit lower bounds on interrupted scans |
+| [`compileGraphAuditFn`](fn/compileGraphAuditFn.ts), [`queryGraphAuditFx`](fx/queryGraphAuditFx.ts) | Snapshot item-role indexes, explained design audits, bounded counts and frozen pages |
 | [`readItemChainQueryFn`](fn/readItemChainQueryFn.ts) | Consequence traversal preset for Editor Chain |
 | [`createEditorGraphWorkerFx`](worker/createEditorGraphWorkerFx.ts), [`EditorGraphProvider`](ui/EditorGraphProvider.tsx) | One scoped worker shared by the open project's views, replaced on hard Refresh |
 | [`useEditorGraphQuery`](ui/useEditorGraphQuery.ts) | Cancels obsolete requests and suppresses stale query/revision results |
@@ -48,6 +49,8 @@ Edges reference reified operation records. Full operation data preserves line in
 Stored facts retain complete authored data for Editor relationship details and selective hydration. MCP discovery projects an explicit compact whitelist: every node has identity, kind and title; edges retain identity, authored direction, relationship kind, operation identity and small scalar metadata. Operations carry identity, kind, title, owner and bounded semantic fields. No input, query, condition, rule, roll, set, outcome table, merge configuration or source path is embedded in discovery. Discovery edge metadata also omits set/roll identities and indices, outcome indices and rule/condition bookkeeping. It keeps only meaningful scalars such as quantity, reserve/consume, distance, unit source/cost, input index, probability, alternatives, participant role and placement coordinates.
 
 Merge discovery identifies an explicit target, replacement and action/effect, with `hasOutcomes` reporting actual authored outcome entries. Receiver-owned Space transport identifies the owner as receiver and carries its destination. Referenced owners, targets, replacements and destinations are accompanied by titled nodes even when their edges were outside the selected query. Line summaries expose `lineUid`, so owner item UID plus line UID can feed `item_lines_json`. Operation references are opaque; clients must not decode them to address source arrays.
+
+The snapshot normalizes operation semantics once. Operation discovery reads its complete authored role occurrences, including disabled and outputless operations; occurrence identity and provenance are preserved. Flow and producer audits share its eligible output branches and required participants. Requirements deduplicate participant identities while role evidence retains parallel occurrences. Structural alias edges remain inspectable but never create duplicate causal outputs. The index references canonical operation records and stores each operation once; flow expands its branches only when visited. No inventory, quantity planner, remaining-unit state or start-reachability solver is retained.
 
 ## MCP presentation
 
@@ -99,7 +102,7 @@ MCP defaults/maxima: depth 1/12 for traverse and 5/12 for path/flow, result limi
 
 Connections and operation pages return a compact opaque `nextCursor` when a scan can continue. The session retains at most 1,024 issued continuation tokens in FIFO order; expired tokens require rediscovery. Repeat the same focused query class with unchanged root/counterpart/direction/search/filters/aggregation, its cursor, revision and snapshotId; a cursor cannot silently continue against different content or a different filter. A bounded page that has not found a match is incomplete, not evidence that no operation exists.
 
-`graph_batch` takes 1–8 uniquely named `{id, query}` entries. Each `query` is an object with `kind: search | connections | operations | path | flow | traverse` and the corresponding focused fields; its fields are validated independently so malformed query fields remain per-entry errors. All subqueries run against one captured immutable snapshot. Internally, node, edge and operation collections are deduplicated by identity and each query keeps references to its own records. MCP presents common project/revision/snapshot metadata once, then a readable section per query ID with its own status, truncation, reasons, paths, flows, ordered nodes/operations, match evidence and continuation; it does not expose the storage tables. A failed subquery reports its own error without replacing successful siblings. Batch revision/snapshot admission fails before any subquery when the requested snapshot is stale.
+`graph_batch` takes 1–8 uniquely named `{id, query}` entries. Each `query` is an object with `kind: search | connections | operations | path | flow | traverse | audit` and the corresponding focused fields; its fields are validated independently so malformed query fields remain per-entry errors. All subqueries run against one captured immutable snapshot. Internally, node, edge and operation collections are deduplicated by identity and each query keeps references to its own records. MCP presents common project/revision/snapshot metadata once, then a readable section per query ID with its own status, truncation, reasons, paths, flows, ordered nodes/operations, match evidence and continuation; it does not expose the storage tables. A failed subquery reports its own error without replacing successful siblings. Batch revision/snapshot admission fails before any subquery when the requested snapshot is stale.
 
 `graph_operations_json` accepts 1–20 short opaque operation references in `operationIds` and requires the discovered revision **and** snapshotId. It returns only those canonical operation bodies under the requested short references, deduplicates repeated references and reports missing ones. No persistent operation UID is needed: content-bound snapshot admission prevents positional merge identities from pointing at another operation after a reorder, including external changes that retain the revision marker. Snapshot tokens are session-local; after restart, rediscover. Existing `items_json` and `item_lines_json` remain the item/line hydration layer and return their own revision, which clients must compare before combining reads.
 
@@ -109,9 +112,34 @@ Timeout and interruption are cooperative, checked during structural/flow travers
 
 Cache lifetime follows the project session. Identical project identity/revision/content reuses the DataScript snapshot even when the repository returns a new JavaScript object. A serialized-config guard also detects hard Refresh after external edits with an unchanged on-disk revision marker. This inexpensive content comparison avoids a stale MCP cache without rebuilding the graph for every query. Expensive initial compilation is acceptable; no tight build-time target or disk snapshot persistence is imposed.
 
+## Design audits
+
+`graph_audit` reads a captured snapshot's item-role index, not a loop over connection queries. It accepts `audit`, `mode: list | count`, normal safety budgets, limit and snapshot-bound cursor. Only present authored items are audited; missing references remain inspectable through ordinary graph discovery. Results include a reason and exact titled identities, with up to three related producers where useful.
+
+| Audit | Exact match |
+| --- | --- |
+| `dangling` | No authored edges of any kind and no owned operation. Reference-only content is a separate category. |
+| `no-producer` | No possible atomic gameplay output and no placement in any authored template. Disabled/chance-zero/missing-participant producers do not qualify; a producer does not itself prove start reachability. |
+| `no-consumer` | No owner/input/merge-target participation. Materials, unit providers/costs and owned lines/merges/Clock/depletion count; references, placement and outputs alone do not. Authored usage includes currently disabled or outcome-free operations. |
+| `dead-end` | Has a possible gameplay producer or authored template source but no consumer/owned interaction. This is the canonical sink audit; there is no redundant `sink-only` alias. |
+| `source-only` | Present in any template and has no gameplay producer; diagnostic, not automatically a defect. |
+| `reference-only` | Connected only through rule references, with no other edge or owned gameplay operation. |
+| `no-owned-operation` | Owns no line/merge/Clock/depletion; diagnostic, not automatically a defect. |
+
+Static template sources include unassigned templates. These audits classify authored relationships, not feasibility from the initial Board. Producer classification reads the same eligible operation outputs as flow; consumer classification retains all authored owner/input/target participation, including disabled operations.
+
+An audit freezes one bounded scan, then pages matches in stable node-ID order; continuation reuses that exact result, including partial scans. Tokens bind snapshot, audit kind and mode. `limit` bounds rows, not scope. Count mode returns the count over the requested scope without rows. A completed scan gives an exact count; interrupted scans give explicit lower bounds and expansion/timeout reasons. Retry without a cursor and with larger bounds for a new scan. Batch preserves each audit's results, counts, reasons and continuation over its common immutable snapshot.
+
+```text
+graph_audit({audit: "dangling"})
+graph_audit({audit: "dangling", mode: "count"})
+graph_audit({audit: "source-only"})
+graph_flow({from: "item:A", to: "item:C"})
+```
+
 ## Editor, MCP and compatibility
 
-Editor graph work runs in a project-owned worker. Relationship details render human-readable facts and linked authored locations, never raw config paths. Production links carry the immutable line UID; configured Space links select their Board, and template placements link to the template Board with coordinates. MCP owns a session-local graph capability and publishes the six focused discovery tools, `graph_batch`, `graph_schema_json` and `graph_operations_json`; callers cannot submit EDN. The backend's fixed EDN queries/rules receive node IDs as data, never interpolated query source. Both surfaces execute against the same canonical facts and relationship semantics. Editor retains its rich `GraphResult` for graphical details; MCP formats the compact `GraphDiscoveryResult` as text and returns authored data only through the explicitly named `_json` hydration tools.
+Editor graph work runs in a project-owned worker. Relationship details render human-readable facts and linked authored locations, never raw config paths. Production links carry the immutable line UID; configured Space links select their Board, and template placements link to the template Board with coordinates. MCP owns a session-local graph capability and publishes the focused discovery tools and `graph_audit`, `graph_batch`, `graph_schema_json` and `graph_operations_json`; callers cannot submit EDN. The backend's fixed EDN queries/rules receive node IDs as data, never interpolated query source. Both surfaces execute against the same canonical facts and relationship semantics. Editor retains its rich `GraphResult` for graphical details; MCP formats the compact `GraphDiscoveryResult` as text and returns authored data only through the explicitly named `_json` hydration tools.
 
 Line tool references use `lineUid`/`lineUids`. Canonical reads include each line’s immutable UID; create/replace line authoring values omit it, creation generates it, and replacement retains the addressed UID. Item creation also gives every supplied line a fresh UID.
 

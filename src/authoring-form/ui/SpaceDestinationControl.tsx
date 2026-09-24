@@ -4,6 +4,8 @@ import type { ReactNode } from "react";
 import type { SpaceDestinationSchema } from "~/space/schema/SpaceDestinationSchema";
 import { EditorChoiceControl, EditorNumberControl } from "~/editor-control/ui/EditorValueControls";
 import { useTranslator } from "~/translation/ui/useTranslator";
+import { Mx } from "~/translation/ui/Mx";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 /** Shared authored destination choice for navigation outcomes and receiver transport. */
 export const SpaceDestinationControl = ({
@@ -12,19 +14,26 @@ export const SpaceDestinationControl = ({
 	description,
 	error,
 	trailing,
+	layout = "stacked",
 }: {
 	readonly value: SpaceDestinationSchema.Type;
 	readonly onChangeFn: (space: SpaceDestinationSchema.Type) => void;
 	readonly description: ReactNode;
 	readonly error?: string;
 	readonly trailing?: ReactNode;
+	readonly layout?: "stacked" | "columns";
 }) => {
 	const translator = useTranslator();
 	const project = useEditorProject();
 	return (
 		<div
-			className="grid gap-1.5"
-			data-ui="SpaceDestinationControl"
+			className="grid min-w-0 content-start items-start gap-1.5 data-[ui-layout=columns]:grid-cols-2 data-[ui-layout=columns]:gap-x-[var(--ak-panel-padding)]"
+			{...readDataUiFn({
+				dataUi: "SpaceDestinationControl",
+				state: {
+					layout,
+				},
+			})}
 		>
 			<EditorChoiceControl
 				label={translator.textFn("Target space")}
@@ -69,29 +78,31 @@ export const SpaceDestinationControl = ({
 					)
 				}
 			/>
-			{typeof value === "object" ? (
-				<TemplateSelector
-					templates={project.config.templates ?? []}
-					value={value.templateUid}
-					onChangeFn={(templateUid) =>
-						onChangeFn({
-							type: "generated",
-							templateUid,
-						})
-					}
-					error={error}
-				/>
-			) : value === "previous" ? null : (
-				<EditorNumberControl
-					label={translator.textFn("Target space")}
-					labelVisible={false}
-					min={0}
-					value={value}
-					onChangeFn={onChangeFn}
-					error={error}
-					trailing={trailing}
-				/>
-			)}
+			<div className="min-w-0 min-h-[calc(1.25rem+var(--ak-control-min-height))]">
+				{typeof value === "object" ? (
+					<TemplateSelector
+						templates={project.config.templates ?? []}
+						value={value.templateUid}
+						onChangeFn={(templateUid) =>
+							onChangeFn({
+								type: "generated",
+								templateUid,
+							})
+						}
+						error={error}
+					/>
+				) : value === "previous" ? null : (
+					<EditorNumberControl
+						label={translator.textFn("Space number")}
+						description={<Mx label="Space number help" />}
+						min={0}
+						value={value}
+						onChangeFn={onChangeFn}
+						error={error}
+						trailing={trailing}
+					/>
+				)}
+			</div>
 		</div>
 	);
 };

@@ -1819,6 +1819,13 @@ Space destination transport help:
     The player stays here and navigation history does not change. Before the first navigation, the drop is rejected without changing either item or applying merge effects and outcomes.
 
     **Generated Space** sends the item into this receiver instance’s private room. The selected template initializes it only on first successful use; navigation and transport share that room. Destroying the receiver destroys its room and everything inside.
+Space number:
+  value: Space number
+Space number help:
+  value: |
+    For item transport, this is the space the dropped item moves to. A Space outcome navigates the player to its own destination.
+
+    Usually, use the same number here and in the related Space outcome so the item and the player arrive in the same space.
 Space output:
   value: Space output
   dynamic: true

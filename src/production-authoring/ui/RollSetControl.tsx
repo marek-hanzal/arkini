@@ -214,6 +214,7 @@ const OutcomeFields = ({
 					},
 					(value) => (
 						<SpaceDestinationControl
+							layout="columns"
 							error={readEditorFormValidationErrorFn(validationIssues, "space")}
 							description={<Mx label="Space destination outcome help" />}
 							value={value.space}

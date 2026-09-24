@@ -62,7 +62,7 @@ export const readGraphSchemaTextFn = () =>
 				"Find a node by title or identity; returns title, exact node ID and kind.",
 			graph_connections:
 				"Read direct authored relationships of one node, optionally against an exact counterpart.",
-			graph_operations: "Search and audit authored operations without a root node.",
+			graph_operations: "List, count or group authored operations without a root node.",
 			graph_path: "Find structural paths between two nodes; not gameplay recipes.",
 			graph_flow: "Find potential causal transformations through atomic authored operations.",
 			graph_traverse:
@@ -80,10 +80,12 @@ export const readGraphSchemaTextFn = () =>
 				"graph_connections requires from, optionally to as an exact direct counterpart. direction defaults both; kinds restricts relationship occurrences. Results are relationship-oriented and may group occurrences belonging to the same authored operation without losing distinct facts. limit counts relationship occurrences, not visual groups. Pages may return Cursor for remaining relationships.",
 			operations:
 				"graph_operations has no root node. Combine operationKinds, owner, participant, role, search and filter. Search scopes title, owner, participant or all (default) reuse the Editor exact-first Fuse configuration; matching is fuzzy, not a strict substring predicate, and relevance order persists across pages. Scalar filters combine with AND: hasOutcomes; merge action/effect/ownership; line clock/default/show; line or Clock enable; runtimeMs, clockWeight, durationMs and intervalMs ranges (min/max inclusive, gt/lt exclusive). A missing property never matches, including false. Operations with no edges remain discoverable.",
+			aggregation:
+				"graph_operations.aggregate selects {mode: count} or {mode: group, by: kind|owner|action|effect|ownership|lineTitle}. The same kind/owner/participant/role/Fuse/scalar filters apply before aggregation. Count returns no operation records. Grouping counts the whole filtered index before applying limit to groups, sorted by count descending then exact group key. Owner groups include title and exact node ID; absent properties form a Not applicable group. Complete counts remain exact even when group pages are truncated. Expansion/timeout interruption yields only explicit lower bounds, no definitive total or stable ranked continuation: retry the original query with larger bounds. Completed grouped scans return snapshot-bound cursors for remaining groups. Aggregation is available unchanged in graph_batch.",
 			participants:
 				"Owner is always a participant; target identifies an explicit merge target or the owner as receiver for Space transport. Inputs identify material/unit providers, outputs identify actual authored results, and reference identifies a rule mention. Participant/role filters include occurrence-level match evidence: titled input with quantity, consume/reserve, distance and unit cost; output with quantity; target or rule reference. Repeated and alternative outcomes remain separate; exclusive outcomes are never summed.",
 			path: "graph_path requires from and to. It finds structural/topological paths, not gameplay recipes or proof of runtime feasibility. With direction both (default), a path can pass through a shared producer, consumer or owner. Ordered steps preserve authored edge direction even when traversed backwards. maxDepth counts relationship hops; kinds applies at every hop. A node has a zero-hop structural path to itself.",
-			flow: "graph_flow requires from and to. It follows potential causal transitions belonging to one atomic authored operation at a time. maxDepth counts operation steps; operationKinds optionally restricts line, merge, clock and depletion. A line input cannot lead to an output of another line sharing its owner. Rule references, structural proximity and reversed production edges never form flow steps. Authored potential does not prove runtime feasibility, inventory, guards or simultaneous outcomes. Space/template outcomes are terminal operation effects; Start/template placement edges are not additional transformation steps. Receiver-owned Space transport requires an unspecified incoming item and never converts the receiver into its destination space. Text presents ordered transformations; no result after incomplete exploration is unknown, never definitive absence.",
+			flow: "graph_flow requires from and to. It follows potential causal transitions belonging to one atomic authored operation at a time. maxDepth counts operation steps; operationKinds optionally restricts line, merge, clock and depletion. A line input cannot lead to an output of another line sharing its owner. Rule references, structural proximity and reversed production edges never form flow steps. Authored potential does not prove runtime feasibility, inventory, guards or simultaneous outcomes. Space/template outcomes are terminal operation effects; Start/template placement edges are not additional transformation steps. Receiver-owned Space transport requires an unspecified incoming item and never converts the receiver into its destination space. Flow maintains branch-local participant state across atomic operations: consumed, replaced, removed or spent states cannot be reused until explicitly recreated. Preserved states and compatible guaranteed co-products remain available; mutually exclusive outcomes are never pooled. Spend retires the prior state conservatively without simulating remaining units. Results prefer fewer operations, fewer external prerequisite identities, fewer side outputs and direct replacement. Cycles require a changed causal context and remain bounded. Text presents ordered transformations, state effects and external prerequisites; no result after incomplete exploration is unknown, never definitive absence.",
 			traverse:
 				"graph_traverse is advanced broad structural exploration, not operation listing, a path or a causal flow. It requires from and defaults to direction out and depth 1. Depth above one requires an explicit nonempty kinds list to avoid accidental unrestricted expansion. maxDepth counts relationship hops; edge directions remain authored even during reverse exploration.",
 			direction:
@@ -95,9 +97,9 @@ export const readGraphSchemaTextFn = () =>
 				"Operation references are short, opaque and bound to the captured snapshot. Pass them unchanged in graph_operations_json.operationIds; never decode them or submit internal tuple IDs. A lineUid pairs with its owner item UID for item_lines_json. Summaries carry human names and exact node identities for owners and relevant participants.",
 			results:
 				"status yes means a match was found; no means the selected scope was exhausted without a match; unknown means incomplete exploration found none. Inspect truncated and reasons even when status is yes, because omitted alternatives may exist. Depth, result, expansion and timeout limits can make search incomplete; partial absence is not proof of no relationship or no flow.",
-			limits: "Result limit defaults 50, maximum 200. Path/flow depth defaults 5, traverse depth 1; depth maximum 12. Expansion defaults 10000, maximum 100000; cooperative timeout defaults 1000 ms, maximum 5000 ms. Search only exposes result bounds; connections are direct. Limit counts relationships for connections/traverse, operations for operations, nodes for search, paths for path and transformation sequences for flow. Paths and flows may contain up to maxDepth steps per result. Timeout excludes synchronous snapshot compilation, index lookups, Fuse search and scalar candidate filtering; it is not an end-to-end deadline.",
+			limits: "Result limit defaults 50, maximum 200. Path/flow depth defaults 5, traverse depth 1; depth maximum 12. Expansion defaults 10000, maximum 100000; cooperative timeout defaults 1000 ms, maximum 5000 ms. Search only exposes result bounds; connections are direct. Limit counts relationships for connections/traverse, operations for listing or groups for grouping (count ignores result limit), nodes for search, paths for path and transformation sequences for flow. Paths and flows may contain up to maxDepth steps per result. Timeout excludes synchronous snapshot compilation, index lookups, Fuse search and scalar candidate filtering; it is not an end-to-end deadline.",
 			continuation:
-				"Connections and operations may return a compact Cursor. Repeat the same focused query and filters with cursor and returned revision/snapshotId. Tokens bind snapshot, normalized filters and continuation position; unknown, stale or incompatible tokens fail. The session retains at most 1024 issued continuations in FIFO order; rediscover after expiry. A page with no match but remaining scan is unknown.",
+				"Connections and operations may return a compact Cursor. Repeat the same focused query and filters with cursor and returned revision/snapshotId. Tokens bind snapshot, normalized filters including aggregation mode/group key and continuation position; unknown, stale or incompatible tokens fail. The session retains at most 1024 issued continuations in FIFO order; rediscover after expiry. A page with no match but remaining scan is unknown.",
 			revision:
 				"Each response carries project ID, revision and snapshot ID. Optional revision/snapshotId pin discovery; hydration requires both. Snapshot identity detects external content changes even with an unchanged revision. Session-local tokens expire on graph session restart; rediscover then.",
 			batch: "graph_batch captures one immutable snapshot and accepts 1–8 uniquely named focused queries. Each query object is admitted separately, so invalid fields produce an error only for that query. Text renders shared project/revision/snapshot once, then one query-ID section with that query's presentation, status, truncation, reasons, continuation and match evidence. Internally deduplicated storage never appears as tables. One query's failure or truncation does not contaminate siblings. Batch-level stale revision/snapshot admission fails before queries run.",
@@ -105,6 +107,42 @@ export const readGraphSchemaTextFn = () =>
 				"graph_operations_json requires revision and snapshotId and reads only 1–20 selected operation references. It returns canonical operation configurations, deduplicates repeated references and reports missing ones. items_json and item_lines_json remain available for complete item/line documents; compare their revision before combining reads.",
 		},
 		examples: [
+			{
+				tool: "graph_operations",
+				arguments: {
+					operationKinds: [
+						"merge",
+					],
+					aggregate: {
+						mode: "count",
+					},
+				},
+			},
+			{
+				tool: "graph_operations",
+				arguments: {
+					operationKinds: [
+						"merge",
+					],
+					aggregate: {
+						mode: "group",
+						by: "owner",
+					},
+					limit: 10,
+				},
+			},
+			{
+				tool: "graph_operations",
+				arguments: {
+					operationKinds: [
+						"line",
+					],
+					aggregate: {
+						mode: "group",
+						by: "lineTitle",
+					},
+				},
+			},
 			{
 				tool: "graph_search",
 				arguments: {

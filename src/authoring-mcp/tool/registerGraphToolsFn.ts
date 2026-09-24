@@ -87,7 +87,7 @@ export const registerGraphToolsFn = ({
 		"graph_operations",
 		{
 			description:
-				"Search the authored operation index without a root node: merge, line, Clock and depletion. Filter by kind, owner, participant/role and scalar properties. Search operation, owner or participant titles with canonical Editor Fuse semantics. Matching participant facts explain each result without hydration; selected operation references feed graph_operations_json. Supports pinned continuation.",
+				"Search the authored operation index without a root node: merge, line, Clock and depletion. Filter by kind, owner, participant/role and scalar properties. Search operation, owner or participant titles with canonical Editor Fuse semantics. Matching participant facts explain each result without hydration; selected operation references feed graph_operations_json. Use aggregate {mode: count} for a whole-scope count, or {mode: group, by: owner} for ranked groups (kind, owner, action, effect, ownership, lineTitle). All filters apply before aggregation; limit bounds groups, not the counted scope. Incomplete counts are explicit lower bounds. Supports pinned continuation.",
 			inputSchema: GraphOperationsQuerySchema,
 			annotations: EditorToolAnnotations.readOnly,
 		},
@@ -129,7 +129,7 @@ export const registerGraphToolsFn = ({
 		"graph_flow",
 		{
 			description:
-				"Find potential causal transformations from A to B through atomic authored gameplay operations. Inputs and outputs must belong to the same operation; rule references, shared-owner proximity and reversed production edges are not transformations. Returns ordered operation steps, not raw edges. Authored possibility is not proof of runtime feasibility. Truncated no-match results remain unknown.",
+				"Find potential causal transformations from A to B through atomic authored gameplay operations. Inputs and outputs must belong to the same operation; rule references, shared-owner proximity and reversed production edges are not transformations. Tracks preserved, consumed, replaced, removed and spent states across the whole branch; unavailable participants cannot be silently reintroduced. Prefers fewer steps, fewer external prerequisites and direct transformations. Returns ordered operation steps, not raw edges. Authored possibility is not proof of runtime feasibility. Truncated no-match results remain unknown.",
 			inputSchema: GraphFlowQuerySchema,
 			annotations: EditorToolAnnotations.readOnly,
 		},

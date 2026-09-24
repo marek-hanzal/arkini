@@ -1,6 +1,10 @@
 import { match } from "ts-pattern";
 import type { GraphEdge, GraphFacts, GraphOperation } from "~/graph/type/GraphFacts";
-import type { GraphFlowIndex, GraphFlowStep } from "~/graph/type/GraphFlow";
+import type {
+	GraphFlowIndex,
+	GraphFlowParticipantEffect,
+	GraphFlowStep,
+} from "~/graph/type/GraphFlow";
 
 type Rules = readonly {
 	readonly type: string;
@@ -47,6 +51,140 @@ const availableOutputFn = (edge: GraphEdge, operation: GraphOperation): boolean 
 	);
 };
 
+const participantEffectsFn = (operation: GraphOperation): readonly GraphFlowParticipantEffect[] => {
+	const effects = match(operation)
+		.with(
+			{
+				kind: "line",
+			},
+			({ owner, data }) => [
+				{
+					node: owner,
+					effect: "preserved" as const,
+				},
+				...data.input.flatMap((input): GraphFlowParticipantEffect[] => {
+					const target =
+						input.type === "simple" ? owner : `item:${input.query.selector.itemUid}`;
+					const effects: GraphFlowParticipantEffect[] = [];
+					if (input.type !== "simple")
+						effects.push({
+							node: target,
+							effect:
+								input.type === "materials" && input.mode === "consume"
+									? "consumed"
+									: "preserved",
+						});
+					if (input.units !== undefined)
+						effects.push({
+							node: input.units.from === "self" ? owner : target,
+							effect: "spent",
+						});
+					return effects;
+				}),
+			],
+		)
+		.with(
+			{
+				kind: "merge",
+			},
+			({ owner, data }) => {
+				const target = data.action === "space" ? owner : `item:${data.target.itemUid}`;
+				const effects: GraphFlowParticipantEffect[] = [];
+				if (data.action !== "space")
+					effects.push({
+						node: owner,
+						effect: match(data.action)
+							.with("consume", () => "consumed" as const)
+							.with("spend", () => "spent" as const)
+							.with("use", () => "preserved" as const)
+							.exhaustive(),
+					});
+				effects.push({
+					node: target,
+					effect: match(data.effect)
+						.with("keep", () => "preserved" as const)
+						.with("remove", () => "removed" as const)
+						.with("replace", () => "replaced" as const)
+						.with("spend", () => "spent" as const)
+						.exhaustive(),
+				});
+				return effects;
+			},
+		)
+		.with(
+			{
+				kind: "clock",
+			},
+			{
+				kind: "depletion",
+			},
+			({ owner }) => [
+				{
+					node: owner,
+					effect: "removed" as const,
+				},
+			],
+		)
+		.exhaustive();
+	const priority = {
+		preserved: 0,
+		spent: 1,
+		consumed: 2,
+		removed: 3,
+		replaced: 4,
+	};
+	const byNode = new Map<string, GraphFlowParticipantEffect>();
+	// Multiple inputs can mention one canonical participant; preservation cannot undo its retirement.
+	for (const effect of effects) {
+		const previous = byNode.get(effect.node);
+		if (previous === undefined || priority[effect.effect] > priority[previous.effect])
+			byNode.set(effect.node, effect);
+	}
+	return [
+		...byNode.values(),
+	];
+};
+
+/** Never combine products from mutually exclusive sets or unselected chance rolls. */
+const createdNodesFn = (
+	selected: GraphEdge,
+	edges: readonly GraphEdge[],
+	operation: GraphOperation,
+): readonly string[] => {
+	const created = new Set([
+		selected.to,
+	]);
+	const table = operation.kind === "clock" ? operation.data.onExpire : operation.data.outcome;
+	// Replacement itself does not select an outcome set. Only an unconditional sole set
+	// has guaranteed co-products without inventing a choice across alternative sets.
+	const soleReplacementSet =
+		selected.kind === "merge-replacement" &&
+		table?.set.length === 1 &&
+		table.set[0].rules.length === 0;
+	for (const edge of edges) {
+		if (edge.kind === "merge-replacement") created.add(edge.to);
+		const outcome = edge.annotations.outcome;
+		if (outcome?.type !== "item" || outcome.quantity.min <= 0 || outcome.rules.length > 0)
+			continue;
+		if (!availableOutputFn(edge, operation) || edge.kind === "rule-reference") continue;
+		if (
+			!soleReplacementSet &&
+			(selected.annotations.setId === undefined ||
+				edge.annotations.setId !== selected.annotations.setId)
+		)
+			continue;
+		if (
+			edge.annotations.rollId === selected.annotations.rollId ||
+			edge.annotations.rollType === "guaranteed" ||
+			edge.annotations.chance === 1
+		)
+			created.add(edge.to);
+	}
+	return [
+		...created,
+	].sort();
+};
+
 /** Potential authored lineage: one transition binds its inputs and output to the same operation. */
 export const compileGraphFlowFn = (facts: GraphFacts): GraphFlowIndex => {
 	const nodes = new Set(facts.nodes.map((node) => node.id));
@@ -69,6 +207,7 @@ export const compileGraphFlowFn = (facts: GraphFacts): GraphFlowIndex => {
 			],
 		]);
 		const prerequisites: string[] = [];
+		const participantEffects = participantEffectsFn(operation);
 		if (operation.kind === "line") {
 			prerequisites.push(
 				"All inputs of this production line must be satisfied; owner must be available.",
@@ -163,6 +302,8 @@ export const compileGraphFlowFn = (facts: GraphFacts): GraphFlowIndex => {
 					owner: operation.owner,
 					evidence: {
 						fromRole,
+						participantEffects,
+						createdNodes: createdNodesFn(edge, edges, operation),
 						output,
 						prerequisiteNodes: [
 							...participants.keys(),

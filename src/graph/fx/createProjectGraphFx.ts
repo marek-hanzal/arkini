@@ -8,6 +8,7 @@ import type { GraphDiscoveryOperation } from "~/graph/type/GraphDiscoveryResult"
 import { compileGraphFactsFn } from "~/graph/fn/compileGraphFactsFn";
 import type { GraphOperationsQuerySchema } from "~/graph/schema/GraphOperationsQuerySchema";
 import { compileGraphFlowFn } from "~/graph/fn/compileGraphFlowFn";
+import { aggregateGraphOperationsFx } from "~/graph/fx/aggregateGraphOperationsFx";
 import { queryGraphFlowFx } from "~/graph/fx/queryGraphFlowFx";
 import type { GraphFlowIndex } from "~/graph/type/GraphFlow";
 import { GraphDiscoveryQuerySchema } from "~/graph/schema/GraphDiscoveryQuerySchema";
@@ -164,6 +165,7 @@ const filterKeyFn = (query: PagedQuery) =>
 					role: query.role ?? null,
 					search: query.search ?? null,
 					filter: query.filter ?? null,
+					aggregate: query.aggregate ?? null,
 				},
 	);
 
@@ -201,6 +203,14 @@ export const createProjectGraphFx = Effect.fn("createProjectGraphFx")(
 			.join("");
 		const continuations = new Map<string, Continuation>();
 		let continuationSequence = 0;
+		const issueContinuationFx = (continuation: Continuation) =>
+			Effect.sync(() => {
+				const token = `c_${sessionId}_${(++continuationSequence).toString(36)}`;
+				continuations.set(token, continuation);
+				if (continuations.size > ContinuationLimit)
+					continuations.delete(continuations.keys().next().value!);
+				return token;
+			});
 		let sequence = 0;
 		let snapshot: Snapshot | undefined;
 		const captureSnapshotFx = (project: Project) =>
@@ -688,6 +698,9 @@ export const createProjectGraphFx = Effect.fn("createProjectGraphFx")(
 						nodes.add(step.to);
 						nodes.add(step.owner);
 						for (const node of step.evidence.prerequisiteNodes) nodes.add(node);
+						for (const node of step.evidence.createdNodes) nodes.add(node);
+						for (const participant of step.evidence.participantEffects)
+							nodes.add(participant.node);
 						operationIds.add(step.operationId);
 					}
 				const projected = readGraphDiscoveryFn(
@@ -835,6 +848,54 @@ export const createProjectGraphFx = Effect.fn("createProjectGraphFx")(
 						readOperationFilterFn(captured.operationSummaries[index], query.filter),
 				);
 			}
+			if (query.kind === "operations" && query.aggregate !== undefined) {
+				const aggregated = yield* aggregateGraphOperationsFx(
+					captured.operationSummaries,
+					candidates,
+					new Map(
+						captured.facts.nodes.map((node) => [
+							node.id,
+							node.title,
+						]),
+					),
+					{
+						...query,
+						aggregate: query.aggregate,
+					},
+					offset,
+				);
+				let nextCursor: string | undefined;
+				if (aggregated.nextOffset !== undefined) {
+					nextCursor = yield* issueContinuationFx({
+						snapshotId: captured.snapshotId,
+						revision: captured.revision,
+						filters,
+						offset: aggregated.nextOffset,
+					});
+				}
+				return {
+					projectId: captured.projectId,
+					revision: captured.revision,
+					snapshotId: captured.snapshotId,
+					status: readQueryStatusFn(
+						aggregated.aggregation.count > 0,
+						!aggregated.aggregation.complete,
+					),
+					truncated: aggregated.reasons.length > 0,
+					reasons: aggregated.reasons,
+					expansions: aggregated.aggregation.count,
+					nodes: [],
+					edges: [],
+					operations: [],
+					paths: [],
+					aggregation: aggregated.aggregation,
+					...(nextCursor === undefined
+						? {}
+						: {
+								nextCursor,
+							}),
+				};
+			}
 			const started = yield* Clock.currentTimeMillis;
 			const reasons = new Set<GraphResult["reasons"][number]>();
 			const selected: number[] = [];
@@ -900,15 +961,12 @@ export const createProjectGraphFx = Effect.fn("createProjectGraphFx")(
 			);
 			let nextCursor: string | undefined;
 			if (position < candidates.length) {
-				nextCursor = `c_${sessionId}_${(++continuationSequence).toString(36)}`;
-				continuations.set(nextCursor, {
+				nextCursor = yield* issueContinuationFx({
 					snapshotId: captured.snapshotId,
 					revision: captured.revision,
 					filters,
 					offset: position,
 				});
-				if (continuations.size > ContinuationLimit)
-					continuations.delete(continuations.keys().next().value!);
 			}
 			return readOperationReferencesFn(
 				{
@@ -982,6 +1040,7 @@ export const createProjectGraphFx = Effect.fn("createProjectGraphFx")(
 					edgeIds: found.edges.map((edge) => edge.id),
 					operationIds: found.operations.map((operation) => operation.id),
 					paths: found.paths,
+					aggregation: found.aggregation,
 					...(found.flows === undefined
 						? {}
 						: {

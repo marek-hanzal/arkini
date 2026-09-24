@@ -197,7 +197,27 @@ const matchRowFn = (evidence: GraphDiscoveryMatch, labelFn: NodeLabelFn): string
 	return `  ${role}: ${labelFn(evidence.nodeId)}${quantity}${details.length === 0 ? "" : `; ${details.join("; ")}`}`;
 };
 
+const aggregationTextFn = (
+	aggregation: NonNullable<GraphDiscoveryResult["aggregation"]>,
+): string => {
+	const count = aggregation.complete
+		? `${aggregation.count}`
+		: `≥${aggregation.count} (incomplete; total unknown)`;
+	if (aggregation.mode === "count") return `Count: ${count}`;
+	return [
+		`Count: ${count}; grouped by ${aggregation.by}`,
+		...aggregation.groups.map((group) => {
+			const label =
+				aggregation.by === "owner" && group.key !== null
+					? `${titleFn(group.label)} [${identityFn(group.key)}]`
+					: titleFn(group.label);
+			return `- ${label}: ${aggregation.complete ? "" : "≥"}${group.count}`;
+		}),
+	].join("\n");
+};
+
 const bodyFn = (result: GraphDiscoveryResult, query: Query): string => {
+	if (result.aggregation !== undefined) return aggregationTextFn(result.aggregation);
 	const nodes = new Map(
 		result.nodes.map((node) => [
 			node.id,
@@ -246,6 +266,11 @@ const bodyFn = (result: GraphDiscoveryResult, query: Query): string => {
 				...(result.flows ?? []).map((flow, index) =>
 					[
 						`Flow ${index + 1}${flow.steps.length === 0 ? `: ${flow.nodes.map(labelFn).join(" → ")} (same node; no transformation)` : ":"}`,
+						...(flow.externalPrerequisiteNodes.length === 0
+							? []
+							: [
+									`  External prerequisites: ${flow.externalPrerequisiteNodes.map(labelFn).join(", ")}`,
+								]),
 						...flow.steps.flatMap((step, stepIndex) => {
 							const operation = operations.get(step.operationId);
 							const evidence = step.evidence;
@@ -270,6 +295,15 @@ const bodyFn = (result: GraphDiscoveryResult, query: Query): string => {
 							return [
 								`  ${stepIndex + 1}. ${labelFn(step.from)} → ${labelFn(step.to)}${quantityFn(evidence.quantityMin, evidence.quantityMax)}; ${properties.join("; ")}`,
 								`     owner: ${labelFn(step.owner)}`,
+								`     state: ${evidence.participantEffects.map((participant) => `${labelFn(participant.node)} ${participant.effect}`).join("; ")}`,
+								...(evidence.createdNodes.some((node) => node !== step.to)
+									? [
+											`     also creates: ${evidence.createdNodes
+												.filter((node) => node !== step.to)
+												.map(labelFn)
+												.join(", ")}`,
+										]
+									: []),
 								...(evidence.prerequisiteNodes.length === 0
 									? []
 									: [
@@ -413,6 +447,7 @@ export const readGraphBatchTextFn = (
 							matches: query.matches,
 							paths: query.paths,
 							flows: query.flows,
+							aggregation: query.aggregation,
 						},
 						parsed.data,
 					)

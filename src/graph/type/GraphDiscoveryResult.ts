@@ -82,6 +82,25 @@ export interface GraphDiscoveryMatch {
 	readonly metadata?: GraphDiscoveryEdge["metadata"];
 }
 
+/** Counts cover the filtered scope; incomplete counts are lower bounds, never totals. */
+export type GraphOperationAggregation = {
+	readonly count: number;
+	readonly complete: boolean;
+} & (
+	| {
+			readonly mode: "count";
+	  }
+	| {
+			readonly mode: "group";
+			readonly by: "kind" | "owner" | "action" | "effect" | "ownership" | "lineTitle";
+			readonly groups: readonly {
+				readonly key: string | null;
+				readonly label: string;
+				readonly count: number;
+			}[];
+	  }
+);
+
 export interface GraphDiscoveryResult {
 	readonly projectId: string;
 	readonly revision: number;
@@ -96,6 +115,7 @@ export interface GraphDiscoveryResult {
 	readonly matches?: readonly GraphDiscoveryMatch[];
 	readonly paths: GraphResult["paths"];
 	readonly flows?: readonly GraphFlow[];
+	readonly aggregation?: GraphOperationAggregation;
 	readonly nextCursor?: string;
 }
 
@@ -118,6 +138,7 @@ export interface GraphBatchResult {
 		readonly matches?: readonly GraphDiscoveryMatch[];
 		readonly paths: GraphResult["paths"];
 		readonly flows?: readonly GraphFlow[];
+		readonly aggregation?: GraphOperationAggregation;
 		readonly nextCursor?: string;
 		readonly error?: {
 			readonly reason: string;

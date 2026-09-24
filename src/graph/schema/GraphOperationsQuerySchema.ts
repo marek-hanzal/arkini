@@ -27,6 +27,31 @@ const NumericRangeSchema = z
 
 export const GraphOperationsQuerySchema = GraphDiscoveryBoundsSchema.extend({
 	cursor: z.string().min(1).max(128).optional(),
+	aggregate: z
+		.discriminatedUnion("mode", [
+			z
+				.object({
+					mode: z.literal("count"),
+				})
+				.strict(),
+			z
+				.object({
+					mode: z.literal("group"),
+					by: z.enum([
+						"kind",
+						"owner",
+						"action",
+						"effect",
+						"ownership",
+						"lineTitle",
+					]),
+				})
+				.strict(),
+		])
+		.optional()
+		.describe(
+			"Count the whole filtered operation scope, or group it by one property. limit bounds returned groups, never scanned operations. Missing properties form a not-applicable group.",
+		),
 	operationKinds: z
 		.array(
 			z.enum([

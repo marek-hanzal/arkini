@@ -147,3 +147,118 @@ it("renders mixed focused batches over one snapshot with query-local flows, erro
 	expect(next.snapshotId).toBe(batch.snapshotId);
 	expect(next.text).toMatch(/Status: yes/);
 });
+
+it("exposes aggregate counts and ranked owner pages through standalone and mixed batch MCP without operation payloads", async () => {
+	const { client, repository } = await createGraphDiscoveryFixtureFn();
+	const count = graphTextFn(
+		await client.callTool({
+			name: "graph_operations",
+			arguments: {
+				operationKinds: [
+					"merge",
+				],
+				aggregate: {
+					mode: "count",
+				},
+				limit: 1,
+			},
+		}),
+	);
+	expect(count.text).toContain("Count: 3");
+	expect(count.text).toContain("truncated: false");
+	expect(count.operationIds).toEqual([]);
+	const readSpy = vi.spyOn(repository, "readProjectFx");
+	const request = {
+		queries: [
+			{
+				id: "count",
+				query: {
+					kind: "operations",
+					operationKinds: [
+						"merge",
+					],
+					aggregate: {
+						mode: "count",
+					},
+				},
+			},
+			{
+				id: "owners",
+				query: {
+					kind: "operations",
+					operationKinds: [
+						"merge",
+					],
+					aggregate: {
+						mode: "group",
+						by: "owner",
+					},
+					limit: 1,
+				},
+			},
+			{
+				id: "matches",
+				query: {
+					kind: "operations",
+					operationKinds: [
+						"merge",
+					],
+					participant: "item:puppy",
+					role: "target",
+				},
+			},
+		],
+	};
+	const batch = graphTextFn(
+		await client.callTool({
+			name: "graph_batch",
+			arguments: request,
+		}),
+	);
+	expect(readSpy).toHaveBeenCalledTimes(1);
+	expect(batch.snapshotId).toBe(count.snapshotId);
+	const [, counted, owners, matches] = batch.text.split(/^Query: /m);
+	expect(counted).toContain("Count: 3");
+	expect(counted).not.toContain("operationId=");
+	expect(owners).toContain("Beagle Puppy [item:puppy]: 2");
+	expect(owners).not.toContain("operationId=");
+	expect(matches).toContain("operationId=");
+	expect(matches).toContain("target: Beagle Puppy [item:puppy]");
+	expect(batch.nextCursor).toBeDefined();
+	const second = graphTextFn(
+		await client.callTool({
+			name: "graph_operations",
+			arguments: {
+				operationKinds: [
+					"merge",
+				],
+				aggregate: {
+					mode: "group",
+					by: "owner",
+				},
+				limit: 1,
+				cursor: batch.nextCursor,
+				revision: batch.revision,
+				snapshotId: batch.snapshotId,
+			},
+		}),
+	);
+	expect(second.text).toContain("Fawn [item:fawn]: 1");
+	expect(second.nextCursor).toBeUndefined();
+	const partial = graphTextFn(
+		await client.callTool({
+			name: "graph_operations",
+			arguments: {
+				operationKinds: [
+					"merge",
+				],
+				aggregate: {
+					mode: "count",
+				},
+				maxExpansions: 1,
+			},
+		}),
+	);
+	expect(partial.text).toContain("Count: ≥1 (incomplete; total unknown)");
+	expect(partial.text).toContain("truncated: true");
+});

@@ -81,6 +81,8 @@ Settings → Dev includes a two-click **Hard reset**. It permanently deletes the
 
 MCP output names identify their representation. Tools without a format suffix return designed, concise text; `_json` tools return one valid JSON document. Plural JSON readers keep shared revision, snapshot and issue metadata in that one document. Mutations return text describing changed identities and the resulting revision or note timestamp. There are no JSONL readers or compatibility aliases.
 
+Every MCP tool publishes explicit behavior annotations: reads are non-destructive and read-only; creates are additive; edits, replacements, reordering and deletion may overwrite existing information. All tools operate in a closed project/schema domain. Required revision or note-timestamp guards make repeated identical requests idempotent by rejecting stale replays; unguarded writes do not promise replay safety. Output schemas remain unadvertised, and response content is unchanged.
+
 | Purpose | Tools |
 | --- | --- |
 | Text discovery and inspection | `project`, `item_meta`, `item_collection`, `item_detail`, `item_lines`, `template_collection`, `template_detail`, `note_collection`, `note_detail`, `artwork_collection` |

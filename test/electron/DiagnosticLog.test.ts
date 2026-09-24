@@ -37,6 +37,29 @@ afterEach(() => {
 });
 
 describe("Diagnostic log", () => {
+	it("persists local MCP evidence without weakening support-log redaction or export privacy", async () => {
+		const directory = mkdtempSync(join(tmpdir(), "serakki-mcp-diagnostics-"));
+		temporaryDirectories.push(directory);
+		const diagnostics = Effect.runSync(createDiagnosticLogFx(directory));
+		try {
+			const record = {
+				level: "warning" as const,
+				message: "Editor MCP tool completed",
+				body: 'Tool: "graph_schema"\nProtocol error -32602: Tool graph_schema not found',
+			};
+			await Effect.runPromise(diagnostics.writeEditorMcpFx(record));
+			await Effect.runPromise(diagnostics.writeApplicationFx(record));
+			const local = readFileSync(join(directory, "editor-mcp.md"), "utf8");
+			expect(local).toContain("Tool graph_schema not found");
+			expect(readFileSync(join(directory, "support.md"), "utf8")).not.toContain(
+				"Protocol error",
+			);
+			const files = await Effect.runPromise(diagnostics.snapshotFx);
+			expect(files.map(({ name }) => name)).not.toContain("editor-mcp.md");
+		} finally {
+			await Effect.runPromise(diagnostics.closeFx);
+		}
+	});
 	it("keeps human application history beside bounded gameplay JSONL", async () => {
 		const userDataPath = mkdtempSync(join(tmpdir(), "serakki-diagnostics-"));
 		temporaryDirectories.push(userDataPath);

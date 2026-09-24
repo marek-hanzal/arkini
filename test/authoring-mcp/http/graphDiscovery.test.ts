@@ -84,6 +84,23 @@ it("explains local and rootless merge interactions in text with exact identities
 
 it("renders per-query batch results over one project read while preserving reusable IDs and isolated errors", async () => {
 	const { client, repository } = await createGraphDiscoveryFixtureFn();
+	const catalog = await client.listTools();
+	expect(
+		catalog.tools.find(({ name }) => name === "graph_query_batch")?.inputSchema,
+	).toMatchObject({
+		properties: {
+			queries: {
+				items: {
+					properties: {
+						query: {
+							type: "object",
+							additionalProperties: true,
+						},
+					},
+				},
+			},
+		},
+	});
 	const query = {
 		kind: "connections",
 		from: "item:puppy",
@@ -150,6 +167,12 @@ it("renders per-query batch results over one project read while preserving reusa
 	);
 	expect(hydrated.issues).toEqual([]);
 	for (const queries of [
+		[
+			{
+				id: "not-an-object",
+				query: null,
+			},
+		],
 		Array.from(
 			{
 				length: 9,

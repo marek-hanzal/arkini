@@ -29,6 +29,10 @@ export interface DiagnosticLog {
 	readonly readLastGameFx: Effect.Effect<DiagnosticLog.LastGame | null, unknown, never>;
 	readonly snapshotFx: Effect.Effect<readonly DiagnosticLog.File[], unknown, never>;
 	readonly writeFx: (record: DiagnosticRecord) => Effect.Effect<void, unknown, never>;
+	/** Local Editor debugging only; excluded from support bundles and renderer IPC. */
+	readonly writeEditorMcpFx: (
+		record: ApplicationLogRecordSchema.Type,
+	) => Effect.Effect<void, unknown, never>;
 	readonly writeApplicationFx: (
 		record: ApplicationLogRecordSchema.Type,
 	) => Effect.Effect<void, unknown, never>;
@@ -193,6 +197,12 @@ export const createDiagnosticLogFx = Effect.fn("createDiagnosticLogFx")((directo
 						maxSize: MAX_FILE_BYTES,
 					},
 				),
+				editorMcp: getRotatingFileSink(join(directoryPath, "editor-mcp.md"), {
+					bufferSize: 0,
+					formatter: (record) => formatApplicationLogRecordFn(record, runtimeIdentity),
+					maxFiles: MAX_FILES,
+					maxSize: MAX_FILE_BYTES,
+				}),
 				diagnostics: getRotatingFileSink(join(directoryPath, DiagnosticLogFiles.session), {
 					bufferSize: 0,
 					formatter: jsonLinesFormatter,
@@ -201,6 +211,14 @@ export const createDiagnosticLogFx = Effect.fn("createDiagnosticLogFx")((directo
 				}),
 			},
 			loggers: [
+				{
+					category: "serakkiEditorMcp",
+					lowestLevel: "debug",
+					parentSinks: "override",
+					sinks: [
+						"editorMcp",
+					],
+				},
 				{
 					category: "serakkiApplication",
 					lowestLevel: "debug",
@@ -247,6 +265,21 @@ export const createDiagnosticLogFx = Effect.fn("createDiagnosticLogFx")((directo
 					writeRecordFn(logger, sanitizeDiagnosticRecordFn(record));
 					if (record.event === "session-ended" && record.sessionId !== undefined)
 						officialSessions.delete(record.sessionId);
+				}),
+			writeEditorMcpFx: (record) =>
+				Effect.try(() => {
+					if (closed) return;
+					const logger = getLogger("serakkiEditorMcp");
+					const properties = {
+						body: record.body.slice(0, 64 * 1024),
+					};
+					if (
+						record.level === "warning" ||
+						record.level === "error" ||
+						record.level === "fatal"
+					)
+						logger.warn(record.message, properties);
+					else logger.info(record.message, properties);
 				}),
 			writeApplicationFx: (record) =>
 				Effect.try(() => {

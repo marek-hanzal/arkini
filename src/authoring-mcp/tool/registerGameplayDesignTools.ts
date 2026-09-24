@@ -1,3 +1,4 @@
+import { EditorToolAnnotations } from "./EditorToolAnnotations";
 import { formatVersionFn } from "~/game-version/fn/formatVersionFn";
 import type { McpServer } from "@modelcontextprotocol/server";
 import { Effect } from "effect";
@@ -202,6 +203,7 @@ export const registerGameplayDesignToolsFn = ({
 	server.registerTool(
 		"project_json",
 		{
+			annotations: EditorToolAnnotations.readOnly,
 			description:
 				"Read JSON containing the complete editable non-item project config and its revision. The config contains full meta, resources, templates, and start sections but intentionally excludes items. Prefer template_collection, template_detail or template_json to read a single template; read item_json for one complete item.",
 			inputSchema: ProjectConfigInputSchema,
@@ -211,6 +213,7 @@ export const registerGameplayDesignToolsFn = ({
 	server.registerTool(
 		"edit_project",
 		{
+			annotations: EditorToolAnnotations.replace,
 			description: `Patch the open project's non-item config. Pass input as a serialized JSON object matching schema ${JSON.stringify(editProjectInputSchemaId)}; retrieve it and each returned $ref through schema_json. Supplied top-level sections replace their complete values and omitted sections remain unchanged; this is not a nested merge. Read project_json first, preserve every unchanged value inside a replaced section, and copy its revision when freshness matters. The stable meta.id cannot be changed. Prefer create_template, edit_template, edit_template_cells and delete_template for focused template edits.`,
 			inputSchema: JsonToolInputSchema,
 		},
@@ -235,6 +238,7 @@ export const registerGameplayDesignToolsFn = ({
 	server.registerTool(
 		"edit_project_layout",
 		{
+			annotations: EditorToolAnnotations.guardedReplace,
 			description:
 				"Patch fallback dimensions used for new templates. Existing templates keep their own dimensions; use edit_template to resize one. Read project_json first and copy its revision.",
 			inputSchema: EditProjectLayoutInputSchema,
@@ -257,6 +261,7 @@ export const registerGameplayDesignToolsFn = ({
 	server.registerTool(
 		"set_start_space",
 		{
+			annotations: EditorToolAnnotations.guardedReplace,
 			description:
 				"Assign an existing template to an initial space. Reusing a template creates independent runtime items. Use template_collection to find a template UID and project revision, or read project_json.",
 			inputSchema: SetStartSpaceInputSchema,
@@ -283,6 +288,7 @@ export const registerGameplayDesignToolsFn = ({
 	server.registerTool(
 		"remove_start_space",
 		{
+			annotations: EditorToolAnnotations.guardedReplace,
 			description:
 				"Remove one initial space assignment without modifying the template. The unmapped space starts empty with project fallback dimensions. Read project_json first and copy its revision.",
 			inputSchema: RemoveStartSpaceInputSchema,
@@ -308,6 +314,7 @@ export const registerGameplayDesignToolsFn = ({
 	server.registerTool(
 		"validate_project",
 		{
+			annotations: EditorToolAnnotations.readOnly,
 			description:
 				"Validate the canonical saved project with the same completed-game semantic and resource-reference rules used by the editor build path. Set includeWarnings to false to return only errors. Returns readable diagnostics; it does not re-decode stored PNG bytes.",
 			inputSchema: ValidateProjectInputSchema,
@@ -324,6 +331,7 @@ export const registerGameplayDesignToolsFn = ({
 	server.registerTool(
 		"rename_item",
 		{
+			annotations: EditorToolAnnotations.replace,
 			description:
 				"Rename an item title while preserving its immutable UID. Uses a revision-guarded project write",
 			inputSchema: RenameItemInputSchema,
@@ -347,6 +355,7 @@ export const registerGameplayDesignToolsFn = ({
 	server.registerTool(
 		"item_delete_impact",
 		{
+			annotations: EditorToolAnnotations.readOnly,
 			description:
 				"Preview whether an item can be safely deleted and every canonical structure a force delete would remove. Read this immediately before delete_item and copy its revision into the destructive request.",
 			inputSchema: ItemDeleteImpactInputSchema,
@@ -361,6 +370,7 @@ export const registerGameplayDesignToolsFn = ({
 	server.registerTool(
 		"delete_item",
 		{
+			annotations: EditorToolAnnotations.guardedReplace,
 			description:
 				"Delete one item at the exact revision returned by item_delete_impact. Safe mode rejects referenced items. Force mode removes the item and the referencing structures listed by that impact in one project write; it never guesses through stale state.",
 			inputSchema: DeleteItemInputSchema,

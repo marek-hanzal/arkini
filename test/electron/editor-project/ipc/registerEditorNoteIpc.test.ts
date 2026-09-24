@@ -48,6 +48,7 @@ const trustedRenderer: TrustedRenderer = {
 const diagnostics = {
 	directoryPath: "/tmp/serakki-diagnostics",
 	writeFx: () => Effect.void,
+	writeEditorMcpFx: () => Effect.void,
 	writeApplicationFx: () => Effect.void,
 	readLastGameFx: Effect.succeed(null),
 	snapshotFx: Effect.succeed([]),

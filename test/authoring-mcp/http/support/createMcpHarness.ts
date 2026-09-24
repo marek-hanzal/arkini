@@ -117,12 +117,14 @@ export interface McpHarness {
 export const createMcpHarness = async (
 	runPromiseFn: createEditorMcpOwnershipFx.Props["runPromiseFn"] = Effect.runPromise,
 	notifyProjectChanged: (projectId: string) => void = () => undefined,
+	writeMcpLogFx?: createEditorMcpOwnershipFx.Props["writeMcpLogFx"],
 ): Promise<McpHarness> => {
 	const repository = await createProjectRepository();
 	const port = await reserveReleasedPort();
 	const storage = await createTestStorage(port);
 	const ownership = Effect.runSync(
 		createEditorMcpOwnershipFx({
+			writeMcpLogFx,
 			editor: {
 				type: "ready",
 				repository,

@@ -1,3 +1,4 @@
+import { EditorToolAnnotations } from "./EditorToolAnnotations";
 import type { CallToolResult, McpServer } from "@modelcontextprotocol/server";
 import { Effect } from "effect";
 import { z } from "zod";
@@ -71,9 +72,7 @@ export const registerGraphToolsFn = ({
 				title: "Graph schema discovery input",
 				description: "Graph schema discovery accepts no arguments.",
 			}),
-			annotations: {
-				readOnlyHint: true,
-			},
+			annotations: EditorToolAnnotations.readOnly,
 		},
 		async () => runToolFn(Effect.succeed(readGraphSchemaTextFn())),
 	);
@@ -83,9 +82,7 @@ export const registerGraphToolsFn = ({
 			description:
 				"Discover the authored project graph as concise formatted text with titled entities, directed relationships and operation summaries. Query local connections, traversal, paths or operations directly without a root (for example kind operations with operationKinds merge). Filter operations by owner or participant and role. Read graph_schema_json for continuation and bounds; hydrate selected operation IDs through graph_operations_json or use items_json/item_lines_json. No authored configuration bodies or executable queries are returned or accepted.",
 			inputSchema: GraphDiscoveryQuerySchema,
-			annotations: {
-				readOnlyHint: true,
-			},
+			annotations: EditorToolAnnotations.readOnly,
 		},
 		async (input) =>
 			runToolFn(
@@ -101,9 +98,7 @@ export const registerGraphToolsFn = ({
 			description:
 				"Run 1–8 uniquely named graph queries against one immutable project snapshot and revision. Returns formatted text with common snapshot metadata and separate named query sections, each with its status, truncation, reasons and exact navigation identities. Use after discovery to expand several interesting branches without repeated graph payloads. Read graph_schema_json for bounds and continuation.",
 			inputSchema: GraphBatchQuerySchema,
-			annotations: {
-				readOnlyHint: true,
-			},
+			annotations: EditorToolAnnotations.readOnly,
 		},
 		async (input) =>
 			runToolFn(
@@ -119,9 +114,7 @@ export const registerGraphToolsFn = ({
 			description:
 				"Read canonical authored configurations for 1–20 graph operation IDs selected during discovery. Required revision and snapshotId must match the discovery result, including after same-revision external edits; stale requests fail. Duplicate IDs are returned once, missing IDs are reported. Prefer items_json for complete items and item_lines_json for known item/line UID pairs.",
 			inputSchema: GraphOperationReadSchema,
-			annotations: {
-				readOnlyHint: true,
-			},
+			annotations: EditorToolAnnotations.readOnly,
 		},
 		async (input) =>
 			runToolFn(
@@ -143,9 +136,7 @@ export const registerGraphToolsFn = ({
 						? "Discover where an item is used as a line material, unit provider or unit cost. Formatted text of outgoing input relationships; level is bounded relationship-hop depth (1–12). Hydrate only selected details with graph_operations_json, items_json or item_lines_json."
 						: "Discover what produces an item through lines, merge outcomes/replacement, Clock or depletion. Formatted text of incoming output relationships; level is bounded relationship-hop depth (1–12). Hydrate only selected details with graph_operations_json, items_json or item_lines_json.",
 				inputSchema: itemRelationInputSchemaFn(role),
-				annotations: {
-					readOnlyHint: true,
-				},
+				annotations: EditorToolAnnotations.readOnly,
 			},
 			async ({ itemUid, level }) =>
 				runToolFn(
@@ -179,9 +170,7 @@ export const registerGraphToolsFn = ({
 			description:
 				"Discover bounded outgoing authored consequences: lines, merges, Clock, depletion, spaces and templates. Returns concise formatted relationship text; maxDepth counts relationship hops (1–12, default 5). Use graph_query for other edge kinds or direction, and batch readers for selected configurations.",
 			inputSchema: ItemChainInputSchema,
-			annotations: {
-				readOnlyHint: true,
-			},
+			annotations: EditorToolAnnotations.readOnly,
 		},
 		async ({ itemUid, maxDepth }) =>
 			runToolFn(

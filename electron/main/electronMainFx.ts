@@ -73,6 +73,7 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 				return {
 					directoryPath: "",
 					writeFx: () => Effect.void,
+					writeEditorMcpFx: () => Effect.void,
 					writeApplicationFx: () => Effect.void,
 					readLastGameFx: Effect.succeed(null),
 					snapshotFx: Effect.fail(new Error("Serakki diagnostic logs are unavailable.")),
@@ -191,6 +192,7 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 		root: userDataPaths.game.preferences,
 	});
 	const editorMcpOwnership = yield* createFilesystemEditorMcpOwnershipFx({
+		writeMcpLogFx: diagnostics.writeEditorMcpFx,
 		editor: editorProjectServiceOwnership,
 		notifyOverviewChangedFn: (overview) => {
 			for (const window of BrowserWindow.getAllWindows()) {

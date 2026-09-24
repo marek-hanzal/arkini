@@ -123,6 +123,7 @@ export const createRegisteredIpcHarness = async () => {
 				diagnostics: {
 					directoryPath: userDataPaths.diagnostics,
 					writeFx: (record) => Effect.sync(() => writeDiagnostic(record)),
+					writeEditorMcpFx: () => Effect.void,
 					writeApplicationFx: (record) => Effect.sync(() => writeApplicationLog(record)),
 					readLastGameFx: Effect.succeed(null),
 					snapshotFx: Effect.succeed([]),

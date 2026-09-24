@@ -1,3 +1,4 @@
+import type { createMcpDiagnosticHandlerFx } from "./createMcpDiagnosticHandlerFx";
 import { Effect, Exit, Semaphore } from "effect";
 import { randomBytes } from "node:crypto";
 
@@ -38,6 +39,9 @@ export namespace createEditorMcpOwnershipFx {
 	export interface Props {
 		readonly checkPortFx?: typeof checkPortAvailabilityFx;
 		readonly checkRemoteFx?: (origin: URL) => Effect.Effect<void, unknown, never>;
+		readonly writeMcpLogFx?: (
+			record: createMcpDiagnosticHandlerFx.Record,
+		) => Effect.Effect<void, unknown, never>;
 		readonly editor: EditorProjectServiceOwnership;
 		readonly notifyOverviewChangedFn: (overview: EditorMcpOverviewSchema.Type) => void;
 		readonly notifyProjectChangedFn: (projectId: string) => void;
@@ -53,6 +57,7 @@ export namespace createEditorMcpOwnershipFx {
 export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx")(function* ({
 	checkPortFx = checkPortAvailabilityFx,
 	checkRemoteFx = checkRemoteEndpointFx,
+	writeMcpLogFx,
 	editor,
 	notifyOverviewChangedFn,
 	notifyProjectChangedFn,
@@ -77,6 +82,7 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 	let projectContext: string | undefined;
 	const commandLock = yield* Semaphore.make(1);
 	const httpListener = yield* createHttpListenerOwnershipFx({
+		writeMcpLogFx,
 		editor,
 		notifyProjectChangedFn,
 		storage,

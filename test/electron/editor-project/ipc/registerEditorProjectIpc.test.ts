@@ -39,6 +39,7 @@ const writeApplicationLog = vi.fn();
 const diagnostics = {
 	directoryPath: "/tmp/serakki-diagnostics",
 	writeFx: () => Effect.void,
+	writeEditorMcpFx: () => Effect.void,
 	writeApplicationFx: (record) => Effect.sync(() => writeApplicationLog(record)),
 	readLastGameFx: Effect.succeed(null),
 	snapshotFx: Effect.succeed([]),

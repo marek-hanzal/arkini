@@ -1,3 +1,4 @@
+import { EditorToolAnnotations } from "./EditorToolAnnotations";
 import type { McpServer } from "@modelcontextprotocol/server";
 import { Effect } from "effect";
 import { z } from "zod";
@@ -158,6 +159,7 @@ export const registerTemplateToolsFn = ({
 	server.registerTool(
 		"template_collection",
 		{
+			annotations: EditorToolAnnotations.readOnly,
 			description:
 				"List board template UIDs, titles, dimensions and placement counts as compact text with the project revision. Page defaults to 1, limit to 25 (max 100); optional query searches UID/title. Use template_detail for cells/references or template_json for canonical JSON.",
 			inputSchema: TemplateCollectionInputSchema,
@@ -170,6 +172,7 @@ export const registerTemplateToolsFn = ({
 	server.registerTool(
 		"template_detail",
 		{
+			annotations: EditorToolAnnotations.readOnly,
 			description:
 				"Read one template as text: immutable UID, title, dimensions, every zero-based item placement, project revision and deletion blockers from initial spaces and Template outcomes. Use edit_template_cells for local edits; copy revision into mutations.",
 			inputSchema: TemplateReadInputSchema,
@@ -184,6 +187,7 @@ export const registerTemplateToolsFn = ({
 	server.registerTool(
 		"template_json",
 		{
+			annotations: EditorToolAnnotations.readOnly,
 			description:
 				"Read JSON {revision, template} containing the complete canonical TemplateSchema configuration: uid, title, width, height and board [{itemUid,x,y}]. Use before replacing board through edit_template; preserve unchanged cells and copy revision. Prefer edit_template_cells for local changes.",
 			inputSchema: TemplateReadInputSchema,
@@ -211,6 +215,7 @@ export const registerTemplateToolsFn = ({
 	server.registerTool(
 		"create_template",
 		{
+			annotations: EditorToolAnnotations.guardedCreate,
 			description: `Create one template with a generated immutable UID. Requires revision from template_collection or project; omitted dimensions use project fallback dimensions and omitted board is empty. Returns UID and new revision as text. Pass input as serialized JSON matching schema ${JSON.stringify(resolveSchemaId(CreateTemplateInputSchema))}; retrieve it through schema_json. Assign the result using set_start_space or a Template outcome.`,
 			inputSchema: JsonToolInputSchema,
 		},
@@ -229,6 +234,7 @@ export const registerTemplateToolsFn = ({
 	server.registerTool(
 		"edit_template",
 		{
+			annotations: EditorToolAnnotations.guardedReplace,
 			description: `Patch one template's title, width, height or complete board. Omitted fields, UID, sibling templates and start assignments stay unchanged. Shrinking rejects stranded cells. Read template_json before replacing board; copy revision. Pass input as serialized JSON matching schema ${JSON.stringify(resolveSchemaId(EditTemplateInputSchema))}; retrieve it through schema_json. Returns text and new revision.`,
 			inputSchema: JsonToolInputSchema,
 		},
@@ -247,6 +253,7 @@ export const registerTemplateToolsFn = ({
 	server.registerTool(
 		"edit_template_cells",
 		{
+			annotations: EditorToolAnnotations.guardedReplace,
 			description: `Apply 1–100 ordered place, replace, move or remove changes to one template using its project revision. Coordinates are zero-based. Place requires an empty cell, replace/remove an occupied cell, move an occupied source and empty destination. Unknown items or out-of-bounds positions reject the entire batch before any write. Other templates and start assignments stay unchanged. Pass input as serialized JSON matching schema ${JSON.stringify(resolveSchemaId(EditTemplateCellsInputSchema))}; retrieve it through schema_json. Returns text and new revision.`,
 			inputSchema: JsonToolInputSchema,
 		},
@@ -265,6 +272,7 @@ export const registerTemplateToolsFn = ({
 	server.registerTool(
 		"delete_template",
 		{
+			annotations: EditorToolAnnotations.guardedReplace,
 			description:
 				"Delete exactly one unreferenced template at the revision from template_detail. Initial-space assignments and Template outcomes block deletion; errors list exact reference paths. Remove/reassign references explicitly first. No cascade or reassignment. Returns text and new revision.",
 			inputSchema: DeleteTemplateInputSchema,

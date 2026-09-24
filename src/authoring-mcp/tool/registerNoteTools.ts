@@ -1,3 +1,4 @@
+import { EditorToolAnnotations } from "./EditorToolAnnotations";
 import type { McpServer } from "@modelcontextprotocol/server";
 import { Effect } from "effect";
 import { z } from "zod";
@@ -232,6 +233,7 @@ export const registerNoteToolsFn = ({
 	server.registerTool(
 		"note_collection",
 		{
+			annotations: EditorToolAnnotations.readOnly,
 			description:
 				"List project notes newest first with bounded previews, exact IDs and freshness timestamps. Optional itemUid and resourceUid filters require matching item and resource links. Linked items include their immutable UIDs and human titles; linked resources include resource IDs and semantic types. All relationship filters and content search run before pagination. Use note_detail to read one complete Markdown note. Notes are not included in Serapacks.",
 			inputSchema: NoteCollectionInputSchema,
@@ -254,6 +256,7 @@ export const registerNoteToolsFn = ({
 	server.registerTool(
 		"note_detail",
 		{
+			annotations: EditorToolAnnotations.readOnly,
 			description:
 				"Read one complete Markdown note as formatted text with exact note ID, linked entity titles and IDs, creation/update times and the exact Updated at ms token. Copy that token into expectedUpdatedAtMs for edit_note or delete_note so stale mutations are rejected.",
 			inputSchema: NoteDetailInputSchema,
@@ -272,6 +275,7 @@ export const registerNoteToolsFn = ({
 	server.registerTool(
 		"create_note",
 		{
+			annotations: EditorToolAnnotations.create,
 			description:
 				"Create and persist one Markdown note in the open project. Notes remain outside Serapacks.",
 			inputSchema: CreateNoteInputSchema,
@@ -303,6 +307,7 @@ export const registerNoteToolsFn = ({
 	server.registerTool(
 		"edit_note",
 		{
+			annotations: EditorToolAnnotations.guardedReplace,
 			description:
 				"Replace complete Markdown content, item and resource links only if it still has the exact updatedAtMs returned by note_detail or note_collection.",
 			inputSchema: EditNoteInputSchema,
@@ -336,6 +341,7 @@ export const registerNoteToolsFn = ({
 	server.registerTool(
 		"delete_note",
 		{
+			annotations: EditorToolAnnotations.guardedReplace,
 			description:
 				"Delete one project note only if it still has the exact updatedAtMs returned by note_detail or note_collection.",
 			inputSchema: DeleteNoteInputSchema,

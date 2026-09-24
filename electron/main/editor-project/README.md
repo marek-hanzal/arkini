@@ -119,6 +119,8 @@ Project and Item save command state belongs to the mounted form, so explicit Ref
 
 Application diagnostics record successful IPC revision transitions (operation, project, expected/previous/result revision), MCP invalidation reads, and renderer Refresh start/completion/failure with its last stage. These records contain identities and revision tokens, never authored config or resource bodies.
 
+GUI Editor MCP wire diagnostics are persisted separately in `~/.serakki/diagnostics/editor-mcp.md` (rotated at 5 MiB, four archives). Calls carry a local correlation ID, request ID, project, tool name, elapsed time, HTTP status and MCP outcome, including SDK validation failures and unknown tool names. Graph calls include bounded whitelisted arguments, snapshot/status/truncation and per-query batch errors. Headers, credentials, other tools' arguments, authored JSON documents and successful graph rows are omitted. Capture is capped at 256 KiB and detail at 16 KiB; oversized requests bypass observation and oversized responses are explicitly marked. This local debugging log is excluded from exported support bundles; general support-log redaction stays unchanged.
+
 The Editor does not watch project files. External changes while a project is open are unsupported; close the project before editing files outside the Editor and reopen it afterward. Hard Refresh rebuilds mounted projections from repository state for supported Editor operations, not concurrent external writes. Build reads the saved source tree independently, and requested image and audio bodies come directly from their registered disk paths. There is no watcher, merge, repair mode, partial load or second renderer store.
 
 ## Output version and Build admission

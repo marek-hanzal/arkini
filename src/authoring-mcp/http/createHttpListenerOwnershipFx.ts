@@ -1,3 +1,4 @@
+import { createMcpDiagnosticHandlerFx } from "./createMcpDiagnosticHandlerFx";
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import {
 	localhostHostValidation,
@@ -33,6 +34,9 @@ interface HttpListenerOwnership {
 
 export namespace createHttpListenerOwnershipFx {
 	export interface Props {
+		readonly writeMcpLogFx?: (
+			record: createMcpDiagnosticHandlerFx.Record,
+		) => Effect.Effect<void, unknown, never>;
 		readonly editor: EditorProjectServiceOwnership;
 		readonly notifyProjectChangedFn: (projectId: string) => void;
 		readonly storage: Pick<McpStorage, "readPortFx">;
@@ -60,6 +64,7 @@ const writeBadRequestFn = (response: ServerResponse) => {
 
 /** Owns the one physical loopback listener shared by local and Remote MCP routing. */
 export const createHttpListenerOwnershipFx = Effect.fn("createHttpListenerOwnershipFx")(function* ({
+	writeMcpLogFx,
 	editor,
 	notifyProjectChangedFn,
 	storage,
@@ -111,7 +116,16 @@ export const createHttpListenerOwnershipFx = Effect.fn("createHttpListenerOwners
 			runPromiseFn,
 		});
 		const handler = createMcpHandler(factory.create);
-		const boundNodeHandlerFn = toNodeHandler(handler, {
+		const observedHandler =
+			writeMcpLogFx === undefined
+				? handler
+				: yield* createMcpDiagnosticHandlerFx({
+						handler,
+						writeMcpLogFx,
+						readProjectContextFn,
+						runPromiseFn,
+					});
+		const boundNodeHandlerFn = toNodeHandler(observedHandler, {
 			onerror: (error) => console.error("Serakki editor MCP request failed.", error),
 		});
 		const listener = createServer((request, response) => {
@@ -159,7 +173,7 @@ export const createHttpListenerOwnershipFx = Effect.fn("createHttpListenerOwners
 		}).pipe(
 			Effect.tapError(() =>
 				Effect.promise(() =>
-					handler
+					observedHandler
 						.close()
 						.catch((error) =>
 							console.error("Serakki editor MCP handler could not close.", error),
@@ -168,7 +182,7 @@ export const createHttpListenerOwnershipFx = Effect.fn("createHttpListenerOwners
 			),
 		);
 		server = listener;
-		mcpHandler = handler;
+		mcpHandler = observedHandler;
 		nodeHandlerFn = boundNodeHandlerFn;
 	});
 	return {

@@ -1,3 +1,4 @@
+import type { createMcpDiagnosticHandlerFx } from "../http/createMcpDiagnosticHandlerFx";
 import { Effect, Exit, FiberSet, Scope } from "effect";
 
 import type { EditorMcpOverviewSchema } from "~/authoring-mcp/schema/EditorMcpOverviewSchema";
@@ -11,6 +12,9 @@ import { createNgrokEditorMcpTunnelFx } from "../tunnel/createNgrokEditorMcpTunn
 
 export namespace createFilesystemEditorMcpOwnershipFx {
 	export interface Props {
+		readonly writeMcpLogFx?: (
+			record: createMcpDiagnosticHandlerFx.Record,
+		) => Effect.Effect<void, unknown, never>;
 		readonly editor: EditorProjectServiceOwnership;
 		readonly notifyOverviewChangedFn: (overview: EditorMcpOverviewSchema.Type) => void;
 		readonly notifyProjectChangedFn: (projectId: string) => void;
@@ -22,6 +26,7 @@ export namespace createFilesystemEditorMcpOwnershipFx {
 export const createFilesystemEditorMcpOwnershipFx = Effect.fn(
 	"createFilesystemEditorMcpOwnershipFx",
 )(function* ({
+	writeMcpLogFx,
 	editor,
 	notifyOverviewChangedFn,
 	notifyProjectChangedFn,
@@ -38,6 +43,7 @@ export const createFilesystemEditorMcpOwnershipFx = Effect.fn(
 		});
 		const tunnel = yield* createNgrokEditorMcpTunnelFx;
 		const ownership = yield* createEditorMcpOwnershipFx({
+			writeMcpLogFx,
 			editor,
 			notifyOverviewChangedFn,
 			notifyProjectChangedFn,

@@ -11,11 +11,12 @@ export const GraphBatchQuerySchema = z
 				z
 					.object({
 						id: IdSchema,
-						query: z
-							.unknown()
-							.describe(
-								"A compact graph query matching graph_schema_json.querySchema. Invalid queries report per-entry errors without discarding valid siblings.",
-							),
+						query: z.looseObject({}).meta({
+							// Spell the open object explicitly for MCP clients instead of Zod's empty schema.
+							additionalProperties: true,
+							description:
+								"A compact graph query object matching graph_schema_json.querySchema. Invalid query fields report per-entry errors without discarding valid siblings.",
+						}),
 					})
 					.strict(),
 			)

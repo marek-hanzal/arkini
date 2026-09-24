@@ -1,3 +1,4 @@
+import { EditorToolAnnotations } from "./EditorToolAnnotations";
 import { registerGraphToolsFn } from "./registerGraphToolsFn";
 import { formatVersionFn } from "~/game-version/fn/formatVersionFn";
 import { McpServer } from "@modelcontextprotocol/server";
@@ -431,6 +432,7 @@ const createServerFn = (
 	server.registerTool(
 		"schema_json",
 		{
+			annotations: EditorToolAnnotations.readOnly,
 			description:
 				"Read one JSON Schema by its exact case-sensitive Zod registry ID. Optional resolveDepth (integer 0–2, default 0) expands that many registered $ref edges, independently in each branch. Cycles, unknown references and references at the depth limit remain as $ref. Local fragment references in embedded schemas retain their original resource ID. Depth limits nesting, not total response size. This tool does not require an open project.",
 			inputSchema: SchemaJsonInputSchema,
@@ -442,6 +444,7 @@ const createServerFn = (
 		server.registerTool(
 			"create_item",
 			{
+				annotations: EditorToolAnnotations.create,
 				description: `Create and persist one item in the open project with generated item and line UIDs. Supplied lines omit uid. Pass input as a serialized JSON object matching schema ${JSON.stringify(schemaId)}; retrieve it and each returned $ref through schema_json. Omitted fields use the same defaults as a new item form in the Editor UI.`,
 				inputSchema: JsonToolInputSchema,
 			},
@@ -469,6 +472,7 @@ const createServerFn = (
 		server.registerTool(
 			"edit_item",
 			{
+				annotations: EditorToolAnnotations.replace,
 				description: `Patch one existing item. Pass input as a serialized JSON object matching schema ${JSON.stringify(schemaId)}; retrieve it and each returned $ref through schema_json. Supplied top-level fields replace their complete values, omitted fields remain unchanged, and null clears optional fields. Before replacing a structured field such as artwork, units, merge, lines, outcome, or nested rolls, read item_json and copy its revision into this request.`,
 				inputSchema: JsonToolInputSchema,
 			},
@@ -494,6 +498,7 @@ const createServerFn = (
 	const lineTools = [
 		{
 			name: "create_item_line",
+			annotations: EditorToolAnnotations.guardedCreate,
 			schema: CreateItemLineInputSchema,
 			description:
 				"Append one complete production line without resending the item's other lines. Read item_detail or item_lines first and copy its project revision. Supply the complete line according to the input schema. A fresh immutable UID is generated; omit uid in the authoring value.",
@@ -507,6 +512,7 @@ const createServerFn = (
 		},
 		{
 			name: "replace_item_line",
+			annotations: EditorToolAnnotations.guardedReplace,
 			schema: ReplaceItemLineInputSchema,
 			description:
 				"Replace one existing production line without resending the item's other lines. Read item_line_json first and copy its revision. Supply the complete line according to the input schema; omitted optional values are removed, and the target line UID is retained. Omit uid in the authoring value. Its position is preserved.",
@@ -520,6 +526,7 @@ const createServerFn = (
 		},
 		{
 			name: "delete_item_line",
+			annotations: EditorToolAnnotations.guardedReplace,
 			schema: DeleteItemLineInputSchema,
 			description:
 				"Delete exactly one production line. Read item_line_json first and copy its revision. Missing line UIDs are rejected; all other item values and line order are preserved.",
@@ -532,10 +539,11 @@ const createServerFn = (
 				),
 		},
 	];
-	for (const { name, schema, description, decodeFx } of lineTools) {
+	for (const { name, schema, description, annotations, decodeFx } of lineTools) {
 		server.registerTool(
 			name,
 			{
+				annotations,
 				description: `${description} Pass input as a serialized JSON object matching schema ${JSON.stringify(resolveSchemaId(schema))}; retrieve it and each returned $ref through schema_json.`,
 				inputSchema: JsonToolInputSchema,
 			},
@@ -564,6 +572,7 @@ const createServerFn = (
 	server.registerTool(
 		"edit_item_lines",
 		{
+			annotations: EditorToolAnnotations.guardedReplace,
 			description: `Apply 1–20 create, replace or delete line operations across items with one project revision. Each item/line pair may appear once. Create appends a line with a generated UID; supplied create/replace line objects omit uid. Replace preserves position and the addressed line UID; delete removes exactly one line. Complete replacements use the same schema as replace_item_line. All operations and resulting items are validated before one best-effort repository commit; invalid input or stale revision writes nothing. Returns a new revision and an operation summary. Pass input as serialized JSON matching schema ${JSON.stringify(resolveSchemaId(EditItemLinesInputSchema))}; retrieve it and each $ref through schema_json.`,
 			inputSchema: JsonToolInputSchema,
 		},
@@ -593,6 +602,7 @@ const createServerFn = (
 	server.registerTool(
 		"item_line_order",
 		{
+			annotations: EditorToolAnnotations.guardedReplace,
 			description:
 				"Reorder an item's existing production lines. Supply every line UID exactly once in the desired order and the revision from item_json or items_json. Missing, unknown or duplicate IDs are rejected without changing the project. Only order changes; line values and all other item fields are preserved.",
 			inputSchema: ItemLineOrderInputSchema,
@@ -634,6 +644,7 @@ const createServerFn = (
 	server.registerTool(
 		"project",
 		{
+			annotations: EditorToolAnnotations.readOnly,
 			description:
 				"Summarize the project currently open in Serakki, including its identity, version, layouts, and collection sizes.",
 			inputSchema: ProjectInputSchema,
@@ -643,6 +654,7 @@ const createServerFn = (
 	server.registerTool(
 		"item_meta",
 		{
+			annotations: EditorToolAnnotations.readOnly,
 			description: "Count items in the open project.",
 			inputSchema: ItemMetaInputSchema,
 		},
@@ -651,6 +663,7 @@ const createServerFn = (
 	server.registerTool(
 		"item_collection",
 		{
+			annotations: EditorToolAnnotations.readOnly,
 			description:
 				"List one page of items with collection metadata, title, ID, optional description, and Editor draft status, optionally filtered by the editor's fuzzy search.",
 			inputSchema: ItemCollectionInputSchema,
@@ -665,6 +678,7 @@ const createServerFn = (
 	server.registerTool(
 		"artwork_collection",
 		{
+			annotations: EditorToolAnnotations.readOnly,
 			description:
 				"List one page of Artwork with the Editor Artwork library's usage filter and fuzzy search. Each result contains its semantic type and exact ID.",
 			inputSchema: ArtworkCollectionInputSchema,
@@ -686,6 +700,7 @@ const createServerFn = (
 	server.registerTool(
 		"item_detail",
 		{
+			annotations: EditorToolAnnotations.readOnly,
 			description:
 				"Read the project revision and simplified identity, Editor draft status, UI mode, and storage detail of one item in the open project. Use this lightweight revision before create_item_line.",
 			inputSchema: ItemDetailInputSchema,
@@ -700,6 +715,7 @@ const createServerFn = (
 	server.registerTool(
 		"item_json",
 		{
+			annotations: EditorToolAnnotations.readOnly,
 			description:
 				"Read the complete canonical JSON configuration of one item and its project revision. Use this before replacing structured fields through edit_item, preserve every unchanged nested value, and copy revision into the write request. Use item_line_json for one production line.",
 			inputSchema: ItemJsonInputSchema,
@@ -715,9 +731,7 @@ const createServerFn = (
 			description:
 				"Read complete canonical JSON configurations for up to 50 unique item UIDs from one project snapshot. Returns revision, items in first-request order, and missingItemUids. Duplicate IDs appear once. Copy revision into subsequent write requests.",
 			inputSchema: ItemsJsonInputSchema,
-			annotations: {
-				readOnlyHint: true,
-			},
+			annotations: EditorToolAnnotations.readOnly,
 		},
 		async ({ itemUids }) =>
 			runToolFn(
@@ -730,9 +744,7 @@ const createServerFn = (
 			description:
 				"Read a compact text list of an item's lines in authored order with the project revision. Includes UID, title, default, clock, clockWeight, show and enable; these are authored values, not evaluated gameplay availability. Use item_lines_json to fetch selected complete lines.",
 			inputSchema: ItemLinesInputSchema,
-			annotations: {
-				readOnlyHint: true,
-			},
+			annotations: EditorToolAnnotations.readOnly,
 		},
 		async ({ itemUid }) =>
 			runToolFn(
@@ -747,9 +759,7 @@ const createServerFn = (
 			description:
 				"Read complete canonical JSON configurations for up to 50 unique item and line pairs from one snapshot. Returns revision, lines in first-request order, and issues with item-not-found or line-not-found reasons. Duplicate pairs appear once. Copy revision into subsequent write requests.",
 			inputSchema: ItemLinesJsonInputSchema,
-			annotations: {
-				readOnlyHint: true,
-			},
+			annotations: EditorToolAnnotations.readOnly,
 		},
 		async ({ lines }) =>
 			runToolFn(
@@ -759,6 +769,7 @@ const createServerFn = (
 	server.registerTool(
 		"item_line_json",
 		{
+			annotations: EditorToolAnnotations.readOnly,
 			description:
 				"Read the complete canonical JSON configuration of one production line and its project revision. Use this immediately before replace_item_line and copy the revision and every unchanged authoring value into the replacement request, omitting the immutable uid from the line object.",
 			inputSchema: ItemLineJsonInputSchema,

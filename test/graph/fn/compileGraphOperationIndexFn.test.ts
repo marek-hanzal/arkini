@@ -113,7 +113,7 @@ it("indexes owner-only operations, exact targets, real outputs and guard referen
 	]);
 });
 
-it("keeps parallel authored roles while sharing one whole operation and each possible output occurrence", () => {
+it("keeps parallel authored roles while sharing one whole operation and each authored output occurrence", () => {
 	const input = {
 		type: "materials",
 		query: queryFn("provider"),
@@ -161,24 +161,23 @@ it("keeps parallel authored roles while sharing one whole operation and each pos
 	);
 	expect(inputs).toHaveLength(2);
 	expect(new Set(inputs.map((entry) => entry.edgeId)).size).toBe(2);
-	expect(active.required).toEqual([
+	expect(active.sources).toEqual([
 		{
 			node: "item:owner",
 			role: "owner",
-			effect: "preserved",
 		},
 		{
 			node: "item:provider",
 			role: "input",
-			effect: "consumed",
 		},
 	]);
 	expect(active.outputs).toHaveLength(1);
 	expect(index.outgoing.get("item:owner")).toEqual([
 		active,
+		disabled,
 	]);
 	expect(index.outgoing.get("item:provider")?.[0]).toBe(active);
-	expect(disabled.outputs).toEqual([]);
+	expect(disabled.outputs).toHaveLength(1);
 	expect(outputless.outputs).toEqual([]);
 	expect(
 		index.participants

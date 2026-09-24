@@ -129,7 +129,7 @@ it("never presents a safety-interrupted audit count as a complete total", async 
 	expect(result.truncated).toBe(true);
 });
 
-it("shares possible producers with flow while retaining disabled operations in authored discovery", async () => {
+it("keeps audit producer eligibility independent of unfiltered authored flow and discovery", async () => {
 	const graph = await Effect.runPromise(createProjectGraphFx());
 	const project = auditProjectFn();
 	project.config.items.factory.lines[0].enable = false;
@@ -169,7 +169,7 @@ it("shares possible producers with flow while retaining disabled operations in a
 	expect(disabled.queries[0].audit?.matches.map((entry) => entry.nodeId)).toContain(
 		"item:product",
 	);
-	expect(disabled.queries[1].status).toBe("no");
+	expect(disabled.queries[1].status).toBe("yes");
 	expect(disabled.queries[2].operationIds).toHaveLength(1);
 	project.config.items.factory.lines[0].enable = true;
 	const enabled = await inspectFn();

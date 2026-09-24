@@ -130,7 +130,7 @@ export const registerGraphToolsFn = ({
 		"graph_path",
 		{
 			description:
-				"Find bounded structural/topological paths between two exact graph nodes, preserving authored edge direction. This is not a gameplay recipe or proof of runtime feasibility. With direction both, paths may pass through a shared producer, consumer or owner. Use graph_flow for potential causal transformations.",
+				"Find bounded structural/topological paths between two exact graph nodes, preserving authored edge direction. This is not a gameplay recipe or proof of runtime feasibility. With direction both, paths may pass through a shared producer, consumer or owner. Use graph_flow for authored operation paths.",
 			inputSchema: GraphPathQuerySchema,
 			annotations: EditorToolAnnotations.readOnly,
 		},
@@ -151,7 +151,7 @@ export const registerGraphToolsFn = ({
 		"graph_flow",
 		{
 			description:
-				"Find potential causal transformations from A to B through atomic authored gameplay operations. Inputs and outputs must belong to the same operation; rule references, shared-owner proximity and reversed production edges are not transformations. Tracks preserved, consumed, replaced, removed and spent states across the whole branch; unavailable participants cannot be silently reintroduced. Prefers fewer steps, fewer external prerequisites and direct transformations. Returns ordered operation steps, not raw edges. Authored possibility is not proof of runtime feasibility. Truncated no-match results remain unknown.",
+				"Find directed simple paths from A to B through authored operations, shortest first. Each step binds sources and outputs to the same operation. Returns participants, exact scoped rules and conditions, flags, inputs and stochastic output facts without evaluating them. Disabled operations, zero chances and missing references remain visible. No inventory, consumption-state or gameplay feasibility evaluation. Nodes do not repeat within a path; same-node queries return zero steps. Use operation references for further hydration. Truncated no-match results remain unknown.",
 			inputSchema: GraphFlowQuerySchema,
 			annotations: EditorToolAnnotations.readOnly,
 		},
@@ -172,7 +172,7 @@ export const registerGraphToolsFn = ({
 		"graph_traverse",
 		{
 			description:
-				"Advanced broad structural exploration around a node across relationship hops. Depth above one requires explicit nonempty edge kinds. Prefer graph_connections for direct relationships, graph_operations for listing, graph_path for structural paths and graph_flow for potential causal transformations.",
+				"Advanced broad structural exploration around a node across relationship hops. Depth above one requires explicit nonempty edge kinds. Prefer graph_connections for direct relationships, graph_operations for listing, graph_path for structural paths and graph_flow for authored operation paths.",
 			inputSchema: GraphTraverseQuerySchema,
 			annotations: EditorToolAnnotations.readOnly,
 		},

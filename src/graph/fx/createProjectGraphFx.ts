@@ -814,10 +814,7 @@ export const createProjectGraphFx = Effect.fn("createProjectGraphFx")(
 						nodes.add(step.from);
 						nodes.add(step.to);
 						nodes.add(step.owner);
-						for (const node of step.evidence.prerequisiteNodes) nodes.add(node);
-						for (const node of step.evidence.createdNodes) nodes.add(node);
-						for (const participant of step.evidence.participantEffects)
-							nodes.add(participant.node);
+						for (const node of step.evidence.participants) nodes.add(node);
 						operationIds.add(step.operationId);
 					}
 				const projected = readGraphDiscoveryFn(

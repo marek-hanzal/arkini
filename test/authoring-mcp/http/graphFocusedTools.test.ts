@@ -60,7 +60,7 @@ it("distinguishes a structural connection from an actual operation flow through 
 	);
 	expect(flow.text).toMatch(/Status: yes/);
 	expect(flow.text).toContain("Fawn [item:fawn] → Beagle Puppy With Fawn [item:paired]");
-	expect(flow.text).toContain("requires: Beagle Puppy [item:puppy]");
+	expect(flow.text).toContain("participants: Beagle Puppy [item:puppy], Fawn [item:fawn]");
 	expect(flow.text).not.toContain("edgeId=");
 	const hydrated = toolJsonFn<GraphOperationReadResult>(
 		await client.callTool({

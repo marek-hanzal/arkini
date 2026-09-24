@@ -104,21 +104,23 @@ it("keeps each production input bound to its own outputs and never follows owner
 		operationId: '["line","recycle"]',
 		evidence: {
 			fromRole: "input",
-			prerequisiteNodes: [
+			participants: [
 				"item:factory",
+				"item:raw",
 			],
 		},
 	});
 	const produced = await readFn(index, "item:factory", "item:product");
-	expect(produced.flows[0].steps[0].evidence.prerequisiteNodes).toEqual([
+	expect(produced.flows[0].steps[0].evidence.participants).toEqual([
+		"item:factory",
 		"item:fuel",
 	]);
 	expect(
-		produced.flows[0].steps[0].evidence.prerequisites.some((note) => note.includes("rules")),
+		produced.flows[0].steps[0].evidence.facts.some((note) => note.includes("item:marker")),
 	).toBe(true);
 });
 
-it("follows merge replacement and expiry as atomic state changes with the other participant retained", async () => {
+it("follows merge replacement, expiry and depletion through exact operations", async () => {
 	const config = configFn({
 		match: itemFn("match", {
 			merge: [
@@ -172,8 +174,9 @@ it("follows merge replacement and expiry as atomic state changes with the other 
 	expect(result.flows[0].steps[0].evidence).toMatchObject({
 		fromRole: "target",
 		output: "replacement",
-		prerequisiteNodes: [
+		participants: [
 			"item:match",
+			"item:unlit",
 		],
 	});
 	expect((await readFn(index, "item:match", "item:lit")).status).toBe("yes");
@@ -184,58 +187,29 @@ it("follows merge replacement and expiry as atomic state changes with the other 
 	// Transport moves an unspecified incoming instance; it never converts the receiver into that space.
 	expect((await readFn(index, "item:portal", "space:9")).status).toBe("no");
 	expect((await readFn(index, "item:unlit", "space:9")).status).toBe("no");
-	expect(
-		(
-			await readFn(index, "item:portal", "item:ash")
-		).flows[0].steps[0].evidence.prerequisites.join(" "),
-	).toContain("unspecified identity");
 });
 
-it("excludes statically impossible outcomes while retaining conditional alternatives as separate evidence", async () => {
+it("keeps disabled, zero-chance, missing and parallel authored output occurrences discoverable", async () => {
 	const chanceFn = (chance: number) => ({
 		...outputFn("B").set[0].roll[0],
 		type: "chance",
 		chance,
 	});
-	const conditional = [
-		{
-			type: "enable",
-			when: [
-				{
-					type: "exists",
-					query: queryFn("C"),
-				},
-			],
-		},
-	];
 	const config = configFn({
 		A: itemFn("A", {
 			lines: [
 				lineFn("disabled", {
 					enable: false,
-					outcome: outputFn("D"),
+					outcome: outputFn("missing"),
 				}),
-				lineFn("conditional", {
-					enable: false,
-					rules: conditional,
+				lineFn("parallel", {
 					outcome: {
 						set: [
 							{
 								rules: [],
 								roll: [
 									chanceFn(0),
-								],
-							},
-							{
-								rules: [],
-								roll: [
 									chanceFn(0.25),
-								],
-							},
-							{
-								rules: conditional,
-								roll: [
-									chanceFn(0.75),
 								],
 							},
 						],
@@ -244,27 +218,26 @@ it("excludes statically impossible outcomes while retaining conditional alternat
 			],
 			clock: {
 				intervalMs: 1000,
-				onExpire: outputFn("D"),
+				onExpire: outputFn("B"),
 			},
 		}),
 		B: itemFn("B"),
-		C: itemFn("C"),
-		D: itemFn("D"),
 	});
 	const index = compileGraphOperationIndexFn(compileGraphFactsFn(config));
-	expect((await readFn(index, "item:A", "item:D")).status).toBe("no");
+	expect((await readFn(index, "item:A", "item:missing")).status).toBe("yes");
 	const result = await readFn(index, "item:A", "item:B");
-	expect(result.flows.map((flow) => flow.steps[0].evidence.chance)).toEqual([
-		0.25,
-		0.75,
-	]);
-	expect(result.flows.every((flow) => flow.steps[0].evidence.alternative)).toBe(true);
-	expect((await readFn(index, "item:C", "item:B")).status).toBe("no");
-	// Returned evidence cannot mutate the snapshot used by subsequent readers.
-	(result.flows[0].steps[0].evidence.prerequisiteNodes as string[]).push("corrupted");
+	expect(result.flows).toHaveLength(3);
 	expect(
-		(await readFn(index, "item:A", "item:B")).flows[0].steps[0].evidence.prerequisiteNodes,
+		result.flows.filter((flow) => flow.steps[0].operationId === '["line","parallel"]'),
+	).toHaveLength(2);
+	// Returned projections must not retain aliases into the reusable snapshot.
+	(result.flows[0].steps[0].evidence.participants as string[]).push("corrupted");
+	expect(
+		(await readFn(index, "item:A", "item:B")).flows[0].steps[0].evidence.participants,
 	).not.toContain("corrupted");
+	await expect(readFn(index, "item:unknown", "item:B")).rejects.toMatchObject({
+		reason: "missing-node",
+	});
 });
 
 it("reports incomplete absence and omitted alternatives under operation depth, expansion and result budgets", async () => {

@@ -29,7 +29,7 @@ export const GraphFlowQuerySchema = GraphDiscoveryBoundsSchema.extend({
 		$id: "urn:serakki:schema:mcp:graph-flow-input",
 		title: "Graph flow",
 		description:
-			"Potential causal transformations through atomic authored operations, not structural proximity or runtime feasibility proof.",
+			"Directed simple paths through authored operations with factual rule and stochastic evidence; no gameplay evaluation.",
 	});
 export type GraphFlowQuerySchema = typeof GraphFlowQuerySchema;
 export namespace GraphFlowQuerySchema {

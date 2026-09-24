@@ -1,8 +1,7 @@
 import type { GraphOperation } from "~/graph/type/GraphFacts";
-import type { GraphOperationParticipantEffect } from "~/graph/type/GraphOperationIndex";
 import type { GraphResult } from "~/graph/type/GraphResult";
 
-/** One causal link through a complete authored operation, never an owner-membership hop. */
+/** One directed authored operation step, without gameplay feasibility evaluation. */
 export interface GraphFlowStep {
 	readonly from: string;
 	readonly to: string;
@@ -10,24 +9,17 @@ export interface GraphFlowStep {
 	readonly kind: GraphOperation["kind"];
 	readonly owner: string;
 	readonly evidence: {
-		readonly participantEffects: readonly GraphOperationParticipantEffect[];
-		/** Only products compatible with this selected outcome occurrence. */
-		readonly createdNodes: readonly string[];
 		readonly fromRole: "owner" | "input" | "target";
 		readonly output: "replacement" | "outcome";
-		readonly prerequisiteNodes: readonly string[];
-		readonly prerequisites: readonly string[];
-		readonly chance?: number;
-		readonly alternative?: boolean;
-		readonly quantityMin?: number;
-		readonly quantityMax?: number;
+		readonly participants: readonly string[];
+		/** Explicit authored facts, including scoped rules and stochastic selection; never evaluated. */
+		readonly facts: readonly string[];
 	};
 }
 
 export interface GraphFlow {
 	readonly nodes: readonly string[];
 	readonly steps: readonly GraphFlowStep[];
-	readonly externalPrerequisiteNodes: readonly string[];
 }
 
 export interface GraphFlowResult {

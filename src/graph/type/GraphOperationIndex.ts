@@ -1,4 +1,4 @@
-import type { GraphOperation } from "~/graph/type/GraphFacts";
+import type { GraphEdge, GraphNode, GraphOperation } from "~/graph/type/GraphFacts";
 
 /** Exact authored role occurrence; parallel edges and unavailable operations remain discoverable. */
 export interface GraphOperationParticipant {
@@ -8,39 +8,21 @@ export interface GraphOperationParticipant {
 	readonly role: "owner" | "target" | "input" | "output" | "reference";
 }
 
-/** Whole-operation effect, regardless of the selected output branch. */
-export interface GraphOperationParticipantEffect {
+/** Traversal entry into an operation; no claim about availability or consumption. */
+export interface GraphOperationSource {
 	readonly node: string;
-	readonly effect: "preserved" | "consumed" | "replaced" | "removed" | "spent";
-}
-
-export interface GraphOperationRequirement extends GraphOperationParticipantEffect {
 	readonly role: "owner" | "input" | "target";
-}
-
-/** One possible output occurrence, with only compatible co-products. */
-export interface GraphOperationOutput {
-	readonly edgeId: string;
-	readonly to: string;
-	readonly output: "replacement" | "outcome";
-	readonly createdNodes: readonly string[];
-	readonly prerequisites: readonly string[];
-	readonly chance?: number;
-	readonly alternative?: boolean;
-	readonly quantityMin?: number;
-	readonly quantityMax?: number;
 }
 
 export interface GraphIndexedOperation {
 	readonly operation: GraphOperation;
-	readonly required: readonly GraphOperationRequirement[];
-	readonly prerequisites: readonly string[];
-	readonly outputs: readonly GraphOperationOutput[];
+	readonly sources: readonly GraphOperationSource[];
+	readonly outputs: readonly GraphEdge[];
 }
 
-/** Snapshot normalization shared by authored discovery, audits and causal lineage queries. */
+/** Snapshot adjacency shared by authored discovery, audits and operation paths. */
 export interface GraphOperationIndex {
-	readonly nodes: ReadonlySet<string>;
+	readonly nodes: ReadonlyMap<string, GraphNode>;
 	readonly participants: readonly GraphOperationParticipant[];
 	readonly operations: readonly GraphIndexedOperation[];
 	readonly outgoing: ReadonlyMap<string, readonly GraphIndexedOperation[]>;

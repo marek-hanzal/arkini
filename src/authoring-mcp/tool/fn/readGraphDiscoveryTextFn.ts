@@ -274,58 +274,16 @@ const bodyFn = (result: GraphDiscoveryResult, query: Query): string => {
 					? "No flow found within the search bounds; existence remains unknown."
 					: "No authored transformation flow exists in the selected operation scope.";
 			return [
-				"Potential authored transformations; other prerequisites and runtime conditions must hold.",
+				"Authored operation paths; gameplay rules and stochastic choices are reported, not evaluated.",
 				...(result.flows ?? []).map((flow, index) =>
 					[
 						`Flow ${index + 1}${flow.steps.length === 0 ? `: ${flow.nodes.map(labelFn).join(" → ")} (same node; no transformation)` : ":"}`,
-						...(flow.externalPrerequisiteNodes.length === 0
-							? []
-							: [
-									`  External prerequisites: ${flow.externalPrerequisiteNodes.map(labelFn).join(", ")}`,
-								]),
-						...flow.steps.flatMap((step, stepIndex) => {
-							const operation = operations.get(step.operationId);
-							const evidence = step.evidence;
-							const properties = [
-								`via ${step.kind}; role=${evidence.fromRole}; output=${evidence.output}`,
-								...(evidence.chance === undefined
-									? []
-									: [
-											`chance=${evidence.chance}`,
-										]),
-								...(evidence.alternative === undefined
-									? []
-									: [
-											`alternative=${evidence.alternative}`,
-										]),
-								...(operation === undefined
-									? [
-											`operationId=${identityFn(step.operationId)}`,
-										]
-									: operationDetailsFn(operation)),
-							];
-							return [
-								`  ${stepIndex + 1}. ${labelFn(step.from)} → ${labelFn(step.to)}${quantityFn(evidence.quantityMin, evidence.quantityMax)}; ${properties.join("; ")}`,
-								`     owner: ${labelFn(step.owner)}`,
-								`     state: ${evidence.participantEffects.map((participant) => `${labelFn(participant.node)} ${participant.effect}`).join("; ")}`,
-								...(evidence.createdNodes.some((node) => node !== step.to)
-									? [
-											`     also creates: ${evidence.createdNodes
-												.filter((node) => node !== step.to)
-												.map(labelFn)
-												.join(", ")}`,
-										]
-									: []),
-								...(evidence.prerequisiteNodes.length === 0
-									? []
-									: [
-											`     requires: ${evidence.prerequisiteNodes.map(labelFn).join(", ")}`,
-										]),
-								...evidence.prerequisites.map(
-									(requirement) => `     ${titleFn(requirement)}`,
-								),
-							];
-						}),
+						...flow.steps.flatMap((step, stepIndex) => [
+							`  ${stepIndex + 1}. ${labelFn(step.from)} → ${labelFn(step.to)}; via ${step.kind}; role=${step.evidence.fromRole}; output=${step.evidence.output}; operationId=${identityFn(step.operationId)}`,
+							`     owner: ${labelFn(step.owner)}`,
+							`     participants: ${step.evidence.participants.map(labelFn).join(", ")}`,
+							...step.evidence.facts.map((fact) => `     ${fact}`),
+						]),
 					].join("\n"),
 				),
 			].join("\n\n");

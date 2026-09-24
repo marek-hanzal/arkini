@@ -65,7 +65,7 @@
 	"templates": [
 		{
 			"uid": "blnlysibqlvgocdqibrsovdf",
-			"title": "Default Template",
+			"title": "Homeland",
 			"width": 17,
 			"height": 11,
 			"board": [
@@ -377,19 +377,6 @@
 					"x": 5,
 					"y": 6,
 					"itemUid": "rok1ie5bkngxk1qbyre9mssz"
-				}
-			]
-		},
-		{
-			"uid": "im1ul442d66zzqib73manbur",
-			"title": "Storage Crate Interior",
-			"width": 3,
-			"height": 3,
-			"board": [
-				{
-					"x": 1,
-					"y": 1,
-					"itemUid": "p8xcflgc417ajesta2eaekdc"
 				}
 			]
 		}

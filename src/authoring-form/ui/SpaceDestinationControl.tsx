@@ -13,13 +13,15 @@ export const SpaceDestinationControl = ({
 	onChangeFn,
 	description,
 	error,
+	kindEditable = true,
 	trailing,
 	layout = "stacked",
 }: {
 	readonly value: SpaceDestinationSchema.Type;
 	readonly onChangeFn: (space: SpaceDestinationSchema.Type) => void;
-	readonly description: ReactNode;
+	readonly description?: ReactNode;
 	readonly error?: string;
+	readonly kindEditable?: boolean;
 	readonly trailing?: ReactNode;
 	readonly layout?: "stacked" | "columns";
 }) => {
@@ -35,74 +37,84 @@ export const SpaceDestinationControl = ({
 				},
 			})}
 		>
-			<EditorChoiceControl
-				label={translator.textFn("Target space")}
-				description={description}
-				error={value === "previous" ? error : undefined}
-				value={
-					typeof value === "object"
-						? "generated"
-						: value === "previous"
-							? "previous"
-							: "exact"
-				}
-				options={[
-					{
-						value: "exact",
-						label: translator.textFn("Space"),
-					},
-					{
-						value: "previous",
-						label: translator.textFn("Previous Space"),
-					},
-					{
-						value: "generated",
-						label: translator.textFn("Generated Space"),
-					},
-				]}
-				onChangeFn={(destination) =>
-					onChangeFn(
-						destination === "previous"
-							? "previous"
-							: destination === "generated"
-								? {
-										type: "generated",
-										templateUid:
-											typeof value === "object"
-												? value.templateUid
-												: (project.config.templates?.[0]?.uid ?? ""),
-									}
-								: typeof value === "number"
-									? value
-									: 0,
-					)
-				}
-			/>
-			<div className="min-w-0 min-h-[calc(1.25rem+var(--ak-control-min-height))]">
-				{typeof value === "object" ? (
-					<TemplateSelector
-						templates={project.config.templates ?? []}
-						value={value.templateUid}
-						onChangeFn={(templateUid) =>
-							onChangeFn({
-								type: "generated",
-								templateUid,
-							})
-						}
-						error={error}
-					/>
-				) : value === "previous" ? null : (
-					<EditorNumberControl
-						label={translator.textFn("Space number")}
-						description={<Mx label="Space number help" />}
-						min={0}
-						value={value}
-						onChangeFn={onChangeFn}
-						error={error}
-						trailing={trailing}
-					/>
-				)}
-			</div>
+			{kindEditable ? (
+				<EditorChoiceControl
+					label={translator.textFn("Target space")}
+					description={description}
+					error={value === "previous" ? error : undefined}
+					value={
+						typeof value === "object"
+							? "generated"
+							: value === "previous"
+								? "previous"
+								: "exact"
+					}
+					options={[
+						{
+							value: "exact",
+							label: translator.textFn("Space"),
+						},
+						{
+							value: "previous",
+							label: translator.textFn("Previous Space"),
+						},
+						{
+							value: "generated",
+							label: translator.textFn("Generated Space"),
+						},
+					]}
+					onChangeFn={(destination) =>
+						onChangeFn(
+							destination === "previous"
+								? "previous"
+								: destination === "generated"
+									? {
+											type: "generated",
+											templateUid:
+												typeof value === "object"
+													? value.templateUid
+													: (project.config.templates?.[0]?.uid ?? ""),
+										}
+									: typeof value === "number"
+										? value
+										: 0,
+						)
+					}
+				/>
+			) : null}
+			{kindEditable || value !== "previous" ? (
+				<div
+					className={
+						kindEditable
+							? "min-w-0 min-h-[calc(1.25rem+var(--ak-control-min-height))]"
+							: "min-w-0"
+					}
+				>
+					{typeof value === "object" ? (
+						<TemplateSelector
+							templates={project.config.templates ?? []}
+							value={value.templateUid}
+							onChangeFn={(templateUid) =>
+								onChangeFn({
+									type: "generated",
+									templateUid,
+								})
+							}
+							error={error}
+						/>
+					) : value === "previous" ? null : (
+						<EditorNumberControl
+							label={translator.textFn("Space number")}
+							description={<Mx label="Space number help" />}
+							min={0}
+							value={value}
+							onChangeFn={onChangeFn}
+							error={error}
+							trailing={trailing}
+						/>
+					)}
+				</div>
+			) : null}
 		</div>
 	);
 };

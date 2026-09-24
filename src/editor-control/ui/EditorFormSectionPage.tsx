@@ -13,7 +13,9 @@ import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 import { EditorPageHelp, type EditorPageHelpContent } from "~/authoring-shell/ui/EditorPageHelp";
 import { PrimaryButton } from "~/ui/ui/Button";
 import { LinkButton } from "~/ui/ui/LinkButton";
+import { ShortcutLabel } from "~/ui/ui/ShortcutLabel";
 import { EditorFormContent } from "~/editor-control/ui/EditorFormContent";
+import { useTranslator } from "~/translation/ui/useTranslator";
 
 const EditorFormActions = ({
 	discardFn,
@@ -25,29 +27,36 @@ const EditorFormActions = ({
 	readonly saveEnabled: boolean;
 	readonly saving: boolean;
 	readonly saveFn: () => Promise<boolean>;
-}) => (
-	<div className="flex items-center gap-3">
-		<LinkButton
-			className="inline-flex items-center gap-1.5"
-			disabled={saving}
-			cursorIntent={saving ? "progress" : undefined}
-			onClick={() => void discardFn().catch(() => undefined)}
-		>
-			<Trash2 className="size-4" />
-			<Tx label="Discard" />
-		</LinkButton>
-		<PrimaryButton
-			type="button"
-			className="min-h-0 gap-1.5 px-4 py-2"
-			disabled={!saveEnabled || saving}
-			cursorIntent={saving ? "progress" : undefined}
-			onClick={() => void saveFn().catch(() => undefined)}
-		>
-			<Save className="size-4" />
-			<Tx label="Save" />
-		</PrimaryButton>
-	</div>
-);
+}) => {
+	const translator = useTranslator();
+	return (
+		<div className="flex items-center gap-3">
+			<LinkButton
+				className="inline-flex items-center gap-1.5"
+				disabled={saving}
+				cursorIntent={saving ? "progress" : undefined}
+				onClick={() => void discardFn().catch(() => undefined)}
+			>
+				<Trash2 className="size-4" />
+				<ShortcutLabel
+					highlightClassName="text-shortcut-highlight"
+					label={translator.textFn("Discard")}
+					shortcut="d"
+				/>
+			</LinkButton>
+			<PrimaryButton
+				type="button"
+				className="min-h-0 gap-1.5 px-4 py-2"
+				disabled={!saveEnabled || saving}
+				cursorIntent={saving ? "progress" : undefined}
+				onClick={() => void saveFn().catch(() => undefined)}
+			>
+				<Save className="size-4" />
+				<Tx label="Save" />
+			</PrimaryButton>
+		</div>
+	);
+};
 
 /** Keeps routed form chrome mounted while only the active form section changes. */
 export const EditorFormSectionPage = ({

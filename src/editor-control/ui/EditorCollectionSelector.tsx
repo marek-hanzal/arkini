@@ -5,6 +5,7 @@ import { useState, type ReactNode } from "react";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { EditorIconButton } from "~/editor-control/ui/EditorIconButton";
 import { EditorSearchCombobox } from "~/editor-control/ui/EditorSearchCombobox";
+import { ActionMenu, type ActionMenuOption } from "~/ui/ui/ActionMenu";
 
 interface EditorCollectionSelectorProps {
 	readonly children: (activeIndex: number) => ReactNode;
@@ -20,6 +21,7 @@ interface EditorCollectionSelectorProps {
 	readonly navigationCard?: boolean;
 	readonly navigationHeader?: ReactNode;
 	readonly onAddFn?: () => void;
+	readonly addOptions?: readonly ActionMenuOption[];
 	readonly onDuplicateFn?: (activeIndex: number) => void;
 	readonly onRemoveFn?: (activeIndex: number) => void;
 	readonly removeDisabled?: boolean;
@@ -44,6 +46,7 @@ export const EditorCollectionSelector = ({
 	navigationCard = false,
 	navigationHeader,
 	onAddFn,
+	addOptions,
 	onDuplicateFn,
 	onRemoveFn,
 	removeDisabled = false,
@@ -118,7 +121,25 @@ export const EditorCollectionSelector = ({
 					/>
 				</div>
 				<div className="flex shrink-0 items-center">
-					{onAddFn === undefined ? null : (
+					{addOptions !== undefined ? (
+						<ActionMenu
+							options={addOptions.map((option) => ({
+								...option,
+								onSelectFn: () => {
+									option.onSelectFn();
+									selectIndexFn(count);
+								},
+							}))}
+							renderTriggerFn={(props) => (
+								<EditorIconButton
+									{...props}
+									data-ui="EditorCollectionAdd"
+								>
+									<Plus className="size-5" />
+								</EditorIconButton>
+							)}
+						/>
+					) : onAddFn === undefined ? null : (
 						<EditorIconButton
 							data-ui="EditorCollectionAdd"
 							onClick={() => {

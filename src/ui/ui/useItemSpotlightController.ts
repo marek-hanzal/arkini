@@ -22,6 +22,9 @@ export namespace useItemSpotlightController {
 		readonly label: string;
 		readonly secondary?: string;
 		readonly terms: ReadonlyArray<string>;
+		readonly identityTerms?: ReadonlyArray<string>;
+		readonly descriptionTerms?: ReadonlyArray<string>;
+		readonly keywordTerms?: ReadonlyArray<string>;
 	}
 
 	export interface Props {
@@ -69,9 +72,12 @@ export const useItemSpotlightController = ({
 	const [selectedIndex, setSelectedIndexFn] = useState(0);
 	const candidates = useMemo(
 		() =>
-			options.map(({ itemUid, terms }) => ({
+			options.map(({ itemUid, terms, identityTerms, descriptionTerms, keywordTerms }) => ({
 				identity: itemUid,
 				terms,
+				identityTerms,
+				descriptionTerms,
+				keywordTerms,
 			})),
 		[
 			options,

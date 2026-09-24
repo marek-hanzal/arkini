@@ -15,5 +15,7 @@ describe("createLineFn", () => {
 		expect(first.uid).toBe("line:first");
 		expect(second.uid).toBe("line:second");
 		expect(second.title).toBe(first.title);
+		expect(first.input).toEqual([]);
+		expect(second.input).toEqual([]);
 	});
 });

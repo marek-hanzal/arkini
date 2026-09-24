@@ -24,7 +24,6 @@ import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionD
 import { SectionEnd } from "~/ui/ui/SectionEnd";
 import { BoardDistancePresentation } from "~/item-query/ui/QueryPresentation";
 import {
-	EditorChoiceControl,
 	EditorNumberControl,
 	EditorSecondsControl,
 	EditorTextControl,
@@ -35,9 +34,9 @@ import {
 } from "~/item-authoring/ui/useFormValidationIssues";
 import { readEditorFormValidationErrorFn } from "~/editor-control/fn/readEditorFormValidationErrorFn";
 import { readRequiredEditorCollectionErrorFn } from "~/editor-control/fn/readRequiredEditorCollectionErrorFn";
-import { Mx } from "~/translation/ui/Mx";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import type { ReactNode } from "react";
+import type { ActionMenuOption } from "~/ui/ui/ActionMenu";
 import { QuantityFields } from "~/production-authoring/ui/QuantityControl";
 import { EditorCollectionOption } from "~/editor-control/ui/EditorCollectionOption";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
@@ -82,6 +81,15 @@ const RuleTypeTranslationKey = {
 	"runtime:adjust": "Runtime adjustment",
 	"runtime:multiplier": "Runtime multiplier",
 	show: "Show",
+} as const satisfies Record<RuleType, string>;
+
+const RuleTypeDescriptionKey = {
+	disable: "Disable this when its conditions match.",
+	enable: "Enable this when its conditions match.",
+	hide: "Hide this production line when its conditions match.",
+	"runtime:adjust": "Adjust this production line's running time.",
+	"runtime:multiplier": "Multiply this production line's running time.",
+	show: "Show this production line when its conditions match.",
 } as const satisfies Record<RuleType, string>;
 
 const readConditionItemUidFn = (when: DraftWhen): string => when.query.selector.itemUid;
@@ -165,33 +173,6 @@ const ConditionOption = ({ label, when }: { readonly label: string; readonly whe
 	);
 };
 
-const readRuleTypeDescriptionFn = (type: RuleType, target: RuleTarget): ReactNode => {
-	if (target === "set")
-		return type === "enable" ? (
-			<Mx label="Outcome set enable rule help" />
-		) : (
-			<Mx label="Outcome set disable rule help" />
-		);
-	if (target === "outcome")
-		return type === "enable" ? (
-			<Mx label="Outcome enable rule help" />
-		) : (
-			<Mx label="Outcome disable rule help" />
-		);
-	if (target === "action")
-		return type === "enable" ? (
-			<Mx label="Action enable rule help" />
-		) : (
-			<Mx label="Action disable rule help" />
-		);
-	if (type === "show") return <Mx label="Production show rule help" />;
-	if (type === "hide") return <Mx label="Production hide rule help" />;
-	if (type === "enable") return <Mx label="Production enable rule help" />;
-	if (type === "disable") return <Mx label="Production disable rule help" />;
-	if (type === "runtime:adjust") return <Mx label="Production runtime adjustment rule help" />;
-	return <Mx label="Production runtime multiplier rule help" />;
-};
-
 const WhenControl = ({
 	onChangeFn,
 	showBranchEnd,
@@ -206,91 +187,43 @@ const WhenControl = ({
 	const selectedValue = value.type === undefined ? undefined : value;
 	return (
 		<div className="grid min-w-0 gap-3">
-			<div className="flex min-w-0 items-start justify-between gap-3">
-				<EditorChoiceControl
-					error={readEditorFormValidationErrorFn(validationIssues, "type")}
-					label={translator.textFn("Condition type")}
-					value={value.type}
-					options={[
-						{
-							description: <Mx label="Exists condition help" />,
-							icon: <SearchCheck className="size-4 shrink-0" />,
-							label: translator.textFn("Exists"),
-							value: "exists",
-						},
-						{
-							description: <Mx label="Exact count condition help" />,
-							icon: <Hash className="size-4 shrink-0" />,
-							label: translator.textFn("Exact count"),
-							value: "count",
-						},
-						{
-							description: <Mx label="Count range condition help" />,
-							icon: <MoveHorizontal className="size-4 shrink-0" />,
-							label: translator.textFn("Count range"),
-							value: "range",
-						},
-					]}
-					onChangeFn={(type) => {
-						const query = value.query;
-						onChangeFn(
-							match(type)
-								.with("exists", () => ({
-									type: "exists" as const,
-									query,
-								}))
-								.with("count", () => ({
-									type: "count" as const,
-									query,
-									count: 1,
-								}))
-								.with("range", () => ({
-									type: "range" as const,
-									query,
-									min: 1,
-									max: 1,
-								}))
-								.exhaustive(),
-						);
-					}}
-				/>
-				{selectedValue === undefined ? null : (
-					<BoardDistanceControl
-						error={readEditorFormValidationErrorFn(
-							validationIssues,
-							"query",
-							"distance",
-						)}
-						value={selectedValue.query}
-						onChangeFn={(query) =>
-							onChangeFn({
-								...selectedValue,
-								query,
-							})
-						}
-					/>
-				)}
-			</div>
 			{selectedValue === undefined ? null : (
 				<>
-					<SelectorControl
-						error={readEditorFormValidationErrorFn(
-							validationIssues,
-							"query",
-							"selector",
-						)}
-						labelVisible={false}
-						value={selectedValue.query.selector}
-						onChangeFn={(selector) =>
-							onChangeFn({
-								...selectedValue,
-								query: {
-									...selectedValue.query,
-									selector,
-								},
-							})
-						}
-					/>
+					<div className="grid min-w-0 grid-cols-2 items-start gap-3">
+						<SelectorControl
+							error={readEditorFormValidationErrorFn(
+								validationIssues,
+								"query",
+								"selector",
+							)}
+							value={selectedValue.query.selector}
+							onChangeFn={(selector) =>
+								onChangeFn({
+									...selectedValue,
+									query: {
+										...selectedValue.query,
+										selector,
+									},
+								})
+							}
+						/>
+						<div className="flex min-w-0 justify-end">
+							<BoardDistanceControl
+								error={readEditorFormValidationErrorFn(
+									validationIssues,
+									"query",
+									"distance",
+								)}
+								value={selectedValue.query}
+								onChangeFn={(query) =>
+									onChangeFn({
+										...selectedValue,
+										query,
+									})
+								}
+							/>
+						</div>
+					</div>
 					{match(selectedValue)
 						.with(
 							{
@@ -359,22 +292,16 @@ const WhenControl = ({
 
 const RuleControl = ({
 	initialWhenIndex,
-	allowedTypes,
-	createRuleFn,
 	onChangeFn,
 	rule,
 	ruleIndex,
 	ruleTarget,
-	ruleTypeDescription,
 }: {
-	readonly allowedTypes: ReadonlyArray<RuleType>;
-	readonly createRuleFn: (type: RuleType) => DraftRule;
 	readonly onChangeFn: (rule: DraftRule) => void;
 	readonly initialWhenIndex?: number;
 	readonly rule: DraftRule;
 	readonly ruleIndex: number;
 	readonly ruleTarget: RuleTarget;
-	readonly ruleTypeDescription: ReactNode;
 }) => {
 	const validationIssues = useFormValidationIssues(rule);
 	const invalidWhenIndex = useFormValidationFocusIndex(rule, "when");
@@ -382,34 +309,6 @@ const RuleControl = ({
 	const translator = useTranslator();
 	return (
 		<article className="grid gap-3">
-			<div className="flex items-end justify-end gap-3">
-				<div className="min-w-0">
-					<EditorChoiceControl
-						error={readEditorFormValidationErrorFn(validationIssues, "type")}
-						label={translator.textFn("Rule type")}
-						description={ruleTypeDescription}
-						value={rule.type}
-						options={allowedTypes.map((type) => ({
-							icon: RuleTypeIcon[type],
-							description: readRuleTypeDescriptionFn(type, ruleTarget),
-							label: translator.textFn(RuleTypeTranslationKey[type]),
-							value: type,
-						}))}
-						onChangeFn={(type) => {
-							const next = createRuleFn(type);
-							onChangeFn({
-								...next,
-								...(rule.hint === undefined
-									? {}
-									: {
-											hint: rule.hint,
-										}),
-								when: rule.when,
-							});
-						}}
-					/>
-				</div>
-			</div>
 			{rule.type === undefined ? null : (
 				<>
 					<EditorTextControl
@@ -494,15 +393,61 @@ const RuleControl = ({
 									];
 						}}
 						label={`${translator.textFn("Rule")} ${ruleIndex + 1} ${translator.textFn("conditions")}`}
-						onAddFn={() =>
-							onChangeFn({
-								...rule,
-								when: [
-									...rule.when,
-									structuredClone(DraftDefaults.when),
-								],
-							})
-						}
+						addOptions={(
+							[
+								{
+									type: "exists",
+									label: "Exists",
+									description:
+										"Match when the selected item exists in the search area.",
+									icon: <SearchCheck className="size-5" />,
+								},
+								{
+									type: "count",
+									label: "Exact count",
+									description: "Match an exact number of selected items.",
+									icon: <Hash className="size-5" />,
+								},
+								{
+									type: "range",
+									label: "Count range",
+									description: "Match a range of selected item counts.",
+									icon: <MoveHorizontal className="size-5" />,
+								},
+							] as const
+						).map(({ type, label, description, icon }) => ({
+							id: type,
+							label: translator.textFn(label),
+							description: translator.textFn(description),
+							icon,
+							onSelectFn: () => {
+								const query = structuredClone(DraftDefaults.conditionQuery);
+								const when: WhenSchema.Type = match(type)
+									.with("exists", () => ({
+										type: "exists" as const,
+										query,
+									}))
+									.with("count", () => ({
+										type: "count" as const,
+										query,
+										count: 1,
+									}))
+									.with("range", () => ({
+										type: "range" as const,
+										query,
+										min: 1,
+										max: 1,
+									}))
+									.exhaustive();
+								onChangeFn({
+									...rule,
+									when: [
+										...rule.when,
+										when,
+									],
+								});
+							},
+						}))}
 						onRemoveFn={(whenIndex) =>
 							onChangeFn({
 								...rule,
@@ -609,14 +554,19 @@ export const RulesControl = ({
 					])
 				}
 				label={collectionLabel}
-				onAddFn={() =>
-					emitChangeFn([
-						...draftRules,
-						{
-							when: [],
-						},
-					])
-				}
+				addOptions={allowedTypes.map(
+					(type): ActionMenuOption => ({
+						id: type,
+						label: translator.textFn(RuleTypeTranslationKey[type]),
+						description: translator.textFn(RuleTypeDescriptionKey[type]),
+						icon: RuleTypeIcon[type],
+						onSelectFn: () =>
+							emitChangeFn([
+								...draftRules,
+								createRuleFn(type),
+							]),
+					}),
+				)}
 				onDuplicateFn={(ruleIndex) =>
 					emitChangeFn([
 						...draftRules.slice(0, ruleIndex + 1),
@@ -640,12 +590,9 @@ export const RulesControl = ({
 						initialWhenIndex={
 							ruleIndex === initialRuleIndex ? initialWhenIndex : undefined
 						}
-						allowedTypes={allowedTypes}
-						createRuleFn={createRuleFn}
 						rule={draftRules[ruleIndex]}
 						ruleIndex={ruleIndex}
 						ruleTarget={target}
-						ruleTypeDescription={description}
 						onChangeFn={(next) =>
 							emitChangeFn(
 								draftRules.map((current, index) =>

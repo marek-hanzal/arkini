@@ -121,7 +121,7 @@ export const ConnectionsSection = ({
 			options.set(`item:${item.uid}`, {
 				id: `item:${item.uid}`,
 				label: item.title,
-				terms: readItemSearchTermsFn(item),
+				...readItemSearchTermsFn(item),
 			});
 		for (const template of project.config.templates ?? [])
 			options.set(`template:${template.uid}`, {

@@ -1,7 +1,7 @@
-import { match } from "ts-pattern";
 import { useResourceUrl } from "~/authoring-session/ui/ResourceUrlSession";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
-import { AudioLines } from "lucide-react";
+import { AudioLines, ImageOff } from "lucide-react";
+import { useState } from "react";
 
 const thumbnailSizeClassName = {
 	input: "size-[var(--ak-control-min-height)]",
@@ -23,39 +23,27 @@ export const EditorResourceThumbnail = ({
 	const resource = project.resources.find(({ uid }) => uid === resourceUid);
 	const audio = resource?.type === "music" || resource?.type === "sfx";
 	const url = useResourceUrl(audio ? undefined : resourceUid);
+	const [failedUrl, setFailedUrlFn] = useState<string>();
 	return (
 		<span
 			data-ui="EditorResourceThumbnail"
 			className={`grid ${thumbnailSizeClassName[size]} shrink-0 place-items-center overflow-hidden rounded-lg bg-canvas/70`}
 		>
-			{match({
-				audio,
-				url,
-				resourceUid,
-			})
-				.with(
-					{
-						audio: true,
-					},
-					() => <AudioLines className="size-5 text-muted" />,
-				)
-				.with(
-					{
-						url: undefined,
-					},
-					() =>
-						resourceUid ? (
-							<span className="text-sm font-semibold text-subtle">?</span>
-						) : null,
-				)
-				.otherwise(({ url }) => (
-					<img
-						src={url}
-						alt=""
-						className="size-full object-contain"
-						draggable={false}
-					/>
-				))}
+			{audio ? (
+				<AudioLines className="size-5 text-muted" />
+			) : url === undefined || failedUrl === url ? (
+				<ImageOff
+					className={size === "input" ? "size-4 text-subtle" : "size-6 text-subtle"}
+				/>
+			) : (
+				<img
+					src={url}
+					alt=""
+					className="size-full object-contain"
+					draggable={false}
+					onError={() => setFailedUrlFn(url)}
+				/>
+			)}
 		</span>
 	);
 };

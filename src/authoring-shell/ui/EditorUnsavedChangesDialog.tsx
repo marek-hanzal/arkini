@@ -1,12 +1,14 @@
 import { Mx } from "~/translation/ui/Mx";
 import { useEditorSaveShortcut } from "~/editor-control/ui/useEditorSaveShortcut";
+import { useEditorDiscardShortcut } from "~/editor-control/ui/useEditorDiscardShortcut";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Save, Trash2, X } from "lucide-react";
-import { useSyncExternalStore } from "react";
+import { useSyncExternalStore, type KeyboardEvent } from "react";
 
 import { useEditorUnsavedChangesOwner } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
 import { Button, PrimaryButton } from "~/ui/ui/Button";
 import { LinkButton } from "~/ui/ui/LinkButton";
+import { ShortcutLabel } from "~/ui/ui/ShortcutLabel";
 import { useOverlayFocus } from "~/ui/ui/useOverlayFocus";
 import type { EditorUnsavedChangesSnapshot } from "~/authoring-session/service/EditorUnsavedChanges";
 
@@ -26,10 +28,32 @@ const EditorUnsavedChangesPrompt = ({
 		saveEnabled: !state.saving && state.canSave,
 		saveFn: () => owner.decideFn("save"),
 	});
+	useEditorDiscardShortcut({
+		discardEnabled: !state.saving,
+		discardFn: () => owner.decideFn("discard"),
+		scope: "dialog",
+	});
+	const onShortcutKeyDownFn = (event: KeyboardEvent<HTMLDivElement>) => {
+		if (
+			event.defaultPrevented ||
+			event.altKey ||
+			event.ctrlKey ||
+			event.metaKey ||
+			event.shiftKey ||
+			(event.key !== "c" && event.key !== "s")
+		)
+			return;
+		event.preventDefault();
+		event.stopPropagation();
+		if (event.repeat || event.nativeEvent.isComposing || state.saving) return;
+		if (event.key === "s" && !state.canSave) return;
+		void owner.decideFn(event.key === "c" ? "cancel" : "save");
+	};
 	return (
 		<div
 			ref={focus.overlayRef}
 			tabIndex={-1}
+			onKeyDownCapture={onShortcutKeyDownFn}
 			onKeyDown={focus.onKeyDownFn}
 			className="fixed inset-0 z-[100] grid place-items-center bg-overlay/95 p-[var(--ak-viewport-padding)]"
 		>
@@ -53,7 +77,11 @@ const EditorUnsavedChangesPrompt = ({
 						onClick={() => void owner.decideFn("discard")}
 					>
 						<Trash2 className="size-4" />
-						{translator.textFn("Discard")}
+						<ShortcutLabel
+							highlightClassName="text-shortcut-highlight"
+							label={translator.textFn("Discard")}
+							shortcut="d"
+						/>
 					</LinkButton>
 					<div className="flex items-center gap-2">
 						<Button
@@ -62,7 +90,11 @@ const EditorUnsavedChangesPrompt = ({
 							onClick={() => void owner.decideFn("cancel")}
 						>
 							<X className="size-4" />
-							{translator.textFn("Cancel")}
+							<ShortcutLabel
+								highlightClassName="text-shortcut-highlight"
+								label={translator.textFn("Cancel")}
+								shortcut="c"
+							/>
 						</Button>
 						<PrimaryButton
 							className="gap-1.5"
@@ -76,7 +108,11 @@ const EditorUnsavedChangesPrompt = ({
 							onClick={() => void owner.decideFn("save")}
 						>
 							<Save className="size-4" />
-							{translator.textFn("Save")}
+							<ShortcutLabel
+								highlightClassName="text-shortcut-highlight-on-accent"
+								label={translator.textFn("Save")}
+								shortcut="s"
+							/>
 						</PrimaryButton>
 					</div>
 				</div>

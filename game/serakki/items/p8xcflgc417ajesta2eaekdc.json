@@ -1,0 +1,62 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "p8xcflgc417ajesta2eaekdc",
+		"title": "Door",
+		"description": "A way back to the space you came from.",
+		"ui": "simple",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"ptmlszumvi6k7fsgfosvnb07"
+			]
+		},
+		"merge": [
+			{
+				"action": "space",
+				"space": "previous",
+				"effect": "keep"
+			}
+		],
+		"maxQueueSize": 1,
+		"lines": [
+			{
+				"uid": "ny19osudv7ogbnyaf4wgr2iw",
+				"title": "Return",
+				"description": "Go back to the previous space.",
+				"clock": false,
+				"clockWeight": 1,
+				"default": true,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"outcome": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"outcome": [
+										{
+											"type": "space",
+											"space": "previous",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

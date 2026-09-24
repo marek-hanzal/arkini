@@ -1,5 +1,6 @@
 import { Overlay } from "~/ui/ui/Overlay";
 import { EditorTextControl } from "~/editor-control/ui/EditorValueControls";
+import { useEditorDiscardShortcut } from "~/editor-control/ui/useEditorDiscardShortcut";
 import { useEditorResourceMetadataEditController } from "~/resource-authoring/ui/useEditorResourceMetadataEditController";
 import { Effect } from "effect";
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
@@ -14,6 +15,7 @@ import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { importEditorResourcesFx } from "~/resource-authoring/fx/importEditorResourcesFx";
 import type { Project } from "~/project-authoring/type/Project";
 import { Button, PrimaryButton } from "~/ui/ui/Button";
+import { ShortcutLabel } from "~/ui/ui/ShortcutLabel";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 import { useTranslator } from "~/translation/ui/useTranslator";
 
@@ -50,6 +52,11 @@ const ProjectImageTitleEditor = ({
 		type: "image",
 		closeFn,
 	});
+	useEditorDiscardShortcut({
+		discardEnabled: !controller.saving,
+		discardFn: controller.discardFn,
+		scope: "overlay",
+	});
 	return (
 		<Overlay onCloseFn={() => void controller.requestCloseFn()}>
 			<div
@@ -71,7 +78,10 @@ const ProjectImageTitleEditor = ({
 						disabled={controller.saving}
 						onClick={() => void controller.discardFn()}
 					>
-						{translator.textFn("Discard")}
+						<ShortcutLabel
+							label={translator.textFn("Discard")}
+							shortcut="d"
+						/>
 					</Button>
 					<PrimaryButton
 						disabled={!controller.dirty || controller.saving}

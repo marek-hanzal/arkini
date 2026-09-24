@@ -39,33 +39,13 @@ import { RulesControl } from "~/production-authoring/ui/RulesControl";
 	}
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
-it("preserves the selected query when changing a condition kind", async () => {
-	const query = {
-		distance: "far" as const,
-		selector: {
-			type: "item" as const,
-			itemUid: "selected-item",
-		},
-	};
-	const rules: RuleSchema.Type[] = [
-		{
-			type: "enable",
-			when: [
-				{
-					type: "range",
-					min: 2,
-					max: 4,
-					query,
-				},
-			],
-		},
-	];
+it("creates only allowed rule kinds and typed conditions from the collection menus", async () => {
 	const container = document.createElement("div");
 	document.body.append(container);
 	const root = createRoot(container);
 	const onChangeFn = vi.fn();
-	try {
-		await act(async () =>
+	const renderFn = async (rules: RuleSchema.Type[]) =>
+		act(async () =>
 			root.render(
 				<RulesControl
 					allowedTypes={[
@@ -79,19 +59,56 @@ it("preserves the selected query when changing a condition kind", async () => {
 				/>,
 			),
 		);
-		const exact = Array.from(
-			container.querySelectorAll<HTMLButtonElement>('[data-ui="EditorChoiceControlOption"]'),
-		).find((button) => button.textContent?.trim() === "Exact count");
-		if (exact === undefined) throw new Error("Missing Exact count choice.");
-		await act(async () => exact.click());
-		expect(onChangeFn).toHaveBeenCalledWith([
+	const selectOptionFn = async (id: string) => {
+		const option = document.querySelector<HTMLButtonElement>(
+			`[data-ui="ActionMenuOption"][data-ui-id="${id}"]`,
+		);
+		if (option === null) throw new Error(`Missing ${id} menu option.`);
+		await act(async () => option.click());
+	};
+	try {
+		await renderFn([]);
+		await act(async () =>
+			container
+				.querySelector<HTMLButtonElement>(
+					'[data-ui="EditorRulesCollection"] [data-ui="EditorCollectionAdd"]',
+				)
+				?.click(),
+		);
+		expect(
+			document.querySelector('[data-ui="ActionMenuOption"][data-ui-id="show"]'),
+		).toBeNull();
+		await selectOptionFn("disable");
+		const rules = onChangeFn.mock.lastCall?.[0] as RuleSchema.Type[];
+		expect(rules).toEqual([
 			{
-				type: "enable",
+				type: "disable",
+				when: [],
+			},
+		]);
+		await renderFn(rules);
+		await act(async () =>
+			container
+				.querySelector<HTMLButtonElement>(
+					'[data-ui="EditorConditionsCollection"] [data-ui="EditorCollectionAdd"]',
+				)
+				?.click(),
+		);
+		await selectOptionFn("count");
+		expect(onChangeFn.mock.lastCall?.[0]).toEqual([
+			{
+				type: "disable",
 				when: [
 					{
 						type: "count",
 						count: 1,
-						query,
+						query: {
+							distance: "far",
+							selector: {
+								type: "item",
+								itemUid: "",
+							},
+						},
 					},
 				],
 			},

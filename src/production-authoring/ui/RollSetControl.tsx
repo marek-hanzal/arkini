@@ -5,9 +5,10 @@ import { TemplateSelector } from "~/template-authoring/ui/TemplateSelector";
 import {
 	CircleCheck,
 	Dice5,
-	Package,
+	History,
 	DoorOpen,
 	MapPin,
+	Sparkles,
 	Shuffle,
 	PanelsTopLeft,
 } from "lucide-react";
@@ -20,6 +21,7 @@ import { RulesControl } from "~/production-authoring/ui/RulesControl";
 import type { OutcomeSchema } from "~/outcome/schema/OutcomeSchema";
 import type { RollSchema } from "~/outcome/schema/RollSchema";
 import type { RollSetSchema } from "~/outcome/schema/RollSetSchema";
+import type { TemplateSchema } from "~/board-template/schema/TemplateSchema";
 import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
 import { OutcomeOption } from "~/production-authoring/ui/OutcomeOption";
 import {
@@ -28,7 +30,7 @@ import {
 } from "~/production-authoring/fn/readDraftRollOutcomesFn";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { SectionEnd } from "~/ui/ui/SectionEnd";
-import { EditorChoiceControl, EditorNumberControl } from "~/editor-control/ui/EditorValueControls";
+import { EditorNumberControl } from "~/editor-control/ui/EditorValueControls";
 import { EditorItemReferenceControl } from "~/authoring-form/ui/EditorItemAutocompleteField";
 import { useEditorItemOptionLabel } from "~/authoring-form/ui/useEditorItemSearchOptions";
 import { EditorItemSearchThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
@@ -44,11 +46,15 @@ import { useTranslator } from "~/translation/ui/useTranslator";
 
 type OutcomeListValue = OutcomeSchema.Type[];
 const readChancePercentFn = (chance: number) => Number((chance * 100).toFixed(6));
-const readOutcomeSummaryFn = (outcome: OutcomeSchema.Type, textFn: (key: string) => string) => {
+const readOutcomeSummaryFn = (
+	outcome: OutcomeSchema.Type,
+	textFn: (key: string) => string,
+	templates: readonly TemplateSchema.Type[] | undefined,
+) => {
 	const rules = outcome.rules.length;
 	const ruleSummary = rules === 0 ? "" : ` · ${rules} ${textFn(rules === 1 ? "rule" : "rules")}`;
 	if (outcome.type === "space")
-		return `${readSpaceDestinationLabelFn(outcome.space, textFn)}${ruleSummary}`;
+		return `${readSpaceDestinationLabelFn(outcome.space, textFn, templates)}${ruleSummary}`;
 	if (outcome.type === "template") return `${textFn("Template")}${ruleSummary}`;
 	const { min, max } = outcome.quantity;
 	const quantity = min === max ? `×${min}` : `×${min}–${max}`;
@@ -76,66 +82,19 @@ const OutcomeFields = ({
 	const translator = useTranslator();
 	return (
 		<div className="grid gap-3">
-			<div className="grid grid-cols-2 items-end gap-3">
-				<EditorChoiceControl
-					label={translator.textFn("Outcome type")}
-					value={value.type}
-					options={[
-						{
-							value: "item",
-							icon: <Package className="size-4 shrink-0" />,
-							label: translator.textFn("Item"),
-						},
-						{
-							value: "space",
-							icon: <DoorOpen className="size-4 shrink-0" />,
-							label: translator.textFn("Space"),
-						},
-						{
-							value: "template",
-							icon: <PanelsTopLeft className="size-4 shrink-0" />,
-							label: translator.textFn("Template"),
-							description: translator.textFn(
-								"Replaces the producer's space with this template, removing its items and active production.",
-							),
-						},
-					]}
-					onChangeFn={(type) => {
-						if (type === value.type) return;
-						onChangeFn(
-							match(type)
-								.with("item", () => ({
-									...structuredClone(DraftDefaults.itemOutcome),
-									rules: value.rules,
-								}))
-								.with("template", () => ({
-									type: "template" as const,
-									templateUid: "",
-									rules: value.rules,
-								}))
-								.with("space", () => ({
-									type: "space" as const,
-									space: 0,
-									rules: value.rules,
-								}))
-								.exhaustive(),
-						);
-					}}
+			{value.type === "template" ? (
+				<TemplateSelector
+					templates={project.config.templates ?? []}
+					value={value.templateUid}
+					error={readEditorFormValidationErrorFn(validationIssues, "templateUid")}
+					onChangeFn={(templateUid) =>
+						onChangeFn({
+							...value,
+							templateUid,
+						})
+					}
 				/>
-				{value.type === "template" ? (
-					<TemplateSelector
-						templates={project.config.templates ?? []}
-						value={value.templateUid}
-						error={readEditorFormValidationErrorFn(validationIssues, "templateUid")}
-						onChangeFn={(templateUid) =>
-							onChangeFn({
-								...value,
-								templateUid,
-							})
-						}
-					/>
-				) : null}
-			</div>
+			) : null}
 			{match(value)
 				.with(
 					{
@@ -154,57 +113,25 @@ const OutcomeFields = ({
 									})
 								}
 							/>
-							<div className="flex flex-wrap items-end justify-between gap-3">
-								<div className="min-w-0 basis-1/2">
-									<QuantityControl
-										minimumError={readEditorFormValidationErrorFn(
-											validationIssues,
-											"quantity",
-											"min",
-										)}
-										maximumError={readEditorFormValidationErrorFn(
-											validationIssues,
-											"quantity",
-											"max",
-										)}
-										value={value.quantity}
-										onChangeFn={(quantity) =>
-											onChangeFn({
-												...value,
-												quantity,
-											})
-										}
-									/>
-								</div>
-								<EditorChoiceControl
-									error={readEditorFormValidationErrorFn(
-										validationIssues,
-										"placement",
-									)}
-									label={translator.textFn("Board placement")}
-									value={value.placement}
-									options={[
-										{
-											description: <Mx label="Local drop placement help" />,
-											label: translator.textFn("Local drop"),
-											icon: <MapPin className="size-4" />,
-											value: "drop",
-										},
-										{
-											description: <Mx label="Random drop placement help" />,
-											label: translator.textFn("Random"),
-											icon: <Shuffle className="size-4" />,
-											value: "random",
-										},
-									]}
-									onChangeFn={(placement) =>
-										onChangeFn({
-											...value,
-											placement,
-										})
-									}
-								/>
-							</div>
+							<QuantityControl
+								minimumError={readEditorFormValidationErrorFn(
+									validationIssues,
+									"quantity",
+									"min",
+								)}
+								maximumError={readEditorFormValidationErrorFn(
+									validationIssues,
+									"quantity",
+									"max",
+								)}
+								value={value.quantity}
+								onChangeFn={(quantity) =>
+									onChangeFn({
+										...value,
+										quantity,
+									})
+								}
+							/>
 						</>
 					),
 				)
@@ -212,33 +139,33 @@ const OutcomeFields = ({
 					{
 						type: "space",
 					},
-					(value) => (
-						<SpaceDestinationControl
-							layout="columns"
-							error={readEditorFormValidationErrorFn(validationIssues, "space")}
-							description={<Mx label="Space destination outcome help" />}
-							value={value.space}
-							onChangeFn={(space) =>
-								onChangeFn({
-									...value,
-									space,
-								})
-							}
-							trailing={
-								<LinkButton
-									className="whitespace-nowrap"
-									onClick={() =>
-										onChangeFn({
-											...value,
-											space: Math.floor(Math.random() * 897) + 128,
-										})
-									}
-								>
-									{translator.textFn("Pick random space")}
-								</LinkButton>
-							}
-						/>
-					),
+					(value) =>
+						value.space === "previous" ? null : (
+							<SpaceDestinationControl
+								kindEditable={false}
+								error={readEditorFormValidationErrorFn(validationIssues, "space")}
+								value={value.space}
+								onChangeFn={(space) =>
+									onChangeFn({
+										...value,
+										space,
+									})
+								}
+								trailing={
+									<LinkButton
+										className="whitespace-nowrap"
+										onClick={() =>
+											onChangeFn({
+												...value,
+												space: Math.floor(Math.random() * 897) + 128,
+											})
+										}
+									>
+										{translator.textFn("Pick random space")}
+									</LinkButton>
+								}
+							/>
+						),
 				)
 				.with(
 					{
@@ -329,7 +256,12 @@ const OutcomeList = ({
 							{
 								type: "space",
 							},
-							({ space }) => `${translator.textFn("Space")} ${space}`,
+							({ space }) =>
+								readSpaceDestinationLabelFn(
+									space,
+									translator.textFn,
+									project.config.templates,
+								),
 						)
 						.exhaustive();
 					return `${translator.textFn("Outcome")} ${index + 1} — ${label}`;
@@ -352,19 +284,30 @@ const OutcomeList = ({
 							{
 								type: "space",
 							},
-							({ space }) => `${translator.textFn("Space")} ${space}`,
+							({ space }) =>
+								readSpaceDestinationLabelFn(
+									space,
+									translator.textFn,
+									project.config.templates,
+								),
 						)
 						.exhaustive(),
 				]}
 				label={translator.textFn("Outcomes")}
-				itemMetaFn={(index) => readOutcomeSummaryFn(value[index], translator.textFn)}
+				itemMetaFn={(index) =>
+					readOutcomeSummaryFn(value[index], translator.textFn, project.config.templates)
+				}
 				renderItemContentFn={(index, label) => (
 					<OutcomeOption
 						label={label}
 						outcomes={[
 							value[index],
 						]}
-						summary={readOutcomeSummaryFn(value[index], translator.textFn)}
+						summary={readOutcomeSummaryFn(
+							value[index],
+							translator.textFn,
+							project.config.templates,
+						)}
 					/>
 				)}
 				renderSelectedItemPreviewFn={(index) => (
@@ -393,12 +336,106 @@ const OutcomeList = ({
 						selected
 					/>
 				)}
-				onAddFn={() =>
-					onChangeFn([
-						...value,
-						structuredClone(DraftDefaults.itemOutcome),
-					])
-				}
+				addOptions={[
+					{
+						id: "drop-local",
+						label: translator.textFn("Drop - Local"),
+						description: translator.textFn(
+							"Place items in nearby empty cells beside the producer.",
+						),
+						icon: <MapPin className="size-5" />,
+						onSelectFn: () =>
+							onChangeFn([
+								...value,
+								structuredClone(DraftDefaults.itemOutcome),
+							]),
+					},
+					{
+						id: "drop-random",
+						label: translator.textFn("Drop - Random"),
+						description: translator.textFn(
+							"Place items near random cells on the current Board.",
+						),
+						icon: <Shuffle className="size-5" />,
+						onSelectFn: () =>
+							onChangeFn([
+								...value,
+								{
+									...structuredClone(DraftDefaults.itemOutcome),
+									placement: "random",
+								},
+							]),
+					},
+					{
+						id: "space",
+						label: translator.textFn("Space"),
+						description: translator.textFn("Move to an exact space number."),
+						icon: <DoorOpen className="size-5" />,
+						onSelectFn: () =>
+							onChangeFn([
+								...value,
+								{
+									type: "space",
+									space: 0,
+									rules: [],
+								},
+							]),
+					},
+					{
+						id: "space-previous",
+						label: translator.textFn("Previous Space"),
+						description: translator.textFn(
+							"Return to the last space left. Without history, this outcome does nothing.",
+						),
+						icon: <History className="size-5" />,
+						onSelectFn: () =>
+							onChangeFn([
+								...value,
+								{
+									type: "space",
+									space: "previous",
+									rules: [],
+								},
+							]),
+					},
+					{
+						id: "space-generated",
+						label: translator.textFn("Generated Space"),
+						description: translator.textFn(
+							"Open this item's private room, initialized from a template on first use.",
+						),
+						icon: <Sparkles className="size-5" />,
+						onSelectFn: () =>
+							onChangeFn([
+								...value,
+								{
+									type: "space",
+									space: {
+										type: "generated",
+										templateUid: project.config.templates?.[0]?.uid ?? "",
+									},
+									rules: [],
+								},
+							]),
+					},
+					{
+						id: "template",
+						label: translator.textFn("Template"),
+						description: translator.textFn(
+							"Replaces the producer's space with this template, removing its items and active production.",
+						),
+						icon: <PanelsTopLeft className="size-5" />,
+						onSelectFn: () =>
+							onChangeFn([
+								...value,
+								{
+									type: "template",
+									templateUid: "",
+									rules: [],
+								},
+							]),
+					},
+				]}
 				onDuplicateFn={(index) =>
 					onChangeFn([
 						...value.slice(0, index + 1),
@@ -451,28 +488,6 @@ const RollControl = ({
 	const translator = useTranslator();
 	return (
 		<div className="grid gap-4">
-			<div className="flex min-w-0 justify-end">
-				<EditorChoiceControl
-					error={readEditorFormValidationErrorFn(validationIssues, "type")}
-					label={translator.textFn("Roll type")}
-					value={value.type}
-					options={[
-						{
-							description: <Mx label="Guaranteed roll type help" />,
-							label: translator.textFn("Guaranteed"),
-							icon: <CircleCheck className="size-4" />,
-							value: "guaranteed",
-						},
-						{
-							description: <Mx label="Chance roll type help" />,
-							label: translator.textFn("Chance"),
-							icon: <Dice5 className="size-4" />,
-							value: "chance",
-						},
-					]}
-					onChangeFn={(type) => onChangeFn(structuredClone(DraftDefaults.rolls[type]))}
-				/>
-			</div>
 			{value.type === undefined
 				? null
 				: match(value as RollSchema.Type)
@@ -642,15 +657,38 @@ export const RollSetControl = ({
 					/>
 				)}
 				label={`${translator.textFn("Outcome set")} ${index + 1} ${translator.textFn("rolls")}`}
-				onAddFn={() =>
-					onChangeFn({
-						...value,
-						roll: [
-							...value.roll,
-							structuredClone(DraftDefaults.roll),
-						],
-					})
-				}
+				addOptions={[
+					{
+						id: "guaranteed",
+						label: translator.textFn("Guaranteed"),
+						description: translator.textFn("Always produce this roll's outcomes."),
+						icon: <CircleCheck className="size-5" />,
+						onSelectFn: () =>
+							onChangeFn({
+								...value,
+								roll: [
+									...value.roll,
+									structuredClone(DraftDefaults.rolls.guaranteed),
+								],
+							}),
+					},
+					{
+						id: "chance",
+						label: translator.textFn("Chance"),
+						description: translator.textFn(
+							"Produce this roll's outcomes with a chosen chance.",
+						),
+						icon: <Dice5 className="size-5" />,
+						onSelectFn: () =>
+							onChangeFn({
+								...value,
+								roll: [
+									...value.roll,
+									structuredClone(DraftDefaults.rolls.chance),
+								],
+							}),
+					},
+				]}
 				onDuplicateFn={(rollIndex) =>
 					onChangeFn({
 						...value,

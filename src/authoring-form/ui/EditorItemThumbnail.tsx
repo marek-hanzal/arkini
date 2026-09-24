@@ -3,6 +3,8 @@ import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { ItemArtwork } from "~/ui/ui/ItemArtwork";
 import { useResourceUrl } from "~/authoring-session/ui/ResourceUrlSession";
 import { twMerge } from "tailwind-merge";
+import { ImageOff } from "lucide-react";
+import { useState } from "react";
 
 const thumbnailSizeClassName = {
 	input: "size-[var(--ak-control-min-height)]",
@@ -64,7 +66,14 @@ export const EditorItemSearchThumbnail = ({
 			{
 				item: undefined,
 			},
-			() => null,
+			() => (
+				<EditorItemThumbnail
+					className={className}
+					resourceUids={[
+						"",
+					]}
+				/>
+			),
 		)
 		.with(
 			{
@@ -89,9 +98,15 @@ export const EditorItemThumbnail = ({
 }: EditorItemThumbnailProps) => {
 	const backgroundUrl = useResourceUrl(resourceUids[0]);
 	const foregroundUrl = useResourceUrl(resourceUids[1]);
+	const [failedImageKey, setFailedImageKeyFn] = useState<string>();
+	const imageKey = JSON.stringify([
+		backgroundUrl,
+		foregroundUrl,
+	]);
 	const ready =
 		backgroundUrl !== undefined &&
-		(resourceUids[1] === undefined || foregroundUrl !== undefined);
+		(resourceUids[1] === undefined || foregroundUrl !== undefined) &&
+		failedImageKey !== imageKey;
 	if (ready) {
 		return (
 			<ItemArtwork
@@ -102,6 +117,7 @@ export const EditorItemThumbnail = ({
 				compositeUrl={foregroundUrl}
 				dataUi="EditorItemThumbnail"
 				imageClassName={imageClassName}
+				onImageErrorFn={() => setFailedImageKeyFn(imageKey)}
 				size={size}
 				sourceUrl={backgroundUrl}
 			/>
@@ -115,9 +131,18 @@ export const EditorItemThumbnail = ({
 			)}
 			data-ui="EditorItemThumbnail"
 		>
-			{resourceUids[0] === "" ? null : (
-				<span className="text-xl font-semibold text-subtle">?</span>
-			)}
+			<ImageOff
+				className={twMerge(
+					"text-subtle",
+					size === "input"
+						? "size-4"
+						: size === "xl"
+							? "size-12"
+							: size === "lg"
+								? "size-8"
+								: "size-6",
+				)}
+			/>
 		</div>
 	);
 };

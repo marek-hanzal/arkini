@@ -1,6 +1,6 @@
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 
-/** Creates a fresh production line with an caller-supplied immutable UID. */
+/** Creates an Editor line draft with a caller-supplied immutable UID; input selection is required before saving. */
 export const createLineFn = (
 	lines: ReadonlyArray<LineSchema.Type>,
 	title: string,
@@ -16,11 +16,7 @@ export const createLineFn = (
 		show: true,
 		enable: true,
 		runtimeMs: 30_000,
-		input: [
-			{
-				type: "simple",
-			},
-		],
+		input: [] as unknown as LineSchema.Type["input"],
 		rules: [],
 	};
 };

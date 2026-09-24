@@ -25,6 +25,15 @@ vi.mock("~/authoring-session/ui/useEditorProject", () => ({
 	useEditorProject: () => ({
 		config: {
 			items: {},
+			templates: [
+				{
+					uid: "default-template",
+					title: "Default Template",
+					width: 2,
+					height: 2,
+					board: [],
+				},
+			],
 		},
 	}),
 }));
@@ -60,25 +69,8 @@ import { RollSetControl } from "~/production-authoring/ui/RollSetControl";
 	}
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
-it("preserves shared rules while replacing fields of the previous outcome kind", async () => {
-	const rules = [
-		{
-			type: "disable",
-			when: [
-				{
-					type: "exists",
-					query: {
-						distance: "self",
-						selector: {
-							type: "item",
-							itemUid: "permit",
-						},
-					},
-				},
-			],
-		},
-	];
-	const value = OutcomeTableSchema.parse({
+it("adds each outcome destination and drop placement without replacing existing outcomes", async () => {
+	const initial = OutcomeTableSchema.parse({
 		set: [
 			{
 				weight: 1,
@@ -95,7 +87,7 @@ it("preserves shared rules while replacing fields of the previous outcome kind",
 									max: 3,
 								},
 								placement: "random",
-								rules,
+								rules: [],
 							},
 						],
 					},
@@ -107,38 +99,88 @@ it("preserves shared rules while replacing fields of the previous outcome kind",
 	document.body.append(container);
 	const root = createRoot(container);
 	const onChangeFn = vi.fn();
-	const renderOutcomeFn = async (outcome: OutcomeTableSchema.Type) =>
+	const renderFn = async (value: OutcomeTableSchema.Type) =>
 		act(async () =>
 			root.render(
 				<OutcomeControl
-					value={outcome}
+					value={value}
 					onChangeFn={onChangeFn}
 				/>,
 			),
 		);
-	const selectKindFn = async (label: string) => {
-		const button = Array.from(container.querySelectorAll<HTMLButtonElement>("button")).find(
-			(candidate) => candidate.textContent === label,
-		);
-		if (button === undefined) throw new Error(`Missing ${label} outcome kind.`);
-		await act(async () => button.click());
-		return onChangeFn.mock.lastCall?.[0] as OutcomeTableSchema.Type;
-	};
 	try {
-		await renderOutcomeFn(value);
-		const space = await selectKindFn("Space");
-		expect(space.set[0].roll[0].outcome[0]).toEqual({
-			type: "space",
-			space: 0,
-			rules,
-		});
-		await renderOutcomeFn(space);
-		const item = await selectKindFn("Item");
-		expect(item.set[0].roll[0].outcome[0]).toMatchObject({
-			type: "item",
-			rules,
-		});
-		expect(item.set[0].roll[0].outcome[0]).not.toHaveProperty("space");
+		let current = initial;
+		for (const id of [
+			"space",
+			"space-previous",
+			"space-generated",
+			"template",
+			"drop-local",
+			"drop-random",
+		]) {
+			await renderFn(current);
+			const add = container.querySelector<HTMLButtonElement>(
+				'[data-ui="EditorOutcomesCollection"] [data-ui="EditorCollectionAdd"]',
+			);
+			if (add === null) throw new Error("Missing outcome add button.");
+			await act(async () => add.click());
+			const option = document.querySelector<HTMLButtonElement>(
+				`[data-ui="ActionMenuOption"][data-ui-id="${id}"]`,
+			);
+			if (option === null) throw new Error(`Missing ${id} outcome option.`);
+			await act(async () => option.click());
+			current = onChangeFn.mock.lastCall?.[0] as OutcomeTableSchema.Type;
+			expect(current.set[0].roll[0].outcome[0]).toEqual(initial.set[0].roll[0].outcome[0]);
+			expect(current.set[0].roll[0].outcome.at(-1)?.type).toBe(
+				id.startsWith("space") ? "space" : id.startsWith("drop") ? "item" : id,
+			);
+		}
+		expect(current.set[0].roll[0].outcome).toEqual([
+			initial.set[0].roll[0].outcome[0],
+			{
+				type: "space",
+				space: 0,
+				rules: [],
+			},
+			{
+				type: "space",
+				space: "previous",
+				rules: [],
+			},
+			{
+				type: "space",
+				space: {
+					type: "generated",
+					templateUid: "default-template",
+				},
+				rules: [],
+			},
+			{
+				type: "template",
+				templateUid: "",
+				rules: [],
+			},
+			{
+				type: "item",
+				itemUid: "",
+				quantity: {
+					min: 1,
+					max: 1,
+				},
+				placement: "drop",
+				rules: [],
+			},
+			{
+				type: "item",
+				itemUid: "",
+				quantity: {
+					min: 1,
+					max: 1,
+				},
+				placement: "random",
+				rules: [],
+			},
+		]);
 	} finally {
 		await act(async () => root.unmount());
 		container.remove();
@@ -334,65 +376,79 @@ it("focuses and edits a set rule without changing the selected set's drops", asy
 	}
 });
 
-it.each([
-	{
-		type: "item" as const,
-		itemUid: "ore",
-		quantity: {
-			min: 3,
-			max: 7,
-		},
-		placement: "random" as const,
-		rules: [],
-	},
-	{
-		type: "space" as const,
-		space: 731,
-		rules: [],
-	},
-])(
-	"preserves the complete $type draft when its selected kind is clicked again",
-	async (outcome) => {
-		const container = document.createElement("div");
-		document.body.append(container);
-		const root = createRoot(container);
-		const onChangeFn = vi.fn();
-		const value = OutcomeTableSchema.parse({
-			set: [
-				{
-					weight: 1,
-					rules: [],
-					roll: [
-						{
-							type: "guaranteed",
-							outcome: [
-								outcome,
-							],
-						},
-					],
-				},
-			],
-		});
-		const before = structuredClone(value);
-		try {
-			await act(async () =>
-				root.render(
-					<OutcomeControl
-						value={value}
-						onChangeFn={onChangeFn}
-					/>,
-				),
+it("adds selected roll kinds with their own defaults", async () => {
+	const initial = OutcomeTableSchema.parse({
+		set: [
+			{
+				weight: 1,
+				rules: [],
+				roll: [
+					{
+						type: "guaranteed",
+						outcome: [
+							{
+								type: "item",
+								itemUid: "ore",
+								quantity: {
+									min: 1,
+									max: 1,
+								},
+								placement: "drop",
+								rules: [],
+							},
+						],
+					},
+				],
+			},
+		],
+	}).set[0];
+	const container = document.createElement("div");
+	document.body.append(container);
+	const root = createRoot(container);
+	const onChangeFn = vi.fn();
+	const renderFn = async (value: typeof initial) =>
+		act(async () =>
+			root.render(
+				<RollSetControl
+					index={0}
+					showWeight={false}
+					value={value}
+					onChangeFn={onChangeFn}
+				/>,
+			),
+		);
+	try {
+		let current = initial;
+		for (const id of [
+			"chance",
+			"guaranteed",
+		]) {
+			await renderFn(current);
+			const add = container.querySelector<HTMLButtonElement>(
+				'[data-ui="EditorRollsCollection"] [data-ui="EditorCollectionAdd"]',
 			);
-			const selectedKind = Array.from(
-				container.querySelectorAll<HTMLButtonElement>("button"),
-			).find((button) => button.textContent === (outcome.type === "item" ? "Item" : "Space"));
-			if (selectedKind === undefined) throw new Error("Missing selected outcome kind.");
-			await act(async () => selectedKind.click());
-			expect(onChangeFn).not.toHaveBeenCalled();
-			expect(value).toEqual(before);
-		} finally {
-			await act(async () => root.unmount());
-			container.remove();
+			if (add === null) throw new Error("Missing roll add button.");
+			await act(async () => add.click());
+			const option = document.querySelector<HTMLButtonElement>(
+				`[data-ui="ActionMenuOption"][data-ui-id="${id}"]`,
+			);
+			if (option === null) throw new Error(`Missing ${id} roll option.`);
+			await act(async () => option.click());
+			current = onChangeFn.mock.lastCall?.[0] as typeof initial;
+			expect(current.roll.at(-1)?.type).toBe(id);
+			expect(current.roll[0]).toEqual(initial.roll[0]);
 		}
-	},
-);
+		expect(current.roll[1]).toEqual({
+			type: "chance",
+			chance: 0.5,
+			outcome: [],
+		});
+		expect(current.roll[2]).toEqual({
+			type: "guaranteed",
+			outcome: [],
+		});
+	} finally {
+		await act(async () => root.unmount());
+		container.remove();
+	}
+});

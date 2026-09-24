@@ -3,22 +3,6 @@ About avatars:
 Accepts merge from:
   value: Accepts merge from
   dynamic: true
-Action disable rule help:
-  value: |
-    **Disable** blocks the action whenever all its conditions match.
-
-    It wins over **Enabled** and every Enable rule. The action stays configured; players simply cannot use it.
-Action enable rule help:
-  value: |
-    **Enable** adds a required check. If you add several Enable rules, **all of them** must pass.
-
-    Any matching Disable rule still blocks the action.
-Action input type help:
-  value: |
-    Choose what the action needs when used:
-
-    - **Simple:** nothing.
-    - **Units:** spends Units from this item or a matching Board item.
 Action inputs:
   value: Action inputs
 Action inputs help:
@@ -55,6 +39,8 @@ Already optimized:
   value: Already optimized
 Alternative set:
   value: Alternative set
+Always produce this roll's outcomes.:
+  value: Always produce this roll's outcomes.
 An unexpected error prevented the build. Try again.:
   value: An unexpected error prevented the build. Try again.
 Any transported incoming item:
@@ -309,11 +295,6 @@ Chance percentage help:
     Chance that this roll creates all its drops.
 
     **0%** never does. **100%** always does. One percentage check covers the whole roll.
-Chance roll type help:
-  value: |
-    Makes one probability check.
-
-    On success, every drop in this roll continues. On failure, this roll creates nothing; the other rolls still run.
 Choose a counterpart to inspect its relationships…:
   value: Choose a counterpart to inspect its relationships…
 Choose a different Project ID.:
@@ -387,8 +368,6 @@ Close:
 Condition:
   value: Condition
   dynamic: true
-Condition type:
-  value: Condition type
 Configure the remote domain in the ngrok tab.:
   value: Configure the remote domain in the ngrok tab.
 Configured — paste to replace:
@@ -399,11 +378,8 @@ Connections:
   value: Connections
 Consume:
   value: Consume
-Consume material mode help:
-  value: |
-    **Consume** removes the delivered items when production finishes.
-
-    Use it for ingredients and components.
+Consume delivered items when production finishes.:
+  value: Consume delivered items when production finishes.
 Consumed:
   value: Consumed
 Continue:
@@ -440,11 +416,6 @@ Could not load notes.:
   value: Could not load notes.
 Count range:
   value: Count range
-Count range condition help:
-  value: |
-    Passes when the total is between **Minimum** and **Maximum**, including both ends.
-
-    Example: `2–4` accepts 2, 3 or 4 items.
 Counterpart:
   value: Counterpart
 Create a template to prepare a reusable board.:
@@ -562,6 +533,10 @@ Dismiss:
   value: Dismiss
 Drop:
   value: Drop
+Drop - Local:
+  value: Drop - Local
+Drop - Random:
+  value: Drop - Random
 Edit:
   value: Edit
 Edit artwork:
@@ -636,18 +611,8 @@ Every slot has a sound assigned. Switch to All to see them.:
   value: Every slot has a sound assigned. Switch to All to see them.
 Exact count:
   value: Exact count
-Exact count condition help:
-  value: |
-    Passes when matching items add up to exactly this number.
-
-    Each matching item counts as **1**.
 Exists:
   value: Exists
-Exists condition help:
-  value: |
-    Passes when at least one matching item exists.
-
-    Use it when the exact amount does not matter.
 Exit:
   value: Exit
 Expiry mode:
@@ -696,11 +661,6 @@ Gone:
   value: Gone
 Guaranteed:
   value: Guaranteed
-Guaranteed roll type help:
-  value: |
-    Always creates every configured drop when this set is selected.
-
-    Each drop still checks its own rules, quantity and placement.
 Height:
   value: Height
 Hero image:
@@ -711,6 +671,8 @@ Hide:
   value: Hide
 Hint:
   value: Hint
+Hold delivered items, then return them.:
+  value: Hold delivered items, then return them.
 Image:
   value: Image
 Images:
@@ -758,8 +720,6 @@ Input:
 Input stored:
   value: Input stored
   dynamic: true
-Input type:
-  value: Input type
 Inputs:
   value: Inputs
   dynamic: true
@@ -1009,11 +969,6 @@ Loading relationships…:
   value: Loading relationships…
 Local MCP:
   value: Local MCP
-Local drop:
-  value: Local drop
-Local drop placement help:
-  value: |
-    Places each output item in a nearby empty cell beside the item that produced it.
 Local server:
   value: Local server
 Loose-kill:
@@ -1055,20 +1010,13 @@ Material minimum quantity help:
     Fewest matching items needed before the line may start.
 
     The run may then take up to **Maximum**.
-Material mode:
-  value: Material use
 Material required item help:
   value: |
     The item delivered into this input.
 
-    Production waits for **Minimum**, then takes up to **Maximum**. **Material use** decides whether those items disappear or return afterward.
+    Production waits for **Minimum**, then takes up to **Maximum**. **Consume** removes them when production finishes; **Reserve** returns them afterward.
 Materials:
   value: Materials
-Materials input type help:
-  value: |
-    Requires matching items to be delivered here.
-
-    Use **Consume** for ingredients or **Reserve** for tools that should return.
 Maximum:
   value: Maximum
 Maximum count:
@@ -1093,13 +1041,6 @@ Merge source consume help:
     **Consume** removes one dragged item, not one Unit.
 
     Example: **Match + Unlit Candle → Candle** consumes one Match.
-Merge source space help:
-  value: |
-    **Space** sends any item dropped onto this item to the target space, preserving its identity and state. An explicit merge on the dragged item takes priority.
-
-    **Target item** controls this receiving item. Extra outcomes use this receiver's original Board position. Transport does not switch the player's space; a Space outcome can do that separately.
-
-    A full destination or failed effect cancels the whole interaction. Each item can define one Space merge.
 Merge source spend help:
   value: |
     **Spend** removes one Unit from the dragged item and keeps it in place.
@@ -1169,6 +1110,14 @@ Missing item marker:
   value: Missing item marker
 Missing reference:
   value: Missing reference
+Move the dropped item into the receiver's private room.:
+  value: Move the dropped item into the receiver's private room.
+Move the dropped item to an exact space number.:
+  value: Move the dropped item to an exact space number.
+Move the dropped item to the last space left. Without history, the merge is rejected.:
+  value: Move the dropped item to the last space left. Without history, the merge is rejected.
+Move to an exact space number.:
+  value: Move to an exact space number.
 Music:
   value: Music
 Music details:
@@ -1248,6 +1197,8 @@ No items can be placed here.:
   value: No items can be placed here.
 No items match this search.:
   value: No items match this search.
+No items or units required.:
+  value: No items or units required.
 No items yet:
   value: No items yet
 No matches found.:
@@ -1336,6 +1287,8 @@ Open project images:
   value: Open project images
 Open project settings:
   value: Open project settings
+Open this item's private room, initialized from a template on first use.:
+  value: Open this item's private room, initialized from a template on first use.
 Open your project:
   value: Open your project
 Optimize:
@@ -1353,26 +1306,16 @@ Other:
   dynamic: true
 Outcome:
   value: Outcome
-Outcome disable rule help:
-  value: Outcome disable rule help
-Outcome enable rule help:
-  value: Outcome enable rule help
 Outcome rules help:
   value: Outcome rules help
 Outcome set:
   value: Outcome set
-Outcome set disable rule help:
-  value: Outcome set disable rule help
-Outcome set enable rule help:
-  value: Outcome set enable rule help
 Outcome set rules help:
   value: Outcome set rules help
 Outcome set weight help:
   value: Outcome set weight help
 Outcome sets:
   value: Outcome sets
-Outcome type:
-  value: Outcome type
 Outcomes:
   value: Outcomes
 Outcomes help:
@@ -1387,8 +1330,6 @@ PNG files:
   value: PNG files
 Page help:
   value: Page help
-Paid by:
-  value: Paid by
 Partly ready. More is available.:
   value: Partly ready. More is available.
 Partly ready. You'll need to find more.:
@@ -1401,6 +1342,10 @@ Paths:
   value: Paths
 Pick random space:
   value: Pick random space
+Place items in nearby empty cells beside the producer.:
+  value: Place items in nearby empty cells beside the producer.
+Place items near random cells on the current Board.:
+  value: Place items near random cells on the current Board.
 Player hint:
   value: Player hint
 Playlist:
@@ -1413,6 +1358,8 @@ Preparing editor game…:
   value: Preparing editor game…
 Previous Space:
   value: Previous Space
+Produce this roll's outcomes with a chosen chance.:
+  value: Produce this roll's outcomes with a chosen chance.
 Produced by:
   value: Produced by
   dynamic: true
@@ -1430,28 +1377,6 @@ Product lines help:
     The first line enables Production and removes Action. Removing every line disables Production.
 Production:
   value: Production
-Production disable rule help:
-  value: |
-    **Disable** makes this line unavailable while all its conditions match.
-
-    It wins over **Enabled** and every Enable rule. Visibility is separate.
-Production enable rule help:
-  value: |
-    **Enable** adds a required check for this line.
-
-    If several Enable rules exist, **all of them** must pass. Any matching Disable rule still blocks the line.
-Production hide rule help:
-  value: |
-    **Hide** conceals this line while all its conditions match.
-
-    It wins over **Visible** and every Show rule. Work already in the queue continues.
-Production input type help:
-  value: |
-    Choose what this line needs before it may start:
-
-    - **Simple:** nothing.
-    - **Materials:** delivered items.
-    - **Units:** Units from this item or a matching Board item.
 Production inputs help:
   value: |
     **Every input must be ready before the line starts.**
@@ -1500,21 +1425,6 @@ Production queue capacity help:
     Maximum work accepted across all lines on this item.
 
     The active job counts, so capacity **3** means one active job plus at most two waiting.
-Production runtime adjustment rule help:
-  value: |
-    Adds or subtracts seconds while all conditions match.
-
-    Time multipliers run first. Negative results stop at zero.
-Production runtime multiplier rule help:
-  value: |
-    Multiplies production time while all conditions match.
-
-    Several matching multipliers combine before any time adjustments.
-Production show rule help:
-  value: |
-    **Show** reveals this line while all its conditions match.
-
-    Any matching Hide rule still wins. Availability is separate.
 Project:
   value: Project
 Project About avatars help:
@@ -1551,11 +1461,6 @@ Queue capacity:
   value: Queue capacity
 Random:
   value: Random
-Random drop placement help:
-  value: |
-    Starts from a random cell on the current Board, then places each item in a nearby empty cell.
-
-    Useful when output should spread around instead of appearing beside its producer.
 Reading image…:
   value: Reading image…
 Ready for this job.:
@@ -1650,11 +1555,6 @@ Required units:
   value: Required units
 Reserve:
   value: Reserve
-Reserve material mode help:
-  value: |
-    **Reserve** holds the delivered item during production and returns that same item afterward.
-
-    Use it for tools or catalysts. If there is nowhere to return it, the job waits.
 Reserved:
   value: Reserved
 Reset:
@@ -1670,12 +1570,12 @@ Result limit:
   dynamic: true
 Retry loading notes:
   value: Retry loading notes
+Return to the last space left. Without history, this outcome does nothing.:
+  value: Return to the last space left. Without history, this outcome does nothing.
 Right click to take one back.:
   value: Right click to take one back.
 Roll:
   value: Roll
-Roll type:
-  value: Roll type
 Rolls:
   value: Rolls
 Rolls help:
@@ -1697,8 +1597,6 @@ Rule reference:
 Rule references:
   value: Rule references
   dynamic: true
-Rule type:
-  value: Rule type
 Rules:
   value: Rules
 Runtime:
@@ -1789,11 +1687,6 @@ Simple:
   value: Simple
 Simple input:
   value: Simple input
-Simple input type help:
-  value: |
-    Adds no Material or Unit cost.
-
-    Other inputs on the same line or action must still be ready.
 Size:
   value: Size
 Source:
@@ -1805,20 +1698,6 @@ Space:
 Space changed:
   value: Space changed
   dynamic: true
-Space destination outcome help:
-  value: |
-    **Space** navigates to an exact space number. **Previous Space** returns the player to the space they last left successfully, using history when the outcome settles.
-
-    A new game has no previous space: this outcome then does nothing, while other outcomes settle normally. Returning updates history, so the next return goes back the other way.
-
-    **Generated Space** opens this item instance’s private room, initialized from the selected template on its first successful use. Later uses return to that same room. Destroying the owner also destroys its room and everything inside.
-Space destination transport help:
-  value: |
-    **Space** sends the dropped item to an exact space number. **Previous Space** sends it to the space the player last left successfully, preserving its identity and state.
-
-    The player stays here and navigation history does not change. Before the first navigation, the drop is rejected without changing either item or applying merge effects and outcomes.
-
-    **Generated Space** sends the item into this receiver instance’s private room. The selected template initializes it only on first successful use; navigation and transport share that room. Destroying the receiver destroys its room and everything inside.
 Space number:
   value: Space number
 Space number help:
@@ -1837,6 +1716,10 @@ Spend:
   value: Spend
 Spend one unit:
   value: Spend one unit
+Spend this item's own units.:
+  value: Spend this item's own units.
+Spend units from a matching Board item.:
+  value: Spend units from a matching Board item.
 Spends one unit:
   value: Spends one unit
   dynamic: true
@@ -1987,21 +1870,6 @@ Units already spent for this job.:
   value: Units already spent for this job.
 Units input:
   value: Units input
-Units input type help:
-  value: |
-    Spends Units when the line or action starts; the paying item stays in place.
-
-    Choose **Self** for this item or **Target** for a matching Board item.
-Units paid by self help:
-  value: |
-    This item pays the Unit cost.
-
-    It must have enough Units. The search is fixed to Self.
-Units paid by target help:
-  value: |
-    A matching item on the current Board pays in place.
-
-    Choose its item type and Board distance below. Only items with Units are available.
 Units per item:
   value: Units per item
   dynamic: true

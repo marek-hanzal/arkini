@@ -108,8 +108,13 @@ describe("MergeField", () => {
 		};
 		await renderFn(transport);
 		await act(async () =>
-			container
-				.querySelector<HTMLButtonElement>('button[data-ui-value="generated"]')!
+			container.querySelector<HTMLButtonElement>('button[data-ui-value="space"]')!.click(),
+		);
+		await act(async () =>
+			document
+				.querySelector<HTMLButtonElement>(
+					'button[data-ui="ActionMenuOption"][data-ui-id="generated"]',
+				)!
 				.click(),
 		);
 		const generated = {
@@ -158,6 +163,13 @@ describe("MergeField", () => {
 		await act(async () =>
 			container.querySelector<HTMLButtonElement>('button[data-ui-value="space"]')!.click(),
 		);
+		await act(async () =>
+			document
+				.querySelector<HTMLButtonElement>(
+					'button[data-ui="ActionMenuOption"][data-ui-id="exact"]',
+				)!
+				.click(),
+		);
 		expect(onChangeFn).not.toHaveBeenCalled();
 		await act(async () =>
 			container.querySelector<HTMLButtonElement>('button[data-ui-value="consume"]')!.click(),
@@ -171,6 +183,43 @@ describe("MergeField", () => {
 			effect: "replace",
 			result: "replacement",
 			outcome: undefined,
+		});
+	});
+
+	it("selects Previous Space without retaining an exact space number", async () => {
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		const onChangeFn = vi.fn();
+		const transport = {
+			action: "space",
+			space: 17,
+			effect: "keep",
+		} satisfies MergeSchema.Type;
+		await act(async () =>
+			root.render(
+				<MergeField
+					merge={transport}
+					onChangeFn={onChangeFn}
+					sourceUnitsEnabled={false}
+					targetUnitsEnabled={false}
+				/>,
+			),
+		);
+		await act(async () =>
+			container.querySelector<HTMLButtonElement>('button[data-ui-value="space"]')!.click(),
+		);
+		await act(async () =>
+			document
+				.querySelector<HTMLButtonElement>(
+					'button[data-ui="ActionMenuOption"][data-ui-id="previous"]',
+				)!
+				.click(),
+		);
+		expect(onChangeFn).toHaveBeenCalledWith({
+			...transport,
+			space: "previous",
 		});
 	});
 

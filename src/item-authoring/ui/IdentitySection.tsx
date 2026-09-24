@@ -42,27 +42,26 @@ export const IdentitySection = () => {
 							/>
 						)}
 					</form.AppField>
-				</div>
-				<div className="grid grid-rows-2 gap-4">
-					<form.AppField name="description">
-						{(field) => (
-							<field.TextAreaField
-								fill
-								label={translator.textFn("Description")}
-								optional
-							/>
-						)}
-					</form.AppField>
 					<form.AppField name="keywords">
 						{(field) => (
 							<field.TextAreaField
-								fill
 								label={translator.textFn("Keywords")}
 								optional
+								resizable={false}
+								rows={2}
 							/>
 						)}
 					</form.AppField>
 				</div>
+				<form.AppField name="description">
+					{(field) => (
+						<field.TextAreaField
+							fill
+							label={translator.textFn("Description")}
+							optional
+						/>
+					)}
+				</form.AppField>
 			</div>
 		</div>
 	);

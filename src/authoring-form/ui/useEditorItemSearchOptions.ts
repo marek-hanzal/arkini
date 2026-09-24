@@ -23,7 +23,7 @@ export const useEditorItemSearchOptions = (
 						({
 							id: item.uid,
 							label: item.title,
-							terms: readItemSearchTermsFn(item),
+							...readItemSearchTermsFn(item),
 						}) satisfies EditorSearchOption,
 				),
 		[

@@ -26,6 +26,9 @@ export const BoardItemPicker = (props: BoardItemPickerProps) => {
 				itemUid: option.id,
 				label: option.label,
 				terms: option.terms,
+				identityTerms: option.identityTerms,
+				descriptionTerms: option.descriptionTerms,
+				keywordTerms: option.keywordTerms,
 			}))}
 			placement="viewport"
 		/>

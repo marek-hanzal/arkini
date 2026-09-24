@@ -415,4 +415,46 @@ describe("EditorShell", () => {
 		expect(container.querySelector('[data-ui="DirtyDraftProbe"]')).not.toBeNull();
 		expect(readLink(container, "project").getAttribute("data-ui-transitioning")).toBe("false");
 	});
+
+	it("uses dialog-only c and s shortcuts for the pending leave decision", async () => {
+		const router = createTestRouter({
+			dirty: true,
+		});
+		const { container, owner } = await renderRouter(router);
+		const requestLeaveFn = async () => {
+			await act(async () => {
+				readLink(container, "project").click();
+				await Promise.resolve();
+			});
+			await vi.waitFor(() => expect(owner.getSnapshotFn().promptOpen).toBe(true));
+		};
+		const pressDialogShortcutFn = (key: string) => {
+			const dialog = container.querySelector('[data-ui="EditorUnsavedChangesDialog"]');
+			if (dialog === null) throw new Error("Missing unsaved-changes dialog.");
+			const event = new KeyboardEvent("keydown", {
+				key,
+				bubbles: true,
+				cancelable: true,
+			});
+			dialog.dispatchEvent(event);
+			return event;
+		};
+
+		await requestLeaveFn();
+		await act(async () => {
+			expect(pressDialogShortcutFn("c").defaultPrevented).toBe(true);
+		});
+		expect(owner.getSnapshotFn().promptOpen).toBe(false);
+		expect(router.state.location.pathname).toBe(
+			"/editor/editor-test/editor/items/test/form/identity",
+		);
+
+		await requestLeaveFn();
+		await act(async () => {
+			expect(pressDialogShortcutFn("s").defaultPrevented).toBe(true);
+		});
+		await vi.waitFor(() =>
+			expect(router.state.location.pathname).toBe("/editor/editor-test/project"),
+		);
+	});
 });

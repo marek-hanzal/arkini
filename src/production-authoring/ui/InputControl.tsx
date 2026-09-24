@@ -1,12 +1,3 @@
-import {
-	MousePointer2,
-	Boxes,
-	Coins,
-	Flame,
-	LockKeyhole,
-	Crosshair,
-	LocateFixed,
-} from "lucide-react";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import type { InputSchema as LineInputSchema } from "~/production-input/schema/InputSchema";
 import { match, P } from "ts-pattern";
@@ -14,15 +5,13 @@ import { DraftDefaults } from "~/production-authoring/ui/DraftDefaults";
 import { QuantityFields } from "~/production-authoring/ui/QuantityControl";
 import { BoardDistanceControl } from "~/production-authoring/ui/BoardDistanceControl";
 import { SelectorControl } from "~/production-authoring/ui/SelectorControl";
-import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { SectionEnd } from "~/ui/ui/SectionEnd";
-import { EditorChoiceControl, EditorNumberControl } from "~/editor-control/ui/EditorValueControls";
+import { EditorNumberControl } from "~/editor-control/ui/EditorValueControls";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import type { EditorFormValidationIssue } from "~/editor-control/type/EditorFormValidationIssue";
 import { readEditorFormValidationErrorFn } from "~/editor-control/fn/readEditorFormValidationErrorFn";
 import { Mx } from "~/translation/ui/Mx";
-import type { ReactNode } from "react";
 
 type UnitsInput = Extract<
 	LineInputSchema.Type,
@@ -40,82 +29,6 @@ type MaterialInput = Extract<
 
 const hasUnitsFn = (item: ItemSchema.Type) => item.units !== undefined;
 
-const UnitsPaidByControl = ({
-	error,
-	input,
-	onChangeFn,
-	ownerItemUid,
-	selfUnitsEnabled,
-}: {
-	readonly error?: string;
-	readonly input: UnitsInput;
-	readonly onChangeFn: (input: UnitsInput) => void;
-	readonly ownerItemUid: string;
-	readonly selfUnitsEnabled: boolean;
-}) => {
-	const translator = useTranslator();
-	const units = input.units ?? DraftDefaults.inputs.units.units;
-	return (
-		<EditorChoiceControl
-			error={
-				error !== undefined && units.from === "self" && !selfUnitsEnabled
-					? translator.textFn("Enable Units on this item before selecting Self.")
-					: error
-			}
-			label={translator.textFn("Paid by")}
-			value={units.from}
-			options={[
-				{
-					description: <Mx label="Units paid by target help" />,
-					icon: <Crosshair className="size-4 shrink-0" />,
-					label: translator.textFn("Target"),
-					value: "target",
-				},
-				{
-					description: <Mx label="Units paid by self help" />,
-					disabled: !selfUnitsEnabled,
-					icon: <LocateFixed className="size-4 shrink-0" />,
-					label: translator.textFn("Self"),
-					value: "self",
-				},
-			]}
-			onChangeFn={(from) => {
-				const switchingBackToTarget = from === "target" && units.from === "self";
-				onChangeFn({
-					...input,
-					units: {
-						...units,
-						from,
-					},
-					query: match({
-						from,
-						switchingBackToTarget,
-					})
-						.with(
-							{
-								from: "self",
-							},
-							() => ({
-								distance: "self" as const,
-								selector: {
-									type: "item" as const,
-									itemUid: ownerItemUid,
-								},
-							}),
-						)
-						.with(
-							{
-								switchingBackToTarget: true,
-							},
-							() => structuredClone(DraftDefaults.inputs.units.query),
-						)
-						.otherwise(() => input.query),
-				});
-			}}
-		/>
-	);
-};
-
 const UnitsSelfUnitCostControl = ({
 	error,
 	input,
@@ -132,14 +45,10 @@ const UnitsSelfUnitCostControl = ({
 			className="grid gap-3"
 			data-ui="EditorInputUnitCost"
 		>
-			<EditorFormSectionDivider
-				description={<Mx label="Self unit cost help" />}
-				title={translator.textFn("Unit cost")}
-				variant="secondary"
-			/>
 			<EditorNumberControl
+				description={<Mx label="Self unit cost help" />}
 				error={error}
-				label={translator.textFn("Cost")}
+				label={translator.textFn("Unit cost")}
 				value={units.cost}
 				min={1}
 				onChangeFn={(cost) =>
@@ -156,45 +65,6 @@ const UnitsSelfUnitCostControl = ({
 	);
 };
 
-const MaterialModeControl = ({
-	error,
-	input,
-	onChangeFn,
-}: {
-	readonly error?: string;
-	readonly input: MaterialInput;
-	readonly onChangeFn: (input: MaterialInput) => void;
-}) => {
-	const translator = useTranslator();
-	return (
-		<EditorChoiceControl
-			error={error}
-			label={translator.textFn("Material mode")}
-			value={input.mode}
-			options={[
-				{
-					description: <Mx label="Consume material mode help" />,
-					icon: <Flame className="size-4 shrink-0" />,
-					label: translator.textFn("Consume"),
-					value: "consume",
-				},
-				{
-					description: <Mx label="Reserve material mode help" />,
-					icon: <LockKeyhole className="size-4 shrink-0" />,
-					label: translator.textFn("Reserve"),
-					value: "reserve",
-				},
-			]}
-			onChangeFn={(mode) =>
-				onChangeFn({
-					...input,
-					mode,
-				})
-			}
-		/>
-	);
-};
-
 const MaterialInputControl = ({
 	input,
 	issues,
@@ -207,14 +77,10 @@ const MaterialInputControl = ({
 	const translator = useTranslator();
 	return (
 		<div className="grid gap-3">
-			<EditorFormSectionDivider
-				description={<Mx label="Material required item help" />}
-				title={translator.textFn("Required item")}
-				variant="secondary"
-			/>
 			<SelectorControl
+				description={<Mx label="Material required item help" />}
 				error={readEditorFormValidationErrorFn(issues, "query", "selector")}
-				labelVisible={false}
+				label={translator.textFn("Required item")}
 				value={input.query.selector}
 				onChangeFn={(selector) =>
 					onChangeFn({
@@ -226,32 +92,34 @@ const MaterialInputControl = ({
 					})
 				}
 			/>
-			<div className="grid grid-cols-2 gap-3">
-				<QuantityFields
-					minimumError={readEditorFormValidationErrorFn(issues, "quantity", "min")}
-					maximumError={readEditorFormValidationErrorFn(issues, "quantity", "max")}
-					minimumDescription={<Mx label="Material minimum quantity help" />}
-					maximumDescription={<Mx label="Material maximum quantity help" />}
-					value={input.quantity}
-					onChangeFn={(quantity) =>
-						onChangeFn({
-							...input,
-							quantity,
-						})
-					}
-				/>
-			</div>
-			<div className="flex min-w-0 items-start justify-between gap-3">
-				<BoardDistanceControl
-					error={readEditorFormValidationErrorFn(issues, "query", "distance")}
-					value={input.query}
-					onChangeFn={(query) =>
-						onChangeFn({
-							...input,
-							query,
-						})
-					}
-				/>
+			<div className="grid grid-cols-2 items-start gap-3">
+				<div className="grid min-w-0 grid-cols-2 gap-3">
+					<QuantityFields
+						minimumError={readEditorFormValidationErrorFn(issues, "quantity", "min")}
+						maximumError={readEditorFormValidationErrorFn(issues, "quantity", "max")}
+						minimumDescription={<Mx label="Material minimum quantity help" />}
+						maximumDescription={<Mx label="Material maximum quantity help" />}
+						value={input.quantity}
+						onChangeFn={(quantity) =>
+							onChangeFn({
+								...input,
+								quantity,
+							})
+						}
+					/>
+				</div>
+				<div className="flex min-w-0 justify-end">
+					<BoardDistanceControl
+						error={readEditorFormValidationErrorFn(issues, "query", "distance")}
+						value={input.query}
+						onChangeFn={(query) =>
+							onChangeFn({
+								...input,
+								query,
+							})
+						}
+					/>
+				</div>
 			</div>
 		</div>
 	);
@@ -278,12 +146,8 @@ const UnitsTargetUnitCostControl = ({
 			className="grid gap-3"
 			data-ui="EditorInputUnitCost"
 		>
-			<EditorFormSectionDivider
-				description={<Mx label="Target unit cost help" />}
-				title={translator.textFn("Unit cost")}
-				variant="secondary"
-			/>
 			<SelectorControl
+				description={<Mx label="Target unit cost help" />}
 				emptyLabel={translator.textFn("No item with Units enabled matches this search.")}
 				error={match({
 					targetMissingUnits,
@@ -305,7 +169,7 @@ const UnitsTargetUnitCostControl = ({
 					)
 					.otherwise(() => selectedItemError)}
 				includeItemFn={hasUnitsFn}
-				labelVisible={false}
+				label={translator.textFn("Unit cost")}
 				value={input.query.selector}
 				onChangeFn={(selector) => {
 					const selectedUnitAmount =
@@ -326,18 +190,7 @@ const UnitsTargetUnitCostControl = ({
 					});
 				}}
 			/>
-			<div className="grid items-end gap-3 sm:grid-cols-[auto_minmax(0,1fr)]">
-				<BoardDistanceControl
-					error={readEditorFormValidationErrorFn(issues, "query", "distance")}
-					value={input.query}
-					onChangeFn={(query) => {
-						onChangeFn({
-							...input,
-							units,
-							query,
-						});
-					}}
-				/>
+			<div className="grid grid-cols-2 items-start gap-3">
 				<EditorNumberControl
 					disabled={selectedItemUnitAmount === undefined}
 					error={readEditorFormValidationErrorFn(issues, "units", "cost")}
@@ -356,107 +209,39 @@ const UnitsTargetUnitCostControl = ({
 						});
 					}}
 				/>
+				<div className="flex min-w-0 justify-end">
+					<BoardDistanceControl
+						error={readEditorFormValidationErrorFn(issues, "query", "distance")}
+						value={input.query}
+						onChangeFn={(query) => {
+							onChangeFn({
+								...input,
+								units,
+								query,
+							});
+						}}
+					/>
+				</div>
 			</div>
 		</div>
 	);
 };
 
 export const InputControl = ({
-	allowMaterials = true,
 	input,
 	issues = [],
 	onChangeFn,
-	ownerItemUid,
 	selfUnitsEnabled,
 }: {
-	readonly allowMaterials?: boolean;
 	readonly input: LineInputSchema.Type;
 	readonly issues?: ReadonlyArray<EditorFormValidationIssue>;
 	readonly onChangeFn: (input: LineInputSchema.Type) => void;
-	readonly ownerItemUid: string;
 	readonly selfUnitsEnabled: boolean;
 }) => {
 	const translator = useTranslator();
-	const inputTypeOptions = [
-		{
-			description: <Mx label="Simple input type help" />,
-			icon: <MousePointer2 className="size-4 shrink-0" />,
-			label: translator.textFn("Simple"),
-			value: "simple",
-		},
-		{
-			description: <Mx label="Materials input type help" />,
-			icon: <Boxes className="size-4 shrink-0" />,
-			label: translator.textFn("Materials"),
-			value: "materials",
-		},
-		{
-			description: <Mx label="Units input type help" />,
-			icon: <Coins className="size-4 shrink-0" />,
-			label: translator.textFn("Units"),
-			value: "units",
-		},
-	] as const satisfies ReadonlyArray<{
-		readonly icon: ReactNode;
-		readonly description: ReactNode;
-		readonly label: string;
-		readonly value: LineInputSchema.Type["type"];
-	}>;
 
 	return (
 		<article className="grid gap-4">
-			<div className="flex flex-wrap items-start gap-4">
-				<EditorChoiceControl
-					error={readEditorFormValidationErrorFn(issues, "type")}
-					label={translator.textFn("Input type")}
-					description={
-						allowMaterials ? (
-							<Mx label="Production input type help" />
-						) : (
-							<Mx label="Action input type help" />
-						)
-					}
-					value={input.type}
-					options={inputTypeOptions.filter(
-						(option) => allowMaterials || option.value !== "materials",
-					)}
-					onChangeFn={(type) => onChangeFn(structuredClone(DraftDefaults.inputs[type]))}
-				/>
-				{match(input)
-					.with(
-						{
-							type: "materials",
-						},
-						(input) => (
-							<MaterialModeControl
-								error={readEditorFormValidationErrorFn(issues, "mode")}
-								input={input}
-								onChangeFn={onChangeFn}
-							/>
-						),
-					)
-					.with(
-						{
-							type: "units",
-						},
-						(input) => (
-							<UnitsPaidByControl
-								error={readEditorFormValidationErrorFn(issues, "units", "from")}
-								input={input}
-								ownerItemUid={ownerItemUid}
-								selfUnitsEnabled={selfUnitsEnabled}
-								onChangeFn={onChangeFn}
-							/>
-						),
-					)
-					.with(
-						{
-							type: "simple",
-						},
-						() => null,
-					)
-					.exhaustive()}
-			</div>
 			{match(input)
 				.with(
 					{
@@ -490,7 +275,22 @@ export const InputControl = ({
 							/>
 						) : (
 							<UnitsSelfUnitCostControl
-								error={readEditorFormValidationErrorFn(issues, "units", "cost")}
+								error={
+									!selfUnitsEnabled
+										? translator.textFn(
+												"Enable Units on this item before selecting Self.",
+											)
+										: (readEditorFormValidationErrorFn(
+												issues,
+												"units",
+												"from",
+											) ??
+											readEditorFormValidationErrorFn(
+												issues,
+												"units",
+												"cost",
+											))
+								}
 								input={unitsInput}
 								onChangeFn={onChangeFn}
 							/>

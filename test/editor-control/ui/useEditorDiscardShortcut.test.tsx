@@ -20,20 +20,28 @@ afterEach(async () => {
 const Probe = ({
 	discardEnabled = true,
 	discardFn,
+	scope,
 }: {
 	readonly discardEnabled?: boolean;
 	readonly discardFn: () => void | Promise<unknown>;
+	readonly scope?: "page" | "overlay" | "dialog";
 }) => {
 	useEditorDiscardShortcut({
 		discardEnabled,
 		discardFn,
+		scope,
 	});
-	return <textarea />;
+	return (
+		<>
+			<textarea />
+			<button type="button">Outside text</button>
+		</>
+	);
 };
 
-const pressEscape = (target: EventTarget, init: KeyboardEventInit = {}) => {
+const pressKey = (target: EventTarget, key: string, init: KeyboardEventInit = {}) => {
 	const event = new KeyboardEvent("keydown", {
-		key: "Escape",
+		key,
 		bubbles: true,
 		cancelable: true,
 		...init,
@@ -41,8 +49,47 @@ const pressEscape = (target: EventTarget, init: KeyboardEventInit = {}) => {
 	target.dispatchEvent(event);
 	return event;
 };
+const pressEscape = (target: EventTarget, init: KeyboardEventInit = {}) =>
+	pressKey(target, "Escape", init);
 
 describe("Editor Discard shortcut", () => {
+	it("uses plain d to discard while preserving typing and modified shortcuts", async () => {
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		const discardFn = vi.fn();
+		await act(async () => root.render(<Probe discardFn={discardFn} />));
+		const button = container.querySelector("button")!;
+		const textarea = container.querySelector("textarea")!;
+		await act(async () => {
+			pressKey(textarea, "d");
+			pressKey(button, "d", {
+				ctrlKey: true,
+			});
+			pressKey(button, "d", {
+				shiftKey: true,
+			});
+		});
+		const dialog = document.createElement("div");
+		dialog.dataset.ui = "EditorUnsavedChangesDialog";
+		document.body.append(dialog);
+		await act(async () => {
+			pressKey(button, "d");
+		});
+		dialog.remove();
+		expect(discardFn).not.toHaveBeenCalled();
+		const conflictingFn = vi.fn();
+		button.addEventListener("keydown", conflictingFn);
+		let event: KeyboardEvent;
+		await act(async () => {
+			event = pressKey(button, "d");
+		});
+		expect(event!.defaultPrevented).toBe(true);
+		expect(discardFn).toHaveBeenCalledOnce();
+		expect(conflictingFn).not.toHaveBeenCalled();
+	});
+
 	it("routes Escape from a form field to the latest discard callback", async () => {
 		const container = document.createElement("div");
 		document.body.append(container);
@@ -59,6 +106,63 @@ describe("Editor Discard shortcut", () => {
 		expect(event!.defaultPrevented).toBe(true);
 		expect(first).not.toHaveBeenCalled();
 		expect(latest).toHaveBeenCalledOnce();
+	});
+
+	it("discards the overlay editor without discarding the page beneath it", async () => {
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		const pageDiscardFn = vi.fn();
+		const overlayDiscardFn = vi.fn();
+		await act(async () =>
+			root.render(
+				<>
+					<Probe discardFn={pageDiscardFn} />
+					<div data-ui="Overlay">
+						<Probe
+							discardFn={overlayDiscardFn}
+							scope="overlay"
+						/>
+					</div>
+				</>,
+			),
+		);
+		const overlay = container.querySelector('[data-ui="Overlay"]')!;
+		await act(async () => {
+			pressKey(overlay.querySelector("textarea")!, "d");
+			pressKey(overlay.querySelector("button")!, "d");
+		});
+		expect(overlayDiscardFn).toHaveBeenCalledOnce();
+		expect(pageDiscardFn).not.toHaveBeenCalled();
+	});
+
+	it("routes d to the unsaved-changes dialog before the underlying editor", async () => {
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		const pageDiscardFn = vi.fn();
+		const dialogDiscardFn = vi.fn();
+		await act(async () =>
+			root.render(
+				<>
+					<Probe discardFn={pageDiscardFn} />
+					<div data-ui="EditorUnsavedChangesDialog">
+						<Probe
+							discardFn={dialogDiscardFn}
+							scope="dialog"
+						/>
+					</div>
+				</>,
+			),
+		);
+		const dialog = container.querySelector('[data-ui="EditorUnsavedChangesDialog"]')!;
+		await act(async () => {
+			pressKey(dialog.querySelector("button")!, "d");
+		});
+		expect(dialogDiscardFn).toHaveBeenCalledOnce();
+		expect(pageDiscardFn).not.toHaveBeenCalled();
 	});
 
 	it("leaves handled, disabled, repeated and composing Escape events alone", async () => {

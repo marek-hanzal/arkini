@@ -38,6 +38,18 @@ export const OutcomeOption = ({
 				)
 			}
 		>
+			{ids.map((id) => (
+				<EditorItemThumbnail
+					key={id}
+					size="md"
+					className="rounded-md"
+					resourceUids={
+						project.config.items[id]?.artwork.default ?? [
+							"",
+						]
+					}
+				/>
+			))}
 			{outcomes
 				.filter((outcome) => outcome.type === "space")
 				.map((outcome, index) => (
@@ -65,18 +77,6 @@ export const OutcomeOption = ({
 						)?.title ?? translator.textFn("No template selected")}
 					</span>
 				))}
-			{ids.map((id) => (
-				<EditorItemThumbnail
-					key={id}
-					size="md"
-					className="rounded-md"
-					resourceUids={
-						project.config.items[id]?.artwork.default ?? [
-							"",
-						]
-					}
-				/>
-			))}
 		</EditorCollectionOption>
 	);
 };

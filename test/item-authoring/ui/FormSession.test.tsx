@@ -300,6 +300,16 @@ const completeFirstProductionLine = async (container: HTMLElement) => {
 		throw new Error("Missing new production line identity fields.");
 	await changeInput(title, "Test production line");
 	await changeTextArea(description, "Produces the test outcome.");
+	const addInput = container.querySelector<HTMLButtonElement>(
+		'[data-ui="EditorInputsCollection"] [data-ui="EditorCollectionAdd"]',
+	);
+	if (addInput === null) throw new Error("Missing new production line input control.");
+	await act(async () => addInput.click());
+	const simple = document.querySelector<HTMLButtonElement>(
+		'[data-ui="ActionMenuOption"][data-ui-id="simple"]',
+	);
+	if (simple === null) throw new Error("Missing Simple input option.");
+	await act(async () => simple.click());
 };
 
 describe("item section form session", () => {
@@ -846,10 +856,10 @@ describe("item section form session", () => {
 		);
 		if (addRoll === null) throw new Error("Missing add roll control.");
 		await act(async () => addRoll.click());
-		const guaranteed = Array.from(container.querySelectorAll("button")).find(
-			(button) => button.textContent?.includes("Guaranteed") === true,
+		const guaranteed = document.querySelector<HTMLButtonElement>(
+			'[data-ui="ActionMenuOption"][data-ui-id="guaranteed"]',
 		);
-		if (guaranteed === undefined) throw new Error("Missing roll type control.");
+		if (guaranteed === null) throw new Error("Missing Guaranteed roll option.");
 		await act(async () => guaranteed.click());
 		const addDrop = container.querySelector<HTMLButtonElement>(
 			'[data-ui="EditorOutcomesCollection"] [data-ui="EditorCollectionAdd"]',
@@ -873,6 +883,11 @@ describe("item section form session", () => {
 		expect(container.textContent).not.toContain("Select an item.");
 
 		await act(async () => addDrop.click());
+		const itemOutcome = document.querySelector<HTMLButtonElement>(
+			'[data-ui="ActionMenuOption"][data-ui-id="drop-local"]',
+		);
+		if (itemOutcome === null) throw new Error("Missing local drop outcome option.");
+		await act(async () => itemOutcome.click());
 		await act(async () => {
 			saveButton.click();
 			await Promise.resolve();
@@ -976,6 +991,15 @@ describe("item section form session", () => {
 		);
 		if (addLine === null) throw new Error("Missing add production line control.");
 		await act(async () => addLine.click());
+		expect(
+			container.querySelector<HTMLInputElement>('[data-ui="EditorInputsCollection"] input')
+				?.value,
+		).toBe("");
+		expect(
+			container.querySelector<HTMLButtonElement>(
+				'[data-ui="EditorInputsCollection"] [data-ui="EditorCollectionRemove"]',
+			)?.disabled,
+		).toBe(true);
 		await completeFirstProductionLine(container);
 		await act(async () => {
 			await state.unsavedSession?.saveFn();

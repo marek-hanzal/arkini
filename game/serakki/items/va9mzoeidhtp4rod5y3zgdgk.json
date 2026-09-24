@@ -3,8 +3,9 @@
 	"item": {
 		"uid": "va9mzoeidhtp4rod5y3zgdgk",
 		"title": "Blasting Machine",
-		"ui": "simple",
 		"description": "This will make kaboom if connected properly",
+		"keywords": "dynamite",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [

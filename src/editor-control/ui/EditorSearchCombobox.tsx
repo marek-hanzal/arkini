@@ -36,6 +36,9 @@ export interface EditorSearchOption {
 	readonly label: string;
 	readonly meta?: string;
 	readonly terms: readonly string[];
+	readonly identityTerms?: readonly string[];
+	readonly descriptionTerms?: readonly string[];
+	readonly keywordTerms?: readonly string[];
 	readonly relatedTerms?: readonly string[];
 }
 
@@ -132,11 +135,16 @@ export const EditorSearchCombobox = ({
 		]);
 	const candidates = useMemo(
 		() =>
-			options.map(({ id, terms, relatedTerms }) => ({
-				identity: id,
-				terms,
-				relatedTerms,
-			})),
+			options.map(
+				({ id, terms, identityTerms, descriptionTerms, keywordTerms, relatedTerms }) => ({
+					identity: id,
+					terms,
+					identityTerms,
+					descriptionTerms,
+					keywordTerms,
+					relatedTerms,
+				}),
+			),
 		[
 			options,
 		],
@@ -295,7 +303,7 @@ export const EditorSearchCombobox = ({
 								}
 								type="button"
 								disabled={searchPending}
-								className="flex min-w-0 cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2 text-left data-[ui-selected=false]:enabled:hover:bg-surface-raised data-[ui-selected=false]:data-[ui-active=true]:enabled:bg-surface-raised data-[ui-selected=true]:bg-selection data-[ui-selected=true]:enabled:hover:bg-selection-hover data-[ui-selected=true]:data-[ui-active=true]:enabled:bg-selection-hover data-[ui-virtual=true]:absolute data-[ui-virtual=true]:top-0 data-[ui-virtual=true]:left-1.5 data-[ui-virtual=true]:w-[calc(100%-0.75rem)]"
+								className="flex w-full min-w-0 cursor-pointer items-center gap-3 overflow-hidden rounded-lg px-2.5 py-2 text-left data-[ui-selected=false]:enabled:hover:bg-surface-raised data-[ui-selected=false]:data-[ui-active=true]:enabled:bg-surface-raised data-[ui-selected=true]:bg-selection data-[ui-selected=true]:enabled:hover:bg-selection-hover data-[ui-selected=true]:data-[ui-active=true]:enabled:bg-selection-hover data-[ui-virtual=true]:absolute data-[ui-virtual=true]:top-0 data-[ui-virtual=true]:left-1.5 data-[ui-virtual=true]:w-[calc(100%-0.75rem)]"
 								onMouseDown={(event) => event.preventDefault()}
 								onMouseEnter={() => {
 									keyboardScrollPendingRef.current = false;
@@ -446,7 +454,7 @@ export const EditorSearchCombobox = ({
 					<span
 						ref={refs.setFloating}
 						style={floatingStyles}
-						className="z-50 grid gap-1 overflow-y-auto rounded-xl border border-control-border bg-[var(--ak-editor-background)] p-1.5 shadow-2xl data-[ui-virtual=true]:block data-[ui-virtual=true]:p-0"
+						className="z-50 grid min-w-0 grid-cols-[minmax(0,1fr)] gap-1 overflow-y-auto rounded-xl border border-control-border bg-[var(--ak-editor-background)] p-1.5 shadow-2xl data-[ui-virtual=true]:block data-[ui-virtual=true]:p-0"
 						{...readDataUiFn({
 							dataUi: "EditorSearchComboboxMenu",
 							state: {

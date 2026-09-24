@@ -6,6 +6,7 @@ import { EditorDurationHint } from "~/editor-control/ui/EditorDurationHint";
 import { EditorValueField } from "~/editor-control/ui/EditorValueField";
 import { editorInputClassName } from "~/editor-control/constant/EditorInputClassName";
 import { SegmentedControl } from "~/ui/ui/SegmentedControl";
+import type { ActionMenuOption } from "~/ui/ui/ActionMenu";
 import { EditorIconButton } from "~/editor-control/ui/EditorIconButton";
 
 interface EditorValueControlProps {
@@ -152,12 +153,14 @@ export const EditorTextAreaControl = ({
 	onChangeFn,
 	placeholder,
 	required = true,
+	resizable = true,
 	rows = 4,
 	value,
 }: {
 	readonly fill?: boolean;
 	readonly onChangeFn: (value: string) => void;
 	readonly placeholder?: string;
+	readonly resizable?: boolean;
 	readonly rows?: number;
 	readonly value: string;
 } & EditorNamedValueControlProps) => (
@@ -171,7 +174,7 @@ export const EditorTextAreaControl = ({
 		<textarea
 			name={name}
 			value={value}
-			className={`${editorInputClassName} ${fill ? "h-full resize-none" : "resize-y"} leading-6`}
+			className={`${editorInputClassName} ${fill ? "h-full" : ""} resize-none data-[ui-resizable=true]:resize-y leading-6`}
 			placeholder={placeholder}
 			rows={rows}
 			onBlur={onBlurFn}
@@ -180,6 +183,7 @@ export const EditorTextAreaControl = ({
 				dataUi: "EditorTextAreaControlInput",
 				state: {
 					invalid: error !== undefined,
+					resizable: resizable && !fill,
 				},
 			})}
 		/>
@@ -244,6 +248,7 @@ export const EditorChoiceControl = <Value extends string>({
 		readonly description?: ReactNode;
 		readonly disabled?: boolean;
 		readonly label: string;
+		readonly menuOptions?: readonly ActionMenuOption[];
 		readonly value: Value;
 	}>;
 	readonly value: Value | undefined;

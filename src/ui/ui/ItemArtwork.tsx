@@ -14,6 +14,7 @@ export interface ItemArtworkProps {
 	readonly compositeUrl?: string;
 	readonly dataUi?: string;
 	readonly imageClassName?: string;
+	readonly onImageErrorFn?: () => void;
 	readonly size?: keyof typeof artworkSizeClassName;
 	readonly sourceUrl: string;
 	/** Fraction of the artwork revealed in color from the bottom, with a feathered boundary. */
@@ -26,6 +27,7 @@ export const ItemArtwork = ({
 	compositeUrl,
 	dataUi,
 	imageClassName = "",
+	onImageErrorFn,
 	size = "sm",
 	sourceUrl,
 	colorFraction,
@@ -45,6 +47,7 @@ export const ItemArtwork = ({
 				src={sourceUrl}
 				alt=""
 				draggable={false}
+				onError={onImageErrorFn}
 			/>
 			{compositeUrl === undefined ? null : (
 				<img
@@ -56,6 +59,7 @@ export const ItemArtwork = ({
 					src={compositeUrl}
 					alt=""
 					draggable={false}
+					onError={onImageErrorFn}
 				/>
 			)}
 		</>

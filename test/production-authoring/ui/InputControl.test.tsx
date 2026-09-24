@@ -71,7 +71,6 @@ const renderInput = async (
 		root.render(
 			<InputControl
 				input={input}
-				ownerItemUid="owner"
 				selfUnitsEnabled={selfUnitsEnabled}
 				onChangeFn={onChangeFn}
 			/>,
@@ -295,33 +294,6 @@ describe("InputControl", () => {
 		);
 	});
 
-	it("binds a self-paid Units to the owning item instead of a hidden empty target", async () => {
-		const { container, root } = createContainer();
-		const onChangeFn = vi.fn();
-		await renderInput(root, withoutUnitsUnitsInput, onChangeFn);
-
-		const self = findChoiceControl(container, "Paid by").querySelector<HTMLButtonElement>(
-			'[data-ui-value="self"]',
-		);
-		if (self === null) throw new Error("Expected Self unit source option.");
-		await act(async () => self.click());
-
-		expect(onChangeFn).toHaveBeenCalledWith({
-			...withoutUnitsUnitsInput,
-			units: {
-				cost: 1,
-				from: "self",
-			},
-			query: {
-				distance: "self",
-				selector: {
-					type: "item",
-					itemUid: "owner",
-				},
-			},
-		});
-	});
-
 	it("marks the exact invalid Units control and shows its local error", async () => {
 		const { container, root } = createContainer();
 		await act(async () => {
@@ -339,7 +311,6 @@ describe("InputControl", () => {
 						},
 					]}
 					onChangeFn={() => undefined}
-					ownerItemUid="owner"
 					selfUnitsEnabled
 				/>,
 			);
@@ -350,21 +321,41 @@ describe("InputControl", () => {
 		);
 		expect(selectedItem?.dataset.uiInvalid).toBe("true");
 		expect(container.textContent).toContain("Choose a target with units.");
-		expect(findChoiceControl(container, "Paid by").getAttribute("data-ui-invalid")).toBe(
-			"false",
-		);
 	});
 
-	it("disables Self when the owning item has no Units", async () => {
+	it("keeps an existing self-paid input editable and flags its disabled owner Units", async () => {
 		const { container, root } = createContainer();
-		await renderInput(root, withoutUnitsUnitsInput, () => undefined, false);
-
-		const paidBy = findChoiceControl(container, "Paid by");
-		const self = paidBy.querySelector<HTMLButtonElement>('[data-ui-value="self"]');
-		if (self === null) throw new Error("Expected Self unit source option.");
-
-		expect(self.disabled).toBe(true);
-		expect(self.dataset.uiDisabled).toBe("true");
+		const input: InputSchema.Type = {
+			type: "units",
+			units: {
+				cost: 2,
+				from: "self",
+			},
+			query: {
+				distance: "self",
+				selector: {
+					type: "item",
+					itemUid: "owner",
+				},
+			},
+		};
+		const onChangeFn = vi.fn();
+		await renderInput(root, input, onChangeFn, false);
+		expect(container.textContent).toContain("Enable Units on this item before selecting Self.");
+		const cost = container.querySelector<HTMLInputElement>('input[type="number"]');
+		if (cost === null) throw new Error("Expected existing self unit Cost.");
+		await changeInput(cost, "3");
+		expect(onChangeFn).toHaveBeenCalledWith({
+			...input,
+			units: {
+				cost: 3,
+				from: "self",
+			},
+		});
+		await renderInput(root, input, onChangeFn, true);
+		expect(container.textContent).not.toContain(
+			"Enable Units on this item before selecting Self.",
+		);
 	});
 
 	it("offers only items with units to a target-paid Units and flags an existing invalid target", async () => {

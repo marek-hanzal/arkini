@@ -39,6 +39,33 @@ const readFormValues = (item: ItemSchema.Type): FormValues => ({
 });
 
 describe("createFormSchema", () => {
+	it("rejects a production line draft until an input type is chosen", () => {
+		const producer = createProducerItem({
+			id: "producer",
+		});
+		const draft = {
+			...readFormValues(producer),
+			lines: producer.lines.map((line) => ({
+				...line,
+				input: [],
+			})),
+		};
+		const project = {
+			config: {
+				...editorTestConfig,
+				items: {
+					[producer.uid]: producer,
+				},
+			},
+		};
+		const result = createFormSchema(project, producer.uid).safeParse(draft);
+		expect(result.success).toBe(false);
+		if (result.success) return;
+		expect(result.error.issues.map((issue) => issue.path.join("."))).toContain(
+			"lines.0.input.0",
+		);
+	});
+
 	it("rejects another item's line UID while retaining the edited owner's stable identity", () => {
 		const first = createProducerItem({
 			id: "first",

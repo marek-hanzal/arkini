@@ -1,4 +1,5 @@
 import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
+import { formatForDisplay } from "@tanstack/react-hotkeys";
 import {
 	EditorSectionBar,
 	EditorSectionShortcutNavigation,
@@ -21,6 +22,8 @@ import { Status } from "~/ui/ui/Status";
 import { SearchInput } from "~/ui/ui/SearchInput";
 import { useDebouncedSearchQuery } from "~/ui/ui/useDebouncedSearchQuery";
 import { useTranslator } from "~/translation/ui/useTranslator";
+import { ShortcutLabel } from "~/ui/ui/ShortcutLabel";
+import { Tooltip } from "~/ui/ui/Tooltip";
 
 const readItemKeyFn = (item: ItemSchema.Type) => item.uid;
 
@@ -50,7 +53,7 @@ export const List = ({
 			icon: ArrowDownAZ,
 			label: translator.textFn("Name"),
 			value: "name",
-			shortcut: "n",
+			shortcut: "a",
 		},
 		{
 			icon: NotebookPen,
@@ -123,15 +126,27 @@ export const List = ({
 		],
 	);
 	const newItemMenu = (
-		<CreateItemLink
-			dataUi="EditorNewItemMenu"
-			projectId={project.projectId}
-			className="h-10 min-h-10 shrink-0 gap-2 px-3 py-2 text-sm"
-			variant="primary"
+		<Tooltip
+			content={`${translator.textFn("New item")} · ${formatForDisplay({
+				key: "n",
+			})}`}
+			placement="bottom"
 		>
-			<Plus className="size-4" />
-			{translator.textFn("New item")}
-		</CreateItemLink>
+			<CreateItemLink
+				dataUi="EditorNewItemMenu"
+				projectId={project.projectId}
+				shortcut="n"
+				className="h-10 min-h-10 shrink-0 gap-2 px-3 py-2 text-sm"
+				variant="primary"
+			>
+				<Plus className="size-4" />
+				<ShortcutLabel
+					highlightClassName="text-shortcut-highlight-on-accent"
+					label={translator.textFn("New item")}
+					shortcut="n"
+				/>
+			</CreateItemLink>
+		</Tooltip>
 	);
 	return (
 		<EditorSectionPage

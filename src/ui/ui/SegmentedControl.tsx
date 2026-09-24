@@ -1,7 +1,8 @@
-import { Info } from "lucide-react";
-import type { ReactNode } from "react";
+import { ChevronDown, Info } from "lucide-react";
+import { cloneElement, type ReactNode } from "react";
 
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
+import { ActionMenu, type ActionMenuOption } from "~/ui/ui/ActionMenu";
 import { Tooltip } from "~/ui/ui/Tooltip";
 
 interface SegmentedControlOption<Value extends string> {
@@ -9,6 +10,7 @@ interface SegmentedControlOption<Value extends string> {
 	readonly description?: ReactNode;
 	readonly disabled?: boolean;
 	readonly label: ReactNode;
+	readonly menuOptions?: readonly ActionMenuOption[];
 	readonly value: Value;
 }
 
@@ -71,7 +73,11 @@ export const SegmentedControl = <Value extends string>({
 					type="button"
 					className={`ak-segmented-option group/shortcut relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-none border font-semibold ${disabledTooltipReference ? "w-full pointer-events-none" : overlapClassName} ${edgeClassName} ${fill ? "flex-1" : ""} ${SegmentedControlSizeClassName[size]}`}
 					disabled={optionDisabled}
-					onClick={() => onChangeFn(option.value)}
+					onClick={
+						option.menuOptions === undefined
+							? () => onChangeFn(option.value)
+							: undefined
+					}
 					{...readDataUiFn({
 						dataUi: optionDataUi,
 						state: {
@@ -84,11 +90,22 @@ export const SegmentedControl = <Value extends string>({
 				>
 					{option.icon}
 					{option.label}
+					{option.menuOptions === undefined ? null : (
+						<ChevronDown className="size-3.5 opacity-70" />
+					)}
 					{option.description === undefined ? null : (
 						<Info className="size-3.5 opacity-70" />
 					)}
 				</button>
 			);
+			if (option.menuOptions !== undefined)
+				return (
+					<ActionMenu
+						key={option.value}
+						options={option.menuOptions}
+						renderTriggerFn={(props) => cloneElement(button, props)}
+					/>
+				);
 			if (option.description === undefined) return button;
 			return disabledTooltipReference ? (
 				<Tooltip

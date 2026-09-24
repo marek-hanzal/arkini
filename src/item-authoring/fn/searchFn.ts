@@ -9,7 +9,7 @@ export const searchFn = (
 ): ReadonlyArray<ItemSchema.Type> => {
 	const fuzzyFn = createFuzzySearchFn({
 		candidates: items.map((item) => ({
-			terms: readItemSearchTermsFn(item),
+			...readItemSearchTermsFn(item),
 			value: item,
 		})),
 	});

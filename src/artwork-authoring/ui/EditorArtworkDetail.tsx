@@ -183,16 +183,28 @@ export const EditorArtworkDetail = ({
 			secondaryNavigation={
 				<EditorSectionBar
 					actions={
-						<CreateItemLink
-							dataUi="EditorArtworkCreateItem"
-							defaultTitle={resource.title}
-							projectId={project.projectId}
-							resourceUid={resource.uid}
-							variant="link"
-							className="inline-flex items-center gap-1.5 text-sm"
+						<Tooltip
+							content={`${translator.textFn("Create item")} · ${formatForDisplay({
+								key: "c",
+							})}`}
+							placement="bottom"
 						>
-							<PackagePlus className="size-4" /> <Tx label="Create item" />
-						</CreateItemLink>
+							<CreateItemLink
+								dataUi="EditorArtworkCreateItem"
+								defaultTitle={resource.title}
+								projectId={project.projectId}
+								resourceUid={resource.uid}
+								shortcut="c"
+								variant="link"
+								className="group/shortcut inline-flex items-center gap-1.5 text-sm text-muted"
+							>
+								<PackagePlus className="size-4" />
+								<ShortcutLabel
+									label={translator.textFn("Create item")}
+									shortcut="c"
+								/>
+							</CreateItemLink>
+						</Tooltip>
 					}
 					help={<EditorPageHelp {...help} />}
 				>

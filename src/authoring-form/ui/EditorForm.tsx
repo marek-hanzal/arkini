@@ -54,6 +54,7 @@ interface EditorTextAreaFieldProps {
 	readonly label: string;
 	readonly optional?: boolean;
 	readonly placeholder?: string;
+	readonly resizable?: boolean;
 	readonly rows?: number;
 }
 
@@ -63,6 +64,7 @@ const EditorTextAreaField = ({
 	label,
 	optional = false,
 	placeholder,
+	resizable = true,
 	rows = 4,
 }: EditorTextAreaFieldProps) => {
 	const field = useFieldContext<string>();
@@ -78,6 +80,7 @@ const EditorTextAreaField = ({
 			onChangeFn={field.handleChange}
 			placeholder={placeholder}
 			required={!optional}
+			resizable={resizable}
 			rows={rows}
 			value={field.state.value}
 		/>

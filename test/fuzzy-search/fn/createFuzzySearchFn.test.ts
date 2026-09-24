@@ -61,6 +61,43 @@ describe("createFuzzySearchFn", () => {
 		]);
 	});
 
+	it("ranks item title, description and keyword matches in that order", () => {
+		const fuzzyFn = createFuzzySearchFn({
+			candidates: [
+				{
+					value: "keyword",
+					terms: [
+						"Blasting Machine",
+					],
+					keywordTerms: [
+						"dynam",
+					],
+				},
+				{
+					value: "description",
+					terms: [
+						"Other machine",
+					],
+					descriptionTerms: [
+						"dynam",
+					],
+				},
+				{
+					value: "title",
+					terms: [
+						"Dynamite",
+					],
+				},
+			],
+		});
+
+		expect(fuzzyFn("dynam")).toEqual([
+			"title",
+			"description",
+			"keyword",
+		]);
+	});
+
 	it("keeps exact matches first without hiding broader fuzzy matches", () => {
 		const fuzzyFn = createFuzzySearchFn({
 			candidates: [

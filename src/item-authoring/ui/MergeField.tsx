@@ -1,8 +1,20 @@
 import { SpaceDestinationControl } from "~/authoring-form/ui/SpaceDestinationControl";
-import { MousePointer2, Flame, Coins, DoorOpen, ShieldCheck, Trash2, Replace } from "lucide-react";
+import {
+	MousePointer2,
+	Flame,
+	Coins,
+	DoorOpen,
+	History,
+	Sparkles,
+	ShieldCheck,
+	Trash2,
+	Replace,
+} from "lucide-react";
 import { useTranslator } from "~/translation/ui/useTranslator";
 
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
+import type { SpaceDestinationSchema } from "~/space/schema/SpaceDestinationSchema";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { SectionEnd } from "~/ui/ui/SectionEnd";
 import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
@@ -27,9 +39,34 @@ export const MergeField = ({
 	readonly targetUnitsEnabled: boolean;
 }) => {
 	const translator = useTranslator();
+	const project = useEditorProject();
 	const validationIssues = useFormValidationIssues(merge);
 	const sourceError = readEditorFormValidationErrorFn(validationIssues, "action");
 	const targetError = readEditorFormValidationErrorFn(validationIssues, "effect");
+	const spaceActionLabel =
+		merge.action !== "space" || typeof merge.space === "number"
+			? translator.textFn("Space")
+			: merge.space === "previous"
+				? translator.textFn("Previous Space")
+				: translator.textFn("Generated Space");
+	const selectSpaceFn = (space: SpaceDestinationSchema.Type) => {
+		if (merge.action === "space" && merge.space === space) return;
+		const effect =
+			merge.effect === "replace"
+				? {
+						effect: merge.effect,
+						result: merge.result,
+					}
+				: {
+						effect: merge.effect,
+					};
+		onChangeFn({
+			...effect,
+			action: "space",
+			space,
+			outcome: merge.outcome,
+		});
+	};
 	return (
 		<div className="grid gap-[var(--ak-viewport-gap)]">
 			<EditorFormCard>
@@ -67,14 +104,60 @@ export const MergeField = ({
 								value: "spend",
 							},
 							{
-								description: <Mx label="Merge source space help" />,
-								label: translator.textFn("Space"),
+								label: spaceActionLabel,
 								icon: <DoorOpen className="size-4" />,
+								menuOptions: [
+									{
+										id: "exact",
+										label: translator.textFn("Space"),
+										description: translator.textFn(
+											"Move the dropped item to an exact space number.",
+										),
+										icon: <DoorOpen className="size-5" />,
+										onSelectFn: () =>
+											selectSpaceFn(
+												merge.action === "space" &&
+													typeof merge.space === "number"
+													? merge.space
+													: 0,
+											),
+									},
+									{
+										id: "previous",
+										label: translator.textFn("Previous Space"),
+										description: translator.textFn(
+											"Move the dropped item to the last space left. Without history, the merge is rejected.",
+										),
+										icon: <History className="size-5" />,
+										onSelectFn: () => selectSpaceFn("previous"),
+									},
+									{
+										id: "generated",
+										label: translator.textFn("Generated Space"),
+										description: translator.textFn(
+											"Move the dropped item into the receiver's private room.",
+										),
+										icon: <Sparkles className="size-5" />,
+										onSelectFn: () =>
+											selectSpaceFn(
+												merge.action === "space" &&
+													typeof merge.space === "object"
+													? merge.space
+													: {
+															type: "generated",
+															templateUid:
+																project.config.templates?.[0]
+																	?.uid ?? "",
+														},
+											),
+									},
+								],
 								value: "space",
 							},
 						]}
 						onChangeFn={(action) => {
 							if (action === merge.action) return;
+							if (action === "space") return;
 							const effect =
 								merge.effect === "replace"
 									? {
@@ -84,33 +167,24 @@ export const MergeField = ({
 									: {
 											effect: merge.effect,
 										};
-							onChangeFn(
-								action === "space"
-									? {
-											...effect,
-											action,
-											space: 0,
-											outcome: merge.outcome,
-										}
-									: {
-											...effect,
-											action,
-											target:
-												merge.action === "space"
-													? {
-															type: "item",
-															itemUid: "",
-														}
-													: merge.target,
-											outcome: merge.outcome,
-										},
-							);
+							onChangeFn({
+								...effect,
+								action,
+								target:
+									merge.action === "space"
+										? {
+												type: "item",
+												itemUid: "",
+											}
+										: merge.target,
+								outcome: merge.outcome,
+							});
 						}}
 					/>
-					{merge.action === "space" ? (
+					{merge.action === "space" && merge.space !== "previous" ? (
 						<SpaceDestinationControl
+							kindEditable={false}
 							error={readEditorFormValidationErrorFn(validationIssues, "space")}
-							description={<Mx label="Space destination transport help" />}
 							value={merge.space}
 							onChangeFn={(space) =>
 								onChangeFn({
@@ -119,6 +193,8 @@ export const MergeField = ({
 								})
 							}
 						/>
+					) : merge.action === "space" ? (
+						<div />
 					) : (
 						<SelectorControl
 							description={<Mx label="Merge with help" />}

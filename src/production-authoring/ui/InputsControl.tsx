@@ -1,4 +1,6 @@
 import { match } from "ts-pattern";
+import { MousePointer2, Flame, LockKeyhole, Crosshair, LocateFixed } from "lucide-react";
+import type { ActionMenuOption } from "~/ui/ui/ActionMenu";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
@@ -22,18 +24,12 @@ import { BoardDistancePresentation } from "~/item-query/ui/QueryPresentation";
 
 interface InputsControlProps {
 	readonly allowMaterials?: boolean;
-	readonly emptyAllowed?: boolean;
 	readonly onChangeFn: (inputs: LineInputSchema.Type[]) => void;
 	readonly value: ReadonlyArray<LineInputSchema.Type>;
 }
 
 /** Assembles immediate input requirements, optionally including Line-owned materials. */
-export const InputsControl = ({
-	allowMaterials = true,
-	emptyAllowed = false,
-	onChangeFn,
-	value,
-}: InputsControlProps) => {
+export const InputsControl = ({ allowMaterials = true, onChangeFn, value }: InputsControlProps) => {
 	const translator = useTranslator();
 	const project = useEditorProject();
 	const readItemLabelFn = useEditorItemOptionLabel();
@@ -52,6 +48,77 @@ export const InputsControl = ({
 		);
 		onChangeFn(next);
 	};
+	const addInputFn = (input: LineInputSchema.Type) =>
+		onChangeFn([
+			...value,
+			structuredClone(input),
+		]);
+	const addOptions: ActionMenuOption[] = [
+		{
+			id: "simple",
+			label: translator.textFn("Simple"),
+			description: translator.textFn("No items or units required."),
+			icon: <MousePointer2 className="size-5" />,
+			onSelectFn: () => addInputFn(DraftDefaults.inputs.simple),
+		},
+		...(allowMaterials
+			? [
+					{
+						id: "materials-consume",
+						label: `${translator.textFn("Materials")} — ${translator.textFn("Consume")}`,
+						description: translator.textFn(
+							"Consume delivered items when production finishes.",
+						),
+						icon: <Flame className="size-5" />,
+						onSelectFn: () => addInputFn(DraftDefaults.inputs.materials),
+					},
+					{
+						id: "materials-reserve",
+						label: `${translator.textFn("Materials")} — ${translator.textFn("Reserve")}`,
+						description: translator.textFn("Hold delivered items, then return them."),
+						icon: <LockKeyhole className="size-5" />,
+						onSelectFn: () =>
+							addInputFn({
+								...DraftDefaults.inputs.materials,
+								mode: "reserve",
+							}),
+					},
+				]
+			: []),
+		{
+			id: "units-target",
+			label: `${translator.textFn("Units")} — ${translator.textFn("Target")}`,
+			description: translator.textFn("Spend units from a matching Board item."),
+			icon: <Crosshair className="size-5" />,
+			onSelectFn: () => addInputFn(DraftDefaults.inputs.units),
+		},
+		{
+			id: "units-self",
+			label: `${translator.textFn("Units")} — ${translator.textFn("Self")}`,
+			description: translator.textFn(
+				selfUnitsEnabled
+					? "Spend this item's own units."
+					: "Enable Units on this item before selecting Self.",
+			),
+			icon: <LocateFixed className="size-5" />,
+			disabled: !selfUnitsEnabled,
+			onSelectFn: () =>
+				addInputFn({
+					...DraftDefaults.inputs.units,
+					units: {
+						...DraftDefaults.inputs.units.units,
+						from: "self",
+					},
+					query: {
+						distance: "self",
+						selector: {
+							type: "item",
+							itemUid,
+						},
+					},
+				}),
+		},
+	];
 	return (
 		<section className="grid min-w-0 content-start gap-3">
 			<EditorFormSectionDivider
@@ -83,7 +150,7 @@ export const InputsControl = ({
 								type: "materials",
 							},
 							(input) =>
-								`${translator.textFn("Material input")} ${index + 1} — ${readItemLabelFn(
+								`${translator.textFn("Material input")} ${index + 1} · ${translator.textFn(input.mode === "consume" ? "Consume" : "Reserve")} — ${readItemLabelFn(
 									input.query.selector.itemUid,
 									translator.textFn("No item selected"),
 								)}`,
@@ -197,12 +264,7 @@ export const InputsControl = ({
 					}
 					return label;
 				}}
-				onAddFn={() =>
-					onChangeFn([
-						...value,
-						structuredClone(DraftDefaults.inputs.simple),
-					])
-				}
+				addOptions={addOptions}
 				onDuplicateFn={(index) =>
 					onChangeFn([
 						...value.slice(0, index + 1),
@@ -213,15 +275,12 @@ export const InputsControl = ({
 				onRemoveFn={(index) =>
 					onChangeFn(value.filter((_current, currentIndex) => currentIndex !== index))
 				}
-				removeDisabled={!emptyAllowed && value.length === 1}
 				selectedIndex={invalidInputIndex}
 			>
 				{(index) => (
 					<InputControl
-						allowMaterials={allowMaterials}
 						input={value[index]}
 						issues={issuesByInput[index]}
-						ownerItemUid={itemUid}
 						selfUnitsEnabled={selfUnitsEnabled}
 						onChangeFn={(next) => replaceAtFn(index, next)}
 					/>

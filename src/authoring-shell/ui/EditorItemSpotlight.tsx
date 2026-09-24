@@ -30,6 +30,9 @@ export const EditorItemSpotlight = ({
 				itemUid: option.id,
 				label: option.label,
 				terms: option.terms,
+				identityTerms: option.identityTerms,
+				descriptionTerms: option.descriptionTerms,
+				keywordTerms: option.keywordTerms,
 			}))}
 			placement="viewport"
 			placeholder={translator.textFn("Search item title, ID or type\u2026")}

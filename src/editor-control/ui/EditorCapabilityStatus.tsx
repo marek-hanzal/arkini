@@ -1,7 +1,10 @@
 import type { LucideIcon } from "lucide-react";
+import { Power } from "lucide-react";
 
 import { PrimaryButton } from "~/ui/ui/Button";
+import { ShortcutLabel } from "~/ui/ui/ShortcutLabel";
 import { Status } from "~/ui/ui/Status";
+import { useSectionShortcuts } from "~/ui/ui/useSectionShortcuts";
 
 interface EditorCapabilityStatusProps {
 	readonly actionLabel: string;
@@ -22,14 +25,39 @@ export const EditorCapabilityStatus = ({
 	size = "normal",
 	summary,
 	title,
-}: EditorCapabilityStatusProps) => (
-	<Status
-		action={<PrimaryButton onClick={onEnableFn}>{actionLabel}</PrimaryButton>}
-		dataUi={dataUi}
-		icon={icon}
-		size={size}
-		description={summary}
-		title={title}
-		variant="flat"
-	/>
-);
+}: EditorCapabilityStatusProps) => {
+	useSectionShortcuts({
+		options: [
+			{
+				shortcut: "e",
+			},
+		],
+		onSelectFn: () => {
+			if (document.querySelector('[data-ui="Overlay"], [data-ui$="Dialog"]') !== null) return;
+			onEnableFn();
+		},
+	});
+	return (
+		<Status
+			action={
+				<PrimaryButton
+					className="gap-1.5"
+					onClick={onEnableFn}
+				>
+					<Power className="size-4" />
+					<ShortcutLabel
+						highlightClassName="text-shortcut-highlight-on-accent"
+						label={actionLabel}
+						shortcut="e"
+					/>
+				</PrimaryButton>
+			}
+			dataUi={dataUi}
+			icon={icon}
+			size={size}
+			description={summary}
+			title={title}
+			variant="flat"
+		/>
+	);
+};

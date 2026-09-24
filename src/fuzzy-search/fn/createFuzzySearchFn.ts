@@ -3,6 +3,9 @@ import type { FuseResult, IFuseOptions } from "fuse.js";
 
 export interface FuzzySearchCandidate<Value> {
 	readonly terms: readonly string[];
+	readonly identityTerms?: readonly string[];
+	readonly descriptionTerms?: readonly string[];
+	readonly keywordTerms?: readonly string[];
 	readonly relatedTerms?: readonly string[];
 	readonly value: Value;
 }
@@ -47,15 +50,27 @@ export const createFuzzySearchFn = <Value>({
 		useTokenSearch: true,
 		tokenMatch: "all",
 		...options,
-		// Direct identity and description outweigh incidental related-item matches four to one.
+		// Keep item title, identity, description and aliases distinct while retaining primary-term priority elsewhere.
 		keys: [
 			{
 				name: "terms",
-				weight: 0.8,
+				weight: 0.4,
+			},
+			{
+				name: "identityTerms",
+				weight: 0.2,
+			},
+			{
+				name: "descriptionTerms",
+				weight: 0.16,
+			},
+			{
+				name: "keywordTerms",
+				weight: 0.14,
 			},
 			{
 				name: "relatedTerms",
-				weight: 0.2,
+				weight: 0.1,
 			},
 		],
 		includeScore: true,
@@ -67,12 +82,20 @@ export const createFuzzySearchFn = <Value>({
 		const exact = documents.filter(({ terms }) =>
 			terms.some((term) => normalizeExactTermFn(term) === exactQuery),
 		);
+		const exactOrders = new Set(exact.map(({ order }) => order));
+		const exactIdentity = documents.filter(
+			({ identityTerms, order }) =>
+				!exactOrders.has(order) &&
+				identityTerms?.some((term) => normalizeExactTermFn(term) === exactQuery),
+		);
 		const fuzzyMatches = fuse.search(normalizedQuery);
 		fuzzyMatches.sort(compareSearchResultFn);
-		if (exact.length === 0) return fuzzyMatches.map(({ item }) => item.value);
-		const exactOrders = new Set(exact.map(({ order }) => order));
+		if (exact.length === 0 && exactIdentity.length === 0)
+			return fuzzyMatches.map(({ item }) => item.value);
+		for (const { order } of exactIdentity) exactOrders.add(order);
 		return [
 			...exact.map(({ value }) => value),
+			...exactIdentity.map(({ value }) => value),
 			...fuzzyMatches
 				.filter(({ item }) => !exactOrders.has(item.order))
 				.map(({ item }) => item.value),

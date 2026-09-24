@@ -33,7 +33,8 @@ export const TemplateForm = ({
 				replace: true,
 			}),
 	});
-	const { project, value, setValueFn, dirty, saving, saveFn, error, issues } = controller;
+	const { project, value, setValueFn, touchFieldFn, dirty, saving, saveFn, error, issues } =
+		controller;
 	const fieldErrorFn = (name: string) => issues.find((issue) => issue.path[0] === name)?.message;
 	return (
 		<EditorFormSectionPage
@@ -108,12 +109,13 @@ export const TemplateForm = ({
 								label={translator.textFn("Title")}
 								value={value.title}
 								error={fieldErrorFn("title")}
-								onChangeFn={(title) =>
+								onChangeFn={(title) => {
+									touchFieldFn("title");
 									setValueFn({
 										...value,
 										title,
-									})
-								}
+									});
+								}}
 							/>
 							<div className="grid grid-cols-2 gap-4">
 								<EditorNumberControl
@@ -122,12 +124,13 @@ export const TemplateForm = ({
 									min={1}
 									max={42}
 									error={fieldErrorFn("width")}
-									onChangeFn={(width) =>
+									onChangeFn={(width) => {
+										touchFieldFn("width");
 										setValueFn({
 											...value,
 											width,
-										})
-									}
+										});
+									}}
 								/>
 								<EditorNumberControl
 									label={translator.textFn("Height")}
@@ -135,12 +138,13 @@ export const TemplateForm = ({
 									min={1}
 									max={42}
 									error={fieldErrorFn("height")}
-									onChangeFn={(height) =>
+									onChangeFn={(height) => {
+										touchFieldFn("height");
 										setValueFn({
 											...value,
 											height,
-										})
-									}
+										});
+									}}
 								/>
 							</div>
 						</EditorFormCard>
@@ -160,14 +164,15 @@ export const TemplateForm = ({
 									cells={value.board}
 									width={value.width}
 									height={value.height}
-									onCellsChangeFn={(board) =>
+									onCellsChangeFn={(board) => {
+										touchFieldFn("board");
 										setValueFn({
 											...value,
 											board: [
 												...board,
 											],
-										})
-									}
+										});
+									}}
 								/>
 							) : null}
 						</>

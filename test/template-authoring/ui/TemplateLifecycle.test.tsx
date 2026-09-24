@@ -24,6 +24,10 @@ const state = vi.hoisted(() => ({
 		saveFn: () => Promise<boolean>;
 	},
 	changeWidth: undefined as unknown as (value: number) => void,
+	titleControl: undefined as unknown as {
+		readonly error?: string;
+		readonly onChangeFn: (value: string) => void;
+	},
 	save: vi.fn(),
 	unsaved: undefined as EditorUnsavedChangesSession | undefined,
 	navigate: vi.fn().mockResolvedValue(undefined),
@@ -52,6 +56,7 @@ vi.mock("~/project-authoring/fx/saveProjectConfigFx", () => ({
 }));
 vi.mock("~/application-runtime/service/RendererRuntime", () => ({
 	RendererRuntime: {
+		runSync: () => "template:new",
 		runPromise: (input: unknown) => state.save(input),
 	},
 }));
@@ -110,7 +115,19 @@ vi.mock("~/editor-control/ui/EditorFormSectionPage", () => ({
 	},
 }));
 vi.mock("~/editor-control/ui/EditorValueControls", () => ({
-	EditorTextControl: () => null,
+	EditorTextControl: ({
+		error,
+		onChangeFn,
+	}: {
+		readonly error?: string;
+		readonly onChangeFn: (value: string) => void;
+	}) => {
+		state.titleControl = {
+			error,
+			onChangeFn,
+		};
+		return null;
+	},
 	EditorNumberControl: ({
 		label,
 		onChangeFn,
@@ -200,6 +217,20 @@ const beginDeleteFn = async () => {
 };
 
 describe("template draft and deletion settlement", () => {
+	it("keeps a new template quiet until its title is edited or saving is attempted", async () => {
+		state.project = projectFn(1, []);
+		await act(async () => root.render(<TemplateForm section="general" />));
+		expect(state.titleControl.error).toBeUndefined();
+
+		await act(async () => state.page.saveFn());
+		expect(state.titleControl.error).toBe("Title is required.");
+		await act(async () => state.titleControl.onChangeFn("New board"));
+		expect(state.titleControl.error).toBeUndefined();
+		await act(async () => state.titleControl.onChangeFn(" "));
+		expect(state.titleControl.error).toBe("Title is required.");
+		expect(state.save).not.toHaveBeenCalled();
+	});
+
 	it("duplicates a template under a fresh UID without changing the original or its board", async () => {
 		await act(async () =>
 			root.render(

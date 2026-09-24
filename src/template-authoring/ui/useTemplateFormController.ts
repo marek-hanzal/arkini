@@ -34,6 +34,8 @@ export const useTemplateFormController = ({
 	const [value, setValueFn] = useState<TemplateSchema.Type>(initial.value);
 	const [savedValue, setSavedValueFn] = useState(initial.value);
 	const [error, setErrorFn] = useState<string>();
+	const [attemptedSave, setAttemptedSaveFn] = useState(false);
+	const [touchedFields, setTouchedFieldsFn] = useState<ReadonlySet<string>>(() => new Set());
 	const [saving, setSavingFn] = useState(false);
 	const pending = useRef(false);
 	const generation = useRef(0);
@@ -48,10 +50,16 @@ export const useTemplateFormController = ({
 	const dirtyRef = useRef(dirty);
 	dirtyRef.current = dirty;
 	const validation = TemplateSchema.safeParse(value);
+	const touchFieldFn = useCallback((field: string) => {
+		setTouchedFieldsFn((current) => new Set(current).add(field));
+		setErrorFn(undefined);
+	}, []);
 	const discardFn = useCallback(() => {
 		dirtyRef.current = false;
 		setValueFn(savedValue);
 		setErrorFn(undefined);
+		setAttemptedSaveFn(false);
+		setTouchedFieldsFn(new Set());
 	}, [
 		savedValue,
 	]);
@@ -59,6 +67,7 @@ export const useTemplateFormController = ({
 		if (pending.current) return false;
 		const parsed = TemplateSchema.safeParse(value);
 		if (!parsed.success) {
+			setAttemptedSaveFn(true);
 			setErrorFn(parsed.error.issues[0]?.message);
 			return false;
 		}
@@ -91,6 +100,8 @@ export const useTemplateFormController = ({
 			dirtyRef.current = false;
 			setValueFn(parsed.data);
 			setSavedValueFn(parsed.data);
+			setAttemptedSaveFn(false);
+			setTouchedFieldsFn(new Set());
 			return true;
 		} catch (cause) {
 			if (generation.current === ownGeneration) setErrorFn(String(cause));
@@ -141,11 +152,16 @@ export const useTemplateFormController = ({
 		project,
 		value,
 		setValueFn,
+		touchFieldFn,
 		dirty,
 		saving,
 		saveFn,
 		discardFn,
 		error,
-		issues: validation.success ? [] : validation.error.issues,
+		issues: validation.success
+			? []
+			: validation.error.issues.filter(
+					(issue) => attemptedSave || touchedFields.has(String(issue.path[0])),
+				),
 	};
 };

@@ -94,6 +94,7 @@ it("indexes owner-only operations, exact targets, real outputs and guard referen
 		),
 	).toEqual([
 		"output:item:replacement",
+		"output:item:replacement",
 		"owner:item:A",
 		"target:item:target",
 	]);

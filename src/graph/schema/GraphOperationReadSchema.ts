@@ -5,7 +5,11 @@ export const GraphOperationReadSchema = z
 	.object({
 		revision: z.number().int().nonnegative(),
 		snapshotId: IdSchema,
-		operationIds: z.array(IdSchema).min(1).max(20),
+		operationIds: z
+			.array(IdSchema)
+			.min(1)
+			.max(20)
+			.describe("Opaque operation references returned by discovery for this exact snapshot."),
 	})
 	.strict()
 	.meta({

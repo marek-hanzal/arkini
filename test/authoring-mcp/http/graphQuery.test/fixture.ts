@@ -128,20 +128,21 @@ export const toolTextFn = (result: { content?: unknown; isError?: unknown }): st
 /** Extract only the exact continuation/hydration tokens an MCP caller must be able to reuse. */
 export const graphTextFn = (result: { content?: unknown; isError?: unknown }) => {
 	const text = toolTextFn(result);
-	const quoted = '"(?:\\\\.|[^"\\\\])*"';
+	const token = '"(?:\\\\.|[^"\\\\])*"|[^\\s;]+';
+	const decodeFn = (value: string): string => (value.startsWith('"') ? JSON.parse(value) : value);
 	const headerFn = (name: string) => {
-		const value = new RegExp(`^${name}: (${quoted})$`, "m").exec(text)?.[1];
+		const value = new RegExp(`^${name}: (${token})$`, "m").exec(text)?.[1];
 		if (value === undefined) throw new Error(`Missing graph ${name} header.`);
-		return JSON.parse(value) as string;
+		return decodeFn(value);
 	};
 	const idsFn = (name: string): string[] => [
 		...new Set(
 			[
-				...text.matchAll(new RegExp(`${name}=(${quoted})`, "g")),
-			].map((match) => JSON.parse(match[1]!)),
+				...text.matchAll(new RegExp(`${name}=(${token})`, "g")),
+			].map((match) => decodeFn(match[1]!)),
 		),
 	];
-	const cursor = new RegExp(`^Cursor: (${quoted})$`, "m").exec(text)?.[1];
+	const cursor = new RegExp(`^Cursor: (${token})$`, "m").exec(text)?.[1];
 	const revision = /^Revision: (\d+)$/m.exec(text)?.[1];
 	if (revision === undefined) throw new Error("Missing graph Revision header.");
 	return {
@@ -150,8 +151,7 @@ export const graphTextFn = (result: { content?: unknown; isError?: unknown }) =>
 		revision: Number(revision),
 		snapshotId: headerFn("Snapshot"),
 		operationIds: idsFn("operationId"),
-		edgeIds: idsFn("edgeId"),
 		lineUids: idsFn("lineUid"),
-		nextCursor: cursor === undefined ? undefined : (JSON.parse(cursor) as string),
+		nextCursor: cursor === undefined ? undefined : decodeFn(cursor),
 	};
 };

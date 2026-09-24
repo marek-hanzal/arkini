@@ -80,7 +80,7 @@ export const registerGraphToolsFn = ({
 		"graph_query",
 		{
 			description:
-				"Discover the authored project graph as concise formatted text with titled entities, directed relationships and operation summaries. Query local connections, traversal, paths or operations directly without a root (for example kind operations with operationKinds merge). Filter operations by owner or participant and role. Read graph_schema_json for continuation and bounds; hydrate selected operation IDs through graph_operations_json or use items_json/item_lines_json. No authored configuration bodies or executable queries are returned or accepted.",
+				"Discover the authored project graph as concise formatted text with titled entities, directed relationships and operation summaries. Query local connections, traversal, paths or operations directly without a root (for example kind operations with operationKinds merge). Filter operations by owner, participant and role; matching participant facts are included without hydration. Search operation/owner/participant titles with search {text, scope} using Editor Fuse semantics; combine scalar filter properties such as clock, show, enable, clockWeight {gt:15}, hasOutcomes and merge action/effect/ownership. Read graph_schema_json for continuation and bounds; hydrate selected operation IDs through graph_operations_json or use items_json/item_lines_json. No authored configuration bodies or executable queries are returned or accepted.",
 			inputSchema: GraphDiscoveryQuerySchema,
 			annotations: EditorToolAnnotations.readOnly,
 		},
@@ -112,7 +112,7 @@ export const registerGraphToolsFn = ({
 		"graph_operations_json",
 		{
 			description:
-				"Read canonical authored configurations for 1–20 graph operation IDs selected during discovery. Required revision and snapshotId must match the discovery result, including after same-revision external edits; stale requests fail. Duplicate IDs are returned once, missing IDs are reported. Prefer items_json for complete items and item_lines_json for known item/line UID pairs.",
+				"Read canonical authored configurations for 1–20 graph operation IDs selected during discovery. Pass the short opaque operation references from discovery directly in operationIds. Required revision and snapshotId must match the discovery result, including after same-revision external edits; stale requests fail. Duplicate IDs are returned once, missing IDs are reported. Prefer items_json for complete items and item_lines_json for known item/line UID pairs.",
 			inputSchema: GraphOperationReadSchema,
 			annotations: EditorToolAnnotations.readOnly,
 		},

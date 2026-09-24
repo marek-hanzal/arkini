@@ -72,6 +72,15 @@ export type GraphDiscoveryOperation = {
 	  }
 );
 
+/** Query-local evidence; repeated authored occurrences remain separate and are never summed. */
+export interface GraphDiscoveryMatch {
+	readonly operationId: string;
+	readonly nodeId: string;
+	readonly role: "owner" | "target" | "input" | "output" | "reference";
+	readonly edgeKind?: GraphEdge["kind"];
+	readonly metadata?: GraphDiscoveryEdge["metadata"];
+}
+
 export interface GraphDiscoveryResult {
 	readonly projectId: string;
 	readonly revision: number;
@@ -83,6 +92,7 @@ export interface GraphDiscoveryResult {
 	readonly nodes: readonly GraphDiscoveryNode[];
 	readonly edges: readonly GraphDiscoveryEdge[];
 	readonly operations: readonly GraphDiscoveryOperation[];
+	readonly matches?: readonly GraphDiscoveryMatch[];
 	readonly paths: GraphResult["paths"];
 	readonly nextCursor?: string;
 }
@@ -103,6 +113,7 @@ export interface GraphBatchResult {
 		readonly nodeIds: readonly string[];
 		readonly edgeIds: readonly string[];
 		readonly operationIds: readonly string[];
+		readonly matches?: readonly GraphDiscoveryMatch[];
 		readonly paths: GraphResult["paths"];
 		readonly nextCursor?: string;
 		readonly error?: {

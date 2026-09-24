@@ -4,6 +4,7 @@ import type { GraphBatchQuerySchema } from "~/graph/schema/GraphBatchQuerySchema
 import type {
 	GraphBatchResult,
 	GraphDiscoveryEdge,
+	GraphDiscoveryMatch,
 	GraphDiscoveryNode,
 	GraphDiscoveryOperation,
 	GraphDiscoveryResult,
@@ -12,8 +13,9 @@ import type {
 type Query = Pick<GraphDiscoveryQuerySchema.Type, "kind" | "from">;
 type NodeLabelFn = (id: string) => string;
 
-// Quoting every exact identity preserves even quotes, brackets, control characters and newlines.
-const identityFn = (id: string): string => JSON.stringify(id);
+// Ordinary identities copy directly; unusual delimiters or controls use a lossless JSON string literal.
+const identityFn = (id: string): string =>
+	/^[\p{L}\p{N}_.:@/-]+$/u.test(id) ? id : JSON.stringify(id);
 const titleFn = (title: string): string => JSON.stringify(title).slice(1, -1);
 const nodeLabelFn = (nodes: ReadonlyMap<string, GraphDiscoveryNode>, id: string): string => {
 	const node = nodes.get(id);
@@ -50,7 +52,7 @@ const operationDetailsFn = (operation: GraphDiscoveryOperation): readonly string
 				kind: "line",
 			},
 			(line) => [
-				`line=${identityFn(line.title)}`,
+				`line=${titleFn(line.title)}`,
 				`lineUid=${identityFn(line.lineUid)}`,
 				`runtimeMs=${line.runtimeMs}`,
 				`default=${line.default}`,
@@ -166,8 +168,30 @@ const edgeDetailsFn = (
 		metadata.push(...operationDetailsFn(operation));
 	} else if (edge.operationId !== undefined)
 		metadata.push(`operationId=${identityFn(edge.operationId)}`);
-	metadata.push(`edgeId=${identityFn(edge.id)}`);
 	return metadata.join("; ");
+};
+
+const quantityFn = (min: number | undefined, max: number | undefined): string => {
+	if (min === undefined) return "";
+	if (max === undefined || min === max) return ` ×${min}`;
+	return ` ×${min}–${max}`;
+};
+
+const matchRowFn = (evidence: GraphDiscoveryMatch, labelFn: NodeLabelFn): string => {
+	const { quantityMin, quantityMax, ...metadata } = evidence.metadata ?? {};
+	const quantity = quantityFn(quantityMin, quantityMax);
+	const details = [
+		...(evidence.edgeKind === undefined
+			? []
+			: [
+					evidence.edgeKind,
+				]),
+		...Object.entries(metadata).map(
+			([key, value]) => `${key}=${typeof value === "string" ? titleFn(value) : value}`,
+		),
+	];
+	const role = evidence.role === "reference" ? "references" : evidence.role;
+	return `  ${role}: ${labelFn(evidence.nodeId)}${quantity}${details.length === 0 ? "" : `; ${details.join("; ")}`}`;
 };
 
 const bodyFn = (result: GraphDiscoveryResult, query: Query): string => {
@@ -197,7 +221,14 @@ const bodyFn = (result: GraphDiscoveryResult, query: Query): string => {
 	};
 	return match(query.kind)
 		.with("operations", () =>
-			result.operations.map((operation) => operationRowFn(operation, labelFn)).join("\n"),
+			result.operations
+				.flatMap((operation) => [
+					operationRowFn(operation, labelFn),
+					...(result.matches ?? [])
+						.filter((evidence) => evidence.operationId === operation.id)
+						.map((evidence) => matchRowFn(evidence, labelFn)),
+				])
+				.join("\n"),
 		)
 		.with("node", () =>
 			[
@@ -222,7 +253,7 @@ const bodyFn = (result: GraphDiscoveryResult, query: Query): string => {
 						`Path ${index + 1}${path.edges.length === 0 ? `: ${path.nodes.map(labelFn).join(" → ")} (zero hops)` : ":"}`,
 						...path.edges.map((id, hop) => {
 							const edge = edges.get(id);
-							return `  ${hop + 1}. ${edge === undefined ? `edgeId=${identityFn(id)}` : edgeRowFn(edge, path.nodes[hop], path.nodes[hop + 1])}`;
+							return `  ${hop + 1}. ${edge === undefined ? `${labelFn(path.nodes[hop])} → ${labelFn(path.nodes[hop + 1])}; relationship unavailable` : edgeRowFn(edge, path.nodes[hop], path.nodes[hop + 1])}`;
 						}),
 					].join("\n"),
 				)
@@ -263,7 +294,12 @@ export const readGraphBatchTextFn = (
 		const parsed = GraphDiscoveryQuerySchema.safeParse(requested.get(query.id));
 		const nodeIds = new Set(query.nodeIds);
 		const edgeIds = new Set(query.edgeIds);
-		const operationIds = new Set(query.operationIds);
+		const operationsById = new Map(
+			result.operations.map((operation) => [
+				operation.id,
+				operation,
+			]),
+		);
 		const body =
 			parsed.success && query.error === undefined
 				? bodyFn(
@@ -277,9 +313,15 @@ export const readGraphBatchTextFn = (
 							expansions: query.expansions,
 							nodes: result.nodes.filter((node) => nodeIds.has(node.id)),
 							edges: result.edges.filter((edge) => edgeIds.has(edge.id)),
-							operations: result.operations.filter((operation) =>
-								operationIds.has(operation.id),
-							),
+							operations: query.operationIds.flatMap((id) => {
+								const operation = operationsById.get(id);
+								return operation === undefined
+									? []
+									: [
+											operation,
+										];
+							}),
+							matches: query.matches,
 							paths: query.paths,
 						},
 						parsed.data,

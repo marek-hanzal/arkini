@@ -20,6 +20,26 @@ const graphArgumentKeys = new Set([
 	"direction",
 	"kinds",
 	"operationKinds",
+	"search",
+	"text",
+	"scope",
+	"filter",
+	"hasOutcomes",
+	"action",
+	"effect",
+	"ownership",
+	"clock",
+	"default",
+	"show",
+	"enable",
+	"runtimeMs",
+	"clockWeight",
+	"durationMs",
+	"intervalMs",
+	"min",
+	"max",
+	"gt",
+	"lt",
 	"owner",
 	"participant",
 	"role",
@@ -40,7 +60,7 @@ const graphArgumentKeys = new Set([
 const boundedValueFn = (value: unknown, depth = 0): unknown => {
 	if (typeof value === "string") return value.slice(0, 8192);
 	if (value === null || typeof value !== "object") return value;
-	if (depth >= 5) return "<depth limit>";
+	if (depth >= 6) return "<depth limit>";
 	if (Array.isArray(value))
 		return value.slice(0, 64).map((entry) => boundedValueFn(entry, depth + 1));
 	return Object.fromEntries(

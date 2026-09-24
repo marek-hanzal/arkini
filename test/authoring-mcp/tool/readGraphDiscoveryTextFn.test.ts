@@ -8,11 +8,7 @@ import type { GraphDiscoveryResult } from "~/graph/type/GraphDiscoveryResult";
 const owner = 'item:puppy"\n]';
 const target = "item:fawn";
 const replacement = "item:puppy-fawn";
-const operationId = JSON.stringify([
-	owner,
-	"merge",
-	0,
-]);
+const operationId = "op_abc123";
 const edgeId = JSON.stringify([
 	operationId,
 	[
@@ -73,8 +69,8 @@ const resultFn = (): GraphDiscoveryResult => ({
 	paths: [],
 });
 const readTokenFn = (text: string, name: string): unknown => {
-	const encoded = text.match(new RegExp(`${name}=("(?:[^"\\\\]|\\\\.)*")`))?.[1];
-	return encoded === undefined ? undefined : JSON.parse(encoded);
+	const encoded = text.match(new RegExp(`${name}=("(?:[^"\\\\]|\\\\.)*"|[^;\\s]+)`))?.[1];
+	return encoded?.startsWith('"') ? JSON.parse(encoded) : encoded;
 };
 
 it("presents merge participants once and preserves exact opaque identities for hydration", () => {
@@ -83,7 +79,7 @@ it("presents merge participants once and preserves exact opaque identities for h
 		kind: "operations",
 	});
 	expect(text).toContain(
-		`Puppy [${JSON.stringify(owner)}] + Fawn [${JSON.stringify(target)}] → Puppy with Fawn [${JSON.stringify(replacement)}]`,
+		`Puppy [${JSON.stringify(owner)}] + Fawn [${target}] → Puppy with Fawn [${replacement}]`,
 	);
 	expect(text.match(/Puppy with Fawn/g)).toHaveLength(1);
 	expect(readTokenFn(text, "operationId")).toBe(operationId);
@@ -116,11 +112,10 @@ it("keeps reverse paths in traversal order while displaying authored edge direct
 			from: target,
 		},
 	);
-	expect(text).toContain(
-		`Fawn [${JSON.stringify(target)}] <--merge-target-- Puppy [${JSON.stringify(owner)}]`,
-	);
-	expect(text).toContain(`replacement=Puppy with Fawn [${JSON.stringify(replacement)}]`);
-	expect(readTokenFn(text, "edgeId")).toBe(edgeId);
+	expect(text).toContain(`Fawn [${target}] <--merge-target-- Puppy [${JSON.stringify(owner)}]`);
+	expect(text).toContain(`replacement=Puppy with Fawn [${replacement}]`);
+	expect(text).not.toContain("edgeId=");
+	expect(text).not.toContain(JSON.stringify(edgeId));
 	expect(readTokenFn(text, "operationId")).toBe(operationId);
 });
 
@@ -242,4 +237,112 @@ it("renders one batch snapshot and preserves per-query partial results, errors a
 	expect(invalid).toContain("Status: unknown; truncated: false");
 	expect(invalid).toContain("Error: invalid-query; Missing root");
 	expect(invalid).not.toContain("operationId=");
+});
+
+it("keeps participant evidence local to each batch query sharing the same operation", () => {
+	const result = resultFn();
+	const base = {
+		status: "yes" as const,
+		truncated: false,
+		reasons: [],
+		expansions: 1,
+		nodeIds: result.nodes.map((node) => node.id),
+		edgeIds: [],
+		operationIds: [
+			operationId,
+		],
+		paths: [],
+	};
+	const text = readGraphBatchTextFn(
+		{
+			...result,
+			queries: [
+				{
+					...base,
+					id: "inputs",
+					matches: [
+						{
+							operationId,
+							nodeId: target,
+							role: "input",
+							edgeKind: "line-material",
+							metadata: {
+								quantityMin: 1,
+								quantityMax: 2,
+								mode: "reserve",
+								distance: "far",
+								unitCost: 3,
+							},
+						},
+					],
+				},
+				{
+					...base,
+					id: "outputs",
+					matches: [
+						{
+							operationId,
+							nodeId: replacement,
+							role: "output",
+							edgeKind: "merge-item-outcome",
+							metadata: {
+								quantityMin: 1,
+								quantityMax: 2,
+								chance: 0,
+								alternative: true,
+							},
+						},
+						{
+							operationId,
+							nodeId: replacement,
+							role: "output",
+							edgeKind: "merge-item-outcome",
+							metadata: {
+								quantityMin: 4,
+								quantityMax: 4,
+								alternative: true,
+							},
+						},
+					],
+				},
+				{
+					...base,
+					id: "references",
+					matches: [
+						{
+							operationId,
+							nodeId: target,
+							role: "reference",
+							edgeKind: "rule-reference",
+							metadata: {
+								distance: "close",
+							},
+						},
+					],
+				},
+			],
+		},
+		[
+			"inputs",
+			"outputs",
+			"references",
+		].map((id) => ({
+			id,
+			query: {
+				kind: "operations",
+			},
+		})),
+	);
+	const [inputs, outputs, references] = text.split("Query: ").slice(1);
+	expect(inputs).toContain(
+		"input: Fawn [item:fawn] ×1–2; line-material; mode=reserve; distance=far; unitCost=3",
+	);
+	expect(inputs).not.toContain("  output:");
+	expect(outputs).toContain(
+		"output: Puppy with Fawn [item:puppy-fawn] ×1–2; merge-item-outcome; chance=0; alternative=true",
+	);
+	expect(outputs).toContain("output: Puppy with Fawn [item:puppy-fawn] ×4;");
+	expect(outputs).not.toContain("  input:");
+	expect(references).toContain("references: Fawn [item:fawn]; rule-reference; distance=close");
+	expect(references).not.toContain("  output:");
 });

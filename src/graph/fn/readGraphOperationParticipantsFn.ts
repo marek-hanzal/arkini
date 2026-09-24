@@ -5,6 +5,7 @@ export namespace readGraphOperationParticipantsFn {
 	export interface Participant {
 		readonly operationId: string;
 		readonly nodeId: string;
+		readonly edgeId?: string;
 		readonly role: "owner" | "target" | "input" | "output" | "reference";
 	}
 }
@@ -18,17 +19,24 @@ export const readGraphOperationParticipantsFn = (
 		operationId: string,
 		nodeId: string,
 		role: readGraphOperationParticipantsFn.Participant["role"],
+		edgeId?: string,
 	) => {
 		participants.set(
 			JSON.stringify([
 				operationId,
 				nodeId,
 				role,
+				edgeId,
 			]),
 			{
 				operationId,
 				nodeId,
 				role,
+				...(edgeId === undefined
+					? {}
+					: {
+							edgeId,
+						}),
 			},
 		);
 	};
@@ -82,7 +90,7 @@ export const readGraphOperationParticipantsFn = (
 			)
 			.exhaustive();
 		if (participant !== undefined)
-			addFn(edge.operationId, participant.nodeId, participant.role);
+			addFn(edge.operationId, participant.nodeId, participant.role, edge.id);
 	}
 	return [
 		...participants.values(),

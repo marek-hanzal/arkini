@@ -19,8 +19,8 @@ it("hydrates only selected canonical operations and rejects a revision changed s
 			},
 		}),
 	);
-	const mergeId = discovery.operationIds.find((id) => id.includes('"merge"'))!;
-	const lineId = discovery.operationIds.find((id) => id.includes('"line"'))!;
+	const mergeId = /- merge:.*operationId=(\S+)/.exec(discovery.text)![1]!;
+	const lineId = /- line:.*operationId=(\S+)/.exec(discovery.text)![1]!;
 	expect(discovery.lineUids).toContain(config.items.puppy!.lines[0]!.uid);
 	const pinned = {
 		revision: discovery.revision,

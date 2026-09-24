@@ -1,6 +1,30 @@
 import { z } from "zod";
 import { IdSchema } from "~/game-value/schema/IdSchema";
+import { SourceActionSchema } from "~/item-merge/schema/SourceActionSchema";
+import { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
 import { GraphEdgeKindSchema } from "~/graph/schema/GraphEdgeKindSchema";
+
+const NumericRangeSchema = z
+	.object({
+		min: z.number().nonnegative().optional(),
+		max: z.number().nonnegative().optional(),
+		gt: z.number().nonnegative().optional(),
+		lt: z.number().nonnegative().optional(),
+	})
+	.strict()
+	.superRefine((range, context) => {
+		const lower = Math.max(range.min ?? -Infinity, range.gt ?? -Infinity);
+		const upper = Math.min(range.max ?? Infinity, range.lt ?? Infinity);
+		if (
+			Object.values(range).every((value) => value === undefined) ||
+			lower > upper ||
+			(lower === upper && (range.gt === lower || range.lt === upper))
+		)
+			context.addIssue({
+				code: "custom",
+				message: "Provide bounds defining a nonempty numeric range.",
+			});
+	});
 
 /** Compact discovery is independent from the Editor's full relationship projection. */
 export const GraphDiscoveryQuerySchema = z
@@ -44,13 +68,55 @@ export const GraphDiscoveryQuerySchema = z
 				"reference",
 			])
 			.optional(),
+		search: z
+			.object({
+				text: z.string().trim().min(1).max(500),
+				scope: z
+					.enum([
+						"title",
+						"owner",
+						"participant",
+						"all",
+					])
+					.default("all"),
+			})
+			.strict()
+			.optional()
+			.describe(
+				"Canonical Editor fuzzy search over operation titles, owner titles, participant titles, or all three; results use relevance order.",
+			),
+		filter: z
+			.object({
+				hasOutcomes: z.boolean().optional(),
+				action: SourceActionSchema.optional(),
+				effect: TargetEffectSchema.optional(),
+				ownership: z
+					.enum([
+						"source",
+						"receiver",
+					])
+					.optional(),
+				clock: z.boolean().optional(),
+				default: z.boolean().optional(),
+				show: z.boolean().optional(),
+				enable: z.boolean().optional(),
+				runtimeMs: NumericRangeSchema.optional(),
+				clockWeight: NumericRangeSchema.optional(),
+				durationMs: NumericRangeSchema.optional(),
+				intervalMs: NumericRangeSchema.optional(),
+			})
+			.strict()
+			.optional()
+			.describe(
+				"AND-combined summary filters. A property absent from an operation kind never matches, including false. min/max inclusive; gt/lt exclusive.",
+			),
 		maxDepth: z.number().int().min(1).max(12).default(1),
 		limit: z.number().int().min(1).max(200).default(50),
 		maxExpansions: z.number().int().min(1).max(100000).default(10000),
 		timeoutMs: z.number().int().min(1).max(5000).default(1000),
 		revision: z.number().int().nonnegative().optional(),
 		snapshotId: IdSchema.optional(),
-		cursor: z.string().min(1).max(8192).optional(),
+		cursor: z.string().min(1).max(128).optional(),
 	})
 	.strict()
 	.superRefine((query, context) => {
@@ -72,6 +138,8 @@ export const GraphDiscoveryQuerySchema = z
 				"owner",
 				"participant",
 				"role",
+				"search",
+				"filter",
 				"cursor",
 			] as const)
 				if (query[key] !== undefined)

@@ -98,9 +98,11 @@ it("keeps MCP convenience queries on the canonical graph with exact edge identit
 				},
 			}),
 		);
-		expect(convenience.edgeIds).toEqual(direct.edgeIds);
+		expect(convenience.text).toBe(direct.text);
 		expect(convenience.operationIds).toEqual(direct.operationIds);
-		expect(convenience.edgeIds.length).toBeGreaterThan(0);
+		expect(convenience.text).toMatch(
+			/--(?:line-material|line-unit-selector|line-unit-cost|line-item-outcome|merge-item-outcome|merge-replacement|clock-item-outcome|depletion-item-outcome)-->/,
+		);
 	}
 	const direct = graphTextFn(
 		await client.callTool({
@@ -134,11 +136,11 @@ it("keeps MCP convenience queries on the canonical graph with exact edge identit
 			},
 		}),
 	);
-	expect(chain.edgeIds).toEqual(direct.edgeIds);
+	expect(chain.text).toBe(direct.text);
 	expect(chain.operationIds).toEqual(direct.operationIds);
 	expect(chain.text).toContain("merge-replacement");
-	expect(chain.text).toContain('"item:forge"');
-	expect(chain.text).toContain('"item:tool"');
+	expect(chain.text).toContain("[item:forge]");
+	expect(chain.text).toContain("[item:tool]");
 });
 
 it("refreshes graph results after writes and project switches, rejecting stale revisions", async () => {
@@ -184,7 +186,7 @@ it("refreshes graph results after writes and project switches, rejecting stale r
 			arguments: query,
 		}),
 	);
-	expect(first.text).toContain('graph-first ["item:water"]');
+	expect(first.text).toContain("graph-first [item:water]");
 	await Effect.runPromise(
 		repository.upsertItemFx({
 			projectId: "graph-first",
@@ -213,7 +215,7 @@ it("refreshes graph results after writes and project switches, rejecting stale r
 		}),
 	);
 	expect(changed.revision).toBeGreaterThan(first.revision);
-	expect(changed.text).toContain('Changed ["item:water"]');
+	expect(changed.text).toContain("Changed [item:water]");
 	const root = await Effect.runPromise(repository.readProjectRootFx("graph-first"));
 	if (root === null) throw new Error("Missing fixture project root.");
 	const waterPath = join(root, "items", "water.json");
@@ -229,7 +231,7 @@ it("refreshes graph results after writes and project switches, rejecting stale r
 	);
 	expect(refreshed.revision).toBe(changed.revision);
 	expect(refreshed.snapshotId).not.toBe(changed.snapshotId);
-	expect(refreshed.text).toContain('Reloaded without marker change ["item:water"]');
+	expect(refreshed.text).toContain("Reloaded without marker change [item:water]");
 	ownership.setProjectContextFn("graph-second");
 	const second = graphTextFn(
 		await client.callTool({
@@ -238,7 +240,7 @@ it("refreshes graph results after writes and project switches, rejecting stale r
 		}),
 	);
 	expect(second.projectId).toBe("graph-second");
-	expect(second.text).toContain('graph-second ["item:water"]');
+	expect(second.text).toContain("graph-second [item:water]");
 });
 
 it("admits only bounded graph requests and exposes discovery without project context", async () => {
@@ -351,5 +353,5 @@ it("admits only bounded graph requests and exposes discovery without project con
 	);
 	expect(limited.text).toMatch(/truncated: true/);
 	expect(limited.text).toMatch(/Reasons:.*limit/);
-	expect(limited.edgeIds).toHaveLength(1);
+	expect(limited.text.split("\n").filter((line) => line.startsWith("- "))).toHaveLength(1);
 });

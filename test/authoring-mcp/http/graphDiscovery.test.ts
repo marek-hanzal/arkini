@@ -37,7 +37,7 @@ it("explains local and rootless merge interactions in text with exact identities
 		}),
 	);
 	expect(all.operationIds).toHaveLength(3);
-	expect(all.edgeIds).toHaveLength(0);
+	expect(all.text).not.toContain("edgeId=");
 	const replacement = all.text
 		.split("\n")
 		.find((line) => line.includes("action=consume") && line.includes("effect=replace"));
@@ -226,7 +226,7 @@ it("shows a reverse-discovered path with its original authored edge direction", 
 	expect(path.text).toContain("Beagle Puppy With Fawn");
 	expect(path.text).toContain("<--merge-replacement--");
 	expect(path.operationIds).toHaveLength(1);
-	expect(path.edgeIds).toHaveLength(1);
+	expect(path.text).not.toContain("edgeId=");
 	const detail = toolJsonFn<GraphOperationReadResult>(
 		await client.callTool({
 			name: "graph_operations_json",

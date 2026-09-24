@@ -1,16 +1,16 @@
 import { afterEach, expect, it, vi } from "vitest";
-import type { GraphBatchResult, GraphDiscoveryResult } from "~/graph/type/GraphDiscoveryResult";
 import { cleanupMcpHarnesses } from "./support/createMcpHarness";
-import { createGraphDiscoveryFixtureFn, toolJsonFn } from "./graphQuery.test/fixture";
+import { createGraphDiscoveryFixtureFn, graphTextFn, toolJsonFn } from "./graphQuery.test/fixture";
+import type { GraphOperationReadResult } from "~/graph/type/GraphDiscoveryResult";
 
 afterEach(async () => {
 	vi.restoreAllMocks();
 	await cleanupMcpHarnesses();
 });
 
-it("discovers readable local and rootless merge interactions without transmitting authored documents", async () => {
+it("explains local and rootless merge interactions in text with exact identities for selective hydration", async () => {
 	const { client } = await createGraphDiscoveryFixtureFn();
-	const local = toolJsonFn<GraphDiscoveryResult>(
+	const local = graphTextFn(
 		await client.callTool({
 			name: "graph_query",
 			arguments: {
@@ -19,61 +19,13 @@ it("discovers readable local and rootless merge interactions without transmittin
 			},
 		}),
 	);
-	expect(local.status).toBe("yes");
-	expect(local.truncated).toBe(false);
-	expect(local.edges).toEqual(
-		expect.arrayContaining([
-			expect.objectContaining({
-				from: "item:puppy",
-				to: "item:fawn",
-				kind: "merge-target",
-			}),
-			expect.objectContaining({
-				from: "item:fawn",
-				to: "item:puppy",
-				kind: "merge-target",
-			}),
-			expect.objectContaining({
-				from: "item:fawn",
-				to: "item:puppy",
-				kind: "line-material",
-			}),
-		]),
-	);
-	const names = new Map(
-		local.nodes.map((node) => [
-			node.id,
-			node.title,
-		]),
-	);
-	const merge = local.operations.find(
-		(operation) =>
-			operation.kind === "merge" &&
-			operation.owner === "item:puppy" &&
-			operation.target === "item:fawn",
-	);
-	expect(merge?.kind).toBe("merge");
-	if (merge?.kind !== "merge") throw new Error("Missing Puppy merge.");
-	expect(
-		`${names.get(merge.owner)} + ${names.get(merge.target!)} → ${names.get(merge.replacement!)}`,
-	).toBe("Beagle Puppy + Fawn → Beagle Puppy With Fawn");
-	expect(merge).toMatchObject({
-		action: "consume",
-		effect: "replace",
-		hasOutcomes: false,
-	});
-	expect(JSON.stringify(local)).not.toContain("PRIVATE_");
-	for (const operation of local.operations) expect(operation).not.toHaveProperty("data");
-	for (const edge of local.edges) {
-		expect(edge).not.toHaveProperty("annotations");
-		expect(
-			Object.values(edge.metadata).every(
-				(value) => value === null || typeof value !== "object",
-			),
-		).toBe(true);
-	}
-
-	const all = toolJsonFn<GraphDiscoveryResult>(
+	expect(local.text).toMatch(/Status: yes.*truncated: false/);
+	expect(local.text).toContain("line-material");
+	expect(local.text).toContain("merge-target");
+	expect(local.text).toContain("Feed Puppy");
+	expect(local.text).not.toContain("PRIVATE_");
+	expect(local.text.trimStart().startsWith("{")).toBe(false);
+	const all = graphTextFn(
 		await client.callTool({
 			name: "graph_query",
 			arguments: {
@@ -84,9 +36,17 @@ it("discovers readable local and rootless merge interactions without transmittin
 			},
 		}),
 	);
-	expect(all.operations).toHaveLength(3);
-	expect(all.operations.every((operation) => operation.kind === "merge")).toBe(true);
-	const targets = toolJsonFn<GraphDiscoveryResult>(
+	expect(all.operationIds).toHaveLength(3);
+	expect(all.edgeIds).toHaveLength(0);
+	const replacement = all.text
+		.split("\n")
+		.find((line) => line.includes("action=consume") && line.includes("effect=replace"));
+	expect(replacement).toBeDefined();
+	expect(replacement).toContain("Beagle Puppy");
+	expect(replacement).toContain("Fawn");
+	expect(replacement).toContain("Beagle Puppy With Fawn");
+	expect(all.text).not.toContain("PRIVATE_");
+	const target = graphTextFn(
 		await client.callTool({
 			name: "graph_query",
 			arguments: {
@@ -99,34 +59,43 @@ it("discovers readable local and rootless merge interactions without transmittin
 			},
 		}),
 	);
-	expect(targets.operations).toEqual([
-		expect.objectContaining({
-			owner: "item:fawn",
-			target: "item:puppy",
-			replacement: "item:paired",
+	expect(target.operationIds).toHaveLength(1);
+	const hydrated = toolJsonFn<GraphOperationReadResult>(
+		await client.callTool({
+			name: "graph_operations_json",
+			arguments: {
+				revision: target.revision,
+				snapshotId: target.snapshotId,
+				operationIds: target.operationIds,
+			},
 		}),
-	]);
-	expect(targets.nodes.map(({ title }) => title).sort()).toEqual([
-		"Beagle Puppy",
-		"Beagle Puppy With Fawn",
-		"Fawn",
-	]);
+	);
+	expect(hydrated.operations[0]).toMatchObject({
+		kind: "merge",
+		owner: "item:fawn",
+		data: {
+			target: {
+				itemUid: "puppy",
+			},
+			result: "paired",
+		},
+	});
 });
 
-it("reads one project snapshot for overlapping batch queries and isolates malformed siblings", async () => {
+it("renders per-query batch results over one project read while preserving reusable IDs and isolated errors", async () => {
 	const { client, repository } = await createGraphDiscoveryFixtureFn();
 	const query = {
 		kind: "connections",
 		from: "item:puppy",
 	};
-	const direct = toolJsonFn<GraphDiscoveryResult>(
+	const direct = graphTextFn(
 		await client.callTool({
 			name: "graph_query",
 			arguments: query,
 		}),
 	);
 	const readSpy = vi.spyOn(repository, "readProjectFx");
-	const batch = toolJsonFn<GraphBatchResult>(
+	const batch = graphTextFn(
 		await client.callTool({
 			name: "graph_query_batch",
 			arguments: {
@@ -139,7 +108,10 @@ it("reads one project snapshot for overlapping batch queries and isolates malfor
 					},
 					{
 						id: "overlap",
-						query,
+						query: {
+							...query,
+							limit: 1,
+						},
 					},
 					{
 						id: "invalid",
@@ -155,35 +127,28 @@ it("reads one project snapshot for overlapping batch queries and isolates malfor
 	expect(readSpy).toHaveBeenCalledTimes(1);
 	expect(batch.revision).toBe(direct.revision);
 	expect(batch.snapshotId).toBe(direct.snapshotId);
-	expect(batch.nodes).toEqual(direct.nodes);
-	expect(batch.edges).toEqual(direct.edges);
-	expect(batch.operations).toEqual(direct.operations);
-	for (const payload of [
-		batch.nodes,
-		batch.edges,
-		batch.operations,
-	])
-		expect(new Set(payload.map(({ id }) => id)).size).toBe(payload.length);
-	for (const result of batch.queries.slice(0, 2)) {
-		expect(result).toMatchObject({
-			status: direct.status,
-			truncated: direct.truncated,
-			reasons: direct.reasons,
-		});
-		expect(result.nodeIds).toEqual(direct.nodes.map(({ id }) => id));
-		expect(result.edgeIds).toEqual(direct.edges.map(({ id }) => id));
-		expect(result.operationIds).toEqual(direct.operations.map(({ id }) => id));
-	}
-	expect(batch.queries[2]).toMatchObject({
-		id: "invalid",
-		status: "unknown",
-		error: {
-			reason: "invalid-query",
-		},
-		nodeIds: [],
-		edgeIds: [],
-		operationIds: [],
-	});
+	expect(batch.text.trimStart().startsWith("{")).toBe(false);
+	const sections = batch.text.split(/^Query: /m);
+	expect(sections).toHaveLength(4);
+	expect(sections[1]).toContain("puppy");
+	expect(sections[1]).toMatch(/Status: yes.*truncated: false/);
+	expect(sections[2]).toContain("overlap");
+	expect(sections[2]).toMatch(/Status: yes.*truncated: true/);
+	expect(sections[2]).toMatch(/Reasons:.*limit/);
+	expect(sections[3]).toContain("invalid-query");
+	expect(sections[3]).toMatch(/Status: unknown/);
+	expect(new Set(batch.operationIds)).toEqual(new Set(direct.operationIds));
+	const hydrated = toolJsonFn<GraphOperationReadResult>(
+		await client.callTool({
+			name: "graph_operations_json",
+			arguments: {
+				revision: batch.revision,
+				snapshotId: batch.snapshotId,
+				operationIds: batch.operationIds,
+			},
+		}),
+	);
+	expect(hydrated.issues).toEqual([]);
 	for (const queries of [
 		Array.from(
 			{
@@ -215,4 +180,45 @@ it("reads one project snapshot for overlapping batch queries and isolates malfor
 				})
 			).isError,
 		).toBe(true);
+});
+
+it("shows a reverse-discovered path with its original authored edge direction", async () => {
+	const { client } = await createGraphDiscoveryFixtureFn();
+	const path = graphTextFn(
+		await client.callTool({
+			name: "graph_query",
+			arguments: {
+				kind: "path",
+				from: "item:paired",
+				to: "item:puppy",
+				direction: "in",
+				kinds: [
+					"merge-replacement",
+				],
+				maxDepth: 1,
+			},
+		}),
+	);
+	expect(path.text).toMatch(/Status: yes/);
+	expect(path.text).toContain("Beagle Puppy With Fawn");
+	expect(path.text).toContain("<--merge-replacement--");
+	expect(path.operationIds).toHaveLength(1);
+	expect(path.edgeIds).toHaveLength(1);
+	const detail = toolJsonFn<GraphOperationReadResult>(
+		await client.callTool({
+			name: "graph_operations_json",
+			arguments: {
+				revision: path.revision,
+				snapshotId: path.snapshotId,
+				operationIds: path.operationIds,
+			},
+		}),
+	);
+	expect(detail.operations[0]).toMatchObject({
+		owner: "item:puppy",
+		kind: "merge",
+		data: {
+			result: "paired",
+		},
+	});
 });

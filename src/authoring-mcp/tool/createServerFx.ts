@@ -60,25 +60,25 @@ const ItemDetailInputSchema = z
 		description: "The identity of the item whose simplified detail is requested.",
 	});
 
-const ItemConfigInputSchema = z
+const ItemJsonInputSchema = z
 	.object({
 		itemUid: IdSchema.describe("The exact item UID returned by item_collection."),
 	})
 	.strict()
 	.meta({
-		$id: "urn:serakki:schema:mcp:item-config-input",
+		$id: "urn:serakki:schema:mcp:item-json-input",
 		title: "Item configuration tool input",
 		description: "The identity of the item whose canonical configuration is requested.",
 	});
 
-const ItemLineConfigInputSchema = z
+const ItemLineJsonInputSchema = z
 	.object({
 		itemUid: IdSchema.describe("The exact item UID returned by item_collection."),
-		lineUid: IdSchema.describe("The exact line UID returned by item_lines or item_config."),
+		lineUid: IdSchema.describe("The exact line UID returned by item_lines or item_json."),
 	})
 	.strict()
 	.meta({
-		$id: "urn:serakki:schema:mcp:item-line-config-input",
+		$id: "urn:serakki:schema:mcp:item-line-json-input",
 		title: "Item line configuration tool input",
 		description: "The item and production-line identities whose canonical config is requested.",
 	});
@@ -105,10 +105,10 @@ const lineReferenceKeyFn = ({ itemUid, lineUid }: ItemLineReference) =>
 		lineUid,
 	]);
 
-const ItemLineConfigsInputSchema = z
+const ItemLinesJsonInputSchema = z
 	.object({
 		lines: z
-			.array(z.object(ItemLineConfigInputSchema.shape).strict())
+			.array(z.object(ItemLineJsonInputSchema.shape).strict())
 			.min(1)
 			.refine(
 				(lines) => new Set(lines.map(lineReferenceKeyFn)).size <= 50,
@@ -120,12 +120,12 @@ const ItemLineConfigsInputSchema = z
 	})
 	.strict()
 	.meta({
-		$id: "urn:serakki:schema:mcp:item-line-configs-input",
+		$id: "urn:serakki:schema:mcp:item-lines-json-input",
 		title: "Item line configurations tool input",
 		description: "Read canonical line configurations from one project snapshot and revision.",
 	});
 
-const ItemConfigsInputSchema = z
+const ItemsJsonInputSchema = z
 	.object({
 		itemUids: z
 			.array(IdSchema)
@@ -140,12 +140,12 @@ const ItemConfigsInputSchema = z
 	})
 	.strict()
 	.meta({
-		$id: "urn:serakki:schema:mcp:item-configs-input",
+		$id: "urn:serakki:schema:mcp:items-json-input",
 		title: "Item configurations tool input",
 		description: "Read canonical item configurations from one project snapshot and revision.",
 	});
 
-const SchemaDetailInputSchema = z
+const SchemaJsonInputSchema = z
 	.object({
 		resolveDepth: z
 			.number()
@@ -165,7 +165,7 @@ const SchemaDetailInputSchema = z
 	})
 	.strict()
 	.meta({
-		$id: "urn:serakki:schema:mcp:schema-detail-input",
+		$id: "urn:serakki:schema:mcp:schema-json-input",
 		title: "Schema detail tool input",
 		description: "The exact registered schema identity to read.",
 	});
@@ -196,7 +196,11 @@ const readProjectTextFn = (project: Project) => {
 };
 
 const readItemMetaTextFn = (project: Project) =>
-	`Total: ${Object.keys(project.config.items).length}`;
+	[
+		`Project ID: ${project.projectId}`,
+		`Revision: ${project.revision}`,
+		`Total: ${Object.keys(project.config.items).length}`,
+	].join("\n");
 
 /** Admit exact stored identities before any single-item projection. */
 const readItemFx = Effect.fn("readMcpItemFx")(function* (project: Project, itemUid: string) {
@@ -225,22 +229,21 @@ const readItemDetailTextFx = Effect.fn("readItemDetailTextFx")(
 		}),
 );
 
-const readItemConfigTextFx = Effect.fn("readItemConfigTextFx")(
-	(project: Project, itemUid: string) =>
-		Effect.gen(function* () {
-			const item = yield* readItemFx(project, itemUid);
-			return JSON.stringify(
-				{
-					revision: project.revision,
-					item,
-				},
-				null,
-				2,
-			);
-		}),
+const readItemJsonFx = Effect.fn("readItemJsonFx")((project: Project, itemUid: string) =>
+	Effect.gen(function* () {
+		const item = yield* readItemFx(project, itemUid);
+		return JSON.stringify(
+			{
+				revision: project.revision,
+				item,
+			},
+			null,
+			2,
+		);
+	}),
 );
 
-const readItemLineConfigTextFx = Effect.fn("readItemLineConfigTextFx")(
+const readItemLineJsonFx = Effect.fn("readItemLineJsonFx")(
 	(project: Project, itemUid: string, lineUid: string) =>
 		Effect.gen(function* () {
 			const item = yield* readItemFx(project, itemUid);
@@ -264,32 +267,28 @@ const readItemLineConfigTextFx = Effect.fn("readItemLineConfigTextFx")(
 const readItemLinesTextFx = Effect.fn("readItemLinesTextFx")((project: Project, itemUid: string) =>
 	Effect.gen(function* () {
 		const item = yield* readItemFx(project, itemUid);
-		return JSON.stringify(
-			{
-				revision: project.revision,
-				itemUid,
-				lines: item.lines.map(
-					({ uid, title, default: isDefault, clock, clockWeight, show, enable }) => ({
-						uid,
-						title,
-						default: isDefault,
-						clock: clock === true,
-						clockWeight,
-						show,
-						enable,
-					}),
-				),
-			},
-			null,
-			2,
-		);
+		return [
+			`Project ID: ${project.projectId}`,
+			`Revision: ${project.revision}`,
+			`Item: ${JSON.stringify(item.title)} [item:${JSON.stringify(item.uid)}]`,
+			...(item.lines.length === 0
+				? [
+						"No authored lines.",
+					]
+				: [
+						`Lines (${item.lines.length}, authored order):`,
+						...item.lines.map((line) =>
+							[
+								`- ${JSON.stringify(line.title)} [line:${JSON.stringify(line.uid)}]`,
+								`  Default: ${line.default}; Clock: ${line.clock === true}; Clock weight: ${line.clockWeight}; Show: ${line.show}; Enable: ${line.enable}`,
+							].join("\n"),
+						),
+					]),
+		].join("\n");
 	}),
 );
 
-const readItemLineConfigsTextFn = (
-	project: Project,
-	references: ReadonlyArray<ItemLineReference>,
-) => {
+const readItemLinesJsonFn = (project: Project, references: ReadonlyArray<ItemLineReference>) => {
 	const seen = new Set<string>();
 	const lines: Array<{
 		itemUid: string;
@@ -338,7 +337,7 @@ const readItemLineConfigsTextFn = (
 	);
 };
 
-const readItemConfigsTextFn = (project: Project, itemUids: ReadonlyArray<string>) => {
+const readItemsJsonFn = (project: Project, itemUids: ReadonlyArray<string>) => {
 	const uniqueItemUids = [
 		...new Set(itemUids),
 	];
@@ -425,16 +424,16 @@ const createServerFn = (
 		},
 		{
 			instructions:
-				"Every project tool targets only the project currently open in the Serakki editor. Results are concise plain text unless a tool explicitly promises JSON. Structurally large create and edit inputs are serialized JSON strings: retrieve the exact schema named by their tool description through schema_detail with optional resolveDepth (0–2) to inline registered references. Remaining $refs can be read through schema_detail again. Create and edit tools persist canonical saved editor state. For board templates, start with template_collection, then template_detail (text) or template_config (canonical JSON); use focused template mutations instead of replacing the project templates array.",
+				"Every project tool targets only the project currently open in the Serakki editor. Tools without a format suffix return concise formatted text. Tools ending in _json return one valid JSON document; plural names hold multiple results with shared metadata. No JSONL tools are exposed. Structurally large create and edit inputs are serialized JSON strings: retrieve the exact schema named by their tool description through schema_json with optional resolveDepth (0–2) to inline registered references. Remaining $refs can be read through schema_json again. Create and edit tools persist canonical saved editor state. For board templates, start with template_collection, then template_detail (text) or template_json (canonical JSON); use focused template mutations instead of replacing the project templates array.",
 		},
 	);
 	const readProjectFx = () => readCurrentProjectFx(repository, readProjectContextFn);
 	server.registerTool(
-		"schema_detail",
+		"schema_json",
 		{
 			description:
 				"Read one JSON Schema by its exact case-sensitive Zod registry ID. Optional resolveDepth (integer 0–2, default 0) expands that many registered $ref edges, independently in each branch. Cycles, unknown references and references at the depth limit remain as $ref. Local fragment references in embedded schemas retain their original resource ID. Depth limits nesting, not total response size. This tool does not require an open project.",
-			inputSchema: SchemaDetailInputSchema,
+			inputSchema: SchemaJsonInputSchema,
 		},
 		async ({ id, resolveDepth }) => runToolFn(readSchemaDetailTextFx(id, resolveDepth)),
 	);
@@ -443,7 +442,7 @@ const createServerFn = (
 		server.registerTool(
 			"create_item",
 			{
-				description: `Create and persist one item in the open project with generated item and line UIDs. Supplied lines omit uid. Pass input as a serialized JSON object matching schema ${JSON.stringify(schemaId)}; retrieve it and each returned $ref through schema_detail. Omitted fields use the same defaults as a new item form in the Editor UI.`,
+				description: `Create and persist one item in the open project with generated item and line UIDs. Supplied lines omit uid. Pass input as a serialized JSON object matching schema ${JSON.stringify(schemaId)}; retrieve it and each returned $ref through schema_json. Omitted fields use the same defaults as a new item form in the Editor UI.`,
 				inputSchema: JsonToolInputSchema,
 			},
 			async ({ input }) =>
@@ -470,7 +469,7 @@ const createServerFn = (
 		server.registerTool(
 			"edit_item",
 			{
-				description: `Patch one existing item. Pass input as a serialized JSON object matching schema ${JSON.stringify(schemaId)}; retrieve it and each returned $ref through schema_detail. Supplied top-level fields replace their complete values, omitted fields remain unchanged, and null clears optional fields. Before replacing a structured field such as artwork, units, merge, lines, outcome, or nested rolls, read item_config and copy its revision into this request.`,
+				description: `Patch one existing item. Pass input as a serialized JSON object matching schema ${JSON.stringify(schemaId)}; retrieve it and each returned $ref through schema_json. Supplied top-level fields replace their complete values, omitted fields remain unchanged, and null clears optional fields. Before replacing a structured field such as artwork, units, merge, lines, outcome, or nested rolls, read item_json and copy its revision into this request.`,
 				inputSchema: JsonToolInputSchema,
 			},
 			async ({ input }) =>
@@ -510,7 +509,7 @@ const createServerFn = (
 			name: "replace_item_line",
 			schema: ReplaceItemLineInputSchema,
 			description:
-				"Replace one existing production line without resending the item's other lines. Read item_line_config first and copy its revision. Supply the complete line according to the input schema; omitted optional values are removed, and the target line UID is retained. Omit uid in the authoring value. Its position is preserved.",
+				"Replace one existing production line without resending the item's other lines. Read item_line_json first and copy its revision. Supply the complete line according to the input schema; omitted optional values are removed, and the target line UID is retained. Omit uid in the authoring value. Its position is preserved.",
 			decodeFx: (input: string) =>
 				parseToolInputJsonFx(input, ReplaceItemLineInputSchema).pipe(
 					Effect.map((decoded) => ({
@@ -523,7 +522,7 @@ const createServerFn = (
 			name: "delete_item_line",
 			schema: DeleteItemLineInputSchema,
 			description:
-				"Delete exactly one production line. Read item_line_config first and copy its revision. Missing line UIDs are rejected; all other item values and line order are preserved.",
+				"Delete exactly one production line. Read item_line_json first and copy its revision. Missing line UIDs are rejected; all other item values and line order are preserved.",
 			decodeFx: (input: string) =>
 				parseToolInputJsonFx(input, DeleteItemLineInputSchema).pipe(
 					Effect.map((decoded) => ({
@@ -537,7 +536,7 @@ const createServerFn = (
 		server.registerTool(
 			name,
 			{
-				description: `${description} Pass input as a serialized JSON object matching schema ${JSON.stringify(resolveSchemaId(schema))}; retrieve it and each returned $ref through schema_detail.`,
+				description: `${description} Pass input as a serialized JSON object matching schema ${JSON.stringify(resolveSchemaId(schema))}; retrieve it and each returned $ref through schema_json.`,
 				inputSchema: JsonToolInputSchema,
 			},
 			async ({ input }) => {
@@ -565,7 +564,7 @@ const createServerFn = (
 	server.registerTool(
 		"edit_item_lines",
 		{
-			description: `Apply 1–20 create, replace or delete line operations across items with one project revision. Each item/line pair may appear once. Create appends a line with a generated UID; supplied create/replace line objects omit uid. Replace preserves position and the addressed line UID; delete removes exactly one line. Complete replacements use the same schema as replace_item_line. All operations and resulting items are validated before one best-effort repository commit; invalid input or stale revision writes nothing. Returns a new revision and an operation summary. Pass input as serialized JSON matching schema ${JSON.stringify(resolveSchemaId(EditItemLinesInputSchema))}; retrieve it and each $ref through schema_detail.`,
+			description: `Apply 1–20 create, replace or delete line operations across items with one project revision. Each item/line pair may appear once. Create appends a line with a generated UID; supplied create/replace line objects omit uid. Replace preserves position and the addressed line UID; delete removes exactly one line. Complete replacements use the same schema as replace_item_line. All operations and resulting items are validated before one best-effort repository commit; invalid input or stale revision writes nothing. Returns a new revision and an operation summary. Pass input as serialized JSON matching schema ${JSON.stringify(resolveSchemaId(EditItemLinesInputSchema))}; retrieve it and each $ref through schema_json.`,
 			inputSchema: JsonToolInputSchema,
 		},
 		async ({ input }) =>
@@ -595,7 +594,7 @@ const createServerFn = (
 		"item_line_order",
 		{
 			description:
-				"Reorder an item's existing production lines. Supply every line UID exactly once in the desired order and the revision from item_config or item_configs. Missing, unknown or duplicate IDs are rejected without changing the project. Only order changes; line values and all other item fields are preserved.",
+				"Reorder an item's existing production lines. Supply every line UID exactly once in the desired order and the revision from item_json or items_json. Missing, unknown or duplicate IDs are rejected without changing the project. Only order changes; line values and all other item fields are preserved.",
 			inputSchema: ItemLineOrderInputSchema,
 		},
 		async (input) =>
@@ -699,41 +698,37 @@ const createServerFn = (
 			),
 	);
 	server.registerTool(
-		"item_config",
+		"item_json",
 		{
 			description:
-				"Read the complete canonical JSON configuration of one item and its project revision. Use this before replacing structured fields through edit_item, preserve every unchanged nested value, and copy revision into the write request. Use item_line_config for one production line.",
-			inputSchema: ItemConfigInputSchema,
+				"Read the complete canonical JSON configuration of one item and its project revision. Use this before replacing structured fields through edit_item, preserve every unchanged nested value, and copy revision into the write request. Use item_line_json for one production line.",
+			inputSchema: ItemJsonInputSchema,
 		},
 		async ({ itemUid }) =>
 			runToolFn(
-				readProjectFx().pipe(
-					Effect.flatMap((project) => readItemConfigTextFx(project, itemUid)),
-				),
+				readProjectFx().pipe(Effect.flatMap((project) => readItemJsonFx(project, itemUid))),
 			),
 	);
 	server.registerTool(
-		"item_configs",
+		"items_json",
 		{
 			description:
 				"Read complete canonical JSON configurations for up to 50 unique item UIDs from one project snapshot. Returns revision, items in first-request order, and missingItemUids. Duplicate IDs appear once. Copy revision into subsequent write requests.",
-			inputSchema: ItemConfigsInputSchema,
+			inputSchema: ItemsJsonInputSchema,
 			annotations: {
 				readOnlyHint: true,
 			},
 		},
 		async ({ itemUids }) =>
 			runToolFn(
-				readProjectFx().pipe(
-					Effect.map((project) => readItemConfigsTextFn(project, itemUids)),
-				),
+				readProjectFx().pipe(Effect.map((project) => readItemsJsonFn(project, itemUids))),
 			),
 	);
 	server.registerTool(
 		"item_lines",
 		{
 			description:
-				"Read a compact JSON list of an item's lines in authored order with the project revision. Includes UID, title, default, clock, clockWeight, show and enable; these are authored values, not evaluated gameplay availability. Use item_line_configs to fetch selected complete lines.",
+				"Read a compact text list of an item's lines in authored order with the project revision. Includes UID, title, default, clock, clockWeight, show and enable; these are authored values, not evaluated gameplay availability. Use item_lines_json to fetch selected complete lines.",
 			inputSchema: ItemLinesInputSchema,
 			annotations: {
 				readOnlyHint: true,
@@ -747,35 +742,31 @@ const createServerFn = (
 			),
 	);
 	server.registerTool(
-		"item_line_configs",
+		"item_lines_json",
 		{
 			description:
 				"Read complete canonical JSON configurations for up to 50 unique item and line pairs from one snapshot. Returns revision, lines in first-request order, and issues with item-not-found or line-not-found reasons. Duplicate pairs appear once. Copy revision into subsequent write requests.",
-			inputSchema: ItemLineConfigsInputSchema,
+			inputSchema: ItemLinesJsonInputSchema,
 			annotations: {
 				readOnlyHint: true,
 			},
 		},
 		async ({ lines }) =>
 			runToolFn(
-				readProjectFx().pipe(
-					Effect.map((project) => readItemLineConfigsTextFn(project, lines)),
-				),
+				readProjectFx().pipe(Effect.map((project) => readItemLinesJsonFn(project, lines))),
 			),
 	);
 	server.registerTool(
-		"item_line_config",
+		"item_line_json",
 		{
 			description:
 				"Read the complete canonical JSON configuration of one production line and its project revision. Use this immediately before replace_item_line and copy the revision and every unchanged authoring value into the replacement request, omitting the immutable uid from the line object.",
-			inputSchema: ItemLineConfigInputSchema,
+			inputSchema: ItemLineJsonInputSchema,
 		},
 		async ({ itemUid, lineUid }) =>
 			runToolFn(
 				readProjectFx().pipe(
-					Effect.flatMap((project) =>
-						readItemLineConfigTextFx(project, itemUid, lineUid),
-					),
+					Effect.flatMap((project) => readItemLineJsonFx(project, itemUid, lineUid)),
 				),
 			),
 	);

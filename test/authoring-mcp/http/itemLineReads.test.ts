@@ -100,7 +100,7 @@ it("reads canonical line pairs once from one snapshot, retaining request order a
 		},
 	];
 	const response = await client.callTool({
-		name: "item_line_configs",
+		name: "item_lines_json",
 		arguments: {
 			lines: references,
 		},
@@ -153,7 +153,7 @@ it("reads canonical line pairs once from one snapshot, retaining request order a
 	);
 	readSpy.mockClear();
 	const duplicates = await client.callTool({
-		name: "item_line_configs",
+		name: "item_lines_json",
 		arguments: {
 			lines: [
 				...fiftyPairs,
@@ -165,7 +165,7 @@ it("reads canonical line pairs once from one snapshot, retaining request order a
 	expect(readSpy).toHaveBeenCalledOnce();
 	readSpy.mockClear();
 	const oversized = await client.callTool({
-		name: "item_line_configs",
+		name: "item_lines_json",
 		arguments: {
 			lines: [
 				...fiftyPairs,
@@ -189,28 +189,30 @@ it("discovers authored lines in order and accepts a lightweight detail revision 
 		},
 	});
 	expect(response.isError).not.toBe(true);
-	expect(response.content).toEqual([
-		{
-			type: "text",
-			text: JSON.stringify(
-				{
-					revision: snapshot.revision,
-					itemUid: "forge",
-					lines: snapshot.config.items.forge!.lines.map((entry) => ({
-						uid: entry.uid,
-						title: entry.title,
-						default: entry.default,
-						clock: entry.clock === true,
-						clockWeight: entry.clockWeight,
-						show: entry.show,
-						enable: entry.enable,
-					})),
-				},
-				null,
-				2,
-			),
+	const listing = response.content[0];
+	if (listing?.type !== "text") throw new Error("Missing line listing.");
+	const lineUids = [
+		...listing.text.matchAll(/\[line:("(?:[^"\\]|\\.)*")\]/g),
+	].map((match) => JSON.parse(match[1]));
+	expect(lineUids).toEqual(snapshot.config.items.forge!.lines.map((entry) => entry.uid));
+	const listedRevision = Number(listing.text.match(/^Revision: (\d+)$/m)?.[1]);
+	expect(listedRevision).toBe(snapshot.revision);
+	const hydrated = await client.callTool({
+		name: "item_line_json",
+		arguments: {
+			itemUid: "forge",
+			lineUid: lineUids[0],
 		},
-	]);
+	});
+	expect(hydrated.isError).not.toBe(true);
+	const hydratedContent = hydrated.content[0];
+	if (hydratedContent?.type !== "text") throw new Error("Missing hydrated line.");
+	expect(JSON.parse(hydratedContent.text)).toEqual({
+		revision: listedRevision,
+		itemUid: "forge",
+		line: snapshot.config.items.forge!.lines[0],
+	});
+
 	const detail = await client.callTool({
 		name: "item_detail",
 		arguments: {

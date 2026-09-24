@@ -28,7 +28,7 @@ describe("editor MCP server", () => {
 		});
 		const tools = await client.listTools();
 		expect(tools.tools.map(({ name }) => name)).toEqual([
-			"schema_detail",
+			"schema_json",
 			"create_item",
 			"edit_item",
 			"create_item_line",
@@ -36,7 +36,7 @@ describe("editor MCP server", () => {
 			"delete_item_line",
 			"edit_item_lines",
 			"item_line_order",
-			"project_config",
+			"project_json",
 			"edit_project",
 			"edit_project_layout",
 			"set_start_space",
@@ -47,7 +47,7 @@ describe("editor MCP server", () => {
 			"delete_item",
 			"template_collection",
 			"template_detail",
-			"template_config",
+			"template_json",
 			"create_template",
 			"edit_template",
 			"edit_template_cells",
@@ -62,15 +62,15 @@ describe("editor MCP server", () => {
 			"edit_note",
 			"delete_note",
 			"item_detail",
-			"item_config",
-			"item_configs",
+			"item_json",
+			"items_json",
 			"item_lines",
-			"item_line_configs",
-			"item_line_config",
-			"graph_schema",
+			"item_lines_json",
+			"item_line_json",
+			"graph_schema_json",
 			"graph_query",
 			"graph_query_batch",
-			"graph_operation_configs",
+			"graph_operations_json",
 			"item_input",
 			"item_outcome",
 			"item_chain",
@@ -132,7 +132,7 @@ describe("editor MCP server", () => {
 			.filter(({ name }) => !jsonInputToolNames.has(name))
 			.forEach(({ inputSchema, name }) => {
 				const expectedId =
-					name === "template_detail" || name === "template_config"
+					name === "template_detail" || name === "template_json"
 						? "urn:serakki:schema:mcp:template-read-input"
 						: name === "item_input" || name === "item_outcome"
 							? `urn:serakki:schema:mcp:${name.replaceAll("_", "-")}-relation`

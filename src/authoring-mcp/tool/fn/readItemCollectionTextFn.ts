@@ -38,6 +38,8 @@ export const readItemCollectionTextFn = (project: Project, input: ItemCollection
 		.join("\n\n");
 	return [
 		"Item collection",
+		`Project ID: ${project.projectId}`,
+		`Revision: ${project.revision}`,
 		`Project items: ${items.length}`,
 		`Matched items: ${matches.length}`,
 		`Page: ${input.page}`,

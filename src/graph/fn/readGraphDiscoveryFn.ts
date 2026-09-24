@@ -126,6 +126,17 @@ const readEdgeFn = (edge: GraphEdge): GraphDiscoveryEdge => {
 			({ outcome }) => outcome.quantity,
 		)
 		.otherwise(() => undefined);
+	const distance = match(input)
+		.with(
+			{
+				type: "materials",
+			},
+			{
+				type: "units",
+			},
+			({ query }) => query.distance,
+		)
+		.otherwise(() => annotations.condition?.query.distance);
 	return {
 		id: edge.id,
 		from: edge.from,
@@ -147,6 +158,11 @@ const readEdgeFn = (edge: GraphEdge): GraphDiscoveryEdge => {
 						mode: input.mode,
 					}
 				: {}),
+			...(distance === undefined
+				? {}
+				: {
+						distance,
+					}),
 			...(quantity === undefined
 				? {}
 				: {
@@ -159,60 +175,15 @@ const readEdgeFn = (edge: GraphEdge): GraphDiscoveryEdge => {
 						unitCost: input.units.cost,
 						unitFrom: input.units.from,
 					}),
-			...(annotations.setId === undefined
-				? {}
-				: {
-						setId: annotations.setId,
-					}),
-			...(annotations.setIndex === undefined
-				? {}
-				: {
-						setIndex: annotations.setIndex,
-					}),
-			...(annotations.setWeight === undefined
-				? {}
-				: {
-						setWeight: annotations.setWeight,
-					}),
 			...(annotations.alternative === undefined
 				? {}
 				: {
 						alternative: annotations.alternative,
 					}),
-			...(annotations.rollId === undefined
-				? {}
-				: {
-						rollId: annotations.rollId,
-					}),
-			...(annotations.rollIndex === undefined
-				? {}
-				: {
-						rollIndex: annotations.rollIndex,
-					}),
-			...(annotations.rollType === undefined
-				? {}
-				: {
-						rollType: annotations.rollType,
-					}),
 			...(annotations.chance === undefined
 				? {}
 				: {
 						chance: annotations.chance,
-					}),
-			...(annotations.outcomeIndex === undefined
-				? {}
-				: {
-						outcomeIndex: annotations.outcomeIndex,
-					}),
-			...(annotations.ruleIndex === undefined
-				? {}
-				: {
-						ruleIndex: annotations.ruleIndex,
-					}),
-			...(annotations.whenIndex === undefined
-				? {}
-				: {
-						whenIndex: annotations.whenIndex,
 					}),
 			...(annotations.inputIndex === undefined
 				? {}

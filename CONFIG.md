@@ -98,7 +98,7 @@ There is one Item schema, without an item-type discriminator. Authoring uses `cr
 
 `edit_item_lines` batches 1–20 create/replace/delete operations across items using one snapshot and expected project revision. Each existing item/line UID pair may appear once; each create operation receives its own new UID. It shares exact-line mutation rules with the single-line tools, validates completed items before one best-effort repository commit, and publishes one revision and notification. Invalid operations or stale revision reject the whole batch before writing; persistence retains the existing best-effort file-plan contract.
 
-MCP `item_detail` includes the project revision for lightweight authoring reads. `item_lines` returns ordered authored line identities and behavior flags, while `item_line_configs` returns canonical configs for up to 50 unique item/line pairs from one snapshot. Batch line reads preserve first-request order, deduplicate pairs, and explicitly report missing items and missing line UIDs.
+MCP `item_detail` includes the project revision for lightweight authoring reads. `item_lines` returns formatted text with ordered authored line titles, exact identities and behavior flags, while `item_lines_json` returns canonical configs for up to 50 unique item/line pairs from one snapshot. Batch line reads preserve first-request order, deduplicate pairs, and explicitly report missing items and missing line UIDs.
 
 Item/config writes validate Template outcome references on changed items under the repository write guard. Removing a template cannot strand an existing item outcome reference, including through a complete config replacement. Form feedback and write admission share the same item outcome traversal; unrelated pre-existing broken references do not block an unrelated edit.
 
@@ -190,13 +190,13 @@ Prefer the focused tools below over resending the project configuration. Templat
 | --- | --- |
 | `template_collection` | Paginated, optionally searched text: UID, title, dimensions, placement count and project revision. |
 | `template_detail` | Text for one UID: dimensions, every cell, revision and deletion blockers with reference paths. |
-| `template_config` | Canonical JSON `{ revision, template }`, including the complete `board` array. |
+| `template_json` | Canonical JSON `{ revision, template }`, including the complete `board` array. |
 | `create_template` | Generate a UID; optional dimensions default to project fallback dimensions, optional board to empty. |
 | `edit_template` | Patch title, dimensions or the complete board; omitted fields stay unchanged. Shrinking rejects stranded cells. |
 | `edit_template_cells` | Apply 1–100 ordered `place`, `replace`, `move` or `remove` changes in one commit. |
 | `delete_template` | Delete one unreferenced template; start assignments and Template outcomes block deletion with exact reference paths. |
 
-All mutations require the latest project `revision`, returned by reads and successful writes. Create, edit and cell edits accept `{ input: "<serialized JSON>" }`; their descriptions link exact `schema_detail` IDs. Delete accepts `{ templateUid, revision }` directly. For example, the decoded cell-edit input is:
+All mutations require the latest project `revision`, returned by reads and successful writes. Create, edit and cell edits accept `{ input: "<serialized JSON>" }`; their descriptions link exact `schema_json` IDs. Delete accepts `{ templateUid, revision }` directly. For example, the decoded cell-edit input is:
 
 ```json
 {

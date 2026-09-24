@@ -27,7 +27,7 @@ export const editItemFx = Effect.fn("editItemFx")(function* ({
 	if (input.revision !== undefined && input.revision !== project.revision)
 		return yield* Effect.fail(
 			new Error(
-				`Revision ${input.revision} is stale; the open project is at revision ${project.revision}. Read item_config again before replacing structured fields.`,
+				`Revision ${input.revision} is stale; the open project is at revision ${project.revision}. Read item_json again before replacing structured fields.`,
 			),
 		);
 	const candidate: Pick<ItemSchema.Type, "uid"> & Record<string, unknown> = {

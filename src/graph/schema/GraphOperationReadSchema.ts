@@ -9,7 +9,7 @@ export const GraphOperationReadSchema = z
 	})
 	.strict()
 	.meta({
-		$id: "urn:serakki:schema:mcp:graph-operation-configs-input",
+		$id: "urn:serakki:schema:mcp:graph-operations-json-input",
 		title: "Graph operation detail",
 		description:
 			"Read exact canonical operations from the revision and snapshot selected during discovery.",

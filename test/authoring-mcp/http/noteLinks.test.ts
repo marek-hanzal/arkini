@@ -112,8 +112,8 @@ describe("editor MCP note item links", () => {
 				}),
 			);
 			expect(result).toContain("Matched notes: 1");
-			expect(result).toContain(`- ${note.noteId}`);
-			expect(result).toContain('"uid":"clay","title":"Potter\'s clay"');
+			expect(result).toContain(`Note ID: ${note.noteId}`);
+			expect(result).toContain("Potter's clay [clay]");
 		}
 		const global = readTextFn(
 			await client.callTool({
@@ -121,7 +121,7 @@ describe("editor MCP note item links", () => {
 				arguments: {},
 			}),
 		);
-		expect(global.split(`- ${note.noteId}`)).toHaveLength(2);
+		expect(global.split(`Note ID: ${note.noteId}`)).toHaveLength(2);
 		const mismatch = readTextFn(
 			await client.callTool({
 				name: "note_collection",
@@ -142,30 +142,18 @@ describe("editor MCP note item links", () => {
 			},
 		});
 		expect(renamed.isError).not.toBe(true);
-		const detail = JSON.parse(
-			readTextFn(
-				await client.callTool({
-					name: "note_detail",
-					arguments: {
-						noteId: note.noteId,
-					},
-				}),
-			),
+		const detail = readTextFn(
+			await client.callTool({
+				name: "note_detail",
+				arguments: {
+					noteId: note.noteId,
+				},
+			}),
 		);
-		expect(detail).toEqual({
-			...note,
-			linkedResources: [],
-			linkedItems: [
-				{
-					uid: "water",
-					title: "Water",
-				},
-				{
-					uid: "clay",
-					title: "Potters clay",
-				},
-			],
-		});
+		expect(detail).toContain("Water [water]");
+		expect(detail).toContain("Potters clay [clay]");
+		expect(detail).toContain(`Updated at ms: ${note.updatedAtMs}`);
+		expect(detail.endsWith(note.content)).toBe(true);
 
 		const invalidEdit = await client.callTool({
 			name: "edit_note",
@@ -239,24 +227,18 @@ describe("editor MCP note item links", () => {
 		});
 		expect(deleted.isError).not.toBe(true);
 		expect(notifyProjectChangedFn).toHaveBeenCalledExactlyOnceWith(project.projectId);
-		const afterDelete = JSON.parse(
-			readTextFn(
-				await client.callTool({
-					name: "note_detail",
-					arguments: {
-						noteId: note.noteId,
-					},
-				}),
-			),
+		const afterDelete = readTextFn(
+			await client.callTool({
+				name: "note_detail",
+				arguments: {
+					noteId: note.noteId,
+				},
+			}),
 		);
-		expect(afterDelete).toEqual({
-			...note,
-			resourceUids: [],
-			itemUids: [],
-			linkedResources: [],
-			linkedItems: [],
-			updatedAtMs: expect.any(Number),
-		});
-		expect(afterDelete.updatedAtMs).toBeGreaterThan(updated?.updatedAtMs ?? 0);
+		expect(afterDelete).not.toContain("[clay]");
+		expect(afterDelete).not.toContain("[water]");
+		expect(afterDelete.endsWith(note.content)).toBe(true);
+		const afterDeleteUpdatedAtMs = Number(afterDelete.match(/^Updated at ms: (\d+)$/m)![1]);
+		expect(afterDeleteUpdatedAtMs).toBeGreaterThan(updated?.updatedAtMs ?? 0);
 	});
 });

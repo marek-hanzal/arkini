@@ -2,18 +2,15 @@ import { Effect } from "effect";
 import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { afterEach, expect, it } from "vitest";
-import type {
-	GraphDiscoveryResult,
-	GraphOperationReadResult,
-} from "~/graph/type/GraphDiscoveryResult";
+import type { GraphOperationReadResult } from "~/graph/type/GraphDiscoveryResult";
 import { cleanupMcpHarnesses } from "./support/createMcpHarness";
-import { createGraphDiscoveryFixtureFn, toolJsonFn } from "./graphQuery.test/fixture";
+import { createGraphDiscoveryFixtureFn, graphTextFn, toolJsonFn } from "./graphQuery.test/fixture";
 
 afterEach(cleanupMcpHarnesses);
 
 it("hydrates only selected canonical operations and rejects a revision changed since discovery", async () => {
 	const { client, config, repository } = await createGraphDiscoveryFixtureFn();
-	const discovery = toolJsonFn<GraphDiscoveryResult>(
+	const discovery = graphTextFn(
 		await client.callTool({
 			name: "graph_query",
 			arguments: {
@@ -22,23 +19,22 @@ it("hydrates only selected canonical operations and rejects a revision changed s
 			},
 		}),
 	);
-	const merge = discovery.operations.find(
-		(operation) => operation.kind === "merge" && operation.target === "item:fawn",
-	)!;
-	const line = discovery.operations.find((operation) => operation.kind === "line")!;
+	const mergeId = discovery.operationIds.find((id) => id.includes('"merge"'))!;
+	const lineId = discovery.operationIds.find((id) => id.includes('"line"'))!;
+	expect(discovery.lineUids).toContain(config.items.puppy!.lines[0]!.uid);
 	const pinned = {
 		revision: discovery.revision,
 		snapshotId: discovery.snapshotId,
 	};
 	const hydrated = toolJsonFn<GraphOperationReadResult>(
 		await client.callTool({
-			name: "graph_operation_configs",
+			name: "graph_operations_json",
 			arguments: {
 				...pinned,
 				operationIds: [
-					merge.id,
-					line.id,
-					merge.id,
+					mergeId,
+					lineId,
+					mergeId,
 					"absent-operation",
 				],
 			},
@@ -47,8 +43,8 @@ it("hydrates only selected canonical operations and rejects a revision changed s
 	expect(hydrated.revision).toBe(discovery.revision);
 	expect(hydrated.snapshotId).toBe(discovery.snapshotId);
 	expect(hydrated.operations.map(({ id }) => id)).toEqual([
-		merge.id,
-		line.id,
+		mergeId,
+		lineId,
 	]);
 	expect(hydrated.operations[0]).toMatchObject({
 		kind: "merge",
@@ -67,13 +63,13 @@ it("hydrates only selected canonical operations and rejects a revision changed s
 	for (const input of [
 		{
 			operationIds: [
-				merge.id,
+				mergeId,
 			],
 		},
 		{
 			revision: pinned.revision,
 			operationIds: [
-				merge.id,
+				mergeId,
 			],
 		},
 		{
@@ -86,14 +82,14 @@ it("hydrates only selected canonical operations and rejects a revision changed s
 				{
 					length: 21,
 				},
-				() => merge.id,
+				() => mergeId,
 			),
 		},
 	])
 		expect(
 			(
 				await client.callTool({
-					name: "graph_operation_configs",
+					name: "graph_operations_json",
 					arguments: input,
 				})
 			).isError,
@@ -114,11 +110,11 @@ it("hydrates only selected canonical operations and rejects a revision changed s
 	expect(
 		(
 			await client.callTool({
-				name: "graph_operation_configs",
+				name: "graph_operations_json",
 				arguments: {
 					...pinned,
 					operationIds: [
-						merge.id,
+						mergeId,
 					],
 				},
 			})
@@ -136,17 +132,17 @@ it("pins operation continuation and hydration to content even after a same-revis
 		owner: "item:puppy",
 		limit: 1,
 	};
-	const first = toolJsonFn<GraphDiscoveryResult>(
+	const first = graphTextFn(
 		await client.callTool({
 			name: "graph_query",
 			arguments: query,
 		}),
 	);
-	expect(first.operations).toHaveLength(1);
-	expect(first.truncated).toBe(true);
-	expect(first.reasons).toContain("limit");
+	expect(first.operationIds).toHaveLength(1);
+	expect(first.text).toMatch(/truncated: true/);
+	expect(first.text).toMatch(/Reasons:.*limit/);
 	expect(first.nextCursor).toBeTypeOf("string");
-	const second = toolJsonFn<GraphDiscoveryResult>(
+	const second = graphTextFn(
 		await client.callTool({
 			name: "graph_query",
 			arguments: {
@@ -156,9 +152,9 @@ it("pins operation continuation and hydration to content even after a same-revis
 		}),
 	);
 	expect(second.snapshotId).toBe(first.snapshotId);
-	expect(second.operations).toHaveLength(1);
-	expect(second.operations[0]!.id).not.toBe(first.operations[0]!.id);
-	expect(second.truncated).toBe(false);
+	expect(second.operationIds).toHaveLength(1);
+	expect(second.operationIds[0]!).not.toBe(first.operationIds[0]!);
+	expect(second.text).toMatch(/truncated: false/);
 
 	const root = await Effect.runPromise(repository.readProjectRootFx(config.meta.id));
 	if (root === null) throw new Error("Missing fixture project root.");
@@ -167,7 +163,7 @@ it("pins operation continuation and hydration to content even after a same-revis
 	document.item.merge.reverse();
 	await writeFile(path, JSON.stringify(document));
 	await Effect.runPromise(repository.refreshProjectFx(config.meta.id));
-	const changed = toolJsonFn<GraphDiscoveryResult>(
+	const changed = graphTextFn(
 		await client.callTool({
 			name: "graph_query",
 			arguments: query,
@@ -182,11 +178,11 @@ it("pins operation continuation and hydration to content even after a same-revis
 	expect(
 		(
 			await client.callTool({
-				name: "graph_operation_configs",
+				name: "graph_operations_json",
 				arguments: {
 					...pinned,
 					operationIds: [
-						first.operations[0]!.id,
+						first.operationIds[0]!,
 					],
 				},
 			})

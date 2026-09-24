@@ -28,34 +28,34 @@ describe("editor MCP project configuration", () => {
 					...editorTestPayload.config,
 					meta: {
 						...editorTestPayload.config.meta,
-						id: "project-config",
+						id: "project-json",
 					},
 				},
 				resources: editorTestPayload.resources,
 			}),
 		);
-		ownership.setProjectContextFn("project-config");
+		ownership.setProjectContextFn("project-json");
 		await Effect.runPromise(ownership.startLocalFx);
 		const client = await connectMcpClient(port);
 
 		const read = await client.callTool({
-			name: "project_config",
+			name: "project_json",
 			arguments: {},
 		});
 		const content = read.content[0];
-		if (content?.type !== "text") throw new Error("Missing project_config text.");
+		if (content?.type !== "text") throw new Error("Missing project_json text.");
 		const config = JSON.parse(content.text) as {
 			revision: number;
 			config: typeof editorTestPayload.config;
 		};
 		expect(config).toMatchObject({
-			projectId: "project-config",
+			projectId: "project-json",
 			revision: created.revision,
 			version: "1.0",
 			config: {
 				meta: {
 					...editorTestPayload.config.meta,
-					id: "project-config",
+					id: "project-json",
 				},
 				resources: editorTestPayload.config.resources,
 				start: editorTestPayload.config.start,
@@ -83,11 +83,11 @@ describe("editor MCP project configuration", () => {
 				text: expect.stringContaining("Replaced: meta"),
 			},
 		]);
-		const project = await Effect.runPromise(repository.readProjectFx("project-config"));
+		const project = await Effect.runPromise(repository.readProjectFx("project-json"));
 		if (project === null) throw new Error("Expected the edited project.");
 		expect(project?.config.meta).toEqual({
 			...editorTestPayload.config.meta,
-			id: "project-config",
+			id: "project-json",
 			title: "Renamed game",
 			board: {
 				width: 3,
@@ -96,7 +96,7 @@ describe("editor MCP project configuration", () => {
 		});
 		expect(project?.config.start).toEqual(editorTestPayload.config.start);
 		expect(project?.config.items).toEqual(editorTestPayload.config.items);
-		expect(notifyProjectChanged).toHaveBeenCalledExactlyOnceWith("project-config");
+		expect(notifyProjectChanged).toHaveBeenCalledExactlyOnceWith("project-json");
 
 		const stale = await client.callTool({
 			name: "edit_project",
@@ -121,8 +121,8 @@ describe("editor MCP project configuration", () => {
 		});
 		expect(misspelled.isError).toBe(true);
 		expect(notifyProjectChanged).toHaveBeenCalledOnce();
-		expect(
-			(await Effect.runPromise(repository.readProjectFx("project-config")))?.revision,
-		).toBe(project.revision);
+		expect((await Effect.runPromise(repository.readProjectFx("project-json")))?.revision).toBe(
+			project.revision,
+		);
 	});
 });

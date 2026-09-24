@@ -158,7 +158,7 @@ it("authors one template through HTTP without replacing other templates or start
 		],
 	});
 	const config = await client.callTool({
-		name: "template_config",
+		name: "template_json",
 		arguments: {
 			templateUid: template.uid,
 		},
@@ -173,7 +173,7 @@ it("authors one template through HTTP without replacing other templates or start
 			templateUid: template.uid,
 		},
 	});
-	expect(textFn(detail)).toContain("stone");
+	expect(textFn(detail)).toContain("2, 1 → Stone [stone]");
 	expect(textFn(detail)).toContain(`Revision: ${saved.revision}`);
 	const deleted = await client.callTool({
 		name: "delete_template",

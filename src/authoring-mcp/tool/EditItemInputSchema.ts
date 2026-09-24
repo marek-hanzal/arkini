@@ -35,7 +35,7 @@ export const EditItemInputSchema = z
 			.nonnegative()
 			.optional()
 			.describe(
-				"Optional project revision returned by item_config. Supply it when replacing structured fields so a stale read is rejected instead of overwriting newer authoring changes.",
+				"Optional project revision returned by item_json. Supply it when replacing structured fields so a stale read is rejected instead of overwriting newer authoring changes.",
 			),
 		patch: itemPatch.describe(
 			"Top-level replacements. Omitted fields remain unchanged; null clears an optional field.",

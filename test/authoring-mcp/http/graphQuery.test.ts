@@ -3,7 +3,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { afterEach, expect, it } from "vitest";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import type { GraphDiscoveryResult } from "~/graph/type/GraphDiscoveryResult";
+import { graphTextFn } from "./graphQuery.test/fixture";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 import {
 	cleanupMcpHarnesses,
@@ -12,15 +12,6 @@ import {
 } from "./support/createMcpHarness";
 
 afterEach(cleanupMcpHarnesses);
-
-const graphResultFn = (result: { content?: unknown; isError?: unknown }): GraphDiscoveryResult => {
-	expect(result.isError).not.toBe(true);
-	const content = result.content as {
-		type: string;
-		text: string;
-	}[];
-	return JSON.parse(content[0]!.text);
-};
 
 it("keeps MCP convenience queries on the canonical graph with exact edge identities and directions", async () => {
 	const { ownership, port, repository } = await createMcpHarness();
@@ -87,7 +78,7 @@ it("keeps MCP convenience queries on the canonical graph with exact edge identit
 			],
 		},
 	]) {
-		const direct = graphResultFn(
+		const direct = graphTextFn(
 			await client.callTool({
 				name: "graph_query",
 				arguments: {
@@ -99,7 +90,7 @@ it("keeps MCP convenience queries on the canonical graph with exact edge identit
 				},
 			}),
 		);
-		const convenience = graphResultFn(
+		const convenience = graphTextFn(
 			await client.callTool({
 				name: entry.name,
 				arguments: {
@@ -107,10 +98,11 @@ it("keeps MCP convenience queries on the canonical graph with exact edge identit
 				},
 			}),
 		);
-		expect(convenience).toEqual(direct);
-		expect(convenience.edges.length).toBeGreaterThan(0);
+		expect(convenience.edgeIds).toEqual(direct.edgeIds);
+		expect(convenience.operationIds).toEqual(direct.operationIds);
+		expect(convenience.edgeIds.length).toBeGreaterThan(0);
 	}
-	const direct = graphResultFn(
+	const direct = graphTextFn(
 		await client.callTool({
 			name: "graph_query",
 			arguments: {
@@ -134,7 +126,7 @@ it("keeps MCP convenience queries on the canonical graph with exact edge identit
 			},
 		}),
 	);
-	const chain = graphResultFn(
+	const chain = graphTextFn(
 		await client.callTool({
 			name: "item_chain",
 			arguments: {
@@ -142,16 +134,11 @@ it("keeps MCP convenience queries on the canonical graph with exact edge identit
 			},
 		}),
 	);
-	expect(chain).toEqual(direct);
-	expect(chain.edges).toEqual(
-		expect.arrayContaining([
-			expect.objectContaining({
-				from: "item:forge",
-				to: "item:tool",
-				kind: "merge-replacement",
-			}),
-		]),
-	);
+	expect(chain.edgeIds).toEqual(direct.edgeIds);
+	expect(chain.operationIds).toEqual(direct.operationIds);
+	expect(chain.text).toContain("merge-replacement");
+	expect(chain.text).toContain('"item:forge"');
+	expect(chain.text).toContain('"item:tool"');
 });
 
 it("refreshes graph results after writes and project switches, rejecting stale revisions", async () => {
@@ -191,17 +178,13 @@ it("refreshes graph results after writes and project switches, rejecting stale r
 		kind: "node",
 		from: "item:water",
 	};
-	const first = graphResultFn(
+	const first = graphTextFn(
 		await client.callTool({
 			name: "graph_query",
 			arguments: query,
 		}),
 	);
-	expect(first.nodes).toEqual([
-		expect.objectContaining({
-			title: "graph-first",
-		}),
-	]);
+	expect(first.text).toContain('graph-first ["item:water"]');
 	await Effect.runPromise(
 		repository.upsertItemFx({
 			projectId: "graph-first",
@@ -212,26 +195,25 @@ it("refreshes graph results after writes and project switches, rejecting stale r
 			},
 		}),
 	);
-	const stale = await client.callTool({
-		name: "graph_query",
-		arguments: {
-			...query,
-			revision: first.revision,
-		},
-	});
-	expect(stale.isError).toBe(true);
-	const changed = graphResultFn(
+	expect(
+		(
+			await client.callTool({
+				name: "graph_query",
+				arguments: {
+					...query,
+					revision: first.revision,
+				},
+			})
+		).isError,
+	).toBe(true);
+	const changed = graphTextFn(
 		await client.callTool({
 			name: "graph_query",
 			arguments: query,
 		}),
 	);
 	expect(changed.revision).toBeGreaterThan(first.revision);
-	expect(changed.nodes).toEqual([
-		expect.objectContaining({
-			title: "Changed",
-		}),
-	]);
+	expect(changed.text).toContain('Changed ["item:water"]');
 	const root = await Effect.runPromise(repository.readProjectRootFx("graph-first"));
 	if (root === null) throw new Error("Missing fixture project root.");
 	const waterPath = join(root, "items", "water.json");
@@ -239,27 +221,24 @@ it("refreshes graph results after writes and project switches, rejecting stale r
 	file.item.title = "Reloaded without marker change";
 	await writeFile(waterPath, JSON.stringify(file));
 	await Effect.runPromise(repository.refreshProjectFx("graph-first"));
-	const refreshed = graphResultFn(
+	const refreshed = graphTextFn(
 		await client.callTool({
 			name: "graph_query",
 			arguments: query,
 		}),
 	);
 	expect(refreshed.revision).toBe(changed.revision);
-	expect(refreshed.nodes[0].title).toBe("Reloaded without marker change");
+	expect(refreshed.snapshotId).not.toBe(changed.snapshotId);
+	expect(refreshed.text).toContain('Reloaded without marker change ["item:water"]');
 	ownership.setProjectContextFn("graph-second");
-	const second = graphResultFn(
+	const second = graphTextFn(
 		await client.callTool({
 			name: "graph_query",
 			arguments: query,
 		}),
 	);
 	expect(second.projectId).toBe("graph-second");
-	expect(second.nodes).toEqual([
-		expect.objectContaining({
-			title: "graph-second",
-		}),
-	]);
+	expect(second.text).toContain('graph-second ["item:water"]');
 });
 
 it("admits only bounded graph requests and exposes discovery without project context", async () => {
@@ -267,7 +246,7 @@ it("admits only bounded graph requests and exposes discovery without project con
 	await Effect.runPromise(ownership.startLocalFx);
 	const client = await connectMcpClient(port);
 	const schema = await client.callTool({
-		name: "graph_schema",
+		name: "graph_schema_json",
 		arguments: {},
 	});
 	expect(schema.isError).not.toBe(true);
@@ -359,7 +338,7 @@ it("admits only bounded graph requests and exposes discovery without project con
 			})
 		).isError,
 	).toBe(true);
-	const limited = graphResultFn(
+	const limited = graphTextFn(
 		await client.callTool({
 			name: "graph_query",
 			arguments: {
@@ -370,7 +349,7 @@ it("admits only bounded graph requests and exposes discovery without project con
 			},
 		}),
 	);
-	expect(limited.truncated).toBe(true);
-	expect(limited.reasons).toContain("limit");
-	expect(limited.edges).toHaveLength(1);
+	expect(limited.text).toMatch(/truncated: true/);
+	expect(limited.text).toMatch(/Reasons:.*limit/);
+	expect(limited.edgeIds).toHaveLength(1);
 });

@@ -103,8 +103,8 @@ describe("editor MCP note asset links", () => {
 				}),
 			);
 			expect(collection).toContain("Matched notes: 1");
-			expect(collection).toContain(`- ${note.noteId}`);
-			expect(collection).toContain('"uid":"hero","type":"image"');
+			expect(collection).toContain(`Note ID: ${note.noteId}`);
+			expect(collection).toContain("hero [hero] (image)");
 		}
 		const unmatched = readTextFn(
 			await client.callTool({
@@ -123,38 +123,19 @@ describe("editor MCP note asset links", () => {
 				arguments: {},
 			}),
 		);
-		expect(global.split(`- ${note.noteId}`)).toHaveLength(2);
-		const detail = JSON.parse(
-			readTextFn(
-				await client.callTool({
-					name: "note_detail",
-					arguments: {
-						noteId: note.noteId,
-					},
-				}),
-			),
+		expect(global.split(`Note ID: ${note.noteId}`)).toHaveLength(2);
+		const detail = readTextFn(
+			await client.callTool({
+				name: "note_detail",
+				arguments: {
+					noteId: note.noteId,
+				},
+			}),
 		);
-		expect(detail).toEqual({
-			...note,
-			linkedItems: [
-				{
-					uid: "water",
-					title: "Water",
-				},
-			],
-			linkedResources: [
-				{
-					uid: "hero",
-					title: "hero",
-					type: "image",
-				},
-				{
-					uid: "item-water",
-					title: "item-water",
-					type: "artwork",
-				},
-			],
-		});
+		expect(detail).toContain("Water [water]");
+		expect(detail).toContain("hero [hero] (image)");
+		expect(detail).toContain("item-water [item-water] (artwork)");
+		expect(detail).toContain(`Updated at ms: ${note.updatedAtMs}`);
 
 		const editInput = {
 			noteId: note.noteId,

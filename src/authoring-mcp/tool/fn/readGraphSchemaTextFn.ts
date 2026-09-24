@@ -59,7 +59,10 @@ export const readGraphSchemaTextFn = () =>
 		operationReadSchema: z.toJSONSchema(GraphOperationReadSchema),
 		semantics: {
 			purpose:
-				"The graph is a compact discovery index. It never includes authored input/query/rule/outcome/roll/set/merge configuration bodies. Read only selected documents after discovery.",
+				"graph_query, graph_query_batch and convenience tools return compact formatted text, not JSON graph dumps. Structured readers end in _json and return one JSON document, including plural batch reads. No JSONL readers are exposed. The graph is a discovery index; read only selected authored documents after discovery.",
+			metadata:
+				"Discovery omits set/roll IDs and indices, outcome indices and rule/condition bookkeeping. Meaningful scalar facts remain: quantities, consume/reserve, distance, unit source/cost, input index, participant role, probability, alternative branches, board-local semantics and template position. Exact authored grouping belongs to graph_operations_json.",
+			text: "Titles are primary; exact node IDs, operation IDs, line UIDs, revision, snapshot and continuation tokens stay available. Operation listings embed participant names once rather than repeating a node table. Quoted identity tokens use JSON string escaping; decode that string to obtain the exact identity for the next call.",
 			direction:
 				"Edges keep authored from/to direction even when traversed backwards. Local queries default to both directions; select out or in explicitly where needed. Merge-target is owner → target, not production.",
 			occurrences:
@@ -67,18 +70,18 @@ export const readGraphSchemaTextFn = () =>
 			operations:
 				"Use kind operations without from to list operations directly. Filter by operationKinds, owner, participant and role. Owner is always a participant; target identifies an explicit merge target or the owner as receiver for Space transport; input/output identify actual providers/results and reference identifies a rule mention. Role does not reinterpret an authored edge's direction. Query operations even when they have no edges.",
 			navigation:
-				"Operation summaries identify owner and any explicit merge target/replacement, with titled nodes in the payload. A lineUid pairs with the owner item UID for item_line_configs. Operation IDs are exact opaque strings; do not parse them to find authored array positions.",
-			paths: "Paths contain ordered node IDs and edge IDs. maxDepth counts relationship hops. Edge-kind filters apply at every hop. A structural path is not a feasible runtime execution plan.",
+				"Operation summaries identify owner and any explicit merge target/replacement, with human-readable names and exact node IDs in the text. A lineUid pairs with the owner item UID for item_lines_json. Operation IDs are exact opaque strings; do not parse them to find authored array positions.",
+			paths: "Paths render ordered steps with exact node and edge IDs and retain authored edge direction, including backwards traversal. maxDepth counts relationship hops. Edge-kind filters apply at every hop. A structural path is not a feasible runtime execution plan.",
 			results:
 				"status yes means a match was found; no means the selected search scope was exhausted without a match; unknown means an incomplete search found none. Inspect truncated and reasons even for yes. Partial absence is never proof of no relationship.",
 			limits: "Discovery defaults to depth 1 and 50 results, with at most depth 12 and 200 results per query. Expansion and cooperative timeout bounds apply; timeout excludes snapshot compilation and synchronous indexed lookups. Path limits count paths, whose edges can span maxDepth; operation limits count operations. Operation pages expose nextCursor when scanning can continue.",
 			pagination:
 				"For kind operations, repeat the same filters with nextCursor as cursor and the returned revision and snapshotId. The cursor is scoped to that immutable snapshot and filter selection; stale or incompatible continuations fail. A page limited before a match is unknown, not no.",
 			revision:
-				"Every response includes projectId, revision and snapshotId. Optional revision/snapshotId pin discovery; operation hydration requires both. Snapshot identity also detects external content changes that retain the on-disk revision. Snapshot tokens belong to the current graph session; rediscover after a session restart.",
-			batch: "graph_query_batch accepts 1–8 uniquely identified queries and captures one immutable snapshot for the entire request. Common nodes, edges and operations are deduplicated by ID; each result carries its query ID, status, truncation reasons and references to its own records. One query's truncation does not imply another is truncated. Paths belong to their query result.",
+				"Every response displays project ID, revision and snapshot ID. Optional revision/snapshotId pin discovery; operation hydration requires both. Snapshot identity also detects external content changes that retain the on-disk revision. Snapshot tokens belong to the current graph session; rediscover after a session restart.",
+			batch: "graph_query_batch accepts 1–8 uniquely identified queries and captures one immutable snapshot for the entire request. Nodes, edges and operations are internally deduplicated by ID. Text starts with common project, revision and snapshot, then separate query-ID sections with their own status, truncation, reasons and exact identities; storage tables are not rendered. One query's truncation does not imply another is truncated. Paths belong to their query result.",
 			hydration:
-				"graph_operation_configs reads only 1–20 requested operation IDs from the discovered revision and snapshot. Returns canonical configurations, deduplicates requested IDs and reports missing IDs. Use existing item_configs (itemUids) and item_line_configs (itemUid/lineUid pairs) for complete item or line documents; check their returned revision against discovery before combining data.",
+				"graph_operations_json reads only 1–20 requested operation IDs from the discovered revision and snapshot. Returns canonical configurations, deduplicates requested IDs and reports missing IDs. Use existing items_json (itemUids) and item_lines_json (itemUid/lineUid pairs) for complete item or line documents; check their returned revision against discovery before combining data.",
 		},
 		examples: [
 			{
@@ -149,7 +152,7 @@ export const readGraphSchemaTextFn = () =>
 				},
 			},
 			{
-				tool: "graph_operation_configs",
+				tool: "graph_operations_json",
 				arguments: {
 					revision: 42,
 					snapshotId: "<returned snapshotId>",

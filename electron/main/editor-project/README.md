@@ -134,7 +134,7 @@ Build and CLI pack publish compiled JSON and validated staged resource bytes. Im
 - Repository failure is serialized as the exact project operation plus bounded message, not leaked native state.
 - Editor persistence may fail independently without preventing gameplay boot; Editor channels report unavailable state.
 - MCP uses the same schema, expected revision, reference checks and repository mutation operations. Note edits, relationship removal and deletes use the exact `updatedAtMs` returned by the last read as their freshness token. Notes MCP collection composes Item UID, Resource UID and content filters before pagination; collection/detail resolve current Item and Resource presentation.
-- Item line authoring reads one canonical line through `item_line_config` and replaces that complete line through `replace_item_line`; the owning item, sibling order and sibling lines remain untouched. Project validation can suppress warning details while retaining their count.
+- Item line authoring reads one canonical line through `item_line_json` and replaces that complete line through `replace_item_line`; the owning item, sibling order and sibling lines remain untouched. Project validation can suppress warning details while retaining their count.
 - Successful MCP mutation emits invalidation; the renderer rereads canonical repository state. Notes also refresh after a local project revision changes. They preserve a local draft across refresh, reject a stale save and leave edit mode when its note disappears from the active global, Item, or Artwork collection.
 - GUI Editor and CLI MCP access are mutually unsupported by contract. No process lock or runtime detection enforces that restriction.
 

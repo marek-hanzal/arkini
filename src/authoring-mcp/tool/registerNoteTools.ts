@@ -116,28 +116,34 @@ const readExcerptFn = (content: string) => {
 	return characters.length <= 240 ? normalized : `${characters.slice(0, 240).join("")}…`;
 };
 
-const readLinkedItemsFn = (note: NoteSchema.Type, project: Project) =>
-	note.itemUids.map((uid) => {
-		const item = project.config.items[uid];
-		return {
-			uid,
-			title: item?.title ?? null,
-		};
-	});
-
-const readLinkedResourcesFn = (note: NoteSchema.Type, project: Project) =>
-	note.resourceUids.map((uid) => {
+const readNoteLinksFn = (note: NoteSchema.Type, project: Project) => [
+	...note.itemUids.map((uid) => {
+		const item = Object.hasOwn(project.config.items, uid)
+			? project.config.items[uid]
+			: undefined;
+		return `Item: ${item?.title ?? "Missing item"} [${uid}]`;
+	}),
+	...note.resourceUids.map((uid) => {
 		const resource = project.resources.find((candidate) => candidate.uid === uid);
-		return {
-			uid,
-			type: resource?.type ?? null,
-			...(resource?.title === undefined
-				? {}
-				: {
-						title: resource.title,
-					}),
-		};
-	});
+		return resource === undefined
+			? `Resource: Missing resource [${uid}]`
+			: `Resource: ${resource.title ?? resource.type} [${uid}] (${resource.type})`;
+	}),
+];
+
+const readNoteDetailTextFn = (note: NoteSchema.Type, project: Project) =>
+	[
+		`Note ID: ${note.noteId}`,
+		`Project: ${project.config.meta.title} [${project.projectId}]`,
+		`Revision: ${project.revision}`,
+		`Created: ${new Date(note.createdAtMs).toISOString()}`,
+		`Updated: ${new Date(note.updatedAtMs).toISOString()}`,
+		`Updated at ms: ${note.updatedAtMs}`,
+		...readNoteLinksFn(note, project),
+		"",
+		"Content:",
+		note.content,
+	].join("\n");
 
 const readNoteCollectionTextFn = (
 	notes: ReadonlyArray<NoteSchema.Type>,
@@ -158,15 +164,11 @@ const readNoteCollectionTextFn = (
 	const hasPreviousPage = input.page > 1;
 	const hasNextPage = input.page * input.limit < matches.length;
 	return [
-		"Note collection",
+		`Project: ${project.config.meta.title} [${project.projectId}]`,
+		`Revision: ${project.revision}`,
 		`Project notes: ${notes.length}`,
 		`Matched notes: ${matches.length}`,
-		`Page: ${input.page}`,
-		`Total pages: ${totalPages}`,
-		`Limit: ${input.limit}`,
-		`Returned notes: ${pageNotes.length}`,
-		`Has previous page: ${hasPreviousPage}`,
-		`Has next page: ${hasNextPage}`,
+		`Page: ${input.page} of ${totalPages}; limit: ${input.limit}; returned: ${pageNotes.length}`,
 		...(hasPreviousPage
 			? [
 					`Previous page: ${input.page - 1}`,
@@ -178,28 +180,14 @@ const readNoteCollectionTextFn = (
 				]
 			: []),
 		"",
-		"Notes:",
-		pageNotes.length === 0
-			? "- none"
-			: pageNotes
-					.map((note) =>
-						[
-							`- ${note.noteId}`,
-							`  Linked items: ${JSON.stringify(readLinkedItemsFn(note, project))}`,
-							`  Resource UIDs: ${JSON.stringify(note.resourceUids)}`,
-							`  Linked resources: ${JSON.stringify(readLinkedResourcesFn(note, project))}`,
-							`  Created: ${new Date(note.createdAtMs).toISOString()}`,
-							`  Updated: ${new Date(note.updatedAtMs).toISOString()}`,
-							`  Updated at ms: ${note.updatedAtMs}`,
-							`  Characters: ${
-								[
-									...note.content,
-								].length
-							}`,
-							`  Preview: ${JSON.stringify(readExcerptFn(note.content))}`,
-						].join("\n"),
-					)
-					.join("\n\n"),
+		...pageNotes.map((note) =>
+			[
+				`- ${readExcerptFn(note.content)}`,
+				`  Note ID: ${note.noteId}`,
+				`  Updated: ${new Date(note.updatedAtMs).toISOString()}; updatedAtMs: ${note.updatedAtMs}`,
+				...readNoteLinksFn(note, project).map((link) => `  ${link}`),
+			].join("\n"),
+		),
 	].join("\n");
 };
 
@@ -267,7 +255,7 @@ export const registerNoteToolsFn = ({
 		"note_detail",
 		{
 			description:
-				"Read one complete project note as JSON, including item UIDs, immutable UIDs and human titles, resource IDs and resolved semantic resource types. Copy updatedAtMs into edit_note or delete_note so stale mutations are rejected.",
+				"Read one complete Markdown note as formatted text with exact note ID, linked entity titles and IDs, creation/update times and the exact Updated at ms token. Copy that token into expectedUpdatedAtMs for edit_note or delete_note so stale mutations are rejected.",
 			inputSchema: NoteDetailInputSchema,
 		},
 		async ({ noteId }) =>
@@ -275,17 +263,7 @@ export const registerNoteToolsFn = ({
 				readProjectFx().pipe(
 					Effect.flatMap((project) =>
 						readNoteFx(repository, project.projectId, noteId).pipe(
-							Effect.map((note) =>
-								JSON.stringify(
-									{
-										...note,
-										linkedItems: readLinkedItemsFn(note, project),
-										linkedResources: readLinkedResourcesFn(note, project),
-									},
-									null,
-									2,
-								),
-							),
+							Effect.map((note) => readNoteDetailTextFn(note, project)),
 						),
 					),
 				),

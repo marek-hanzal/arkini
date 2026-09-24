@@ -223,7 +223,7 @@ it("exposes bounded optional resolveDepth through MCP without requiring an open 
 	const client = await connectMcpClient(port);
 	const callFn = (resolveDepth?: unknown) =>
 		client.callTool({
-			name: "schema_detail",
+			name: "schema_json",
 			arguments: {
 				id: "resolution.HttpRoot",
 				...(resolveDepth === undefined

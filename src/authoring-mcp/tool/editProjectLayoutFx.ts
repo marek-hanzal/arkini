@@ -22,7 +22,7 @@ export const editProjectLayoutFx = Effect.fn("editProjectLayoutFx")(function* ({
 	if (revision !== project.revision)
 		return yield* Effect.fail(
 			new Error(
-				`Revision ${revision} is stale; the open project is at revision ${project.revision}. Read project_config again before editing the project layout.`,
+				`Revision ${revision} is stale; the open project is at revision ${project.revision}. Read project_json again before editing the project layout.`,
 			),
 		);
 	const meta = {

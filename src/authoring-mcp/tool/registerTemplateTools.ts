@@ -82,11 +82,12 @@ const readCollectionTextFn = (
 	})(input.query ?? "");
 	const entries = matches.slice((input.page - 1) * input.limit, input.page * input.limit);
 	return [
+		`Project: ${project.config.meta.title} [${project.projectId}]`,
 		`Revision: ${project.revision}`,
 		`Templates: ${templates.length}; matched: ${matches.length}; page: ${input.page}; returned: ${entries.length}`,
 		...entries.map(
 			(template) =>
-				`- ${JSON.stringify(template.title)} | UID: ${template.uid} | ${template.width} × ${template.height} | items: ${template.board.length}`,
+				`- ${template.title} [${template.uid}] | ${template.width} × ${template.height} | items: ${template.board.length}`,
 		),
 		...(input.page * input.limit < matches.length
 			? [
@@ -103,12 +104,21 @@ const readDetailTextFx = Effect.fn("readTemplateDetailTextFx")(function* (
 	const template = yield* readTemplateFx(project, templateUid);
 	const blockers = readTemplateDeleteBlockersFn(project.config, templateUid);
 	return [
-		`Template: ${JSON.stringify(template.title)}`,
-		`UID: ${template.uid}`,
+		`Template: ${template.title} [${template.uid}]`,
+		`Project: ${project.config.meta.title} [${project.projectId}]`,
 		`Revision: ${project.revision}`,
 		`Board: ${template.width} × ${template.height}; items: ${template.board.length}`,
-		"Placements (x, y -> item UID):",
-		...template.board.map((cell) => `- ${cell.x}, ${cell.y} -> ${cell.itemUid}`),
+		...(template.board.length === 0
+			? []
+			: [
+					"Placements (zero-based x, y):",
+				]),
+		...template.board.map((cell) => {
+			const item = Object.hasOwn(project.config.items, cell.itemUid)
+				? project.config.items[cell.itemUid]
+				: undefined;
+			return `- ${cell.x}, ${cell.y} → ${item?.title ?? "Missing item"} [${cell.itemUid}]`;
+		}),
 		`Deletion blockers: ${blockers.length}`,
 		...blockers.map((entry) => `- ${entry.path.join(".")}: ${entry.message}`),
 	].join("\n");
@@ -149,7 +159,7 @@ export const registerTemplateToolsFn = ({
 		"template_collection",
 		{
 			description:
-				"List board template UIDs, titles, dimensions and placement counts as compact text with the project revision. Page defaults to 1, limit to 25 (max 100); optional query searches UID/title. Use template_detail for cells/references or template_config for canonical JSON.",
+				"List board template UIDs, titles, dimensions and placement counts as compact text with the project revision. Page defaults to 1, limit to 25 (max 100); optional query searches UID/title. Use template_detail for cells/references or template_json for canonical JSON.",
 			inputSchema: TemplateCollectionInputSchema,
 		},
 		async (input) =>
@@ -172,7 +182,7 @@ export const registerTemplateToolsFn = ({
 			),
 	);
 	server.registerTool(
-		"template_config",
+		"template_json",
 		{
 			description:
 				"Read JSON {revision, template} containing the complete canonical TemplateSchema configuration: uid, title, width, height and board [{itemUid,x,y}]. Use before replacing board through edit_template; preserve unchanged cells and copy revision. Prefer edit_template_cells for local changes.",
@@ -201,7 +211,7 @@ export const registerTemplateToolsFn = ({
 	server.registerTool(
 		"create_template",
 		{
-			description: `Create one template with a generated immutable UID. Requires revision from template_collection or project; omitted dimensions use project fallback dimensions and omitted board is empty. Returns UID and new revision as text. Pass input as serialized JSON matching schema ${JSON.stringify(resolveSchemaId(CreateTemplateInputSchema))}; retrieve it through schema_detail. Assign the result using set_start_space or a Template outcome.`,
+			description: `Create one template with a generated immutable UID. Requires revision from template_collection or project; omitted dimensions use project fallback dimensions and omitted board is empty. Returns UID and new revision as text. Pass input as serialized JSON matching schema ${JSON.stringify(resolveSchemaId(CreateTemplateInputSchema))}; retrieve it through schema_json. Assign the result using set_start_space or a Template outcome.`,
 			inputSchema: JsonToolInputSchema,
 		},
 		async ({ input }) =>
@@ -219,7 +229,7 @@ export const registerTemplateToolsFn = ({
 	server.registerTool(
 		"edit_template",
 		{
-			description: `Patch one template's title, width, height or complete board. Omitted fields, UID, sibling templates and start assignments stay unchanged. Shrinking rejects stranded cells. Read template_config before replacing board; copy revision. Pass input as serialized JSON matching schema ${JSON.stringify(resolveSchemaId(EditTemplateInputSchema))}; retrieve it through schema_detail. Returns text and new revision.`,
+			description: `Patch one template's title, width, height or complete board. Omitted fields, UID, sibling templates and start assignments stay unchanged. Shrinking rejects stranded cells. Read template_json before replacing board; copy revision. Pass input as serialized JSON matching schema ${JSON.stringify(resolveSchemaId(EditTemplateInputSchema))}; retrieve it through schema_json. Returns text and new revision.`,
 			inputSchema: JsonToolInputSchema,
 		},
 		async ({ input }) =>
@@ -237,7 +247,7 @@ export const registerTemplateToolsFn = ({
 	server.registerTool(
 		"edit_template_cells",
 		{
-			description: `Apply 1–100 ordered place, replace, move or remove changes to one template using its project revision. Coordinates are zero-based. Place requires an empty cell, replace/remove an occupied cell, move an occupied source and empty destination. Unknown items or out-of-bounds positions reject the entire batch before any write. Other templates and start assignments stay unchanged. Pass input as serialized JSON matching schema ${JSON.stringify(resolveSchemaId(EditTemplateCellsInputSchema))}; retrieve it through schema_detail. Returns text and new revision.`,
+			description: `Apply 1–100 ordered place, replace, move or remove changes to one template using its project revision. Coordinates are zero-based. Place requires an empty cell, replace/remove an occupied cell, move an occupied source and empty destination. Unknown items or out-of-bounds positions reject the entire batch before any write. Other templates and start assignments stay unchanged. Pass input as serialized JSON matching schema ${JSON.stringify(resolveSchemaId(EditTemplateCellsInputSchema))}; retrieve it through schema_json. Returns text and new revision.`,
 			inputSchema: JsonToolInputSchema,
 		},
 		async ({ input }) =>

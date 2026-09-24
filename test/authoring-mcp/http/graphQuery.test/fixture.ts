@@ -114,3 +114,44 @@ export const createGraphDiscoveryFixtureFn = async () => {
 		client: await connectMcpClient(harness.port),
 	};
 };
+
+export const toolTextFn = (result: { content?: unknown; isError?: unknown }): string => {
+	expect(result.isError).not.toBe(true);
+	const content = result.content as {
+		type: string;
+		text: string;
+	}[];
+	expect(content).toHaveLength(1);
+	return content[0]!.text;
+};
+
+/** Extract only the exact continuation/hydration tokens an MCP caller must be able to reuse. */
+export const graphTextFn = (result: { content?: unknown; isError?: unknown }) => {
+	const text = toolTextFn(result);
+	const quoted = '"(?:\\\\.|[^"\\\\])*"';
+	const headerFn = (name: string) => {
+		const value = new RegExp(`^${name}: (${quoted})$`, "m").exec(text)?.[1];
+		if (value === undefined) throw new Error(`Missing graph ${name} header.`);
+		return JSON.parse(value) as string;
+	};
+	const idsFn = (name: string): string[] => [
+		...new Set(
+			[
+				...text.matchAll(new RegExp(`${name}=(${quoted})`, "g")),
+			].map((match) => JSON.parse(match[1]!)),
+		),
+	];
+	const cursor = new RegExp(`^Cursor: (${quoted})$`, "m").exec(text)?.[1];
+	const revision = /^Revision: (\d+)$/m.exec(text)?.[1];
+	if (revision === undefined) throw new Error("Missing graph Revision header.");
+	return {
+		text,
+		projectId: headerFn("Project"),
+		revision: Number(revision),
+		snapshotId: headerFn("Snapshot"),
+		operationIds: idsFn("operationId"),
+		edgeIds: idsFn("edgeId"),
+		lineUids: idsFn("lineUid"),
+		nextCursor: cursor === undefined ? undefined : (JSON.parse(cursor) as string),
+	};
+};

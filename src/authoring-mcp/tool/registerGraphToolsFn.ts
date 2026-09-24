@@ -9,6 +9,7 @@ import { GraphBatchQuerySchema } from "~/graph/schema/GraphBatchQuerySchema";
 import { GraphOperationReadSchema } from "~/graph/schema/GraphOperationReadSchema";
 import { readItemChainQueryFn } from "~/graph/fn/readItemChainQueryFn";
 import { readItemConnectionQueryFn } from "~/graph/fn/readItemConnectionQueryFn";
+import { readGraphDiscoveryTextFn, readGraphBatchTextFn } from "./fn/readGraphDiscoveryTextFn";
 import { readGraphSchemaTextFn } from "./fn/readGraphSchemaTextFn";
 
 const itemRelationInputSchemaFn = (role: "input" | "output") =>
@@ -61,12 +62,12 @@ export const registerGraphToolsFn = ({
 	readonly runToolFn: (effect: Effect.Effect<string, unknown>) => Promise<CallToolResult>;
 }) => {
 	server.registerTool(
-		"graph_schema",
+		"graph_schema_json",
 		{
 			description:
 				"Discover compact graph nodes, relationships and operations, query and batch schemas, revision-pinned operation hydration, pagination and limits. Available without an open project.",
 			inputSchema: z.object({}).strict().meta({
-				$id: "urn:serakki:schema:mcp:graph-schema-input",
+				$id: "urn:serakki:schema:mcp:graph-schema-json-input",
 				title: "Graph schema discovery input",
 				description: "Graph schema discovery accepts no arguments.",
 			}),
@@ -80,7 +81,7 @@ export const registerGraphToolsFn = ({
 		"graph_query",
 		{
 			description:
-				"Discover the authored project graph with compact titled nodes, typed edges and operation summaries. Query local connections, traversal, paths or operations directly without a root (for example kind operations with operationKinds merge). Filter operations by owner or participant and role. Read graph_schema for continuation and bounds; hydrate selected operation IDs through graph_operation_configs or use item_configs/item_line_configs. No authored configuration bodies or executable queries are returned or accepted.",
+				"Discover the authored project graph as concise formatted text with titled entities, directed relationships and operation summaries. Query local connections, traversal, paths or operations directly without a root (for example kind operations with operationKinds merge). Filter operations by owner or participant and role. Read graph_schema_json for continuation and bounds; hydrate selected operation IDs through graph_operations_json or use items_json/item_lines_json. No authored configuration bodies or executable queries are returned or accepted.",
 			inputSchema: GraphDiscoveryQuerySchema,
 			annotations: {
 				readOnlyHint: true,
@@ -90,7 +91,7 @@ export const registerGraphToolsFn = ({
 			runToolFn(
 				readProjectFx().pipe(
 					Effect.flatMap((project) => graph.discoveryFx(project, input)),
-					Effect.map((result) => JSON.stringify(result)),
+					Effect.map((result) => readGraphDiscoveryTextFn(result, input)),
 				),
 			),
 	);
@@ -98,7 +99,7 @@ export const registerGraphToolsFn = ({
 		"graph_query_batch",
 		{
 			description:
-				"Run 1–8 uniquely named graph queries against one immutable project snapshot and revision. Returns one deduplicated compact node/edge/operation payload and per-query status, truncation, reasons and identity references. Use after discovery to expand several interesting branches without repeated graph payloads. Read graph_schema for bounds and continuation.",
+				"Run 1–8 uniquely named graph queries against one immutable project snapshot and revision. Returns formatted text with common snapshot metadata and separate named query sections, each with its status, truncation, reasons and exact navigation identities. Use after discovery to expand several interesting branches without repeated graph payloads. Read graph_schema_json for bounds and continuation.",
 			inputSchema: GraphBatchQuerySchema,
 			annotations: {
 				readOnlyHint: true,
@@ -108,15 +109,15 @@ export const registerGraphToolsFn = ({
 			runToolFn(
 				readProjectFx().pipe(
 					Effect.flatMap((project) => graph.batchFx(project, input)),
-					Effect.map((result) => JSON.stringify(result)),
+					Effect.map((result) => readGraphBatchTextFn(result, input.queries)),
 				),
 			),
 	);
 	server.registerTool(
-		"graph_operation_configs",
+		"graph_operations_json",
 		{
 			description:
-				"Read canonical authored configurations for 1–20 graph operation IDs selected during discovery. Required revision and snapshotId must match the discovery result, including after same-revision external edits; stale requests fail. Duplicate IDs are returned once, missing IDs are reported. Prefer item_configs for complete items and item_line_configs for known item/line UID pairs.",
+				"Read canonical authored configurations for 1–20 graph operation IDs selected during discovery. Required revision and snapshotId must match the discovery result, including after same-revision external edits; stale requests fail. Duplicate IDs are returned once, missing IDs are reported. Prefer items_json for complete items and item_lines_json for known item/line UID pairs.",
 			inputSchema: GraphOperationReadSchema,
 			annotations: {
 				readOnlyHint: true,
@@ -139,8 +140,8 @@ export const registerGraphToolsFn = ({
 			{
 				description:
 					role === "input"
-						? "Discover where an item is used as a line material, unit provider or unit cost. Compact outgoing input relationships; level is bounded relationship-hop depth (1–12). Hydrate only selected details with graph_operation_configs, item_configs or item_line_configs."
-						: "Discover what produces an item through lines, merge outcomes/replacement, Clock or depletion. Compact incoming output relationships; level is bounded relationship-hop depth (1–12). Hydrate only selected details with graph_operation_configs, item_configs or item_line_configs.",
+						? "Discover where an item is used as a line material, unit provider or unit cost. Formatted text of outgoing input relationships; level is bounded relationship-hop depth (1–12). Hydrate only selected details with graph_operations_json, items_json or item_lines_json."
+						: "Discover what produces an item through lines, merge outcomes/replacement, Clock or depletion. Formatted text of incoming output relationships; level is bounded relationship-hop depth (1–12). Hydrate only selected details with graph_operations_json, items_json or item_lines_json.",
 				inputSchema: itemRelationInputSchemaFn(role),
 				annotations: {
 					readOnlyHint: true,
@@ -162,7 +163,12 @@ export const registerGraphToolsFn = ({
 								maxDepth: level,
 							});
 						}),
-						Effect.map((result) => JSON.stringify(result)),
+						Effect.map((result) =>
+							readGraphDiscoveryTextFn(result, {
+								kind: level === 1 ? "connections" : "traverse",
+								from: `item:${itemUid}`,
+							}),
+						),
 					),
 				),
 		);
@@ -171,7 +177,7 @@ export const registerGraphToolsFn = ({
 		"item_chain",
 		{
 			description:
-				"Discover bounded outgoing authored consequences: lines, merges, Clock, depletion, spaces and templates. Returns compact graph records; maxDepth counts relationship hops (1–12, default 5). Use graph_query for other edge kinds or direction, and batch readers for selected configurations.",
+				"Discover bounded outgoing authored consequences: lines, merges, Clock, depletion, spaces and templates. Returns concise formatted relationship text; maxDepth counts relationship hops (1–12, default 5). Use graph_query for other edge kinds or direction, and batch readers for selected configurations.",
 			inputSchema: ItemChainInputSchema,
 			annotations: {
 				readOnlyHint: true,
@@ -190,7 +196,12 @@ export const registerGraphToolsFn = ({
 							maxDepth,
 						});
 					}),
-					Effect.map((result) => JSON.stringify(result)),
+					Effect.map((result) =>
+						readGraphDiscoveryTextFn(result, {
+							kind: "traverse",
+							from: `item:${itemUid}`,
+						}),
+					),
 				),
 			),
 	);

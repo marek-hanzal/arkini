@@ -61,14 +61,13 @@ describe("editor MCP item editing", () => {
 		const client = await connectMcpClient(port);
 		const readConfig = async (itemUid: string) => {
 			const result = await client.callTool({
-				name: "item_config",
+				name: "item_json",
 				arguments: {
 					itemUid,
 				},
 			});
 			const content = result.content[0];
-			if (content?.type !== "text")
-				throw new Error(`Missing item_config text for ${itemUid}.`);
+			if (content?.type !== "text") throw new Error(`Missing item_json text for ${itemUid}.`);
 			return JSON.parse(content.text) as unknown;
 		};
 		const waterConfig = {

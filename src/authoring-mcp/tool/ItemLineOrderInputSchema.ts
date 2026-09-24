@@ -13,7 +13,7 @@ export const ItemLineOrderInputSchema = z
 			.number()
 			.int()
 			.nonnegative()
-			.describe("The exact project revision returned by item_config or item_configs."),
+			.describe("The exact project revision returned by item_json or items_json."),
 	})
 	.strict()
 	.meta({

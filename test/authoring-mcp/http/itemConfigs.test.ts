@@ -39,7 +39,7 @@ it("returns ordered canonical batch configs and missing IDs from one revision, w
 	expect(snapshot).not.toBeNull();
 	const readSpy = vi.spyOn(repository, "readProjectFx");
 	const response = await client.callTool({
-		name: "item_configs",
+		name: "items_json",
 		arguments: {
 			itemUids: [
 				"tool",
@@ -84,7 +84,7 @@ it("returns ordered canonical batch configs and missing IDs from one revision, w
 		(_, index) => `absent-${index}`,
 	);
 	const duplicates = await client.callTool({
-		name: "item_configs",
+		name: "items_json",
 		arguments: {
 			itemUids: [
 				...fiftyIds,
@@ -111,7 +111,7 @@ it("returns ordered canonical batch configs and missing IDs from one revision, w
 
 	readSpy.mockClear();
 	const oversized = await client.callTool({
-		name: "item_configs",
+		name: "items_json",
 		arguments: {
 			itemUids: [
 				...fiftyIds,
@@ -123,7 +123,7 @@ it("returns ordered canonical batch configs and missing IDs from one revision, w
 	expect(readSpy).not.toHaveBeenCalled();
 
 	const inherited = await client.callTool({
-		name: "item_config",
+		name: "item_json",
 		arguments: {
 			itemUid: "constructor",
 		},
@@ -135,7 +135,7 @@ it("returns ordered canonical batch configs and missing IDs from one revision, w
 		},
 	]);
 	const inheritedLine = await client.callTool({
-		name: "item_line_configs",
+		name: "item_lines_json",
 		arguments: {
 			lines: [
 				{

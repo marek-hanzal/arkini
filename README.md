@@ -79,11 +79,21 @@ Serakki is Electron-only: there is no web target or browser-storage fallback. De
 Settings → Dev includes a two-click **Hard reset**. It permanently deletes the entire `~/.serakki` data root (including managed Editor projects, installed games, saves, preferences, and logs) and restarts the app. Projects stored outside that root are not deleted.
 
 
-MCP `graph_schema` documents compact discovery and selective hydration. `graph_query` finds titled nodes, typed relationships and operation summaries, including rootless operation queries filtered by kind, owner or participant role. `graph_query_batch` expands up to eight branches over one snapshot with deduplicated records. `graph_operation_configs` hydrates selected operations using the discovery revision and snapshot identity; existing `item_configs` and `item_line_configs` provide item/line documents. `item_input`, `item_outcome` and `item_chain` are compact convenience queries. Results carry explicit truncation, and operation listing supports continuation. See the [query and compatibility contract](src/graph/README.md).
+MCP output names identify their representation. Tools without a format suffix return designed, concise text; `_json` tools return one valid JSON document. Plural JSON readers keep shared revision, snapshot and issue metadata in that one document. Mutations return text describing changed identities and the resulting revision or note timestamp. There are no JSONL readers or compatibility aliases.
 
-MCP Board Templates have focused collection/detail reads, canonical JSON through `template_config`, creation, patching, deletion and ordered cell edits. All mutations use the project revision; descriptions point to exact input schemas. See [Template authoring](CONFIG.md#mcp-board-template-authoring) for the workflow and cell-operation contract.
+| Purpose | Tools |
+| --- | --- |
+| Text discovery and inspection | `project`, `item_meta`, `item_collection`, `item_detail`, `item_lines`, `template_collection`, `template_detail`, `note_collection`, `note_detail`, `artwork_collection` |
+| Text relationship discovery | `graph_query`, `graph_query_batch`, `item_input`, `item_outcome`, `item_chain` |
+| Structured documents | `project_json`, `item_json`, `items_json`, `item_line_json`, `item_lines_json`, `template_json`, `graph_operations_json` |
+| Structured schema discovery | `schema_json`, `graph_schema_json` |
 
-MCP `schema_detail({ id, resolveDepth })` optionally inlines registered schema references. `resolveDepth` defaults to `0` (the original response) and accepts integers from `0` through `2`; each followed `$ref` consumes one level, independently per branch. Cycles, unknown references, and references at the limit remain visible as `$ref`. Embedded local fragment references retain their original resource identity. The shallow limit avoids enormous expanded authoring schemas; request remaining `$ref` IDs separately. It bounds reference depth, not a fixed response byte size.
+
+MCP `graph_schema_json` documents compact discovery and selective hydration. `graph_query` renders titled relationships, operations and paths as compact text, including rootless operation queries filtered by kind, owner or participant role. `graph_query_batch` expands up to eight branches over one snapshot, with separate named text sections over internally deduplicated records. `graph_operations_json` hydrates selected operations using the discovery revision and snapshot identity; existing `items_json` and `item_lines_json` provide item/line documents. `item_input`, `item_outcome` and `item_chain` are compact text convenience queries. Exact IDs, line UIDs, revision, snapshot and continuation remain available for follow-up calls. Results carry explicit truncation, and operation listing supports continuation. See the [query and compatibility contract](src/graph/README.md).
+
+MCP Board Templates have focused collection/detail reads, canonical JSON through `template_json`, creation, patching, deletion and ordered cell edits. All mutations use the project revision; descriptions point to exact input schemas. See [Template authoring](CONFIG.md#mcp-board-template-authoring) for the workflow and cell-operation contract.
+
+MCP `schema_json({ id, resolveDepth })` optionally inlines registered schema references. `resolveDepth` defaults to `0` (the original response) and accepts integers from `0` through `2`; each followed `$ref` consumes one level, independently per branch. Cycles, unknown references, and references at the limit remain visible as `$ref`. Embedded local fragment references retain their original resource identity. The shallow limit avoids enormous expanded authoring schemas; request remaining `$ref` IDs separately. It bounds reference depth, not a fixed response byte size.
 
 The installed macOS CLI can list Editor projects and run one project's configured MCP server without opening the Editor:
 

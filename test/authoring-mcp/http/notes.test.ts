@@ -1,4 +1,6 @@
 import { Effect } from "effect";
+import { readFile, writeFile } from "node:fs/promises";
+import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
@@ -67,9 +69,9 @@ describe("editor MCP project notes", () => {
 				},
 			}),
 		);
-		expect(page).toContain(`- ${second.noteId}`);
-		expect(page).not.toContain(`- ${first.noteId}`);
-		expect(page).toContain("Has next page: true");
+		expect(page).toContain(`Note ID: ${second.noteId}`);
+		expect(page).not.toContain(`Note ID: ${first.noteId}`);
+		expect(page).toContain("Next page: 2");
 
 		const search = readTextFn(
 			await client.callTool({
@@ -80,24 +82,50 @@ describe("editor MCP project notes", () => {
 			}),
 		);
 		expect(search).toContain("Matched notes: 1");
-		expect(search).toContain(`- ${first.noteId}`);
+		expect(search).toContain(`Note ID: ${first.noteId}`);
 		expect(search).not.toContain("searchable-tail");
 
-		const detail = JSON.parse(
-			readTextFn(
-				await client.callTool({
-					name: "note_detail",
-					arguments: {
-						noteId: first.noteId,
-					},
-				}),
-			),
+		const detail = readTextFn(
+			await client.callTool({
+				name: "note_detail",
+				arguments: {
+					noteId: first.noteId,
+				},
+			}),
 		);
-		expect(detail).toEqual({
-			...first,
-			linkedResources: [],
-			linkedItems: [],
-		});
+		expect(detail.slice(detail.indexOf("\nContent:\n") + "\nContent:\n".length)).toBe(
+			firstContent,
+		);
+		expect(detail).toContain(`Note ID: ${first.noteId}`);
+		expect(detail).toContain(`Updated at ms: ${first.updatedAtMs}`);
+		const root = await Effect.runPromise(repository.readProjectRootFx("note-reading"));
+		if (root === null) throw new Error("Expected project root.");
+		const notePath = join(root, "notes", `${first.noteId}.json`);
+		const file = JSON.parse(await readFile(notePath, "utf8"));
+		await writeFile(
+			notePath,
+			JSON.stringify({
+				...file,
+				itemUids: [
+					"absent-item",
+				],
+				resourceUids: [
+					"absent-resource",
+				],
+			}),
+		);
+		await Effect.runPromise(repository.refreshProjectFx("note-reading"));
+		const dangling = readTextFn(
+			await client.callTool({
+				name: "note_detail",
+				arguments: {
+					noteId: first.noteId,
+				},
+			}),
+		);
+		expect(dangling).toContain("Missing item [absent-item]");
+		expect(dangling).toContain("Missing resource [absent-resource]");
+		expect(dangling.endsWith(firstContent)).toBe(true);
 	});
 
 	it("creates, freshness-guards, and deletes notes while notifying only committed mutations", async () => {
@@ -140,11 +168,21 @@ describe("editor MCP project notes", () => {
 		expect(created.content).toBe("**MCP idea**");
 		expect(notifyProjectChanged).toHaveBeenCalledExactlyOnceWith("note-mutation");
 
+		const detail = readTextFn(
+			await client.callTool({
+				name: "note_detail",
+				arguments: {
+					noteId: created.noteId,
+				},
+			}),
+		);
+		const noteId = detail.match(/^Note ID: (.+)$/m)![1];
+		const expectedUpdatedAtMs = Number(detail.match(/^Updated at ms: (\d+)$/m)![1]);
 		const editedResult = await client.callTool({
 			name: "edit_note",
 			arguments: {
-				noteId: created.noteId,
-				expectedUpdatedAtMs: created.updatedAtMs,
+				noteId,
+				expectedUpdatedAtMs,
 				content: "Updated by MCP",
 				resourceUids: [],
 				itemUids: [],

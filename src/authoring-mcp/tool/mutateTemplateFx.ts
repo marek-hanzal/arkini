@@ -149,7 +149,7 @@ export const mutateTemplateFx = Effect.fn("mutateTemplateFx")(function* ({
 	if (revision !== project.revision)
 		return yield* Effect.fail(
 			new Error(
-				`Revision ${revision} is stale; the open project is at revision ${project.revision}. Read template_detail or template_config again before editing.`,
+				`Revision ${revision} is stale; the open project is at revision ${project.revision}. Read template_detail or template_json again before editing.`,
 			),
 		);
 	const templates = project.config.templates ?? [];

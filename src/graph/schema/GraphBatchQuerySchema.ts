@@ -14,7 +14,7 @@ export const GraphBatchQuerySchema = z
 						query: z
 							.unknown()
 							.describe(
-								"A compact graph query matching graph_schema.querySchema. Invalid queries report per-entry errors without discarding valid siblings.",
+								"A compact graph query matching graph_schema_json.querySchema. Invalid queries report per-entry errors without discarding valid siblings.",
 							),
 					})
 					.strict(),

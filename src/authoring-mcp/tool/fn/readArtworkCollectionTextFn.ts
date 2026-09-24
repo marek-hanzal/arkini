@@ -20,6 +20,8 @@ export const readArtworkCollectionTextFn = (project: Project, input: ArtworkColl
 		.join("\n\n");
 	return [
 		"Artwork collection",
+		`Project ID: ${project.projectId}`,
+		`Revision: ${project.revision}`,
 		`Project artwork: ${artwork.length}`,
 		`Usage filter: ${input.filter}`,
 		`Matched artwork: ${matches.length}`,

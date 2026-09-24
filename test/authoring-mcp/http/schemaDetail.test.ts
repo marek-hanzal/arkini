@@ -26,7 +26,7 @@ describe("editor MCP authoring schema registry", () => {
 			const cached = schemasById.get(id);
 			if (cached !== undefined) return cached;
 			const result = await client.callTool({
-				name: "schema_detail",
+				name: "schema_json",
 				arguments: {
 					id,
 				},
@@ -267,7 +267,7 @@ describe("editor MCP authoring schema registry", () => {
 		).toBe(false);
 
 		const wrongCase = await client.callTool({
-			name: "schema_detail",
+			name: "schema_json",
 			arguments: {
 				id: "lineschema",
 			},

@@ -3,7 +3,14 @@ import { compileGraphFactsFn } from "~/graph/fn/compileGraphFactsFn";
 import { readGraphDiscoveryFn } from "~/graph/fn/readGraphDiscoveryFn";
 import type { GraphFacts } from "~/graph/type/GraphFacts";
 import type { GraphResult } from "~/graph/type/GraphResult";
-import { configFn, itemFn, lineFn, outputFn, queryFn } from "./compileGraphFactsFn.test/fixtures";
+import {
+	adversarialConfigFn,
+	configFn,
+	itemFn,
+	lineFn,
+	outputFn,
+	queryFn,
+} from "./compileGraphFactsFn.test/fixtures";
 
 const resultFn = (facts: GraphFacts): GraphResult => ({
 	projectId: "project",
@@ -206,5 +213,57 @@ describe("compact graph discovery", () => {
 				title: "Space 9",
 			},
 		]);
+	});
+});
+
+it("retains relationship meaning while leaving outcome bookkeeping to hydration", () => {
+	const facts = compileGraphFactsFn(adversarialConfigFn());
+	const selected = facts.edges.find(
+		(edge) =>
+			edge.kind === "line-item-outcome" &&
+			edge.annotations.outcome?.type === "item" &&
+			edge.annotations.outcome.quantity.min === 2,
+	)!;
+	const compact = readGraphDiscoveryFn(
+		{
+			...resultFn(facts),
+			edges: [
+				selected,
+			],
+		},
+		"snapshot",
+		facts,
+	);
+	expect(compact.edges[0].metadata).toEqual({
+		quantityMin: 2,
+		quantityMax: 4,
+		alternative: true,
+		chance: 0,
+		boardLocal: true,
+	});
+	const material = facts.edges.find(
+		(edge) =>
+			edge.kind === "line-material" &&
+			edge.annotations.input?.type === "materials" &&
+			edge.annotations.input.mode === "reserve",
+	)!;
+	const input = readGraphDiscoveryFn(
+		{
+			...resultFn(facts),
+			edges: [
+				material,
+			],
+		},
+		"snapshot",
+		facts,
+	);
+	expect(input.edges[0].metadata).toEqual({
+		inputType: "materials",
+		mode: "reserve",
+		distance: "close",
+		quantityMin: 1,
+		quantityMax: 1,
+		inputIndex: 1,
+		boardLocal: true,
 	});
 });

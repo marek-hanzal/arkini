@@ -1,6 +1,7 @@
 import type { GraphEdge, GraphNode, GraphOperation } from "~/graph/type/GraphFacts";
 import type { GraphResult } from "~/graph/type/GraphResult";
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
+import type { QuerySchema } from "~/item-query/schema/QuerySchema";
 import type { ItemScheduleSchema } from "~/item-schedule/schema/ItemScheduleSchema";
 
 export interface GraphDiscoveryNode {
@@ -19,23 +20,11 @@ export interface GraphDiscoveryEdge {
 	readonly operationId?: string;
 	readonly metadata: Pick<
 		GraphEdge["annotations"],
-		| "setId"
-		| "setIndex"
-		| "setWeight"
-		| "alternative"
-		| "rollId"
-		| "rollIndex"
-		| "rollType"
-		| "chance"
-		| "outcomeIndex"
-		| "ruleIndex"
-		| "whenIndex"
-		| "inputIndex"
-		| "role"
-		| "boardLocal"
+		"alternative" | "chance" | "inputIndex" | "role" | "boardLocal"
 	> & {
 		readonly inputType?: "simple" | "materials" | "units";
 		readonly mode?: "consume" | "reserve";
+		readonly distance?: QuerySchema.Type["distance"];
 		readonly quantityMin?: number;
 		readonly quantityMax?: number;
 		readonly unitCost?: number;

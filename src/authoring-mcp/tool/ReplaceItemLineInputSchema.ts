@@ -12,7 +12,7 @@ export const ReplaceItemLineInputSchema = z
 			.number()
 			.int()
 			.nonnegative()
-			.describe("The exact project revision returned by item_line_config."),
+			.describe("The exact project revision returned by item_line_json."),
 		line: CompleteItemLineSchema.describe(
 			"The complete replacement line. The addressed line UID is retained; omitted optional values are removed.",
 		),

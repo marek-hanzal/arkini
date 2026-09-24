@@ -22,7 +22,7 @@ export const renameItemFx = Effect.fn("renameItemFx")(function* ({
 	if (revision !== undefined && revision !== project.revision)
 		return yield* Effect.fail(
 			new Error(
-				`Revision ${revision} is stale; the open project is at revision ${project.revision}. Read item_config again before renaming the item.`,
+				`Revision ${revision} is stale; the open project is at revision ${project.revision}. Read item_json again before renaming the item.`,
 			),
 		);
 	const original = Object.hasOwn(project.config.items, itemUid)

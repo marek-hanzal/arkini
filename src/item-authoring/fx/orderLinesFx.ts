@@ -33,7 +33,7 @@ export const orderLinesFx = Effect.fn("orderItemLinesFx")(function* ({
 			new ProjectRepositoryError({
 				operation: "upsert-item",
 				reason: "revision-conflict",
-				message: `Revision ${revision} is stale; the open project is at revision ${project.revision}. Read item_config again before ordering lines.`,
+				message: `Revision ${revision} is stale; the open project is at revision ${project.revision}. Read item_json again before ordering lines.`,
 			}),
 		);
 	const byUid = new Map(

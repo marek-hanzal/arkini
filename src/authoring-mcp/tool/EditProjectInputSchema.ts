@@ -15,7 +15,7 @@ export const EditProjectInputSchema = z
 			.nonnegative()
 			.optional()
 			.describe(
-				"Optional optimistic concurrency guard copied from project_config. A stale revision rejects the edit; when omitted, the current snapshot is patched.",
+				"Optional optimistic concurrency guard copied from project_json. A stale revision rejects the edit; when omitted, the current snapshot is patched.",
 			),
 		patch: z
 			.object({

@@ -7,7 +7,7 @@ export const JsonToolInputSchema = z
 			.string()
 			.min(1)
 			.describe(
-				"A JSON object serialized as text. Read the tool description for its exact schema ID, then resolve that schema and every referenced schema through schema_detail.",
+				"A JSON object serialized as text. Read the tool description for its exact schema ID, then resolve that schema and every referenced schema through schema_json.",
 			),
 	})
 	.strict()

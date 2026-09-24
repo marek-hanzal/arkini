@@ -59,14 +59,14 @@ describe("editor MCP item line replacement", () => {
 		const client = await connectMcpClient(port);
 
 		const read = await client.callTool({
-			name: "item_line_config",
+			name: "item_line_json",
 			arguments: {
 				itemUid: "forge",
 				lineUid: firstLine.uid,
 			},
 		});
 		const readContent = read.content[0];
-		if (readContent?.type !== "text") throw new Error("Missing item_line_config text.");
+		if (readContent?.type !== "text") throw new Error("Missing item_line_json text.");
 		expect(JSON.parse(readContent.text)).toEqual({
 			revision: created.revision,
 			itemUid: "forge",

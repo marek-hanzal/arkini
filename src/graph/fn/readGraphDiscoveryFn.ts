@@ -1,10 +1,10 @@
 import { match, P } from "ts-pattern";
-import type { GraphEdge, GraphFacts } from "~/graph/type/GraphFacts";
-import { readGraphOperationSummaryFn } from "~/graph/fn/readGraphOperationSummaryFn";
+import type { GraphEdge, GraphNode } from "~/graph/type/GraphFacts";
 import type { GraphOperationParticipant } from "~/graph/type/GraphOperationIndex";
 import type { GraphResult } from "~/graph/type/GraphResult";
 import type {
 	GraphDiscoveryEdge,
+	GraphDiscoveryOperation,
 	GraphDiscoveryMatch,
 	GraphDiscoveryResult,
 } from "~/graph/type/GraphDiscoveryResult";
@@ -79,6 +79,11 @@ const readEdgeFn = (edge: GraphEdge): GraphDiscoveryEdge => {
 					operationId: edge.operationId,
 				}),
 		metadata: {
+			...(annotations.rule?.type === "runtime:adjust"
+				? {
+						adjustSeconds: annotations.rule.adjustMs / 1000,
+					}
+				: {}),
 			...(input === undefined
 				? {}
 				: {
@@ -145,49 +150,28 @@ const readEdgeFn = (edge: GraphEdge): GraphDiscoveryEdge => {
 export const readGraphDiscoveryFn = (
 	result: GraphResult,
 	snapshotId: string,
-	facts: GraphFacts,
+	index: readGraphDiscoveryFn.Index,
 	participants: readonly GraphOperationParticipant[] = [],
 ): GraphDiscoveryResult => {
-	const nodeById = new Map(
-		facts.nodes.map((node) => [
-			node.id,
-			node,
-		]),
-	);
 	const operationIds = new Set(result.operations.map((operation) => operation.id));
 	for (const edge of result.edges)
 		if (edge.operationId !== undefined) operationIds.add(edge.operationId);
-	const operationById = new Map(
-		facts.operations.map((operation) => [
-			operation.id,
-			operation,
-		]),
-	);
 	const operations = [
 		...operationIds,
 	].flatMap((id) => {
-		const operation = operationById.get(id);
+		const operation = index.operations.get(id);
 		return operation === undefined
 			? []
 			: [
-					readGraphOperationSummaryFn(
-						operation,
-						nodeById.get(operation.owner)?.title ?? operation.owner,
-					),
+					{
+						...operation,
+					},
 				];
 	});
-	const edgeById = new Map(
-		participants.length === 0
-			? []
-			: facts.edges.map((edge) => [
-					edge.id,
-					edge,
-				]),
-	);
 	const matches: GraphDiscoveryMatch[] = participants
 		.filter((participant) => operationIds.has(participant.operationId))
 		.map(({ operationId, nodeId, role, edgeId }) => {
-			const edge = edgeId === undefined ? undefined : edgeById.get(edgeId);
+			const edge = edgeId === undefined ? undefined : index.edges.get(edgeId);
 			return {
 				operationId,
 				nodeId,
@@ -223,12 +207,29 @@ export const readGraphDiscoveryFn = (
 		reasons: result.reasons,
 		expansions: result.expansions,
 		paths: result.paths,
-		nodes: facts.nodes
-			.filter((node) => nodeIds.has(node.id))
+		nodes: [
+			...nodeIds,
+		]
+			.sort()
+			.flatMap((id) => {
+				const node = index.nodes.get(id);
+				return node === undefined
+					? []
+					: [
+							node,
+						];
+			})
 			.map((node) => ({
 				id: node.id,
 				kind: node.kind,
 				title: node.title,
+				...(node.clock === undefined
+					? {}
+					: {
+							clock: {
+								...node.clock,
+							},
+						}),
 				...(node.missing
 					? {
 							missing: true,
@@ -244,3 +245,12 @@ export const readGraphDiscoveryFn = (
 				}),
 	};
 };
+
+export namespace readGraphDiscoveryFn {
+	/** Immutable snapshot indexes; projections return detached values, never these shared records. */
+	export interface Index {
+		readonly nodes: ReadonlyMap<string, GraphNode>;
+		readonly edges: ReadonlyMap<string, GraphEdge>;
+		readonly operations: ReadonlyMap<string, GraphDiscoveryOperation>;
+	}
+}

@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest";
 import { readGraphDiscoveryTextFn } from "~/authoring-mcp/tool/fn/readGraphDiscoveryTextFn";
 import { compileGraphFactsFn } from "~/graph/fn/compileGraphFactsFn";
 import { compileGraphOperationIndexFn } from "~/graph/fn/compileGraphOperationIndexFn";
-import { readGraphDiscoveryFn } from "~/graph/fn/readGraphDiscoveryFn";
+import { readGraphDiscoveryFn as projectDiscoveryFn } from "~/graph/fn/readGraphDiscoveryFn";
+import { readGraphOperationSummaryFn } from "~/graph/fn/readGraphOperationSummaryFn";
+import type { GraphOperationParticipant } from "~/graph/type/GraphOperationIndex";
 import type { GraphFacts } from "~/graph/type/GraphFacts";
 import type { GraphResult } from "~/graph/type/GraphResult";
 import {
@@ -13,6 +15,43 @@ import {
 	outputFn,
 	queryFn,
 } from "./compileGraphFactsFn.test/fixtures";
+
+const readGraphDiscoveryFn = (
+	result: GraphResult,
+	snapshotId: string,
+	facts: GraphFacts,
+	participants: readonly GraphOperationParticipant[] = [],
+) => {
+	const nodes = new Map(
+		facts.nodes.map((node) => [
+			node.id,
+			node,
+		]),
+	);
+	return projectDiscoveryFn(
+		result,
+		snapshotId,
+		{
+			nodes,
+			edges: new Map(
+				facts.edges.map((edge) => [
+					edge.id,
+					edge,
+				]),
+			),
+			operations: new Map(
+				facts.operations.map((operation) => [
+					operation.id,
+					readGraphOperationSummaryFn(
+						operation,
+						nodes.get(operation.owner)?.title ?? operation.owner,
+					),
+				]),
+			),
+		},
+		participants,
+	);
+};
 
 const resultFn = (facts: GraphFacts): GraphResult => ({
 	projectId: "project",

@@ -6,6 +6,7 @@ import type { UnitsSchema } from "~/item-definition/schema/UnitsSchema";
 import type { InputSchema } from "~/production-input/schema/InputSchema";
 import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
 import type { OutcomeSchema } from "~/outcome/schema/OutcomeSchema";
+import type { RuleSchema } from "~/production-line/schema/RuleSchema";
 
 export interface GraphNode {
 	readonly id: string;
@@ -13,6 +14,11 @@ export interface GraphNode {
 	readonly title: string;
 	readonly missing: boolean;
 	readonly source: readonly (string | number)[];
+	/** Authored item scheduling, converted without rounding or evaluating rules. */
+	readonly clock?: {
+		readonly intervalSeconds?: number;
+		readonly durationSeconds?: number;
+	};
 }
 
 /** Reified operations retain participants, scheduling, guards, costs and all alternative groups. */
@@ -49,10 +55,7 @@ export interface GraphEdge {
 	readonly source: readonly (string | number)[];
 	readonly annotations: {
 		readonly input?: InputSchema.Type;
-		readonly rule?: {
-			readonly type: string;
-			readonly when: readonly WhenSchema.Type[];
-		};
+		readonly rule?: RuleSchema.Type;
 		readonly condition?: WhenSchema.Type;
 		readonly outcome?: OutcomeSchema.Type;
 		readonly setId?: string;

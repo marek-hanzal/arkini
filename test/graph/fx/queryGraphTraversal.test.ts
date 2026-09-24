@@ -320,3 +320,43 @@ it("keeps shared templates, receiver transport and disconnected spaces distinct"
 		).status,
 	).toBe("yes");
 });
+
+it("completes a structural identity without enumerating self edges or reversed return cycles", async () => {
+	const graph = await Effect.runPromise(createProjectGraphFx());
+	const project = projectFn([
+		[
+			"A",
+			"B",
+		],
+		[
+			"A",
+			"A",
+		],
+	]);
+	const result = await Effect.runPromise(
+		graph.discoveryFx(project, {
+			kind: "path",
+			from: "item:A",
+			to: "item:A",
+			direction: "both",
+			limit: 1,
+			maxExpansions: 1,
+		}),
+	);
+	expect(result).toMatchObject({
+		status: "yes",
+		truncated: false,
+		reasons: [],
+		expansions: 0,
+		paths: [
+			{
+				nodes: [
+					"item:A",
+				],
+				edges: [],
+			},
+		],
+		edges: [],
+		operations: [],
+	});
+});

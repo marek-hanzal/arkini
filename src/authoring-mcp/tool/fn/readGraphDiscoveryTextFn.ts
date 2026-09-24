@@ -57,7 +57,7 @@ const operationDetailsFn = (operation: GraphDiscoveryOperation): readonly string
 			(line) => [
 				`line=${titleFn(line.title)}`,
 				`lineUid=${identityFn(line.lineUid)}`,
-				`runtimeMs=${line.runtimeMs}`,
+				`runtimeSeconds=${line.runtimeSeconds}`,
 				`default=${line.default}`,
 				`clock=${line.clock}`,
 				...(line.clock
@@ -86,15 +86,15 @@ const operationDetailsFn = (operation: GraphDiscoveryOperation): readonly string
 				kind: "clock",
 			},
 			(clock) => [
-				...(clock.intervalMs === undefined
+				...(clock.intervalSeconds === undefined
 					? []
 					: [
-							`intervalMs=${clock.intervalMs}`,
+							`intervalSeconds=${clock.intervalSeconds}`,
 						]),
-				...(clock.durationMs === undefined
+				...(clock.durationSeconds === undefined
 					? []
 					: [
-							`durationMs=${clock.durationMs}`,
+							`durationSeconds=${clock.durationSeconds}`,
 						]),
 				...(clock.expiryMode === undefined
 					? []
@@ -278,7 +278,23 @@ const bodyFn = (result: GraphDiscoveryResult, query: Query): string => {
 				.join("\n"),
 		)
 		.with("search", () =>
-			result.nodes.map((node) => `- ${labelFn(node.id)}; kind=${node.kind}`).join("\n"),
+			result.nodes
+				.map((node) =>
+					[
+						`- ${labelFn(node.id)}; kind=${node.kind}`,
+						...(node.clock?.intervalSeconds === undefined
+							? []
+							: [
+									`clock intervalSeconds=${node.clock.intervalSeconds}`,
+								]),
+						...(node.clock?.durationSeconds === undefined
+							? []
+							: [
+									`clock durationSeconds=${node.clock.durationSeconds}`,
+								]),
+					].join("; "),
+				)
+				.join("\n"),
 		)
 		.with("flow", () => {
 			if ((result.flows?.length ?? 0) === 0)
@@ -383,21 +399,26 @@ export const readGraphBatchTextFn = (
 			request.query,
 		]),
 	);
+	const nodesById = new Map(
+		result.nodes.map((node) => [
+			node.id,
+			node,
+		]),
+	);
+	const operationsById = new Map(
+		result.operations.map((operation) => [
+			operation.id,
+			operation,
+		]),
+	);
+	const edgesById = new Map(
+		result.edges.map((edge) => [
+			edge.id,
+			edge,
+		]),
+	);
 	const sections = result.queries.map((query) => {
 		const parsed = GraphDiscoveryQuerySchema.safeParse(requested.get(query.id));
-		const nodesById = new Map(
-			result.nodes.map((node) => [
-				node.id,
-				node,
-			]),
-		);
-		const edgeIds = new Set(query.edgeIds);
-		const operationsById = new Map(
-			result.operations.map((operation) => [
-				operation.id,
-				operation,
-			]),
-		);
 		const body =
 			parsed.success && query.error === undefined
 				? bodyFn(
@@ -417,7 +438,14 @@ export const readGraphBatchTextFn = (
 											node,
 										];
 							}),
-							edges: result.edges.filter((edge) => edgeIds.has(edge.id)),
+							edges: query.edgeIds.flatMap((id) => {
+								const edge = edgesById.get(id);
+								return edge === undefined
+									? []
+									: [
+											edge,
+										];
+							}),
 							operations: query.operationIds.flatMap((id) => {
 								const operation = operationsById.get(id);
 								return operation === undefined

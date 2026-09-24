@@ -5,7 +5,7 @@ import { GraphQueryResult } from "~/graph/ui/GraphQueryResult";
 import { EditorSelect } from "~/editor-control/ui/EditorSelect";
 import { useTranslator } from "~/translation/ui/useTranslator";
 
-/** Consequence traversal shares its exact kinds and depth meaning with the MCP Chain query. */
+/** Editor consequence traversal uses the shared authored graph preset. */
 export const ItemChain = ({ itemUid }: { readonly itemUid: string }) => {
 	const translator = useTranslator();
 	const [depth, setDepthFn] = useState("5");

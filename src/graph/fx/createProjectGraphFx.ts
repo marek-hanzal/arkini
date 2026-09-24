@@ -12,6 +12,7 @@ import { compileGraphFactsFn } from "~/graph/fn/compileGraphFactsFn";
 import type { GraphOperationsQuerySchema } from "~/graph/schema/GraphOperationsQuerySchema";
 import { compileGraphOperationIndexFn } from "~/graph/fn/compileGraphOperationIndexFn";
 import { aggregateGraphOperationsFx } from "~/graph/fx/aggregateGraphOperationsFx";
+import { queryGraphStructureFx } from "~/graph/fx/queryGraphStructureFx";
 import { queryGraphFlowFx } from "~/graph/fx/queryGraphFlowFx";
 import type { GraphOperationIndex } from "~/graph/type/GraphOperationIndex";
 import { GraphDiscoveryQuerySchema } from "~/graph/schema/GraphDiscoveryQuerySchema";
@@ -38,7 +39,6 @@ const DirectionRules = {
 } as const;
 const AdjacentQuery =
 	'[:find ?index ?next :in $ % ?node :where (adjacent ?e ?node ?next) [?e "edge/index" ?index]]';
-const NodeQuery = '[:find ?index . :in $ ?id :where [?n "node/id" ?id] [?n "node/index" ?index]]';
 
 interface Snapshot {
 	readonly projectId: string;
@@ -53,6 +53,7 @@ interface Snapshot {
 	readonly operationReferences: readonly string[];
 	readonly operationByReference: ReadonlyMap<string, number>;
 	readonly operationSummaries: readonly GraphDiscoveryOperation[];
+	readonly discoveryIndex: readGraphDiscoveryFn.Index;
 	readonly searchOperationsFn: (
 		search: NonNullable<GraphOperationsQuerySchema.Type["search"]>,
 	) => readonly number[];
@@ -284,33 +285,13 @@ export const createProjectGraphFx = Effect.fn("createProjectGraphFx")(
 								]);
 						entity++;
 					};
-					for (const [index, node] of facts.nodes.entries())
-						entityFn({
-							"node/id": node.id,
-							"node/index": index,
-							"node/kind": node.kind,
-						});
-					for (const operation of facts.operations)
-						entityFn({
-							"operation/id": operation.id,
-							"operation/owner": operation.owner,
-							"operation/kind": operation.kind,
-						});
 					for (const [index, edge] of facts.edges.entries())
 						entityFn({
 							"edge/index": index,
-							"edge/id": edge.id,
 							"edge/from": edge.from,
 							"edge/to": edge.to,
-							"edge/kind": edge.kind,
-							"edge/operation": edge.operationId,
-							"edge/set": edge.annotations.setId,
-							"edge/roll": edge.annotations.rollId,
 						});
 					const db = datascript.init_db(datoms, {
-						"node/id": {
-							":db/unique": ":db.unique/identity",
-						},
 						"edge/from": {
 							":db/index": true,
 						},
@@ -450,6 +431,21 @@ export const createProjectGraphFx = Effect.fn("createProjectGraphFx")(
 						operationReferences,
 						operationByReference,
 						operationSummaries,
+						discoveryIndex: {
+							nodes: operationIndex.nodes,
+							edges: new Map(
+								facts.edges.map((edge) => [
+									edge.id,
+									edge,
+								]),
+							),
+							operations: new Map(
+								operationSummaries.map((operation) => [
+									operation.id,
+									operation,
+								]),
+							),
+						},
 						searchOperationsFn,
 						operationById,
 						operationKinds,
@@ -466,171 +462,24 @@ export const createProjectGraphFx = Effect.fn("createProjectGraphFx")(
 				}
 				return snapshot;
 			});
-		const runQueryFx = Effect.fn("ProjectGraph.runQueryFx")(function* (
-			snapshot: Snapshot,
-			query: GraphQuerySchema.Type,
-		) {
-			const { facts, db } = snapshot;
-			const rootIndex = datascript.q(NodeQuery, db, query.from) as number | null;
-			if (rootIndex === null || rootIndex === undefined)
-				return yield* Effect.fail(
-					new GraphQueryError({
-						reason: "missing-node",
-						message: `Unknown graph node ${query.from}.`,
-					}),
-				);
-			if (query.to !== undefined && datascript.q(NodeQuery, db, query.to) == null)
-				return yield* Effect.fail(
-					new GraphQueryError({
-						reason: "missing-node",
-						message: `Unknown graph node ${query.to}.`,
-					}),
-				);
-			const started = yield* Clock.currentTimeMillis;
-			const reasons = new Set<GraphResult["reasons"][number]>();
-			const selected = new Set<number>();
-			const nodeIds = new Set([
-				query.from,
-			]);
-			const paths: {
-				nodes: string[];
-				edges: string[];
-			}[] = [];
-			let expansions = 0;
-			let found = query.kind === "node" || (query.kind === "path" && query.from === query.to);
-			const pending = [
-				{
-					nodes: [
-						query.from,
-					],
-					edges: [] as string[],
-				},
-			];
-			const visited = new Set([
-				query.from,
-			]);
-			if (query.kind === "path" && found) paths.push(pending[0]);
-			search: for (
-				let cursor = 0;
-				query.kind !== "node" && cursor < pending.length;
-				cursor++
-			) {
-				if (query.kind === "path" && query.detail === "summary" && found) break;
-				const path = pending[cursor];
-				const current = path.nodes[path.nodes.length - 1];
-				const adjacent = (
-					datascript.q(AdjacentQuery, db, DirectionRules[query.direction], current) as [
-						number,
-						string,
-					][]
-				)
-					.filter(
-						([index]) =>
-							query.kinds === undefined ||
-							query.kinds.includes(facts.edges[index].kind),
-					)
-					.sort(([a], [b]) => a - b);
-				for (const [index, next] of adjacent) {
-					if (expansions >= query.maxExpansions) {
-						reasons.add("expansions");
-						break search;
-					}
-					expansions++;
-					if (expansions % 64 === 1) {
-						yield* Effect.yieldNow;
-						if ((yield* Clock.currentTimeMillis) - started >= query.timeoutMs) {
-							reasons.add("timeout");
-							break search;
-						}
-					}
-					const edge = facts.edges[index];
-					if (query.kind === "connections" && query.to !== undefined && next !== query.to)
-						continue;
-					if (path.edges.length >= query.maxDepth) {
-						if (
-							query.kind === "path"
-								? !path.nodes.includes(next)
-								: !selected.has(index)
-						)
-							reasons.add("depth");
-						continue;
-					}
-					const nextPath = {
-						nodes: [
-							...path.nodes,
-							next,
-						],
-						edges: [
-							...path.edges,
-							edge.id,
-						],
-					};
-					if (query.kind === "path") {
-						if (next === query.to) {
-							found = true;
-							if (paths.length >= query.limit) {
-								reasons.add("limit");
-								break search;
-							}
-							paths.push(nextPath);
-							if (query.detail === "summary") break search;
-						}
-						if (!path.nodes.includes(next) && next !== query.to) pending.push(nextPath);
-					} else {
-						if (!selected.has(index) && selected.size >= query.limit) {
-							reasons.add("limit");
-							break search;
-						}
-						selected.add(index);
-						nodeIds.add(next);
-						found = true;
-						if (query.kind === "traverse" && !visited.has(next)) {
-							visited.add(next);
-							pending.push(nextPath);
-							paths.push(nextPath);
-						}
-					}
-				}
-				if (query.kind === "connections") break;
-			}
-			if (query.kind === "path") {
-				const edgeIds = new Set(paths.flatMap((path) => path.edges));
-				for (const [index, edge] of facts.edges.entries())
-					if (edgeIds.has(edge.id)) selected.add(index);
-				for (const path of paths) for (const node of path.nodes) nodeIds.add(node);
-			}
-			const edges = [
-				...selected,
-			]
-				.sort((a, b) => a - b)
-				.map((index) => facts.edges[index]);
-			const operationIds = new Set(edges.map((edge) => edge.operationId));
-			const operations =
-				query.detail === "summary"
-					? []
-					: facts.operations.filter(
-							(operation) =>
-								operationIds.has(operation.id) ||
-								(query.kind === "node" && operation.owner === query.from),
-						);
-			if (query.kind === "node" && operations.length > query.limit) reasons.add("limit");
-			const compactPath = query.kind === "path" && query.detail === "summary";
-			const result: GraphResult = {
+		const runQueryFx = (snapshot: Snapshot, query: GraphQuerySchema.Type) =>
+			queryGraphStructureFx({
+				facts: snapshot.facts,
+				nodes: snapshot.operationIndex.nodes,
 				projectId: snapshot.projectId,
 				revision: snapshot.revision,
-				status: readQueryStatusFn(found, reasons.size > 0),
-				truncated: reasons.size > 0,
-				reasons: [
-					...reasons,
-				].sort(),
-				expansions,
-				nodes: compactPath ? [] : facts.nodes.filter((node) => nodeIds.has(node.id)),
-				edges: compactPath ? [] : edges,
-				operations: query.kind === "node" ? operations.slice(0, query.limit) : operations,
-				paths: query.detail === "summary" ? [] : paths,
-			};
-			return structuredClone(result);
-		});
+				query,
+				adjacentFn: (nodeId) =>
+					datascript.q(
+						AdjacentQuery,
+						snapshot.db,
+						DirectionRules[query.direction],
+						nodeId,
+					) as [
+						number,
+						string,
+					][],
+			});
 		const parseInputFx = <T>(
 			schema: z.ZodType<T>,
 			input: unknown,
@@ -742,6 +591,13 @@ export const createProjectGraphFx = Effect.fn("createProjectGraphFx")(
 							id: node.id,
 							title: node.title,
 							kind: node.kind,
+							...(node.clock === undefined
+								? {}
+								: {
+										clock: {
+											...node.clock,
+										},
+									}),
 							...(node.missing
 								? {
 										missing: true,
@@ -818,7 +674,7 @@ export const createProjectGraphFx = Effect.fn("createProjectGraphFx")(
 						),
 					},
 					captured.snapshotId,
-					captured.facts,
+					captured.discoveryIndex,
 				);
 				return readOperationReferencesFn(
 					{
@@ -867,7 +723,7 @@ export const createProjectGraphFx = Effect.fn("createProjectGraphFx")(
 						),
 					},
 					captured.snapshotId,
-					captured.facts,
+					captured.discoveryIndex,
 				);
 				return readOperationReferencesFn(
 					{
@@ -885,7 +741,7 @@ export const createProjectGraphFx = Effect.fn("createProjectGraphFx")(
 				});
 				const result = yield* runQueryFx(captured, editorQuery);
 				return readOperationReferencesFn(
-					readGraphDiscoveryFn(result, captured.snapshotId, captured.facts),
+					readGraphDiscoveryFn(result, captured.snapshotId, captured.discoveryIndex),
 					captured,
 				);
 			}
@@ -900,7 +756,7 @@ export const createProjectGraphFx = Effect.fn("createProjectGraphFx")(
 							query.participant,
 						];
 			for (const nodeId of requiredNodes) {
-				if (nodeId !== undefined && datascript.q(NodeQuery, captured.db, nodeId) == null)
+				if (nodeId !== undefined && !captured.operationIndex.nodes.has(nodeId))
 					return yield* Effect.fail(
 						new GraphQueryError({
 							reason: "missing-node",
@@ -1076,7 +932,7 @@ export const createProjectGraphFx = Effect.fn("createProjectGraphFx")(
 					paths: [],
 				},
 				captured.snapshotId,
-				captured.facts,
+				captured.discoveryIndex,
 				query.kind !== "operations" ||
 					(query.participant === undefined && query.role === undefined)
 					? []

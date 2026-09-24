@@ -108,9 +108,12 @@ export const GraphOperationsQuerySchema = GraphDiscoveryBoundsSchema.extend({
 			show: z.boolean().optional(),
 			enable: z.boolean().optional(),
 			runtimeMs: NumericRangeSchema.optional(),
+			runtimeSeconds: NumericRangeSchema.optional(),
 			clockWeight: NumericRangeSchema.optional(),
 			durationMs: NumericRangeSchema.optional(),
 			intervalMs: NumericRangeSchema.optional(),
+			durationSeconds: NumericRangeSchema.optional(),
+			intervalSeconds: NumericRangeSchema.optional(),
 		})
 		.strict()
 		.optional()

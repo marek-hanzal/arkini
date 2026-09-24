@@ -26,7 +26,7 @@ const rulesFn = (
 				{
 					type: "runtime:adjust",
 				},
-				({ adjustMs }) => `runtime adjustment=${adjustMs}ms`,
+				({ adjustMs }) => `runtime adjustment=${adjustMs / 1000}s`,
 			)
 			.with(
 				{
@@ -82,7 +82,7 @@ export const readGraphFlowEvidenceFn = (
 				kind: "line",
 			},
 			({ data }) => [
-				`Line ${textFn(data.title)}; uid=${data.uid}; runtimeMs=${data.runtimeMs}; enable=${data.enable}; show=${data.show}; default=${data.default}; clock=${data.clock === true}; clockWeight=${data.clockWeight}`,
+				`Line ${textFn(data.title)}; uid=${data.uid}; runtimeSeconds=${data.runtimeMs / 1000}; enable=${data.enable}; show=${data.show}; default=${data.default}; clock=${data.clock === true}; clockWeight=${data.clockWeight}`,
 				...data.input.map((input, index) => {
 					const requirement = match(input)
 						.with(
@@ -141,7 +141,7 @@ export const readGraphFlowEvidenceFn = (
 				kind: "clock",
 			},
 			({ data }) => [
-				`Clock expiry; enable=${data.enable}; intervalMs=${data.intervalMs ?? "none"}; durationMs=${data.durationMs ?? "none"}; expiryMode=${data.expiryMode ?? "loose-kill (default)"}`,
+				`Clock expiry; enable=${data.enable}; intervalSeconds=${data.intervalMs === undefined ? "none" : data.intervalMs / 1000}; durationSeconds=${data.durationMs === undefined ? "none" : data.durationMs / 1000}; expiryMode=${data.expiryMode ?? "loose-kill (default)"}`,
 				...rulesFn("Operation", data.rules, nodes),
 			],
 		)

@@ -11,6 +11,7 @@ export interface GraphDiscoveryNode {
 	readonly kind: GraphNode["kind"];
 	readonly title: string;
 	readonly missing?: boolean;
+	readonly clock?: GraphNode["clock"];
 }
 
 /** Explicit scalar whitelist; authored documents belong to hydration readers. */
@@ -31,6 +32,7 @@ export interface GraphDiscoveryEdge {
 		readonly quantityMax?: number;
 		readonly unitCost?: number;
 		readonly unitFrom?: "self" | "target";
+		readonly adjustSeconds?: number;
 		readonly x?: number;
 		readonly y?: number;
 	};
@@ -46,6 +48,7 @@ export type GraphDiscoveryOperation = {
 			readonly kind: "line";
 			readonly lineUid: string;
 			readonly runtimeMs: number;
+			readonly runtimeSeconds: number;
 			readonly default: boolean;
 			readonly clock: boolean;
 			readonly clockWeight: number;
@@ -65,6 +68,8 @@ export type GraphDiscoveryOperation = {
 			readonly kind: "clock";
 			readonly intervalMs?: number;
 			readonly durationMs?: number;
+			readonly intervalSeconds?: number;
+			readonly durationSeconds?: number;
 			readonly expiryMode?: ItemScheduleSchema.Type["expiryMode"];
 			readonly enable: boolean;
 	  }

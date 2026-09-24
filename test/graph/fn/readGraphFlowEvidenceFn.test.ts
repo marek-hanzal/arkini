@@ -148,7 +148,7 @@ it("preserves selected branch provenance, disabled and zero-chance facts, and ex
 		"input [item:input]; distance=close; ×2–4; mode=reserve; units cost=3; paid by=self",
 	);
 	expect(text).toContain(
-		"Operation rule 1: runtime adjustment=-200ms when ALL (Plague [item:plague]; distance=self; quantity = 0) AND (input [item:input]; distance=near; quantity in 1–3 inclusive)",
+		"Operation rule 1: runtime adjustment=-0.2s when ALL (Plague [item:plague]; distance=self; quantity = 0) AND (input [item:input]; distance=near; quantity in 1–3 inclusive)",
 	);
 	expect(text).toContain("Output set 1/2; relative weight=7");
 	expect(text).toContain(

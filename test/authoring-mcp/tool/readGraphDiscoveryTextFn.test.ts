@@ -137,6 +137,7 @@ it("retains line hydration identity without replaying operation details for ever
 					owner,
 					lineUid,
 					runtimeMs: 5,
+					runtimeSeconds: 0.005,
 					default: true,
 					clock: false,
 					clockWeight: 1,
@@ -346,4 +347,58 @@ it("keeps participant evidence local to each batch query sharing the same operat
 	expect(outputs).not.toContain("  input:");
 	expect(references).toContain("references: Fawn [item:fawn]; rule-reference; distance=close");
 	expect(references).not.toContain("  output:");
+});
+
+it("dereferences batch edges in each query's order, regardless of shared-table insertion order", () => {
+	const result = resultFn();
+	const second = {
+		...result.edges[0],
+		id: "second",
+		to: replacement,
+	};
+	const edges = [
+		result.edges[0],
+		second,
+	];
+	const query = {
+		kind: "traverse" as const,
+		from: owner,
+	};
+	const standalone = readGraphDiscoveryTextFn(
+		{
+			...result,
+			edges,
+		},
+		query,
+	);
+	const batch = readGraphBatchTextFn(
+		{
+			...result,
+			edges: [
+				...edges,
+			].reverse(),
+			queries: [
+				{
+					id: "ordered",
+					status: result.status,
+					truncated: false,
+					reasons: [],
+					expansions: 1,
+					nodeIds: result.nodes.map((node) => node.id),
+					edgeIds: edges.map((edge) => edge.id),
+					operationIds: result.operations.map((operation) => operation.id),
+					paths: [],
+				},
+			],
+		},
+		[
+			{
+				id: "ordered",
+				query,
+			},
+		],
+	);
+	expect(batch.split("Query: ordered\n")[1]).toBe(
+		standalone.slice(standalone.indexOf("Status:")),
+	);
 });

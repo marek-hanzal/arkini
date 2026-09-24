@@ -2,13 +2,10 @@ import { match } from "ts-pattern";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { GraphEdge, GraphFacts, GraphNode, GraphOperation } from "~/graph/type/GraphFacts";
 import type { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
-import type { WhenSchema } from "~/production-condition/schema/WhenSchema";
+import type { RuleSchema } from "~/production-line/schema/RuleSchema";
 
 type Source = readonly (string | number)[];
-type Rules = readonly {
-	readonly type: string;
-	readonly when: readonly WhenSchema.Type[];
-}[];
+type Rules = readonly RuleSchema.Type[];
 
 const orderFn = (
 	a: {
@@ -44,6 +41,22 @@ export const compileGraphFactsFn = (config: GameConfigSchema.Type): GraphFacts =
 			nodes.set(id, {
 				id,
 				kind,
+				...(item?.clock === undefined
+					? {}
+					: {
+							clock: {
+								...(item.clock.intervalMs === undefined
+									? {}
+									: {
+											intervalSeconds: item.clock.intervalMs / 1000,
+										}),
+								...(item.clock.durationMs === undefined
+									? {}
+									: {
+											durationSeconds: item.clock.durationMs / 1000,
+										}),
+							},
+						}),
 				title: item?.title ?? template?.title ?? (kind === "space" ? `Space ${key}` : key),
 				missing: match(kind)
 					.with("item", () => item === undefined)

@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "mnlaqzcefea2pashxwbqvq6e",
 		"title": "Empty Sheep Pen",
-		"draft": false,
 		"description": "An empty enclosure waiting for the next group of animals to arrive.",
 		"ui": "default",
 		"artwork": {

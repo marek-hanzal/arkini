@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "nl86ut5kjaf2m0mxf3hpl6d3",
 		"title": "Spoiled Herb Seed",
-		"draft": false,
 		"description": "Herb seed that spoiled before it ever reached the soil.",
 		"ui": "simple",
 		"artwork": {

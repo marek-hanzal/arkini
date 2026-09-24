@@ -87,7 +87,6 @@ describe("Form", () => {
 					project.resources.find(({ type }) => type === "artwork")?.uid,
 				],
 			},
-			draft: false,
 
 			uid,
 		});
@@ -102,7 +101,6 @@ describe("Form", () => {
 		await act(async () => {
 			root.render(
 				createElement(Form, {
-					defaultDraft: true,
 					defaultTitle: "Selected Asset Name",
 					create: true,
 					resourceUid: "selected_asset-name",
@@ -120,7 +118,6 @@ describe("Form", () => {
 					"selected_asset-name",
 				],
 			},
-			draft: true,
 			uid: "draft-with-selected-asset",
 			lines: [],
 			title: "Selected Asset Name",

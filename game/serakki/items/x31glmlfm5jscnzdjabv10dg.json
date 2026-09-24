@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "x31glmlfm5jscnzdjabv10dg",
 		"title": "Sack With Flower Seed",
-		"draft": false,
 		"description": "A sack of flower seed, marked with the flowers it is meant to grow.",
 		"ui": "simple",
 		"artwork": {

@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "ekstw01ksb6lp64ums0563jk",
 		"title": "Cow Pen",
-		"draft": false,
 		"description": "A populated enclosure holding animals that can be released one at a time.",
 		"ui": "simple",
 		"artwork": {

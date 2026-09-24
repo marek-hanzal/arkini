@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "pvfsx02l7omudco7ntq9ajb5",
 		"title": "Sunflower Farm",
-		"draft": false,
 		"description": "Operates nearby sunflower fields and keeps their seed stock moving.",
 		"ui": "default",
 		"artwork": {

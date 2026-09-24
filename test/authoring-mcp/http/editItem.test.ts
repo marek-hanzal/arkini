@@ -89,7 +89,6 @@ describe("editor MCP item editing", () => {
 				itemUid: "water",
 				revision: waterConfig.revision,
 				patch: {
-					draft: true,
 					description: null,
 					title: "Fresh Water",
 				},
@@ -104,7 +103,7 @@ describe("editor MCP item editing", () => {
 						"Edited item.",
 						"UID: water",
 						`Revision: ${project.revision}`,
-						"Replaced: description, draft, title",
+						"Replaced: description, title",
 					].join("\n"),
 				},
 			],
@@ -112,7 +111,6 @@ describe("editor MCP item editing", () => {
 		expect(project.config.items.water).toEqual({
 			...water,
 			description: undefined,
-			draft: true,
 			title: "Fresh Water",
 		});
 		expect(notifyProjectChanged).toHaveBeenCalledExactlyOnceWith("edit-simple-project");

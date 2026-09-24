@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "yc0am9mudbeggwjs6dzusk3j",
 		"title": "Carpenter",
-		"draft": false,
 		"description": "Craft useful wooden tools and containers from planks.",
 		"ui": "default",
 		"artwork": {

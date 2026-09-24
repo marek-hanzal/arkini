@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "sy01gwgqbum87oa96usrv67x",
 		"title": "Cotton Field",
-		"draft": false,
 		"description": "Grows cotton",
 		"ui": "simple",
 		"artwork": {

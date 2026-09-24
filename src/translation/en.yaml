@@ -421,7 +421,7 @@ Copy from…:
   value: Copy from…
 Copy identity section help:
   value: |
-    **Item ID**, **UID** and **Draft** stay unchanged.
+    **Item ID** and **UID** stay unchanged.
 Copy password:
   value: Copy password
 Copy production section help:
@@ -560,8 +560,6 @@ Discard:
   value: Discard
 Dismiss:
   value: Dismiss
-Draft:
-  value: Draft
 Drop:
   value: Drop
 Edit:
@@ -840,11 +838,6 @@ Item disappeared:
 Item discarded:
   value: Item discarded
   dynamic: true
-Item draft status help:
-  value: |
-    **Draft** marks work in progress for you and other authors.
-
-    The item still validates, runs in the game and appears in builds.
 Item drop rejected:
   value: Item drop rejected
   dynamic: true
@@ -860,7 +853,7 @@ Item identity help:
 
     Action cannot coexist with Production or Clock. Merges work independently.
 
-    Renaming **Item ID** updates project links; UID never changes. **Draft** is saved immediately and marks work in progress, but the item still runs and builds normally.
+    Renaming **Item ID** updates project links; UID never changes.
 Item interface:
   value: Item interface
 Item interface help:
@@ -872,9 +865,9 @@ Item interface help:
     Clock, Actions, movement and merges keep their own rules.
 Item list help:
   value: |
-    Browse saved items by title or ID. Cards show artwork, Draft status and linked Notes.
+    Browse saved items by title or ID. Cards show artwork and linked Notes.
 
-    Items are ordered by **Name**. **With note** and **Draft** combine with search.
+    Items are ordered by **Name**. **With note** combines with search.
 
     **New item** opens an unsaved draft. Creating from Artwork fills its first title and artwork for you.
 Item merges empty title:
@@ -918,7 +911,7 @@ Item section copy help:
   value: |
     **Copy from** replaces the whole open section with values from another saved item. Unsaved changes in this section are replaced too; the source item never changes.
 
-    - **Item** keeps Item ID, UID and Draft.
+    - **Item** keeps Item ID and UID.
     - **Production** copies every line and queue size; nonempty Production removes Action.
     - **Clock** removes Action.
     - **Action** removes Production and Clock.

@@ -1,21 +1,15 @@
-import { ShortcutLabel } from "~/ui/ui/ShortcutLabel";
-import { formatForDisplay } from "@tanstack/react-hotkeys";
-import { Tooltip } from "~/ui/ui/Tooltip";
-import { useSectionShortcuts } from "~/ui/ui/useSectionShortcuts";
 import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
 import {
 	EditorSectionBar,
 	EditorSectionShortcutNavigation,
 } from "~/authoring-shell/ui/EditorSectionBar";
 import { Mx } from "~/translation/ui/Mx";
-import { ArrowDownAZ, FilePenLine, NotebookPen, PackageOpen, Plus, SearchX } from "lucide-react";
+import { ArrowDownAZ, NotebookPen, PackageOpen, Plus, SearchX } from "lucide-react";
 import { useCallback, useMemo } from "react";
-import { sectionLinkClassName } from "~/ui/constant/SectionLinkClassName";
 import { EditorVirtualCollection } from "~/editor-control/ui/EditorVirtualCollection";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 
 import { useProjectNotes } from "~/project-note/ui/useProjectNotes";
-import { readDraftFn } from "~/item-authoring/fn/readDraftFn";
 import { selectItemCollectionFn } from "~/item-authoring/fn/selectItemCollectionFn";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
@@ -27,22 +21,16 @@ import { Status } from "~/ui/ui/Status";
 import { SearchInput } from "~/ui/ui/SearchInput";
 import { useDebouncedSearchQuery } from "~/ui/ui/useDebouncedSearchQuery";
 import { useTranslator } from "~/translation/ui/useTranslator";
-import { LinkButton } from "~/ui/ui/LinkButton";
-import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 const readItemKeyFn = (item: ItemSchema.Type) => item.uid;
 
 /** Lists the canonical saved item registry as the editor's default workspace. */
 export const List = ({
-	draft,
-	onDraftChangeFn,
 	onQueryChangeFn,
 	onViewChangeFn,
 	query,
 	view,
 }: {
-	readonly draft: boolean;
-	readonly onDraftChangeFn: (draft: boolean) => void;
 	readonly onQueryChangeFn: (query: string) => void;
 	readonly query: string;
 	readonly view: selectItemCollectionFn.View;
@@ -57,14 +45,6 @@ export const List = ({
 			notes.notes,
 		],
 	);
-	useSectionShortcuts({
-		options: [
-			{
-				shortcut: "d",
-			},
-		],
-		onSelectFn: () => onDraftChangeFn(!draft),
-	});
 	const itemViewOptions = [
 		{
 			icon: ArrowDownAZ,
@@ -98,12 +78,10 @@ export const List = ({
 			selectItemCollectionFn({
 				items,
 				notedItemUids,
-				draft,
 				query: settledQuery,
 				view,
 			}),
 		[
-			draft,
 			items,
 			settledQuery,
 			notedItemUids,
@@ -120,26 +98,13 @@ export const List = ({
 					sectionId: "identity",
 				}}
 				preload="intent"
-				className="data-[ui-draft=true]:bg-accent/10 data-[ui-draft=true]:hover:bg-accent/15"
-				{...readDataUiFn({
-					dataUi: "EditorItemCard",
-					state: {
-						draft: readDraftFn(item),
-					},
-				})}
+				data-ui="EditorItemCard"
 				data-item-uid={item.uid}
 				label={item.title}
 				corner={
 					notedItemUids.has(item.uid) ? (
 						<span title={translator.textFn("Notes")}>
 							<NotebookPen className="size-5 text-accent" />
-						</span>
-					) : undefined
-				}
-				cornerEnd={
-					readDraftFn(item) ? (
-						<span className="rounded-full border border-accent/35 bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">
-							{translator.textFn("Draft")}
 						</span>
 					) : undefined
 				}
@@ -160,7 +125,6 @@ export const List = ({
 	const newItemMenu = (
 		<CreateItemLink
 			dataUi="EditorNewItemMenu"
-			defaultDraft={false}
 			projectId={project.projectId}
 			className="h-10 min-h-10 shrink-0 gap-2 px-3 py-2 text-sm"
 			variant="primary"
@@ -200,29 +164,6 @@ export const List = ({
 						options={itemViewOptions}
 						value={view}
 					/>
-					<Tooltip
-						content={`${translator.textFn("Draft")} · ${formatForDisplay({
-							key: "d",
-						})}`}
-						placement="bottom"
-					>
-						<LinkButton
-							className={`${sectionLinkClassName} gap-1.5`}
-							onClick={() => onDraftChangeFn(!draft)}
-							{...readDataUiFn({
-								dataUi: "EditorItemDraftFilter",
-								state: {
-									selected: draft,
-								},
-							})}
-						>
-							<FilePenLine className="size-4 shrink-0" />
-							<ShortcutLabel
-								label={translator.textFn("Draft")}
-								shortcut="d"
-							/>
-						</LinkButton>
-					</Tooltip>
 				</EditorSectionBar>
 			}
 			scrollRestorationId="editor-item-list"

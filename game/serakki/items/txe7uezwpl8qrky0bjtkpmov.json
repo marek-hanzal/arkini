@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "txe7uezwpl8qrky0bjtkpmov",
 		"title": "Coffee Seed",
-		"draft": false,
 		"description": "Loose coffee seed. Plant it or pack it into a sack before it spoils.",
 		"ui": "simple",
 		"artwork": {

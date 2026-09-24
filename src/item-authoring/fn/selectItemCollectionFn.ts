@@ -1,5 +1,5 @@
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
-import { filterFn } from "~/item-authoring/fn/filterFn";
+import { searchFn } from "~/item-authoring/fn/searchFn";
 
 export namespace selectItemCollectionFn {
 	export type View = "name" | "with-note";
@@ -9,22 +9,17 @@ export namespace selectItemCollectionFn {
 export const selectItemCollectionFn = ({
 	items,
 	notedItemUids,
-	draft,
 	query,
 	view,
 }: {
 	readonly items: ReadonlyArray<ItemSchema.Type>;
 	readonly notedItemUids: ReadonlySet<string>;
-	readonly draft: boolean;
 	readonly query: string;
 	readonly view: selectItemCollectionFn.View;
 }): ReadonlyArray<ItemSchema.Type> =>
-	filterFn(
+	searchFn(
 		items
 			.filter((item) => view !== "with-note" || notedItemUids.has(item.uid))
 			.sort((left, right) => left.title.localeCompare(right.title)),
-		{
-			draft,
-			query,
-		},
+		query,
 	);

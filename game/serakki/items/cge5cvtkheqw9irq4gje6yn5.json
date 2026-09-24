@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "cge5cvtkheqw9irq4gje6yn5",
 		"title": "Sheep Farm",
-		"draft": false,
 		"description": "Manages nearby sheep pens, prepares empty ones, and releases sheep over time.",
 		"ui": "default",
 		"artwork": {

@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "ouhetymctez7398vqukr9vhv",
 		"title": "Sack With Vegetable Seed",
-		"draft": false,
 		"description": "A sack of vegetable seed, marked with the produce it is meant to grow.",
 		"ui": "simple",
 		"artwork": {

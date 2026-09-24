@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "r2y0wgdu2zxdboof3lqs4bg0",
 		"title": "Sheep Pen",
-		"draft": false,
 		"description": "A populated enclosure holding animals that can be released one at a time.",
 		"ui": "simple",
 		"artwork": {

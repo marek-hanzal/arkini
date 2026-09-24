@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "rt5kdthl4xt8l0i7eawdrz2p",
 		"title": "Fruit Seed",
-		"draft": false,
 		"description": "Loose fruit seed. Plant it or pack it into a sack before it spoils.",
 		"ui": "simple",
 		"artwork": {

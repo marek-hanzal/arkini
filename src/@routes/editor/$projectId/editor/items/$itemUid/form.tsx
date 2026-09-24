@@ -3,7 +3,6 @@ import { Form } from "~/item-authoring/ui/Form";
 import type { OptionalCapability, SectionId } from "~/item-authoring/type/Section";
 
 interface EditorItemFormSearch {
-	readonly defaultDraft?: boolean;
 	readonly defaultTitle?: string;
 	readonly enable?: OptionalCapability;
 	readonly create?: boolean;
@@ -60,11 +59,6 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 						outcomeRoll,
 					}
 				: {}),
-			...(typeof search.defaultDraft === "boolean"
-				? {
-						defaultDraft: search.defaultDraft,
-					}
-				: {}),
 			...(typeof search.defaultTitle === "string" && search.defaultTitle.length > 0
 				? {
 						defaultTitle: search.defaultTitle,
@@ -103,7 +97,6 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 	component: () => {
 		const { itemUid } = Route.useParams();
 		const {
-			defaultDraft,
 			defaultTitle,
 			enable,
 			create,
@@ -125,7 +118,6 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 		) as SectionId;
 		return (
 			<Form
-				defaultDraft={defaultDraft}
 				defaultTitle={defaultTitle}
 				enableCapability={enable}
 				create={create}

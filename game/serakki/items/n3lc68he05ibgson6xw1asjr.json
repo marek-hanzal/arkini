@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "n3lc68he05ibgson6xw1asjr",
 		"title": "Sack With Grass Seed",
-		"draft": false,
 		"description": "A sack of grass seed, marked with the crop it is meant to grow.",
 		"ui": "simple",
 		"artwork": {

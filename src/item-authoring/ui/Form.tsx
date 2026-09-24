@@ -8,7 +8,6 @@ import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { useItemByUid } from "~/item-authoring/ui/useItemByUid";
 
 const useDraft = (
-	defaultDraft: boolean | undefined,
 	defaultTitle: string | undefined,
 	uid: string,
 	resourceUid?: string,
@@ -16,7 +15,6 @@ const useDraft = (
 	const project = useEditorProject();
 	return useMemo(() => {
 		const draft = createDraftFn({
-			draft: defaultDraft,
 			resourceUid:
 				resourceUid ??
 				project.resources.find(({ type }) => type === "artwork")?.uid ??
@@ -32,7 +30,6 @@ const useDraft = (
 					};
 		return namedDraft;
 	}, [
-		defaultDraft,
 		defaultTitle,
 		project.resources,
 		resourceUid,
@@ -41,7 +38,6 @@ const useDraft = (
 };
 
 interface FormProps extends PropsWithChildren {
-	readonly defaultDraft?: boolean;
 	readonly defaultTitle?: string;
 	readonly enableCapability?: OptionalCapability;
 	readonly create?: boolean;
@@ -61,7 +57,6 @@ interface FormProps extends PropsWithChildren {
 /** Resolves a canonical item by UID or seeds its first local form from create. */
 export const Form = ({
 	children,
-	defaultDraft,
 	defaultTitle,
 	enableCapability,
 	create,
@@ -77,7 +72,7 @@ export const Form = ({
 	sectionId = "identity",
 	uid,
 }: FormProps) => {
-	const draft = useDraft(defaultDraft, defaultTitle, uid, resourceUid);
+	const draft = useDraft(defaultTitle, uid, resourceUid);
 	const persistedItem = useItemByUid(uid);
 	if (persistedItem === undefined && create !== true) return <NotFound uid={uid} />;
 	const initialItem = persistedItem ?? draft;
@@ -85,7 +80,6 @@ export const Form = ({
 	return (
 		<FormSession
 			key={initialItem.uid}
-			defaultDraft={defaultDraft}
 			defaultTitle={defaultTitle}
 			enableCapability={enableCapability}
 			initialItem={initialItem}

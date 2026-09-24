@@ -3,16 +3,15 @@ import { describe, expect, it } from "vitest";
 import { selectItemCollectionFn } from "~/item-authoring/fn/selectItemCollectionFn";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 
-const itemFn = (id: string, title: string, draft = false) =>
+const itemFn = (id: string, title: string) =>
 	({
 		uid: id,
 		title,
-		draft,
 	}) as ItemSchema.Type;
-const alpha = itemFn("alpha", "Alpha ore", true);
-const beta = itemFn("beta", "Beta ore", true);
+const alpha = itemFn("alpha", "Alpha ore");
+const beta = itemFn("beta", "Beta ore");
 const gamma = itemFn("gamma", "Gamma ore");
-const fresh = itemFn("fresh", "Fresh", true);
+const fresh = itemFn("fresh", "Fresh");
 const items = [
 	fresh,
 	gamma,
@@ -21,7 +20,7 @@ const items = [
 ];
 
 describe("selectItemCollectionFn", () => {
-	it("filters notes by stable item UID and combines them with drafts and search", () => {
+	it("filters notes by stable item UID and combines them with search", () => {
 		const notedItemUids = new Set([
 			beta.uid,
 			gamma.uid,
@@ -31,7 +30,6 @@ describe("selectItemCollectionFn", () => {
 			selectItemCollectionFn({
 				items,
 				notedItemUids,
-				draft: false,
 				query: "",
 				view: "with-note",
 			}),
@@ -44,12 +42,12 @@ describe("selectItemCollectionFn", () => {
 			selectItemCollectionFn({
 				items,
 				notedItemUids,
-				draft: true,
 				query: "ore",
 				view: "with-note",
 			}),
 		).toEqual([
 			beta,
+			gamma,
 		]);
 	});
 });

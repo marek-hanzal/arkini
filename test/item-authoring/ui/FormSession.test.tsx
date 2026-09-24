@@ -226,7 +226,6 @@ afterEach(async () => {
 const render = async (
 	children: ReactNode,
 	newItem = false,
-	defaultDraft?: boolean,
 	enableCapability?: OptionalCapability,
 	productionLine?: {
 		readonly uid: string;
@@ -242,7 +241,6 @@ const render = async (
 				<Form
 					{...(newItem
 						? {
-								defaultDraft,
 								defaultTitle: "Dirty Bucket",
 								create: true as const,
 							}
@@ -432,12 +430,7 @@ describe("item section form session", () => {
 		});
 		state.persisted = configured;
 		(state.project as Project).config.items[item.uid] = configured;
-		const { container, renderSection } = await render(
-			<IdentitySection />,
-			false,
-			undefined,
-			capability,
-		);
+		const { container, renderSection } = await render(<IdentitySection />, false, capability);
 		expect(state.saveItem).not.toHaveBeenCalled();
 		if (capability === "production") {
 			await renderSection(<ProductionSection />, "production");
@@ -456,7 +449,7 @@ describe("item section form session", () => {
 
 	it("keeps an asset-origin draft seed in routed section links", async () => {
 		state.persisted = undefined;
-		const { container } = await render(<IdentitySection />, true, true);
+		const { container } = await render(<IdentitySection />, true);
 		const title = container.querySelector<HTMLInputElement>('input[name="title"]');
 		if (title === null) throw new Error("Missing seeded title field");
 		expect(title.value).toBe("Dirty Bucket");
@@ -468,7 +461,6 @@ describe("item section form session", () => {
 		if (artworkLink === undefined) throw new Error("Missing Artwork section link.");
 
 		expect(JSON.parse(artworkLink.dataset.search ?? "null")).toMatchObject({
-			defaultDraft: true,
 			defaultTitle: "Dirty Bucket",
 			create: true,
 		});
@@ -1063,7 +1055,7 @@ describe("item section form session", () => {
 		};
 		state.persisted = common;
 		(state.project as Project).config.items[item.uid] = common;
-		const { container } = await render(<ProductionSection />, false, undefined, undefined, {
+		const { container } = await render(<ProductionSection />, false, undefined, {
 			uid: "second-line",
 		});
 		expect(
@@ -1214,7 +1206,6 @@ describe("item section form session", () => {
 		const { container } = await render(
 			<ClockSection />,
 			false,
-			undefined,
 			entry === "detail" ? "clock" : undefined,
 		);
 		if (entry === "form") {

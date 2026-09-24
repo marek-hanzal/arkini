@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "ovdqj7txazzmjzi4kiq764sm",
 		"title": "Chicken Coop",
-		"draft": false,
 		"description": "A populated enclosure holding animals that can be released one at a time.",
 		"ui": "simple",
 		"artwork": {

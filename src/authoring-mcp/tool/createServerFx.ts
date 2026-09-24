@@ -30,7 +30,6 @@ import { notifyProjectChangedFx } from "./notifyProjectChangedFx";
 import { mutateItemLineFx } from "./mutateItemLineFx";
 import { readArtworkCollectionTextFn } from "./fn/readArtworkCollectionTextFn";
 import { readItemCollectionTextFn } from "./fn/readItemCollectionTextFn";
-import { readDraftFn } from "~/item-authoring/fn/readDraftFn";
 import { readSchemaDetailTextFx, schemaDetailResolveDepthLimit } from "./readSchemaDetailTextFx";
 import { registerGameplayDesignToolsFn } from "./registerGameplayDesignTools";
 import { registerNoteToolsFn } from "./registerNoteTools";
@@ -205,7 +204,6 @@ const readItemDetailTextFx = Effect.fn("readItemDetailTextFx")(
 				`Item: ${item.title}`,
 				`Revision: ${project.revision}`,
 				`UID: ${item.uid}`,
-				`Draft: ${readDraftFn(item)}`,
 				`UI: ${item.ui}`,
 				...(item.description === undefined
 					? []
@@ -643,7 +641,7 @@ const createServerFn = (
 		{
 			annotations: EditorToolAnnotations.readOnly,
 			description:
-				"List one page of items with collection metadata, title, ID, optional description, and Editor draft status, optionally filtered by the editor's fuzzy search.",
+				"List one page of items with collection metadata, title, ID, optional description, optionally filtered by the editor's fuzzy search.",
 			inputSchema: ItemCollectionInputSchema,
 		},
 		async (input) =>
@@ -680,7 +678,7 @@ const createServerFn = (
 		{
 			annotations: EditorToolAnnotations.readOnly,
 			description:
-				"Read the project revision and simplified identity, Editor draft status, UI mode, and storage detail of one item in the open project. Use this lightweight revision before create_item_line.",
+				"Read the project revision and simplified identity, UI mode, and storage detail of one item in the open project. Use this lightweight revision before create_item_line.",
 			inputSchema: ItemDetailInputSchema,
 		},
 		async ({ itemUid }) =>

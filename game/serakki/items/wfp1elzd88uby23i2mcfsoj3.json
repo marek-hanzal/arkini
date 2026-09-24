@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "wfp1elzd88uby23i2mcfsoj3",
 		"title": "Sack With Cacao Seed",
-		"draft": false,
 		"description": "A sack of cacao seed, marked with the pod it is meant to grow.",
 		"ui": "simple",
 		"artwork": {

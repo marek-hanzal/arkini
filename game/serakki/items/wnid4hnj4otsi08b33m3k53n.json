@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "wnid4hnj4otsi08b33m3k53n",
 		"title": "Flower Seed",
-		"draft": false,
 		"description": "Loose flower seed. Plant it or pack it into a sack before it spoils.",
 		"ui": "simple",
 		"artwork": {

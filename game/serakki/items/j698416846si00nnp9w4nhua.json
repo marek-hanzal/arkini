@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "j698416846si00nnp9w4nhua",
 		"title": "Sack With Flax Seed",
-		"draft": false,
 		"description": "A sack of flax seed, marked with the crop it is meant to grow.",
 		"ui": "simple",
 		"artwork": {

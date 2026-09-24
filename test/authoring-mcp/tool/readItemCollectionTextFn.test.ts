@@ -17,7 +17,6 @@ describe("readItemCollectionTextFn", () => {
 		});
 
 		expect(producers).toContain("- forge\n  UID: forge");
-		expect(producers).toContain("Draft: false");
 		expect(lastPage).toContain("Page: 3\nTotal pages: 3");
 		expect(lastPage).toContain("Previous page: 2");
 	});

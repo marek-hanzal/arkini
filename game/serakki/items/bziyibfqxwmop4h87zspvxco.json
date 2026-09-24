@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "bziyibfqxwmop4h87zspvxco",
 		"title": "Townhall II Supply Chest",
-		"draft": false,
 		"description": "A small supply package for the second civic age. Mostly practical odds and ends that unlock systems before their own production chains come online.",
 		"ui": "default",
 		"artwork": {

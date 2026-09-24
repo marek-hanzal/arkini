@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "sxhiobnebf8wbp098iuyxtda",
 		"title": "Shepherd's Crook",
-		"draft": false,
 		"description": "A reusable herding tool. Use it on a populated enclosure to release one animal immediately.",
 		"ui": "simple",
 		"artwork": {

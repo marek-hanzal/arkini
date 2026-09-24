@@ -1804,10 +1804,6 @@
 					"description": "The human-readable title of this item.",
 					"$ref": "urn:serakki:schema:project#/$defs/TitleSchema"
 				},
-				"draft": {
-					"description": "Whether this item still needs authoring work in the Editor; omitted means false.",
-					"type": "boolean"
-				},
 				"description": {
 					"description": "The optional human-readable explanation of this item's purpose.",
 					"$ref": "urn:serakki:schema:project#/$defs/DescriptionSchema"

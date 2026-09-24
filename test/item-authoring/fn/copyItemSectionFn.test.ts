@@ -65,7 +65,6 @@ const destination: FormValues = {
 	...source,
 	uid: "destination",
 	title: "Destination",
-	draft: true,
 	description: "Keep this unsaved description",
 	artwork: {
 		scale: 1,
@@ -109,7 +108,6 @@ describe("section copy ownership", () => {
 		expect(result.description).toBe(destination.description);
 		expect(result.uid).toBe(destination.uid);
 		expect(result.uid).toBe(destination.uid);
-		expect(result.draft).toBe(true);
 		expect(FormSchema.parse(result).lines[0].input[0]).toMatchObject({
 			query: {
 				distance: "self",
@@ -135,7 +133,6 @@ describe("section copy ownership", () => {
 		expect(result).toMatchObject({
 			uid: "destination",
 			title: "New title",
-			draft: true,
 			description: "",
 		});
 		expect(result.lines).toBe(destination.lines);

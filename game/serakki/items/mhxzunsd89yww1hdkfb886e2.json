@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "mhxzunsd89yww1hdkfb886e2",
 		"title": "Architect - Tier 1",
-		"draft": true,
 		"description": "The settlement has discovered architecture as a service. Once a building exists, the Architect can draw another copy without bothering the Townhall again.",
 		"ui": "default",
 		"artwork": {

@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "qorgowckp3327nlzyzincspi",
 		"title": "Herders Guild",
-		"draft": false,
 		"description": "The livestock and beekeeping guild for discovering animal farms and Apiary infrastructure after animal-feed production is established.",
 		"ui": "default",
 		"artwork": {

@@ -18,7 +18,6 @@ import { SectionLink } from "~/item-authoring/ui/SectionLink";
 import type { SectionId } from "~/item-authoring/type/Section";
 import { readSectionsFn } from "~/item-authoring/fn/readSectionsFn";
 import { useItemByUid } from "~/item-authoring/ui/useItemByUid";
-import { ItemDraftToggle } from "~/item-authoring/ui/ItemDraftToggle";
 import { ItemSectionHelp } from "~/item-authoring/ui/ItemSectionHelp";
 import { useItemSectionShortcuts } from "~/item-authoring/ui/useItemSectionShortcuts";
 
@@ -108,7 +107,6 @@ export const Detail = ({
 			}
 			secondaryNavigation={
 				<EditorSectionBar
-					actions={<ItemDraftToggle item={item} />}
 					help={help === undefined ? undefined : <EditorPageHelp {...help} />}
 				>
 					{sections.map((section) => (

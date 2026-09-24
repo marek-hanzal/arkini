@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "u7ewet2noa354ctarpe429q6",
 		"title": "Chicken Farm",
-		"draft": false,
 		"description": "Manages nearby chicken coops, prepares empty ones, and releases chickens over time.",
 		"ui": "default",
 		"artwork": {

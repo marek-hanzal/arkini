@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "ihjlxwwz0g56999k30gz7ryf",
 		"title": "Sack With Herb Seed",
-		"draft": false,
 		"description": "A sack of herb seed, marked with the herbs it is meant to grow.",
 		"ui": "simple",
 		"artwork": {

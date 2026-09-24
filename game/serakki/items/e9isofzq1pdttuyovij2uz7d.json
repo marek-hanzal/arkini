@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "e9isofzq1pdttuyovij2uz7d",
 		"title": "Spoiled Cotton Seed",
-		"draft": false,
 		"description": "Cotton seed that has spoiled before it could become anything useful.",
 		"ui": "simple",
 		"artwork": {

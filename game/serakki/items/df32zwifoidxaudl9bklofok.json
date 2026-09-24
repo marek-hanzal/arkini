@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "df32zwifoidxaudl9bklofok",
 		"title": "Goose Farm",
-		"draft": false,
 		"description": "Manages nearby goose pens, prepares empty ones, and releases geese over time.",
 		"ui": "default",
 		"artwork": {

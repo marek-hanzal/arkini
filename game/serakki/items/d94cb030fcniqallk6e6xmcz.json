@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "d94cb030fcniqallk6e6xmcz",
 		"title": "Sack With Sunflower Seed",
-		"draft": false,
 		"description": "A sack of sunflower seed, marked with the crop it is meant to grow.",
 		"ui": "simple",
 		"artwork": {

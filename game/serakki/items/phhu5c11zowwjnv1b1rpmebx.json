@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "phhu5c11zowwjnv1b1rpmebx",
 		"title": "Hop Field",
-		"draft": false,
 		"description": "A planted hop field ready to be worked by a nearby Hop Farm.",
 		"ui": "simple",
 		"artwork": {

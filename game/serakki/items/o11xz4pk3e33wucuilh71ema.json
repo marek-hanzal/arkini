@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "o11xz4pk3e33wucuilh71ema",
 		"title": "Grass Farm",
-		"draft": false,
 		"description": "Operates nearby grass fields and keeps their seed stock moving.",
 		"ui": "default",
 		"artwork": {

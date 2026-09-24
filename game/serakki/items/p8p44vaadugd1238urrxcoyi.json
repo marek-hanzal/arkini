@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "p8p44vaadugd1238urrxcoyi",
 		"title": "Sack With Dye Seed",
-		"draft": false,
 		"description": "A sack of dye plant seed, marked with the plants it is meant to grow.",
 		"ui": "simple",
 		"artwork": {

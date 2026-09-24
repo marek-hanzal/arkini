@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "kzwt0gkhs7reqg7vt0xumgv6",
 		"title": "Spoiled Grain",
-		"draft": false,
 		"description": "Loose grain that sat around long enough to become considerably less useful.",
 		"ui": "simple",
 		"artwork": {

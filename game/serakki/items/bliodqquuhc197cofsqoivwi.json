@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "bliodqquuhc197cofsqoivwi",
 		"title": "Herb Seed",
-		"draft": false,
 		"description": "Loose herb seed. Plant it or pack it into a sack before it spoils.",
 		"ui": "simple",
 		"artwork": {

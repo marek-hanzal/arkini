@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "kz9bl0anw4tlxc5zcdakoex9",
 		"title": "Corn Farm",
-		"draft": false,
 		"description": "Operates nearby corn fields and keeps their seed stock moving.",
 		"ui": "default",
 		"artwork": {

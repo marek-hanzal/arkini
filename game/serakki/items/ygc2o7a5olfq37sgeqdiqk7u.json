@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "ygc2o7a5olfq37sgeqdiqk7u",
 		"title": "Flax Farm",
-		"draft": false,
 		"description": "Operates nearby flax fields and keeps their seed stock moving.",
 		"ui": "default",
 		"artwork": {

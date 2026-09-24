@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "tp8elp5lpun7bpz4evjysk2m",
 		"title": "Empty Pig Pen",
-		"draft": false,
 		"description": "An empty enclosure waiting for the next group of animals to arrive.",
 		"ui": "default",
 		"artwork": {

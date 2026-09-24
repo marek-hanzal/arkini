@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "ybm9et9f0pph5amk9mml068q",
 		"title": "Vegetable Farm",
-		"draft": false,
 		"description": "Operates nearby vegetable garden and prepares new growing plots.",
 		"ui": "default",
 		"artwork": {

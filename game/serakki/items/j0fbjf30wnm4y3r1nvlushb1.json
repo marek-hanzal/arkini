@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "j0fbjf30wnm4y3r1nvlushb1",
 		"title": "Sack With Hop Seed",
-		"draft": false,
 		"description": "A sack of hop seed, marked with the hops it is meant to grow.",
 		"ui": "simple",
 		"artwork": {

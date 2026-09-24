@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "o2y57smpozsjnhr8gvpleec5",
 		"title": "Grape Seed",
-		"draft": false,
 		"description": "Loose grape seed. Plant it or pack it into a sack before it spoils.",
 		"ui": "simple",
 		"artwork": {

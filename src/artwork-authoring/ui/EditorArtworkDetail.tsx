@@ -185,7 +185,6 @@ export const EditorArtworkDetail = ({
 					actions={
 						<CreateItemLink
 							dataUi="EditorArtworkCreateItem"
-							defaultDraft
 							defaultTitle={resource.title}
 							projectId={project.projectId}
 							resourceUid={resource.uid}

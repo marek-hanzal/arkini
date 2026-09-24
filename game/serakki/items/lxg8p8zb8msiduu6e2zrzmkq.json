@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "lxg8p8zb8msiduu6e2zrzmkq",
 		"title": "Shredded Order",
-		"draft": false,
 		"description": "An order that has been reduced to paperwork confetti. Still perfectly suitable for pulp.",
 		"ui": "simple",
 		"artwork": {

@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "l4vlgxmnvh7pmze314zoju6r",
 		"title": "Growers Guild",
-		"draft": false,
 		"description": "The agricultural guild. Basic crops come first; diversified farming follows grain, and specialty crops open after established fiber or oil farming.",
 		"ui": "default",
 		"artwork": {

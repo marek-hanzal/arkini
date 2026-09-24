@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "tc3de9tmijvf8n6zgukfi1w3",
 		"title": "Sack With Cotton Seed",
-		"draft": false,
 		"description": "A sack of cotton seed, marked with the crop it will eventually become.",
 		"ui": "simple",
 		"artwork": {

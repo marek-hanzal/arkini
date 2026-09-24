@@ -4,7 +4,6 @@
 		"uid": "jn0d9duoke8x541an3z3nnem",
 		"title": "Order Corn",
 		"ui": "simple",
-		"draft": false,
 		"description": "Automated corn productions will pick up this order and make a corn",
 		"artwork": {
 			"scale": 1,

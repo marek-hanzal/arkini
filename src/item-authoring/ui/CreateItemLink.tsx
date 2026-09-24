@@ -9,7 +9,6 @@ export const CreateItemLink = ({
 	children,
 	className,
 	dataUi,
-	defaultDraft,
 	defaultTitle,
 	resourceUid,
 	variant = "default",
@@ -18,7 +17,6 @@ export const CreateItemLink = ({
 	readonly children: ReactNode;
 	readonly className?: string;
 	readonly dataUi?: string;
-	readonly defaultDraft?: boolean;
 	readonly defaultTitle?: string;
 	readonly resourceUid?: string;
 	readonly variant?: "default" | "primary" | "link";
@@ -39,7 +37,6 @@ export const CreateItemLink = ({
 			}}
 			search={{
 				create: true,
-				defaultDraft,
 				defaultTitle,
 				resourceUid,
 			}}

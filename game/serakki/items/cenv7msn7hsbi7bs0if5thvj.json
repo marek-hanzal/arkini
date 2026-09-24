@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "cenv7msn7hsbi7bs0if5thvj",
 		"title": "Sack With Grape Seed",
-		"draft": false,
 		"description": "A sack of grape seed. The grapes on the sack prevent future winemakers from having to identify seeds by squinting.",
 		"ui": "simple",
 		"artwork": {

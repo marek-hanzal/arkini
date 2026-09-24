@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "gbm8cfe7jwaqmy3egbxji16p",
 		"title": "Flint And Steel",
-		"draft": false,
 		"description": "A tiny machine for turning friction into poor decisions. Makes fire. Keep it away from anything you would prefer to remain unburned.",
 		"ui": "simple",
 		"artwork": {

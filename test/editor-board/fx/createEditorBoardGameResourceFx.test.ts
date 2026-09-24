@@ -212,7 +212,7 @@ describe("Board Scenario createEditorBoardGameResourceFx", () => {
 						...editorTestPayload.config.items,
 						water: {
 							...water,
-							draft: true,
+							description: "Updated author notes",
 						},
 					},
 				},
@@ -227,7 +227,9 @@ describe("Board Scenario createEditorBoardGameResourceFx", () => {
 			]);
 			expect(released).toEqual([]);
 			expect(after.resource.game.projectRevision).toBe(2);
-			expect(after.resource.game.config.items.water?.draft).toBe(true);
+			expect(after.resource.game.config.items.water?.description).toBe(
+				"Updated author notes",
+			);
 			expect(after.resource.game.runFx).toBe(before.resource.game.runFx);
 
 			yield* owner.releaseCurrentFx;

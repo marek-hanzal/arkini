@@ -147,7 +147,6 @@ describe("filesystem Editor project writes", () => {
 				item: {
 					...water,
 					title: "Fresh Water",
-					draft: true,
 					artwork: {
 						...water.artwork,
 						scale: 0.65,
@@ -178,7 +177,6 @@ describe("filesystem Editor project writes", () => {
 			),
 		);
 		expect(savedItem.item.artwork.scale).toBe(0.65);
-		expect(savedItem.item.draft).toBe(true);
 		publishedTargets.clear();
 		pngOperations.length = 0;
 		jsonReads.clear();

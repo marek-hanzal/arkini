@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "avzrwr1i9lmmjqc6i8cgxxsq",
 		"title": "Fruit Farm",
-		"draft": false,
 		"description": "Operates nearby fruit garden and prepares new growing plots.",
 		"ui": "default",
 		"artwork": {

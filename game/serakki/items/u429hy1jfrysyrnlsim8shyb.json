@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "u429hy1jfrysyrnlsim8shyb",
 		"title": "Empty Beehive",
-		"draft": false,
 		"description": "The hive structure is still sound, but the colony is gone. Apiary can repopulate it with a fresh bunch of flowers.",
 		"ui": "simple",
 		"artwork": {

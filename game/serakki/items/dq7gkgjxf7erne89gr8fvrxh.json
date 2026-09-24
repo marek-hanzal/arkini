@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "dq7gkgjxf7erne89gr8fvrxh",
 		"title": "Sack With Rapeseed Seed",
-		"draft": false,
 		"description": "A sack of rapeseed seed, marked with the crop it is meant to grow.",
 		"ui": "simple",
 		"artwork": {

@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "s7qsiqftxoa846oliqd49ie6",
 		"title": "Spoiled Grain Seed",
-		"draft": false,
 		"description": "Grain seed that waited too long and is no longer fit for planting.",
 		"ui": "simple",
 		"artwork": {

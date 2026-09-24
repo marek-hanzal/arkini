@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "g7swy27j2dvvktfcwhjpu8su",
 		"title": "Flower Farm",
-		"draft": false,
 		"description": "Operates nearby flower fields and keeps their seed stock moving.",
 		"ui": "default",
 		"artwork": {

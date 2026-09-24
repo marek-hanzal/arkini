@@ -2,7 +2,6 @@ import { Order } from "effect";
 
 import type { Project } from "~/project-authoring/type/Project";
 import { searchFn } from "~/item-authoring/fn/searchFn";
-import { readDraftFn } from "~/item-authoring/fn/readDraftFn";
 import type { ItemCollectionInput } from "../ItemCollectionInputSchema";
 
 const indentTextFn = (value: string) =>
@@ -26,7 +25,6 @@ export const readItemCollectionTextFn = (project: Project, input: ItemCollection
 			[
 				`- ${item.title}`,
 				`  UID: ${item.uid}`,
-				`  Draft: ${readDraftFn(item)}`,
 				...(item.description === undefined
 					? []
 					: [

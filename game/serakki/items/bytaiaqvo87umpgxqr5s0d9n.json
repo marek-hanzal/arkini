@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "bytaiaqvo87umpgxqr5s0d9n",
 		"title": "Rapeseed Farm",
-		"draft": false,
 		"description": "Operates nearby rapeseed fields and keeps their seed stock moving.",
 		"ui": "default",
 		"artwork": {

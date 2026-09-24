@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "o2skwmlh3wggmy9qyjjhkm3e",
 		"title": "Sack With Corn Kernels",
-		"draft": false,
 		"description": "A sack of corn kernels, marked with the crop they are meant to grow.",
 		"ui": "simple",
 		"artwork": {

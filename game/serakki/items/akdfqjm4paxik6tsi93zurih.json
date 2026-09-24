@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "akdfqjm4paxik6tsi93zurih",
 		"title": "Farmers Market",
-		"draft": false,
 		"description": "A trade hub where outside demand turns local agricultural surplus into contracts, imports, and occasional valuables.",
 		"ui": "simple",
 		"artwork": {

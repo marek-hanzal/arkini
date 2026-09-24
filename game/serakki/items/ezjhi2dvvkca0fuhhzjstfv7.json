@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "ezjhi2dvvkca0fuhhzjstfv7",
 		"title": "Dye Farm",
-		"draft": false,
 		"description": "Operates nearby dye fields and keeps seed stock moving.",
 		"ui": "default",
 		"artwork": {

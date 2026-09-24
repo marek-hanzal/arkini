@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "xxwklwezina4c0ejukf5fcpz",
 		"title": "Sack With Grain Seed",
-		"draft": false,
 		"description": "A sack of grain seed. The grain shown on the sack is considerably easier to identify than the individual seeds.",
 		"ui": "simple",
 		"artwork": {

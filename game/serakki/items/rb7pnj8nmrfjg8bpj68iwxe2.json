@@ -3,7 +3,6 @@
 	"item": {
 		"uid": "rb7pnj8nmrfjg8bpj68iwxe2",
 		"title": "Grape Farm",
-		"draft": false,
 		"description": "Operates nearby grape fields and keeps seed stock moving.",
 		"ui": "default",
 		"artwork": {

@@ -8,7 +8,6 @@ export namespace useItemSectionShortcuts {
 		readonly enabled: boolean;
 		readonly destination?: "detail" | "form";
 		readonly search?: {
-			readonly defaultDraft?: boolean;
 			readonly defaultTitle?: string;
 			readonly create?: boolean;
 			readonly resourceUid?: string;

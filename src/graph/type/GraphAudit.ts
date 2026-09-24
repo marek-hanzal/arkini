@@ -1,12 +1,21 @@
-/** Snapshot-native indexes distinguish authored participation from mere references. */
+/** Counts are complete; identities are bounded samples for exact follow-up queries. */
+export type GraphAuditFact =
+	| {
+			readonly kind: "producer" | "usage" | "behavior" | "configuration-only" | "reference";
+			readonly count: number;
+			readonly operationIds: readonly string[];
+	  }
+	| {
+			readonly kind: "template";
+			readonly count: number;
+			readonly nodeIds: readonly string[];
+	  };
+
 export interface GraphAuditItem {
 	readonly nodeId: string;
 	readonly connected: boolean;
-	readonly ownsOperation: boolean;
-	readonly source: boolean;
-	readonly producers: readonly string[];
-	readonly consumers: readonly string[];
 	readonly referenceOnly: boolean;
+	readonly facts: readonly GraphAuditFact[];
 }
 
 export interface GraphAuditIndex {
@@ -16,7 +25,7 @@ export interface GraphAuditIndex {
 export interface GraphAuditMatch {
 	readonly nodeId: string;
 	readonly reason: string;
-	readonly relatedNodeIds: readonly string[];
+	readonly facts: readonly GraphAuditFact[];
 }
 
 export interface GraphAuditResult {

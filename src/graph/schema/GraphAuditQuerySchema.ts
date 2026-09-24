@@ -5,11 +5,10 @@ export const GraphAuditQuerySchema = GraphDiscoveryBoundsSchema.extend({
 	audit: z.enum([
 		"dangling",
 		"no-producer",
-		"no-consumer",
-		"dead-end",
+		"no-usage",
+		"no-behavior",
 		"source-only",
 		"reference-only",
-		"no-owned-operation",
 	]),
 
 	mode: z
@@ -25,7 +24,7 @@ export const GraphAuditQuerySchema = GraphDiscoveryBoundsSchema.extend({
 		$id: "urn:serakki:schema:mcp:graph-audit-input",
 		title: "Graph audit",
 		description:
-			"Snapshot-native item design audits with reasons and pinned continuation. dead-end is the canonical sink audit.",
+			"Snapshot-native authored item facts with exact operation references and pinned continuation. No gameplay rule evaluation or design judgement.",
 	});
 export type GraphAuditQuerySchema = typeof GraphAuditQuerySchema;
 export namespace GraphAuditQuerySchema {

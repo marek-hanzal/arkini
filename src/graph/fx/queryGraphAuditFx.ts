@@ -13,40 +13,37 @@ const staticMatchFn = (
 	item: GraphAuditItem,
 	audit: GraphAuditQuerySchema.Type["audit"],
 ): GraphAuditMatch | undefined => {
+	const countFn = (kind: GraphAuditItem["facts"][number]["kind"]) =>
+		item.facts.find((fact) => fact.kind === kind)?.count ?? 0;
 	const reason = match(audit)
 		.with("dangling", () =>
-			!item.connected && !item.ownsOperation
-				? "No authored relationship or owned gameplay operation."
+			!item.connected && countFn("behavior") === 0
+				? "No authored relationship or configured input, output, unit cost or merge interaction."
 				: undefined,
 		)
 		.with("no-producer", () =>
-			item.producers.length === 0 && !item.source
-				? "No possible authored producer and no start/template placement source."
+			countFn("producer") === 0
+				? "No authored operation outputs this item; template placement is listed separately."
 				: undefined,
 		)
-		.with("no-consumer", () =>
-			item.consumers.length === 0
-				? "No owned operation, material/unit input or merge participation; rule references do not count as usage."
+		.with("no-usage", () =>
+			countFn("usage") === 0
+				? "No authored input, unit payer or merge source/target participation."
 				: undefined,
 		)
-		.with("dead-end", () =>
-			(item.producers.length > 0 || item.source) && item.consumers.length === 0
-				? "Has an authored producer or template source, but no further gameplay usage."
+		.with("no-behavior", () =>
+			countFn("behavior") === 0
+				? "No owned operation has configured inputs, outputs, unit costs or a merge interaction."
 				: undefined,
 		)
 		.with("source-only", () =>
-			item.source && item.producers.length === 0
-				? "Placed in an authored template, with no gameplay producer; source content, not automatically a defect."
+			countFn("template") > 0 && countFn("producer") === 0
+				? "Placed in an authored template, with no authored producer."
 				: undefined,
 		)
 		.with("reference-only", () =>
 			item.referenceOnly
-				? "Connected only by rule references, with no gameplay participation or placement."
-				: undefined,
-		)
-		.with("no-owned-operation", () =>
-			!item.ownsOperation
-				? "Owns no line, merge, Clock or depletion operation; diagnostic, not automatically a defect."
+				? "Connected only by rule references, without other authored relationships or configured behavior."
 				: undefined,
 		)
 		.exhaustive();
@@ -54,7 +51,7 @@ const staticMatchFn = (
 	return {
 		nodeId: item.nodeId,
 		reason,
-		relatedNodeIds: item.producers.slice(0, 3),
+		facts: item.facts,
 	};
 };
 

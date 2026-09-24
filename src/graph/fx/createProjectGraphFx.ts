@@ -124,6 +124,24 @@ const readOperationReferencesFn = (
 						})),
 					})),
 				}),
+		...(result.audit === undefined
+			? {}
+			: {
+					audit: {
+						...result.audit,
+						matches: result.audit.matches.map((entry) => ({
+							...entry,
+							facts: entry.facts.map((fact) =>
+								fact.kind === "template"
+									? fact
+									: {
+											...fact,
+											operationIds: fact.operationIds.map(referenceFn),
+										},
+							),
+						})),
+					},
+				}),
 		...(result.matches === undefined
 			? {}
 			: {
@@ -762,45 +780,61 @@ export const createProjectGraphFx = Effect.fn("createProjectGraphFx")(
 				const selected = new Set(
 					matches.flatMap((entry) => [
 						entry.nodeId,
-						...entry.relatedNodeIds,
+						...entry.facts.flatMap((fact) =>
+							fact.kind === "template" ? fact.nodeIds : [],
+						),
 					]),
 				);
-				return {
-					projectId: captured.projectId,
-					revision: captured.revision,
-					snapshotId: captured.snapshotId,
-					status: readQueryStatusFn(analysis.audit.count > 0, !analysis.audit.complete),
-					truncated: hasMore || !analysis.audit.complete,
-					reasons: [
-						...analysis.reasons,
-						...(hasMore
-							? [
-									"limit" as const,
-								]
-							: []),
-					],
-					expansions: analysis.expansions,
-					nodes: captured.facts.nodes
-						.filter((node) => selected.has(node.id))
-						.map((node) => ({
-							id: node.id,
-							title: node.title,
-							kind: node.kind,
-							missing: node.missing,
-						})),
-					edges: [],
-					operations: [],
-					paths: [],
-					audit: structuredClone({
-						...analysis.audit,
-						matches,
-					}),
-					...(nextCursor === undefined
-						? {}
-						: {
-								nextCursor,
-							}),
-				};
+				const operationIds = new Set(
+					matches.flatMap((entry) =>
+						entry.facts.flatMap((fact) =>
+							fact.kind === "template" ? [] : fact.operationIds,
+						),
+					),
+				);
+				const projected = readGraphDiscoveryFn(
+					{
+						projectId: captured.projectId,
+						revision: captured.revision,
+						status: readQueryStatusFn(
+							analysis.audit.count > 0,
+							!analysis.audit.complete,
+						),
+						truncated: hasMore || !analysis.audit.complete,
+						reasons: [
+							...analysis.reasons,
+							...(hasMore
+								? [
+										"limit" as const,
+									]
+								: []),
+						],
+						expansions: analysis.expansions,
+						nodes: captured.facts.nodes.filter((node) => selected.has(node.id)),
+						edges: [],
+						paths: [],
+						operations: captured.facts.operations.filter((operation) =>
+							operationIds.has(operation.id),
+						),
+					},
+					captured.snapshotId,
+					captured.facts,
+				);
+				return readOperationReferencesFn(
+					{
+						...projected,
+						audit: structuredClone({
+							...analysis.audit,
+							matches,
+						}),
+						...(nextCursor === undefined
+							? {}
+							: {
+									nextCursor,
+								}),
+					},
+					captured,
+				);
 			}
 			if (query.kind === "flow") {
 				const result = yield* queryGraphFlowFx(captured.operationIndex, query);

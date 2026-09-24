@@ -46,7 +46,7 @@ export const registerGraphToolsFn = ({
 		"graph_audit",
 		{
 			description:
-				"Audit authored items directly on one graph snapshot: dangling, no-producer, no-consumer, dead-end (sink), source-only, reference-only, no-owned-operation. Returns titled identities and reasons. Mode count returns only counts. Interrupted scans report lower bounds. Continue frozen result pages with cursor and the same audit/mode plus revision/snapshotId. Read graph_schema_json for exact audit definitions.",
+				"Read authored item facts from one graph snapshot: dangling, no-producer, no-usage, no-behavior, source-only, reference-only. No gameplay evaluation or design judgment: disabled/zero-chance operations count, template placement is independent of production, and bare Clock/units configuration is not behavior. Returns independent fact counts with up to three exact sample operation/template references per group; operation references can be hydrated. Mode count returns only counts. Interrupted scans report lower bounds. Continue frozen pages with cursor and the same audit/mode plus revision/snapshotId. Read graph_schema_json for precise structural definitions.",
 			inputSchema: GraphAuditQuerySchema,
 			annotations: EditorToolAnnotations.readOnly,
 		},

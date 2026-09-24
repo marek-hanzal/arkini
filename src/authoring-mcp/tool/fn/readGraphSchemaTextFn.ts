@@ -78,23 +78,23 @@ export const readGraphSchemaTextFn = () =>
 			purpose:
 				"Unsuffixed discovery tools return compact formatted text. graph_schema_json and graph_operations_json return one JSON document. Discovery never returns authored configuration bodies; hydrate selected operations only after discovering their references.",
 			audit: {
-				input: "graph_audit requires audit, with optional mode list/count, limit, cursor, revision, snapshotId, maxExpansions and timeoutMs. Only authored present items are audited; missing references stay inspectable through discovery. dead-end is the sole sink category; no redundant sink-only alias exists.",
+				input: "graph_audit requires audit, with optional mode list/count, limit, cursor, revision, snapshotId, maxExpansions and timeoutMs. Only present authored items are audited. Reports facts, never design correctness or gameplay feasibility. All authored outputs count regardless of enable flags, chance, weight, quantity, rules or missing participants.",
 				kinds: {
 					dangling:
-						"No authored edge of any kind (including references/placement) and no owned operation.",
+						"No authored relationship of any kind and no configured behavior. Bare Clock/units configuration or an empty simple line does not prevent this match.",
 					"no-producer":
-						"No possible atomic gameplay output providing the item and no placement in any authored template. Static disabled/chance-zero/missing-participant producers do not qualify. An authored producer is not proof of start reachability.",
-					"no-consumer":
-						"No participation as an operation owner, merge target, material input, unit provider or unit payer. Outputs, placement and rule references alone are not usage. Authored operations count even if currently disabled or outcome-free.",
-					"dead-end":
-						"Has a possible gameplay producer or authored template placement, but no consumer/owned gameplay interaction. Canonical sink audit; local availability does not prove reachability from start.",
+						"No authored operation output for this item. Template placements are independent facts and never suppress this match.",
+					"no-usage":
+						"No actual line input/unit payer or merge source/target/receiver participation. Mere line/Clock/depletion ownership, outputs, references and templates are not usage.",
+					"no-behavior":
+						"No configured behavior: merge interaction; line with an output, non-simple input or unit cost; Clock/depletion with an output. Item/space/template outputs all count. No rule or availability evaluation.",
 					"source-only":
-						"Placed in an authored template and has no gameplay producer. A diagnostic source category, not automatically a defect; template may be unassigned at start.",
+						"Appears in an authored template and has no authored producer. Unassigned templates count.",
 					"reference-only":
-						"Has rule-reference connections but no other edge, placement or owned gameplay operation.",
-					"no-owned-operation":
-						"Owns no line, merge, Clock or depletion configuration. Diagnostic, not automatically a defect.",
+						"Has rule-reference edges but no other edge or configured behavior.",
 				},
+				evidence:
+					"Each match reports six independent groups: producer, usage, behavior, configuration-only, reference, template. Counts are distinct operations or distinct templates, not edge/placement occurrences. Each group carries up to three deterministic sample identities with the full count. Operation samples include authored scalar summaries and exact references for graph_operations_json. Templates include node identities. configuration-only includes Clock/units without outputs and simple lines without outputs or unit costs. Such presence is not interpreted as behavior. Further relationships are queryable via graph_operations or graph_connections. Count mode returns no rows/evidence.",
 				pagination:
 					"Audit scans the snapshot item index and pages a frozen result in exact node-ID order. Cursor binds snapshot, audit kind and mode. Continuation does not recompute the analysis. Interrupted scans report lower bounds; retry without cursor and with larger safety bounds for a new scan. limit bounds returned rows, never the analyzed scope; count mode returns no rows. Completed scans have exact totals even while their result pages are truncated.",
 			},

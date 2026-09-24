@@ -249,10 +249,22 @@ const bodyFn = (result: GraphDiscoveryResult, query: Query): string => {
 			const prefix = audit.complete ? "" : "≥";
 			return [
 				`Audit matches: ${prefix}${audit.count}${audit.complete ? "" : " (incomplete; total unknown)"}`,
-				...audit.matches.map(
-					(entry) =>
-						`- ${labelFn(entry.nodeId)} — ${titleFn(entry.reason)}${entry.relatedNodeIds.length === 0 ? "" : ` Related: ${entry.relatedNodeIds.map(labelFn).join(", ")}`}`,
-				),
+				...audit.matches.flatMap((entry) => [
+					`- ${labelFn(entry.nodeId)} — ${titleFn(entry.reason)}`,
+					...entry.facts.flatMap((fact) => {
+						if (fact.kind === "template")
+							return [
+								`  Templates: ${fact.count}${fact.count > fact.nodeIds.length ? ` (showing ${fact.nodeIds.length})` : ""}${fact.nodeIds.length === 0 ? "" : `; ${fact.nodeIds.map(labelFn).join(", ")}`}`,
+							];
+						return [
+							`  ${fact.kind} operations: ${fact.count}${fact.count > fact.operationIds.length ? ` (showing ${fact.operationIds.length}; query graph_operations for more)` : ""}`,
+							...fact.operationIds.map((id) => {
+								const operation = operations.get(id);
+								return `    ${operation === undefined ? `operationId=${identityFn(id)}` : operationRowFn(operation, labelFn)}`;
+							}),
+						];
+					}),
+				]),
 			].join("\n");
 		})
 		.with("operations", () =>

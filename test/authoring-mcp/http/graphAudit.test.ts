@@ -5,7 +5,7 @@ import {
 	createMcpHarness,
 	connectMcpClient,
 } from "./support/createMcpHarness";
-import { graphTextFn } from "./graphQuery.test/fixture";
+import { graphTextFn, toolJsonFn } from "./graphQuery.test/fixture";
 import { auditProjectFn } from "~test/graph/fx/graphAudit.test/fixtures";
 
 afterEach(async () => {
@@ -16,6 +16,7 @@ afterEach(async () => {
 it("serves audits, frozen pages and mixed graph batches through the registered MCP boundary", async () => {
 	const harness = await createMcpHarness();
 	const project = auditProjectFn();
+	project.config.items.factory.lines[0].enable = false;
 	await Effect.runPromise(
 		harness.repository.createProjectFx({
 			version: {
@@ -39,7 +40,7 @@ it("serves audits, frozen pages and mixed graph batches through the registered M
 		}),
 	);
 	expect(first.text).toContain("Audit matches: 2");
-	expect(first.text).toContain("No authored relationship or owned gameplay operation.");
+	expect(first.text).toContain("producer operations: 0");
 	expect(first.nextCursor).toBeDefined();
 	const next = graphTextFn(
 		await client.callTool({
@@ -94,7 +95,7 @@ it("serves audits, frozen pages and mixed graph batches through the registered M
 						id: "invalid",
 						query: {
 							kind: "audit",
-							audit: "typo",
+							audit: "dead-end",
 						},
 					},
 				],
@@ -108,6 +109,40 @@ it("serves audits, frozen pages and mixed graph batches through the registered M
 	expect(operations).toContain("middle [item:middle]");
 	expect(flow).toContain("middle [item:middle]");
 	expect(invalid).toContain("Error: invalid-query");
+	const usage = graphTextFn(
+		await client.callTool({
+			name: "graph_audit",
+			arguments: {
+				audit: "no-usage",
+			},
+		}),
+	);
+	expect(usage.operationIds.length).toBeGreaterThan(0);
+	expect(usage.text).toContain("enable=false");
+	const hydrated = toolJsonFn<{
+		operations: {
+			id: string;
+			data: {
+				enable?: boolean;
+			};
+		}[];
+	}>(
+		await client.callTool({
+			name: "graph_operations_json",
+			arguments: {
+				operationIds: usage.operationIds,
+				revision: usage.revision,
+				snapshotId: usage.snapshotId,
+			},
+		}),
+	);
+	expect(hydrated.operations.map((operation) => operation.id).sort()).toEqual(
+		[
+			...usage.operationIds,
+		].sort(),
+	);
+	expect(hydrated.operations.some((operation) => operation.data.enable === false)).toBe(true);
+
 	const count = graphTextFn(
 		await client.callTool({
 			name: "graph_audit",

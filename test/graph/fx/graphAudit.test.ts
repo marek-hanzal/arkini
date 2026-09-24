@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 import { expect, it } from "vitest";
 import { createProjectGraphFx } from "~/graph/fx/createProjectGraphFx";
-import { auditProjectFn } from "./graphAudit.test/fixtures";
+import { auditProjectFn, factualAuditProjectFn } from "./graphAudit.test/fixtures";
 
-it("distinguishes disconnected items, rule references, authored sources and operation-aware sinks", async () => {
+it("distinguishes disconnected items, rule references, authored sources, usage and behavior", async () => {
 	const graph = await Effect.runPromise(createProjectGraphFx());
 	const project = auditProjectFn();
 	const audited = async (audit: string) =>
@@ -23,25 +23,23 @@ it("distinguishes disconnected items, rule references, authored sources and oper
 		"item:reference",
 	]);
 	expect(await audited("no-producer")).toEqual([
+		"item:factory",
 		"item:forgotten",
 		"item:forgottenOther",
 		"item:material",
 		"item:reference",
+		"item:root",
+		"item:templateOnly",
 	]);
 	expect(await audited("source-only")).toEqual([
 		"item:factory",
 		"item:root",
 		"item:templateOnly",
 	]);
-	expect(await audited("dead-end")).toEqual([
-		"item:finished",
-		"item:product",
-		"item:templateOnly",
-	]);
-	expect(await audited("no-consumer")).toContain("item:reference");
-	expect(await audited("no-consumer")).not.toContain("item:material");
-	expect(await audited("no-owned-operation")).toContain("item:material");
-	expect(await audited("no-owned-operation")).not.toContain("item:root");
+	expect(await audited("no-usage")).toContain("item:reference");
+	expect(await audited("no-usage")).not.toContain("item:material");
+	expect(await audited("no-behavior")).toContain("item:material");
+	expect(await audited("no-behavior")).not.toContain("item:root");
 });
 
 it("pins stable audit pages and detached counts to their mode and exact snapshot", async () => {
@@ -85,7 +83,7 @@ it("pins stable audit pages and detached counts to their mode and exact snapshot
 	expect(count.nodes).toEqual([]);
 	for (const change of [
 		{
-			audit: "no-consumer",
+			audit: "no-usage",
 		},
 		{
 			mode: "count",
@@ -119,7 +117,7 @@ it("never presents a safety-interrupted audit count as a complete total", async 
 	const result = await Effect.runPromise(
 		graph.discoveryFx(auditProjectFn(), {
 			kind: "audit",
-			audit: "no-owned-operation",
+			audit: "no-behavior",
 			mode: "count",
 			maxExpansions: 1,
 		}),
@@ -129,53 +127,81 @@ it("never presents a safety-interrupted audit count as a complete total", async 
 	expect(result.truncated).toBe(true);
 });
 
-it("keeps audit producer eligibility independent of unfiltered authored flow and discovery", async () => {
+it("keeps configuration-only items visible while separating production, usage and behavior", async () => {
 	const graph = await Effect.runPromise(createProjectGraphFx());
-	const project = auditProjectFn();
-	project.config.items.factory.lines[0].enable = false;
-	const inspectFn = async () => {
-		const results = await Effect.runPromise(
-			graph.batchFx(project, {
-				queries: [
-					{
-						id: "producers",
-						query: {
-							kind: "audit",
-							audit: "no-producer",
-						},
-					},
-					{
-						id: "flow",
-						query: {
-							kind: "flow",
-							from: "item:factory",
-							to: "item:product",
-						},
-					},
-					{
-						id: "authored",
-						query: {
-							kind: "operations",
-							participant: "item:product",
-							role: "output",
-						},
-					},
-				],
+	const project = factualAuditProjectFn();
+	const inspectFn = async (audit: string) =>
+		(
+			await Effect.runPromise(
+				graph.discoveryFx(project, {
+					kind: "audit",
+					audit,
+					limit: 100,
+				}),
+			)
+		).audit!;
+	const dangling = await inspectFn("dangling");
+	expect(dangling.matches.map(({ nodeId }) => nodeId)).toEqual([
+		"item:emptyClock",
+		"item:emptyLine",
+		"item:emptyUnits",
+	]);
+	const usage = await inspectFn("no-usage");
+	const behavior = await inspectFn("no-behavior");
+	for (const id of [
+		"item:activeClock",
+		"item:battery",
+	])
+		expect(usage.matches.map(({ nodeId }) => nodeId)).toContain(id);
+	expect(behavior.matches.map(({ nodeId }) => nodeId)).toContain("item:battery");
+	expect(behavior.matches.map(({ nodeId }) => nodeId)).not.toContain("item:activeClock");
+	const battery = behavior.matches.find(({ nodeId }) => nodeId === "item:battery")!;
+	expect(battery.facts).toEqual(
+		expect.arrayContaining([
+			expect.objectContaining({
+				kind: "producer",
+				count: 4,
 			}),
-		);
-		return results;
-	};
-	const disabled = await inspectFn();
-	expect(disabled.queries[0].audit?.matches.map((entry) => entry.nodeId)).toContain(
-		"item:product",
+			expect.objectContaining({
+				kind: "configuration-only",
+				count: 1,
+			}),
+		]),
 	);
-	expect(disabled.queries[1].status).toBe("yes");
-	expect(disabled.queries[2].operationIds).toHaveLength(1);
-	project.config.items.factory.lines[0].enable = true;
-	const enabled = await inspectFn();
-	expect(enabled.queries[0].audit?.matches.map((entry) => entry.nodeId)).not.toContain(
-		"item:product",
+	const producers = battery.facts.find((fact) => fact.kind === "producer")!;
+	if (producers.kind !== "template") expect(producers.operationIds).toHaveLength(3);
+	const unproduced = await inspectFn("no-producer");
+	expect(unproduced.matches.map(({ nodeId }) => nodeId)).not.toContain("item:battery");
+	const templateOnly = unproduced.matches.find(({ nodeId }) => nodeId === "item:templateOnly")!;
+	expect(templateOnly.facts).toContainEqual({
+		kind: "template",
+		count: 1,
+		nodeIds: [
+			"template:Unused",
+		],
+	});
+	expect((await inspectFn("reference-only")).matches.map(({ nodeId }) => nodeId)).toEqual([
+		"item:reference",
+	]);
+});
+
+it("counts explicit unit payers and merge participants without counting mere operation ownership as usage", async () => {
+	const graph = await Effect.runPromise(createProjectGraphFx());
+	const project = factualAuditProjectFn();
+	const result = await Effect.runPromise(
+		graph.discoveryFx(project, {
+			kind: "audit",
+			audit: "no-usage",
+			limit: 100,
+		}),
 	);
-	expect(enabled.queries[1].status).toBe("yes");
-	expect(enabled.queries[2].operationIds).toHaveLength(1);
+	const unused = result.audit!.matches.map(({ nodeId }) => nodeId);
+	for (const item of [
+		"payer",
+		"mergeSource",
+		"mergeTarget",
+		"receiver",
+	])
+		expect(unused).not.toContain(`item:${item}`);
+	expect(unused).toContain("item:factory");
 });

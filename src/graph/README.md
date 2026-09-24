@@ -1,6 +1,6 @@
 # Authored relationship graph
 
-The Graph Engine describes the relationships authored in a project. Its primary questions are “who produces this?”, “do A and B have a relationship?” and “which relationships?”. Editor Connections, Chain and MCP consume the same query backend. Query semantics, audit calculations and snapshot caches belong to this internal Editor core; MCP validates calls and presents its results. There is no numeric acquisition Estimate.
+The Graph Engine describes the relationships authored in a project. Its primary questions are “who produces this?”, “do A and B have a relationship?” and “which relationships?”. Editor Connections, Chain and MCP consume the same query backend. Query semantics, audit calculations and snapshot caches belong to this internal Editor core; MCP validates calls and presents its results. All graph answers describe authored facts. They do not evaluate gameplay feasibility, rule satisfaction, usefulness or design correctness. There is no numeric acquisition Estimate.
 
 ## Owners
 
@@ -50,7 +50,7 @@ Stored facts retain complete authored data for Editor relationship details and s
 
 Merge discovery identifies an explicit target, replacement and action/effect, with `hasOutcomes` reporting actual authored outcome entries. Receiver-owned Space transport identifies the owner as receiver and carries its destination. Referenced owners, targets, replacements and destinations are accompanied by titled nodes even when their edges were outside the selected query. Line summaries expose `lineUid`, so owner item UID plus line UID can feed `item_lines_json`. Operation references are opaque; clients must not decode them to address source arrays.
 
-The snapshot indexes authored operation membership once, preserving parallel role/output occurrences and disabled or outputless operations. Flow follows source-to-output adjacency within the same operation; audit producer eligibility is a separate policy over those same records. Structural alias edges remain inspectable but never create duplicate operation outputs. The index references canonical operation records and edges instead of copying configuration or expanding the participant/output Cartesian product. There is no inventory, participant-state tracking, quantity planner, remaining-unit simulation or start-reachability solver.
+The snapshot indexes authored operation membership once, preserving parallel role/output occurrences and disabled or outputless operations. Flow follows source-to-output adjacency within the same operation; audits classify the same authored records by explicit structural presence. Structural alias edges remain inspectable but never create duplicate operation outputs. The index references canonical operation records and edges instead of copying configuration or expanding the participant/output Cartesian product. There is no inventory, participant-state tracking, quantity planner, remaining-unit simulation or start-reachability solver.
 
 ## MCP presentation
 
@@ -116,19 +116,20 @@ Cache lifetime follows the project session. Identical project identity/revision/
 
 ## Design audits
 
-`graph_audit` reads a captured snapshot's item-role index, not a loop over connection queries. It accepts `audit`, `mode: list | count`, normal safety budgets, limit and snapshot-bound cursor. Only present authored items are audited; missing references remain inspectable through ordinary graph discovery. Results include a reason and exact titled identities, with up to three related producers where useful.
+`graph_audit` reads a captured snapshot's item-role index, not a loop over connection queries. It accepts `audit`, `mode: list | count`, normal safety budgets, limit and snapshot-bound cursor. Only present authored items are audited; missing references remain visible in their relationships. Audits report structural facts, never defects, usefulness, reachability or runtime availability. Disabled operations, zero-weight sets, zero-chance rolls, zero-quantity outputs and missing participants remain authored producers and interactions. No rule is evaluated.
 
 | Audit | Exact match |
 | --- | --- |
-| `dangling` | No authored edges of any kind and no owned operation. Reference-only content is a separate category. |
-| `no-producer` | No possible atomic gameplay output and no placement in any authored template. Disabled/chance-zero/missing-participant producers do not qualify; a producer does not itself prove start reachability. |
-| `no-consumer` | No owner/input/merge-target participation. Materials, unit providers/costs and owned lines/merges/Clock/depletion count; references, placement and outputs alone do not. Authored usage includes currently disabled or outcome-free operations. |
-| `dead-end` | Has a possible gameplay producer or authored template source but no consumer/owned interaction. This is the canonical sink audit; there is no redundant `sink-only` alias. |
-| `source-only` | Present in any template and has no gameplay producer; diagnostic, not automatically a defect. |
-| `reference-only` | Connected only through rule references, with no other edge or owned gameplay operation. |
-| `no-owned-operation` | Owns no line/merge/Clock/depletion; diagnostic, not automatically a defect. |
+| `dangling` | No authored edge of any kind (including references and template placement), and no configured behavior. Bare Clock/units or an empty simple line do not prevent this match. |
+| `no-producer` | No authored operation output providing this item. Template placement is separate and never suppresses this match. |
+| `no-usage` | No line input/unit-payer role or explicit merge source/target/receiver participation. Mere ownership of a line, Clock or depletion operation, outputs, references and template placement do not count as usage. |
+| `no-behavior` | No configured behavior under the structural definition below. This is independent of use by other operations. |
+| `source-only` | Present in an authored template and has no authored producer; templates may be unassigned. |
+| `reference-only` | Has rule-reference edges but no other edge or configured behavior. |
 
-Static template sources include unassigned templates. These audits classify authored relationships, not feasibility from the initial Board. Producer eligibility belongs to the audit compiler and filters authored outputs using the existing static enable/chance/weight/quantity/presence policy. Flow does not apply that policy. Consumer classification retains all authored owner/input/target participation, including disabled operations.
+Configured behavior means a merge interaction; a line with an authored output, non-simple input or unit cost; or a Clock/depletion operation with an authored output. Item, space and template outputs all count, without evaluating flags, rules or quantities. A Clock-selected line contributes its own line behavior. Clock/units configurations without outputs and simple lines without outputs or unit costs are reported separately as `configuration-only`. The word behavior describes these fields, not a prediction that anything executes. A produced item without further usage or behavior still has its incoming production relationship and is not dangling. There is no dead-end/sink judgment.
+
+Each match returns six independent fact groups: `producer`, `usage`, `behavior`, `configuration-only`, `reference`, and `template`. Operation groups count distinct operation identities; template groups count distinct templates, not placement occurrences. Each group includes its full count and up to three deterministic sample references, including explicit zero counts. Samples carry exact snapshot-bound operation references usable by `graph_operations_json`, with titled owners and authored scalar summaries. Template samples carry exact titled node IDs. The displayed sample count never masquerades as the full relationship count; further relationships remain queryable through `graph_operations` and `graph_connections`. Count mode emits no match rows or evidence.
 
 An audit freezes one bounded scan, then pages matches in stable node-ID order; continuation reuses that exact result, including partial scans. Tokens bind snapshot, audit kind and mode. `limit` bounds rows, not scope. Count mode returns the count over the requested scope without rows. A completed scan gives an exact count; interrupted scans give explicit lower bounds and expansion/timeout reasons. Retry without a cursor and with larger bounds for a new scan. Batch preserves each audit's results, counts, reasons and continuation over its common immutable snapshot.
 

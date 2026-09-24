@@ -2,6 +2,7 @@ import { EditorToolAnnotations } from "./EditorToolAnnotations";
 import type { McpServer } from "@modelcontextprotocol/server";
 import { Effect } from "effect";
 import { z } from "zod";
+import type { TemplateSchema } from "~/board-template/schema/TemplateSchema";
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 import { createFuzzySearchFn } from "~/fuzzy-search/fn/createFuzzySearchFn";
@@ -98,6 +99,76 @@ const readCollectionTextFn = (
 	].join("\n");
 };
 
+const readPlacementSymbolFn = (index: number): string => {
+	let symbol = "";
+	for (let value = index + 1; value > 0; value = Math.floor((value - 1) / 26))
+		symbol = String.fromCharCode(65 + ((value - 1) % 26)) + symbol;
+	return symbol;
+};
+
+const readBoardTextFn = (template: TemplateSchema.Type, project: Project): string[] => {
+	const total = template.width * template.height;
+	// Templates and runtime placements occupy one cell per item; artwork scale is visual only.
+	const placements = template.board.map((cell, index) => ({
+		...cell,
+		symbol: readPlacementSymbolFn(index),
+	}));
+	const text = [
+		`Occupied: ${placements.length} / ${total}`,
+		`Free: ${total - placements.length}`,
+	];
+	// Dimensions are unbounded in canonical data. Never allocate an unbounded text grid or crop it silently.
+	const maxMapCells = 10000;
+	if (total > maxMapCells) {
+		text.push(
+			`Board map omitted: ${total} cells exceeds the ${maxMapCells}-cell rendering limit. No partial map is shown; all placements are listed below. Read template_json for canonical coordinates.`,
+		);
+	} else {
+		const cells = new Map(
+			placements.map((cell) => [
+				`${cell.x},${cell.y}`,
+				cell.symbol,
+			]),
+		);
+		const columnWidth = Math.max(
+			String(template.width - 1).length,
+			readPlacementSymbolFn(Math.max(0, placements.length - 1)).length,
+		);
+		const rowWidth = String(template.height - 1).length;
+		text.push(
+			"Coordinates: zero-based; X increases left to right; Y increases top to bottom.",
+			"```text",
+			`${"x".padStart(rowWidth)}  ${Array.from(
+				{
+					length: template.width,
+				},
+				(_, x) => String(x).padStart(columnWidth),
+			).join(" ")}`,
+			"y",
+		);
+		for (let y = 0; y < template.height; y++) {
+			const row = Array.from(
+				{
+					length: template.width,
+				},
+				(_, x) => (cells.get(`${x},${y}`) ?? ".").padStart(columnWidth),
+			);
+			text.push(`${String(y).padStart(rowWidth)}  ${row.join(" ")}`);
+		}
+		text.push("```");
+	}
+	text.push("Legend: . = empty");
+	for (const cell of placements) {
+		const item = Object.hasOwn(project.config.items, cell.itemUid)
+			? project.config.items[cell.itemUid]
+			: undefined;
+		text.push(
+			`- ${cell.symbol} = ${item?.title ?? "Missing item"} [item:${cell.itemUid}] @ (${cell.x},${cell.y})`,
+		);
+	}
+	return text;
+};
+
 const readDetailTextFx = Effect.fn("readTemplateDetailTextFx")(function* (
 	project: Project,
 	templateUid: string,
@@ -109,17 +180,7 @@ const readDetailTextFx = Effect.fn("readTemplateDetailTextFx")(function* (
 		`Project: ${project.config.meta.title} [${project.projectId}]`,
 		`Revision: ${project.revision}`,
 		`Board: ${template.width} × ${template.height}; items: ${template.board.length}`,
-		...(template.board.length === 0
-			? []
-			: [
-					"Placements (zero-based x, y):",
-				]),
-		...template.board.map((cell) => {
-			const item = Object.hasOwn(project.config.items, cell.itemUid)
-				? project.config.items[cell.itemUid]
-				: undefined;
-			return `- ${cell.x}, ${cell.y} → ${item?.title ?? "Missing item"} [${cell.itemUid}]`;
-		}),
+		...readBoardTextFn(template, project),
 		`Deletion blockers: ${blockers.length}`,
 		...blockers.map((entry) => `- ${entry.path.join(".")}: ${entry.message}`),
 	].join("\n");
@@ -174,7 +235,7 @@ export const registerTemplateToolsFn = ({
 		{
 			annotations: EditorToolAnnotations.readOnly,
 			description:
-				"Read one template as text: immutable UID, title, dimensions, every zero-based item placement, project revision and deletion blockers from initial spaces and Template outcomes. Use edit_template_cells for local edits; copy revision into mutations.",
+				"Read one template as text: immutable UID, title, dimensions, occupied/free counts, an ASCII board with zero-based X/Y axes and a per-placement item legend, project revision and deletion blockers from initial spaces and Template outcomes. Maps above 10000 cells are explicitly omitted without cropping; every placement remains listed. Use edit_template_cells for local edits; copy revision into mutations.",
 			inputSchema: TemplateReadInputSchema,
 		},
 		async ({ templateUid }) =>

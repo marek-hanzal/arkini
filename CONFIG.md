@@ -190,7 +190,7 @@ Prefer the focused tools below over resending the project configuration. Templat
 | Tool | Contract |
 | --- | --- |
 | `template_collection` | Paginated, optionally searched text: UID, title, dimensions, placement count and project revision. |
-| `template_detail` | Text for one UID: dimensions, every cell, revision and deletion blockers with reference paths. |
+| `template_detail` | Text for one UID: dimensions, occupied/free counts, zero-based ASCII map (X right, Y down), per-placement symbol/item/coordinate legend, revision and deletion blockers. Above 10,000 cells, explicitly omits the map and retains every placement in the legend. |
 | `template_json` | Canonical JSON `{ revision, template }`, including the complete `board` array. |
 | `create_template` | Generate a UID; optional dimensions default to project fallback dimensions, optional board to empty. |
 | `edit_template` | Patch title, dimensions or the complete board; omitted fields stay unchanged. Shrinking rejects stranded cells. |

@@ -85,8 +85,8 @@ const readOperationFilterFn = (
 		if (typeof expected !== "object") return actual === expected;
 		return (
 			typeof actual === "number" &&
-			(expected.min === undefined || actual >= expected.min) &&
-			(expected.max === undefined || actual <= expected.max) &&
+			(expected.gte === undefined || actual >= expected.gte) &&
+			(expected.lte === undefined || actual <= expected.lte) &&
 			(expected.gt === undefined || actual > expected.gt) &&
 			(expected.lt === undefined || actual < expected.lt)
 		);

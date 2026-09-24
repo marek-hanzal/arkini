@@ -109,7 +109,7 @@ export const registerGraphToolsFn = ({
 		"graph_operations",
 		{
 			description:
-				"Search the authored operation index without a root node: merge, line, Clock and depletion. Filter by kind, owner, participant/role and scalar properties. Search operation, owner or participant titles with canonical Editor Fuse semantics. Matching participant facts explain each result without hydration; selected operation references feed graph_operations_json. Use aggregate {mode: count} for a whole-scope count, or {mode: group, by: owner} for ranked groups (kind, owner, action, effect, ownership, lineTitle). All filters apply before aggregation; limit bounds groups, not the counted scope. Incomplete counts are explicit lower bounds. Supports pinned continuation.",
+				"Search the authored operation index without a root node: merge, line, Clock and depletion. Filter by kind, owner, participant/role and scalar properties. Time filters use seconds; numeric ranges use inclusive gte/lte and exclusive gt/lt. Search operation, owner or participant titles with canonical Editor Fuse semantics. Matching participant facts explain each result without hydration; selected operation references feed graph_operations_json. Use aggregate {mode: count} for a whole-scope count, or {mode: group, by: owner} for ranked groups (kind, owner, action, effect, ownership, lineTitle). All filters apply before aggregation; limit bounds groups, not the counted scope. Incomplete counts are explicit lower bounds. Supports pinned continuation.",
 			inputSchema: GraphOperationsQuerySchema,
 			annotations: EditorToolAnnotations.readOnly,
 		},
@@ -151,7 +151,7 @@ export const registerGraphToolsFn = ({
 		"graph_flow",
 		{
 			description:
-				"Find directed simple paths from A to B through authored operations, shortest first. Each step binds sources and outputs to the same operation. Returns participants, exact scoped rules and conditions, flags, inputs and stochastic output facts without evaluating them. Disabled operations, zero chances and missing references remain visible. No inventory, consumption-state or gameplay feasibility evaluation. Nodes do not repeat within a path; same-node queries return zero steps. Use operation references for further hydration. Truncated no-match results remain unknown.",
+				"Find directed simple paths from A to B through authored operations, shortest first. Returns up to 5 paths by default; set limit explicitly for up to 200. Each step binds sources and outputs to the same operation. Returns participants, exact scoped rules and conditions, flags, inputs and stochastic output facts without evaluating them. Disabled operations, zero chances and missing references remain visible. No inventory, consumption-state or gameplay feasibility evaluation. Nodes do not repeat within a path; same-node queries return zero steps. Use operation references for further hydration. Truncated no-match results remain unknown.",
 			inputSchema: GraphFlowQuerySchema,
 			annotations: EditorToolAnnotations.readOnly,
 		},

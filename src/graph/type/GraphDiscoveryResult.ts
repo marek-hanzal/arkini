@@ -47,7 +47,6 @@ export type GraphDiscoveryOperation = {
 	| {
 			readonly kind: "line";
 			readonly lineUid: string;
-			readonly runtimeMs: number;
 			readonly runtimeSeconds: number;
 			readonly default: boolean;
 			readonly clock: boolean;
@@ -66,8 +65,6 @@ export type GraphDiscoveryOperation = {
 	  }
 	| {
 			readonly kind: "clock";
-			readonly intervalMs?: number;
-			readonly durationMs?: number;
 			readonly intervalSeconds?: number;
 			readonly durationSeconds?: number;
 			readonly expiryMode?: ItemScheduleSchema.Type["expiryMode"];

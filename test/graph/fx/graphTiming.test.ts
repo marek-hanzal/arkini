@@ -58,7 +58,6 @@ it("exposes fractional authored seconds without evaluating timing rules or leaki
 	expect(
 		result.operations.find((op) => op.kind === "line" && op.lineUid === "line"),
 	).toMatchObject({
-		runtimeMs: 1500,
 		runtimeSeconds: 1.5,
 	});
 	expect(
@@ -94,10 +93,10 @@ it("exposes fractional authored seconds without evaluating timing rules or leaki
 			kind: "operations",
 			filter: {
 				intervalSeconds: {
-					max: 0.25,
+					lte: 0.25,
 				},
 				durationSeconds: {
-					min: 1.25,
+					gte: 1.25,
 				},
 			},
 		}),

@@ -3,6 +3,7 @@ import { GraphDiscoveryBoundsSchema } from "~/graph/schema/GraphDiscoveryBoundsS
 import { IdSchema } from "~/game-value/schema/IdSchema";
 
 export const GraphFlowQuerySchema = GraphDiscoveryBoundsSchema.extend({
+	limit: GraphDiscoveryBoundsSchema.shape.limit.removeDefault().default(5),
 	from: IdSchema,
 	to: IdSchema,
 	operationKinds: z

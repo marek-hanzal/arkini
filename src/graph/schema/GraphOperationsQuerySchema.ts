@@ -5,15 +5,15 @@ import { SourceActionSchema } from "~/item-merge/schema/SourceActionSchema";
 import { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
 const NumericRangeSchema = z
 	.object({
-		min: z.number().nonnegative().optional(),
-		max: z.number().nonnegative().optional(),
+		gte: z.number().nonnegative().optional(),
+		lte: z.number().nonnegative().optional(),
 		gt: z.number().nonnegative().optional(),
 		lt: z.number().nonnegative().optional(),
 	})
 	.strict()
 	.superRefine((range, context) => {
-		const lower = Math.max(range.min ?? -Infinity, range.gt ?? -Infinity);
-		const upper = Math.min(range.max ?? Infinity, range.lt ?? Infinity);
+		const lower = Math.max(range.gte ?? -Infinity, range.gt ?? -Infinity);
+		const upper = Math.min(range.lte ?? Infinity, range.lt ?? Infinity);
 		if (
 			Object.values(range).every((value) => value === undefined) ||
 			lower > upper ||
@@ -107,18 +107,15 @@ export const GraphOperationsQuerySchema = GraphDiscoveryBoundsSchema.extend({
 			default: z.boolean().optional(),
 			show: z.boolean().optional(),
 			enable: z.boolean().optional(),
-			runtimeMs: NumericRangeSchema.optional(),
 			runtimeSeconds: NumericRangeSchema.optional(),
 			clockWeight: NumericRangeSchema.optional(),
-			durationMs: NumericRangeSchema.optional(),
-			intervalMs: NumericRangeSchema.optional(),
 			durationSeconds: NumericRangeSchema.optional(),
 			intervalSeconds: NumericRangeSchema.optional(),
 		})
 		.strict()
 		.optional()
 		.describe(
-			"AND-combined summary filters. A property absent from an operation kind never matches, including false. min/max inclusive; gt/lt exclusive.",
+			"AND-combined summary filters. A property absent from an operation kind never matches, including false. gte/lte inclusive; gt/lt exclusive.",
 		),
 })
 	.strict()

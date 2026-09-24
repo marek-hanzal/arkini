@@ -25,7 +25,6 @@ export const readGraphOperationSummaryFn = (
 				kind: "line",
 				title: data.title,
 				lineUid: data.uid,
-				runtimeMs: data.runtimeMs,
 				runtimeSeconds: data.runtimeMs / 1000,
 				default: data.default,
 				clock: data.clock === true,
@@ -71,13 +70,11 @@ export const readGraphOperationSummaryFn = (
 				...(data.intervalMs === undefined
 					? {}
 					: {
-							intervalMs: data.intervalMs,
 							intervalSeconds: data.intervalMs / 1000,
 						}),
 				...(data.durationMs === undefined
 					? {}
 					: {
-							durationMs: data.durationMs,
 							durationSeconds: data.durationMs / 1000,
 						}),
 				...(data.expiryMode === undefined

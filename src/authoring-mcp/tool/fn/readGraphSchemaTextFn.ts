@@ -54,9 +54,15 @@ export const readGraphSchemaTextFn = () =>
 			depletion:
 				"The owner's authored unit/depletion operation, independent of current live state.",
 		},
-		querySchema: z.toJSONSchema(GraphDiscoveryQuerySchema),
-		batchSchema: z.toJSONSchema(GraphBatchQuerySchema),
-		operationReadSchema: z.toJSONSchema(GraphOperationReadSchema),
+		querySchema: z.toJSONSchema(GraphDiscoveryQuerySchema, {
+			io: "input",
+		}),
+		batchSchema: z.toJSONSchema(GraphBatchQuerySchema, {
+			io: "input",
+		}),
+		operationReadSchema: z.toJSONSchema(GraphOperationReadSchema, {
+			io: "input",
+		}),
 		tools: {
 			graph_audit: "Snapshot-native design audits with reasons, counts and pinned pages.",
 			graph_search:
@@ -102,7 +108,7 @@ export const readGraphSchemaTextFn = () =>
 			connections:
 				"graph_connections requires from, optionally to as an exact direct counterpart. direction defaults both; kinds restricts relationship occurrences. Results are relationship-oriented and may group occurrences belonging to the same authored operation without losing distinct facts. limit counts relationship occurrences, not visual groups. Pages may return Cursor for remaining relationships.",
 			operations:
-				"graph_operations has no root node. Combine operationKinds, owner, participant, role, search and filter. Search scopes title, owner, participant or all (default) reuse the Editor exact-first Fuse configuration; matching is fuzzy, not a strict substring predicate, and relevance order persists across pages. Scalar filters combine with AND: hasOutcomes; merge action/effect/ownership; line clock/default/show; line or Clock enable; runtimeMs, clockWeight, durationMs and intervalMs ranges (min/max inclusive, gt/lt exclusive). A missing property never matches, including false. Operations with no edges remain discoverable.",
+				"graph_operations has no root node. Combine operationKinds, owner, participant, role, search and filter. Search scopes title, owner, participant or all (default) reuse the Editor exact-first Fuse configuration; matching is fuzzy, not a strict substring predicate, and relevance order persists across pages. Scalar filters combine with AND: hasOutcomes; merge action/effect/ownership; line clock/default/show; line or Clock enable; runtimeSeconds, clockWeight, durationSeconds and intervalSeconds ranges (gte/lte inclusive, gt/lt exclusive). A missing property never matches, including false. Operations with no edges remain discoverable.",
 			aggregation:
 				"graph_operations.aggregate selects {mode: count} or {mode: group, by: kind|owner|action|effect|ownership|lineTitle}. The same kind/owner/participant/role/Fuse/scalar filters apply before aggregation. Count returns no operation records. Grouping counts the whole filtered index before applying limit to groups, sorted by count descending then exact group key. Owner groups include title and exact node ID; absent properties form a Not applicable group. Complete counts remain exact even when group pages are truncated. Expansion/timeout interruption yields only explicit lower bounds, no definitive total or stable ranked continuation: retry the original query with larger bounds. Completed grouped scans return snapshot-bound cursors for remaining groups. Aggregation is available unchanged in graph_batch.",
 			participants:
@@ -114,14 +120,14 @@ export const readGraphSchemaTextFn = () =>
 			direction:
 				"Connections/path default both, traverse defaults out. Choose out or in explicitly where appropriate. Every displayed relationship retains authored from/to direction. Merge-target is owner → target, not production. An empty kinds list selects no relationships where accepted.",
 			text: "Titles are primary. Exact node IDs, short opaque operation references, line UIDs, revision, snapshot and compact Cursor tokens remain reusable. Ordinary identities are bare, for example Puppy [item:puppy]. Only identities containing whitespace, delimiters or control characters use lossless JSON string quoting; decode those quoted values before reuse. Internal edge IDs are never printed. No internal node/edge storage tables are rendered.",
-			timing: "Authored seconds are exact, without rounding: line runtimeSeconds; Clock intervalSeconds/durationSeconds; item node clock.intervalSeconds/clock.durationSeconds; rule-reference adjustSeconds and flow rule adjustments. Missing timing stays absent. Text uses seconds; operation hydration retains authored milliseconds. Filters accept runtimeSeconds, intervalSeconds and durationSeconds as well as the original millisecond fields. No effective runtime or path duration is calculated.",
+			timing: "Authored seconds are exact, without rounding: line runtimeSeconds; Clock intervalSeconds/durationSeconds; item node clock.intervalSeconds/clock.durationSeconds; rule-reference adjustSeconds and flow rule adjustments. Missing timing stays absent. Text uses seconds; operation hydration retains authored milliseconds. Time filters accept only runtimeSeconds, intervalSeconds and durationSeconds; numeric bounds use gte/lte/gt/lt. Hydrated operation bodies retain their canonical authored units. No effective runtime or path duration is calculated.",
 			metadata:
 				"Compact edge metadata omits source paths, set/roll IDs and indices, outcome indices and rule/condition bookkeeping. It preserves meaningful scalar facts: quantity, consume/reserve, distance, unit source/cost, input index, participant role, probability, alternatives, board-local semantics and template position. Flow evidence additionally identifies its selected set/roll/outcome positions and scoped rules. Full alternative branches remain in operation hydration.",
 			navigation:
 				"Operation references are short, opaque and bound to the captured snapshot. Pass them unchanged in graph_operations_json.operationIds; never decode them or submit internal tuple IDs. A lineUid pairs with its owner item UID for item_lines_json. Summaries carry human names and exact node identities for owners and relevant participants.",
 			results:
 				"status yes means a match was found; no means the selected scope was exhausted without a match; unknown means incomplete exploration found none. Inspect truncated and reasons even when status is yes, because omitted alternatives may exist. Depth, result, expansion and timeout limits can make search incomplete; partial absence is not proof of no relationship or no flow.",
-			limits: "Result limit defaults 50, maximum 200. Path/flow depth defaults 5, traverse depth 1; depth maximum 12. Expansion defaults 10000, maximum 100000; cooperative timeout defaults 1000 ms, maximum 5000 ms. Search only exposes result bounds; connections are direct. Limit counts relationships for connections/traverse, operations for listing or groups for grouping (count ignores result limit), nodes for search, paths for path and transformation sequences for flow. Paths and flows may contain up to maxDepth steps per result. Timeout excludes synchronous snapshot compilation, index lookups, Fuse search and scalar candidate filtering; it is not an end-to-end deadline.",
+			limits: "Flow result limit defaults 5; other result limits default 50. Maximum 200 for both, with the same defaults in graph_batch. Path/flow depth defaults 5, traverse depth 1; depth maximum 12. Expansion defaults 10000, maximum 100000; cooperative timeout defaults 1000 ms, maximum 5000 ms. Search only exposes result bounds; connections are direct. Limit counts relationships for connections/traverse, operations for listing or groups for grouping (count ignores result limit), nodes for search, paths for path and transformation sequences for flow. Paths and flows may contain up to maxDepth steps per result. Timeout excludes synchronous snapshot compilation, index lookups, Fuse search and scalar candidate filtering; it is not an end-to-end deadline.",
 			continuation:
 				"Connections and operations may return a compact Cursor. Repeat the same focused query and filters with cursor and returned revision/snapshotId. Tokens bind snapshot, normalized filters, aggregation mode/group key and continuation position; unknown, stale or incompatible tokens fail. The session retains at most 1024 issued continuations in FIFO order; rediscover after expiry. A page with no match but remaining scan is unknown.",
 			revision:
@@ -131,6 +137,17 @@ export const readGraphSchemaTextFn = () =>
 				"graph_operations_json requires revision and snapshotId and reads only 1–20 selected operation references. It returns canonical operation configurations, deduplicates repeated references and reports missing ones. items_json and item_lines_json remain available for complete item/line documents; compare their revision before combining reads.",
 		},
 		examples: [
+			{
+				tool: "graph_operations",
+				arguments: {
+					filter: {
+						runtimeSeconds: {
+							gte: 30,
+							lt: 120,
+						},
+					},
+				},
+			},
 			{
 				tool: "graph_audit",
 				arguments: {

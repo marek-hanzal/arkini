@@ -33,6 +33,10 @@ it("records pre-callback admission and stale tool errors without authored inputs
 				clockWeight: {
 					gt: 15,
 				},
+				runtimeSeconds: {
+					gte: 30,
+					lte: 120,
+				},
 			},
 		},
 	});
@@ -45,7 +49,9 @@ it("records pre-callback admission and stale tool errors without authored inputs
 	expect(end.body.split("\n")[0]).toBe(start.body.split("\n")[0]);
 	expect(start.body).toContain('"kinds":[]');
 	expect(start.body).toContain('"search":{"text":"Digest","scope":"title"}');
-	expect(start.body).toContain('"filter":{"clock":true,"clockWeight":{"gt":15}}');
+	expect(start.body).toContain(
+		'"filter":{"clock":true,"clockWeight":{"gt":15},"runtimeSeconds":{"gte":30,"lte":120}}',
+	);
 	expect(end.body).toContain("Outcome: tool error");
 	await expect(
 		client.callTool({

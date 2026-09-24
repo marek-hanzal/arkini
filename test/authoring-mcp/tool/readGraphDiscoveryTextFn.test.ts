@@ -136,7 +136,6 @@ it("retains line hydration identity without replaying operation details for ever
 					title: "Craft",
 					owner,
 					lineUid,
-					runtimeMs: 5,
 					runtimeSeconds: 0.005,
 					default: true,
 					clock: false,

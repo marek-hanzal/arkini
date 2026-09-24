@@ -21,7 +21,7 @@ export namespace resolveInventoryFx {
 	}
 }
 
-/** Allocates and initializes only a surviving live owner's first use, in the caller's draft. */
+/** Allocates one room per owner and creating template, in the caller's draft. */
 export const resolveInventoryFx = Effect.fn("resolveInventoryFx")(function* ({
 	ownerItemId,
 	templateUid,
@@ -29,9 +29,13 @@ export const resolveInventoryFx = Effect.fn("resolveInventoryFx")(function* ({
 }: resolveInventoryFx.Props) {
 	const owner = runtime.items.find(({ id }) => id === ownerItemId);
 	if (owner === undefined) return undefined;
-	if (owner.inventory !== undefined)
+	const existingSpace =
+		owner.inventories !== undefined && Object.hasOwn(owner.inventories, templateUid)
+			? owner.inventories[templateUid]
+			: undefined;
+	if (existingSpace !== undefined)
 		return {
-			space: owner.inventory,
+			space: existingSpace,
 			runtime,
 			initialization: undefined,
 		} satisfies resolveInventoryFx.Result;
@@ -46,7 +50,7 @@ export const resolveInventoryFx = Effect.fn("resolveInventoryFx")(function* ({
 		if (state.previousSpace !== undefined) occupied.add(state.previousSpace);
 		for (const key of Object.keys(state.templateUidBySpace)) occupied.add(Number(key));
 		for (const item of state.items) {
-			if (item.inventory !== undefined) occupied.add(item.inventory);
+			for (const space of Object.values(item.inventories ?? {})) occupied.add(space);
 			if (item.location.scope === "board") occupied.add(item.location.space);
 			if (item.location.scope === "delivery") {
 				occupied.add(item.location.origin.space);
@@ -65,7 +69,10 @@ export const resolveInventoryFx = Effect.fn("resolveInventoryFx")(function* ({
 	const bound = yield* reviseRuntimeItemFx({
 		item: {
 			...owner,
-			inventory: space,
+			inventories: {
+				...owner.inventories,
+				[templateUid]: space,
+			},
 		},
 	});
 	return {

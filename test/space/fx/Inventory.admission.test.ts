@@ -104,7 +104,9 @@ it("room destruction during first material admission discards later allocations 
 		{
 			id: "container",
 			itemUid: "warehouse",
-			inventory: 1,
+			inventories: {
+				room: 1,
+			},
 			location: {
 				scope: "input",
 				ownerItemId: "first-material",

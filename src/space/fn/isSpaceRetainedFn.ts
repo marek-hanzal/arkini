@@ -10,9 +10,13 @@ export const isSpaceRetainedFn = ({
 	readonly previousRuntime: RuntimeSchema.Type;
 	readonly runtime: RuntimeSchema.Type;
 }): boolean => {
-	const owner = previousRuntime.items.find((item) => item.inventory === space);
+	const owner = previousRuntime.items.find((item) =>
+		Object.values(item.inventories ?? {}).includes(space),
+	);
 	return (
 		owner === undefined ||
-		runtime.items.some((item) => item.id === owner.id && item.inventory === space)
+		runtime.items.some(
+			(item) => item.id === owner.id && Object.values(item.inventories ?? {}).includes(space),
+		)
 	);
 };

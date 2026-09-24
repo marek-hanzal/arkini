@@ -276,7 +276,7 @@ const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(function*
 					const replacementWithSequence = {
 						...replacement,
 						mergeSequence: target.mergeSequence,
-						inventory: target.inventory,
+						inventories: target.inventories,
 					};
 					return {
 						facts: [],

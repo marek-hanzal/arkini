@@ -10,7 +10,9 @@ export const SpaceDestinationSchema = z
 		z
 			.object({
 				type: z.literal("inventory"),
-				templateUid: IdSchema,
+				templateUid: IdSchema.refine((uid) => uid !== "__proto__", {
+					message: "Inventory template UID cannot be __proto__.",
+				}),
 			})
 			.strict(),
 	])

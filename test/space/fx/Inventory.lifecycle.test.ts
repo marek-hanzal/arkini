@@ -79,7 +79,7 @@ describe("Inventory lifecycle", () => {
 			),
 		);
 		expect(result.outer.items).toHaveLength(4);
-		expect(result.child.inventory).toBeUndefined();
+		expect(result.child.inventories).toBeUndefined();
 		expect(Object.keys(result.outer.templateUidBySpace)).toHaveLength(1);
 		expect(result.inner.items).toHaveLength(5);
 		expect(Object.keys(result.inner.templateUidBySpace)).toHaveLength(2);
@@ -94,7 +94,7 @@ describe("Inventory lifecycle", () => {
 		expect(result.removed.jobs).toEqual([]);
 		expect(result.removed.jobQueue).toEqual([]);
 		expect(result.reused.currentSpace).toBe(result.outer.currentSpace);
-		expect(result.reused.items.find((item) => item.id === "second")?.inventory).toBe(
+		expect(result.reused.items.find((item) => item.id === "second")?.inventories?.room).toBe(
 			result.outer.currentSpace,
 		);
 	});
@@ -135,7 +135,7 @@ describe("Inventory lifecycle", () => {
 			),
 		);
 		expect(result.reset.currentSpace).toBe(result.outer.currentSpace);
-		expect(result.reset.items.find((item) => item.id === "first")?.inventory).toBe(
+		expect(result.reset.items.find((item) => item.id === "first")?.inventories?.room).toBe(
 			result.outer.currentSpace,
 		);
 		expect(result.reset.items.some((item) => item.id === result.child.id)).toBe(false);

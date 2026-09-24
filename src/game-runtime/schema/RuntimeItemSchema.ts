@@ -35,9 +35,10 @@ export const RuntimeItemSchema = z
 			"The optional remaining units of this concrete item instance; undefined means the authored full amount.",
 		),
 		schedule: ScheduleStateSchema.optional(),
-		inventory: NonNegativeIntegerSchema.optional().describe(
-			"The numeric Space bound as this live item's Inventory after its first successful interaction.",
-		),
+		inventories: z
+			.record(IdSchema, NonNegativeIntegerSchema)
+			.optional()
+			.describe("Item-owned Inventory Spaces keyed by their creating template UID."),
 		/** Persisted merge random-stream cursor; bookkeeping does not make an item impure. */
 		mergeSequence: NonNegativeIntegerSchema.optional().describe(
 			"Successful merges owned by this surviving identity; omitted means zero.",

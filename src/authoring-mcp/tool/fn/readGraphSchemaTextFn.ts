@@ -41,10 +41,10 @@ export const readGraphSchemaTextFn = () =>
 		nodes: {
 			item: "item:<exact item UID>",
 			template: "template:<exact template UID>",
-			space: "space:<space number>, space:previous (navigation history), or space:inventory:<template UID> (item-owned Space recipe; never a shared runtime Space)",
+			space: "space:<space number>, space:previous (navigation history), or space:inventory:<template UID> (item-owned Space recipe; matching references on one owner share a runtime Space)",
 			start: "start",
 			semantics:
-				"Every node carries id, kind and a required human-readable title. Inventory destination nodes also carry templateUid; each describes an item-owned Space recipe, and matching recipes never imply a shared runtime Space. Exact owners remain on operations and occurrence source paths. Missing authored references remain inspectable. Node identity is distinct from operation identity. Titles travel with references so discovery needs no item lookup just to name an entity.",
+				"Every node carries id, kind and a required human-readable title. Inventory destination nodes also carry templateUid; matching recipes share one runtime Space only on the same exact live owner instance. Exact owners remain on operations and occurrence source paths. Missing authored references remain inspectable. Node identity is distinct from operation identity. Titles travel with references so discovery needs no item lookup just to name an entity.",
 		},
 		edgeKinds,
 		operationKinds: {

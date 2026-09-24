@@ -6,10 +6,10 @@ const fromRuntimeItemFn = ({ item }: { readonly item: RuntimeItemSchema.Type }) 
 	id: item.id,
 	itemUid: item.item.uid,
 	location: item.location,
-	...(item.inventory === undefined
+	...(item.inventories === undefined
 		? {}
 		: {
-				inventory: item.inventory,
+				inventories: item.inventories,
 			}),
 	...(item.mergeSequence === undefined
 		? {}

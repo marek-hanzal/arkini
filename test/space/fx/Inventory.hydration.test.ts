@@ -11,13 +11,17 @@ it.each([
 ] as const)("rejects corrupted saved Inventory bindings: %s", (reason) => {
 	const config = inventoryTestConfigFn();
 	const state = inventoryStateFn();
-	state.items[0]!.inventory = 1;
+	state.items[0]!.inventories = {
+		room: 1,
+	};
 	state.templateUidBySpace = {
 		1: "room",
 	};
 	switch (reason) {
 		case "duplicate-owner":
-			state.items[1]!.inventory = 1;
+			state.items[1]!.inventories = {
+				room: 1,
+			};
 			break;
 		case "authored-address":
 			config.items.token!.merge = [

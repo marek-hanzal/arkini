@@ -24,15 +24,7 @@ export const destroyInventoriesFx = Effect.fn("destroyInventoriesFx")(function* 
 	runtime,
 	ownershipRuntime,
 }: destroyInventoriesFx.Props) {
-	const spaces = new Set(
-		removedItems.flatMap((item) =>
-			item.inventory === undefined
-				? []
-				: [
-						item.inventory,
-					],
-		),
-	);
+	const spaces = new Set(removedItems.flatMap((item) => Object.values(item.inventories ?? {})));
 	if (spaces.size === 0)
 		return {
 			runtime,
@@ -68,7 +60,7 @@ export const destroyInventoriesFx = Effect.fn("destroyInventoriesFx")(function* 
 							: discardedJobs.has(location.jobId);
 			if (!destroyed || discardedIds.has(item.id)) continue;
 			discardedIds.add(item.id);
-			if (item.inventory !== undefined) spaces.add(item.inventory);
+			for (const space of Object.values(item.inventories ?? {})) spaces.add(space);
 			changed = true;
 		}
 		for (const job of jobs)

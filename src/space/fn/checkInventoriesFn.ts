@@ -15,25 +15,30 @@ export const checkInventoriesFn = ({
 	const owners = new Set<number>();
 	const issues: InventoryIssueSchema.Type[] = [];
 	for (const item of runtime.items) {
-		const space = item.inventory;
-		if (space === undefined) continue;
-		const templateUid = runtime.templateUidBySpace[space];
-		const reason = owners.has(space)
-			? "duplicate-owner"
-			: reserved.has(space)
-				? "authored-address"
-				: templateUid === undefined ||
-						!config.templates?.some((template) => template.uid === templateUid)
-					? "missing-template"
-					: undefined;
-		owners.add(space);
-		if (reason !== undefined)
-			issues.push({
-				type: "space:inventory",
-				itemId: item.id,
-				space,
-				reason,
-			});
+		for (const [creatingTemplateUid, space] of Object.entries(item.inventories ?? {})) {
+			const activeTemplateUid = runtime.templateUidBySpace[space];
+			const reason = owners.has(space)
+				? "duplicate-owner"
+				: reserved.has(space)
+					? "authored-address"
+					: activeTemplateUid === undefined ||
+							!config.templates?.some(
+								(template) => template.uid === activeTemplateUid,
+							) ||
+							!config.templates?.some(
+								(template) => template.uid === creatingTemplateUid,
+							)
+						? "missing-template"
+						: undefined;
+			owners.add(space);
+			if (reason !== undefined)
+				issues.push({
+					type: "space:inventory",
+					itemId: item.id,
+					space,
+					reason,
+				});
+		}
 	}
 	return issues;
 };

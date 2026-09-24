@@ -98,7 +98,9 @@ it("consuming a container destroys its interior producer and detached job reserv
 		{
 			id: "container",
 			itemUid: "warehouse",
-			inventory: 1,
+			inventories: {
+				room: 1,
+			},
 			location: {
 				scope: "job",
 				jobId: "work",
@@ -209,7 +211,9 @@ it("removing a container releases its passive input but destroys the room after 
 			x: 1,
 		},
 	]);
-	state.items[0]!.inventory = 1;
+	state.items[0]!.inventories = {
+		room: 1,
+	};
 	state.templateUidBySpace = {
 		1: "room",
 	};

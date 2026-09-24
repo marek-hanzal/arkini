@@ -50,12 +50,12 @@ export const MergeField = ({
 				? "exact"
 				: merge.space === "previous"
 					? "previous"
-					: "generated";
+					: "inventory";
 	const spaceActionLabel =
 		selectedSpaceKind === "previous"
 			? translator.textFn("Previous Space")
-			: selectedSpaceKind === "generated"
-				? translator.textFn("Generated Space")
+			: selectedSpaceKind === "inventory"
+				? translator.textFn("Inventory")
 				: translator.textFn("Space");
 	const selectSpaceFn = (space: SpaceDestinationSchema.Type) => {
 		if (merge.action === "space" && merge.space === space) return;
@@ -142,11 +142,11 @@ export const MergeField = ({
 										onSelectFn: () => selectSpaceFn("previous"),
 									},
 									{
-										id: "generated",
-										selected: selectedSpaceKind === "generated",
-										label: translator.textFn("Generated Space"),
+										id: "inventory",
+										selected: selectedSpaceKind === "inventory",
+										label: translator.textFn("Inventory"),
 										description: translator.textFn(
-											"Move the dropped item into the receiver's private room.",
+											"Move the dropped item into the receiver's Inventory, an item-owned Space.",
 										),
 										icon: <Sparkles className="size-5" />,
 										onSelectFn: () =>
@@ -155,7 +155,7 @@ export const MergeField = ({
 													typeof merge.space === "object"
 													? merge.space
 													: {
-															type: "generated",
+															type: "inventory",
 															templateUid:
 																project.config.templates?.[0]
 																	?.uid ?? "",

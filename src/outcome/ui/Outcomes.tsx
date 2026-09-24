@@ -103,7 +103,7 @@ const OutcomeRoll = <Item extends OutcomeProjection.Item>({
 								<>
 									{typeof item.space === "object" ? (
 										<>
-											<Tx label="Generated Space" /> ·{" "}
+											<Tx label="Inventory" /> ·{" "}
 											{item.templateTitle ?? item.space.templateUid}
 										</>
 									) : item.space === "previous" ? (

@@ -21,7 +21,7 @@ const fromStateItemFx = Effect.fn("fromStateItemFx")(function* (state: StateItem
 		item,
 		location: state.location,
 		mergeSequence: state.mergeSequence,
-		generatedSpace: state.generatedSpace,
+		inventory: state.inventory,
 		remainingUnits: state.remainingUnits,
 		schedule: state.schedule,
 		revision: yield* createRevisionFx(),

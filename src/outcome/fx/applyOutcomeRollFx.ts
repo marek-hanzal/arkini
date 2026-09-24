@@ -1,5 +1,5 @@
 import { isSpaceRetainedFn } from "~/space/fn/isSpaceRetainedFn";
-import { resolveGeneratedSpaceFx } from "~/space/fx/resolveGeneratedSpaceFx";
+import { resolveInventoryFx } from "~/space/fx/resolveInventoryFx";
 import { applyBoardTemplateRuntimeFx } from "~/board-template/fx/applyBoardTemplateRuntimeFx";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import { Effect } from "effect";
@@ -87,11 +87,11 @@ export const applyOutcomeRollFx = Effect.fn("applyOutcomeRollFx")(function* ({
 			)
 			.with(
 				{
-					type: "generated-space",
+					type: "inventory",
 				},
 				(outcome) =>
 					Effect.gen(function* () {
-						const resolved = yield* resolveGeneratedSpaceFx({
+						const resolved = yield* resolveInventoryFx({
 							ownerItemId: outcome.ownerItemId,
 							templateUid: outcome.templateUid,
 							runtime: draft,

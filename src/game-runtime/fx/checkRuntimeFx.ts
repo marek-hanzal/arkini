@@ -1,5 +1,5 @@
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
-import { checkGeneratedSpacesFn } from "~/space/fn/checkGeneratedSpacesFn";
+import { checkInventoriesFn } from "~/space/fn/checkInventoriesFn";
 import { checkRuntimeItemSchedulesFn } from "~/item-schedule/fn/checkRuntimeItemSchedulesFn";
 import { Effect } from "effect";
 
@@ -130,7 +130,7 @@ export const checkRuntimeFx = Effect.fn("checkRuntimeFx")(function* ({
 
 	return {
 		issues: [
-			...checkGeneratedSpacesFn({
+			...checkInventoriesFn({
 				runtime,
 				config,
 			}),

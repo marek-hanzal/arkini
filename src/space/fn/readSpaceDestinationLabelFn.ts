@@ -9,5 +9,5 @@ export const readSpaceDestinationLabelFn = (
 ): string => {
 	if (space === "previous") return textFn("Previous Space");
 	if (typeof space === "number") return `${textFn("Space")} ${space}`;
-	return `${textFn("Generated Space")} · ${templates?.find(({ uid }) => uid === space.templateUid)?.title ?? space.templateUid}`;
+	return `${textFn("Inventory")} · ${templates?.find(({ uid }) => uid === space.templateUid)?.title ?? space.templateUid}`;
 };

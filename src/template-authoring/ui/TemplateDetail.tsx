@@ -132,7 +132,7 @@ const TemplateDeleteBlockerLink = ({
 			: [
 					`${translator.textFn("Outcome")} ${outcomeIndex + 1}`,
 				]),
-		translator.textFn(path.includes("space") ? "Generated Space" : "Template"),
+		translator.textFn(path.includes("space") ? "Inventory" : "Template"),
 	];
 	return (
 		<ButtonLink

@@ -4,7 +4,7 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import { reconcileOutboundDeliveriesRuntimeFx } from "~/production-delivery/fx/reconcileOutboundDeliveriesRuntimeFx";
 
-export namespace destroyGeneratedSpacesFx {
+export namespace destroyInventoriesFx {
 	export interface Props {
 		readonly removedItems: readonly RuntimeItemSchema.Type[];
 		readonly runtime: RuntimeSchema.Type;
@@ -19,17 +19,17 @@ export namespace destroyGeneratedSpacesFx {
 /** Permanently destroys rooms owned by removed identities, including nested rooms and work.
  * This is destruction, never an expiry/return operation. Snapshot ancestry covers jobs
  * already detached by completion while their material roots are still being consumed. */
-export const destroyGeneratedSpacesFx = Effect.fn("destroyGeneratedSpacesFx")(function* ({
+export const destroyInventoriesFx = Effect.fn("destroyInventoriesFx")(function* ({
 	removedItems,
 	runtime,
 	ownershipRuntime,
-}: destroyGeneratedSpacesFx.Props) {
+}: destroyInventoriesFx.Props) {
 	const spaces = new Set(
 		removedItems.flatMap((item) =>
-			item.generatedSpace === undefined
+			item.inventory === undefined
 				? []
 				: [
-						item.generatedSpace,
+						item.inventory,
 					],
 		),
 	);
@@ -37,7 +37,7 @@ export const destroyGeneratedSpacesFx = Effect.fn("destroyGeneratedSpacesFx")(fu
 		return {
 			runtime,
 			removed: [],
-		} satisfies destroyGeneratedSpacesFx.Result;
+		} satisfies destroyInventoriesFx.Result;
 	const config = yield* GameConfigFx;
 	const snapshot = ownershipRuntime ?? runtime;
 	const liveIds = new Set(runtime.items.map(({ id }) => id));
@@ -68,7 +68,7 @@ export const destroyGeneratedSpacesFx = Effect.fn("destroyGeneratedSpacesFx")(fu
 							: discardedJobs.has(location.jobId);
 			if (!destroyed || discardedIds.has(item.id)) continue;
 			discardedIds.add(item.id);
-			if (item.generatedSpace !== undefined) spaces.add(item.generatedSpace);
+			if (item.inventory !== undefined) spaces.add(item.inventory);
 			changed = true;
 		}
 		for (const job of jobs)
@@ -107,5 +107,5 @@ export const destroyGeneratedSpacesFx = Effect.fn("destroyGeneratedSpacesFx")(fu
 			runtime: draft,
 		}),
 		removed,
-	} satisfies destroyGeneratedSpacesFx.Result;
+	} satisfies destroyInventoriesFx.Result;
 });

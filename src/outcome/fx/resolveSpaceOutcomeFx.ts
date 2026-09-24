@@ -24,10 +24,10 @@ export const resolveSpaceOutcomeFx = Effect.fn("resolveSpaceOutcomeFx")(function
 		return undefined;
 	if (typeof outcome.space === "object")
 		return {
-			type: "generated-space",
+			type: "inventory",
 			ownerItemId,
 			templateUid: outcome.space.templateUid,
-		} satisfies ResolvedOutcome.GeneratedSpace;
+		} satisfies ResolvedOutcome.Inventory;
 	const space =
 		outcome.space === "previous"
 			? (yield* (yield* RuntimeFx).read).previousSpace

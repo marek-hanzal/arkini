@@ -2,26 +2,26 @@ import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/useGameFx";
 import {
-	generatedSpaceTestConfigFn,
-	generatedSpaceStateFn,
-	enterGeneratedSpaceFx,
-	mergeGeneratedSpaceItemsFx,
-} from "~test/space/support/generatedSpaceTestConfig";
+	inventoryTestConfigFn,
+	inventoryStateFn,
+	enterInventoryFx,
+	mergeInventoryItemsFx,
+} from "~test/space/support/inventoryTestConfig";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 
-describe("Generated Space transport", () => {
+describe("Inventory transport", () => {
 	it("drops near the occupied center of a new template room and shares it with subsequent navigation", () => {
-		const config = generatedSpaceTestConfigFn();
+		const config = inventoryTestConfigFn();
 		config.templates![0]!.width = 5;
 		config.templates![0]!.height = 3;
 		config.templates![0]!.board[0]!.x = 2;
 		config.templates![0]!.board[0]!.y = 1;
 		const result = Effect.runSync(
 			Effect.gen(function* () {
-				yield* mergeGeneratedSpaceItemsFx("cargo", "first");
+				yield* mergeInventoryItemsFx("cargo", "first");
 				const transported = yield* readRuntimeFx();
-				const entered = yield* enterGeneratedSpaceFx("first");
+				const entered = yield* enterInventoryFx("first");
 				return {
 					transported,
 					entered,
@@ -29,11 +29,11 @@ describe("Generated Space transport", () => {
 			}).pipe(
 				useGameFx({
 					config,
-					state: generatedSpaceStateFn(),
+					state: inventoryStateFn(),
 				}),
 			),
 		);
-		const room = result.transported.items.find((item) => item.id === "first")!.generatedSpace;
+		const room = result.transported.items.find((item) => item.id === "first")!.inventory;
 		expect(room).toBeDefined();
 		expect(result.transported.currentSpace).toBe(0);
 		expect(result.transported.previousSpace).toBeUndefined();
@@ -52,14 +52,12 @@ describe("Generated Space transport", () => {
 	});
 
 	it("rolls back room creation, owner binding and transport when the initialized template is full", () => {
-		const config = generatedSpaceTestConfigFn();
+		const config = inventoryTestConfigFn();
 		config.templates![0]!.width = 1;
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const before = yield* (yield* CommittedTransitionsFx).read;
-				const attempt = yield* mergeGeneratedSpaceItemsFx("cargo", "first").pipe(
-					Effect.result,
-				);
+				const attempt = yield* mergeInventoryItemsFx("cargo", "first").pipe(Effect.result);
 				return {
 					before,
 					attempt,
@@ -68,7 +66,7 @@ describe("Generated Space transport", () => {
 			}).pipe(
 				useGameFx({
 					config,
-					state: generatedSpaceStateFn(),
+					state: inventoryStateFn(),
 				}),
 			),
 		);
@@ -76,12 +74,12 @@ describe("Generated Space transport", () => {
 		expect(result.after).toBe(result.before);
 		expect(result.after.runtime.templateUidBySpace).toEqual({});
 		expect(
-			result.after.runtime.items.find((item) => item.id === "first")?.generatedSpace,
+			result.after.runtime.items.find((item) => item.id === "first")?.inventory,
 		).toBeUndefined();
 	});
 
 	it("preserves the room and contents when a replacement retains the owner identity", () => {
-		const state = generatedSpaceStateFn([
+		const state = inventoryStateFn([
 			{
 				id: "first",
 				itemUid: "warehouse",
@@ -95,20 +93,20 @@ describe("Generated Space transport", () => {
 		]);
 		const result = Effect.runSync(
 			Effect.gen(function* () {
-				const before = yield* enterGeneratedSpaceFx("first");
-				yield* mergeGeneratedSpaceItemsFx("upgrade", "first");
+				const before = yield* enterInventoryFx("first");
+				yield* mergeInventoryItemsFx("upgrade", "first");
 				return {
 					before,
-					after: yield* enterGeneratedSpaceFx("first"),
+					after: yield* enterInventoryFx("first"),
 				};
 			}).pipe(
 				useGameFx({
-					config: generatedSpaceTestConfigFn(),
+					config: inventoryTestConfigFn(),
 					state,
 				}),
 			),
 		);
-		expect(result.after.items.find((item) => item.id === "first")?.generatedSpace).toBe(
+		expect(result.after.items.find((item) => item.id === "first")?.inventory).toBe(
 			result.before.currentSpace,
 		);
 		expect(result.after.currentSpace).toBe(result.before.currentSpace);

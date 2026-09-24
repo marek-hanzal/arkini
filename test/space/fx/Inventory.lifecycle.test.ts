@@ -2,21 +2,21 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/useGameFx";
 import {
-	generatedSpaceTestConfigFn,
-	generatedSpaceStateFn,
-	enterGeneratedSpaceFx,
-	removeGeneratedSpaceItemFx,
-} from "~test/space/support/generatedSpaceTestConfig";
+	inventoryTestConfigFn,
+	inventoryStateFn,
+	enterInventoryFx,
+	removeInventoryItemFx,
+} from "~test/space/support/inventoryTestConfig";
 import { applyBoardTemplateFx } from "~/board-template/fx/applyBoardTemplateFx";
 
-describe("Generated Space lifecycle", () => {
+describe("Inventory lifecycle", () => {
 	it("returns from a deleted viewed room to surviving history without reviving the deleted address", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
-				const first = yield* enterGeneratedSpaceFx("first");
-				const second = yield* enterGeneratedSpaceFx("second");
-				const removed = yield* removeGeneratedSpaceItemFx("second");
-				const reused = yield* enterGeneratedSpaceFx("first");
+				const first = yield* enterInventoryFx("first");
+				const second = yield* enterInventoryFx("second");
+				const removed = yield* removeInventoryItemFx("second");
+				const reused = yield* enterInventoryFx("first");
 				return {
 					first,
 					second,
@@ -25,8 +25,8 @@ describe("Generated Space lifecycle", () => {
 				};
 			}).pipe(
 				useGameFx({
-					config: generatedSpaceTestConfigFn(),
-					state: generatedSpaceStateFn(),
+					config: inventoryTestConfigFn(),
+					state: inventoryStateFn(),
 				}),
 			),
 		);
@@ -45,7 +45,7 @@ describe("Generated Space lifecycle", () => {
 	});
 
 	it("initializes self-referential templates lazily and recursively deletes nested rooms with start fallback", () => {
-		const config = generatedSpaceTestConfigFn();
+		const config = inventoryTestConfigFn();
 		config.templates![0]!.board = [
 			{
 				itemUid: "warehouse",
@@ -55,15 +55,15 @@ describe("Generated Space lifecycle", () => {
 		];
 		const result = Effect.runSync(
 			Effect.gen(function* () {
-				const outer = yield* enterGeneratedSpaceFx("first");
+				const outer = yield* enterInventoryFx("first");
 				const child = outer.items.find(
 					(item) =>
 						item.location.scope === "board" &&
 						item.location.space === outer.currentSpace,
 				)!;
-				const inner = yield* enterGeneratedSpaceFx(child.id);
-				const removed = yield* removeGeneratedSpaceItemFx("first");
-				const reused = yield* enterGeneratedSpaceFx("second");
+				const inner = yield* enterInventoryFx(child.id);
+				const removed = yield* removeInventoryItemFx("first");
+				const reused = yield* enterInventoryFx("second");
 				return {
 					outer,
 					child,
@@ -74,12 +74,12 @@ describe("Generated Space lifecycle", () => {
 			}).pipe(
 				useGameFx({
 					config,
-					state: generatedSpaceStateFn(),
+					state: inventoryStateFn(),
 				}),
 			),
 		);
 		expect(result.outer.items).toHaveLength(4);
-		expect(result.child.generatedSpace).toBeUndefined();
+		expect(result.child.inventory).toBeUndefined();
 		expect(Object.keys(result.outer.templateUidBySpace)).toHaveLength(1);
 		expect(result.inner.items).toHaveLength(5);
 		expect(Object.keys(result.inner.templateUidBySpace)).toHaveLength(2);
@@ -94,13 +94,13 @@ describe("Generated Space lifecycle", () => {
 		expect(result.removed.jobs).toEqual([]);
 		expect(result.removed.jobQueue).toEqual([]);
 		expect(result.reused.currentSpace).toBe(result.outer.currentSpace);
-		expect(result.reused.items.find((item) => item.id === "second")?.generatedSpace).toBe(
+		expect(result.reused.items.find((item) => item.id === "second")?.inventory).toBe(
 			result.outer.currentSpace,
 		);
 	});
 
 	it("a template reset destroys nested owned rooms while preserving the surviving outer binding", () => {
-		const config = generatedSpaceTestConfigFn();
+		const config = inventoryTestConfigFn();
 		config.templates![0]!.board = [
 			{
 				itemUid: "warehouse",
@@ -110,14 +110,14 @@ describe("Generated Space lifecycle", () => {
 		];
 		const result = Effect.runSync(
 			Effect.gen(function* () {
-				const outer = yield* enterGeneratedSpaceFx("first");
+				const outer = yield* enterInventoryFx("first");
 				const child = outer.items.find(
 					(item) =>
 						item.location.scope === "board" &&
 						item.location.space === outer.currentSpace,
 				)!;
-				const inner = yield* enterGeneratedSpaceFx(child.id);
-				yield* enterGeneratedSpaceFx("first");
+				const inner = yield* enterInventoryFx(child.id);
+				yield* enterInventoryFx("first");
 				const reset = yield* applyBoardTemplateFx({
 					templateUid: "room",
 				});
@@ -130,12 +130,12 @@ describe("Generated Space lifecycle", () => {
 			}).pipe(
 				useGameFx({
 					config,
-					state: generatedSpaceStateFn(),
+					state: inventoryStateFn(),
 				}),
 			),
 		);
 		expect(result.reset.currentSpace).toBe(result.outer.currentSpace);
-		expect(result.reset.items.find((item) => item.id === "first")?.generatedSpace).toBe(
+		expect(result.reset.items.find((item) => item.id === "first")?.inventory).toBe(
 			result.outer.currentSpace,
 		);
 		expect(result.reset.items.some((item) => item.id === result.child.id)).toBe(false);

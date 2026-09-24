@@ -21,14 +21,14 @@ const itemFn = (uid: string) => ({
 	maxQueueSize: 1,
 });
 
-export const generatedSpaceTestConfigFn = () =>
+export const inventoryTestConfigFn = () =>
 	GameConfigSchema.parse({
 		resources: {
 			hero: "hero",
 		},
 		meta: {
-			id: "generated-space-test",
-			title: "Generated space",
+			id: "inventory-test",
+			title: "Inventory",
 			board: {
 				width: 6,
 				height: 1,
@@ -81,7 +81,7 @@ export const generatedSpaceTestConfigFn = () =>
 												{
 													type: "space",
 													space: {
-														type: "generated",
+														type: "inventory",
 														templateUid: "room",
 													},
 													rules: [],
@@ -98,7 +98,7 @@ export const generatedSpaceTestConfigFn = () =>
 					{
 						action: "space",
 						space: {
-							type: "generated",
+							type: "inventory",
 							templateUid: "room",
 						},
 						effect: "keep",
@@ -122,7 +122,7 @@ export const generatedSpaceTestConfigFn = () =>
 		},
 	});
 
-export const generatedSpaceStateFn = (
+export const inventoryStateFn = (
 	items = [
 		{
 			id: "first",
@@ -165,7 +165,7 @@ export const generatedSpaceStateFn = (
 		jobQueue: [],
 	});
 
-export const enterGeneratedSpaceFx = (ownerItemId: string) =>
+export const enterInventoryFx = (ownerItemId: string) =>
 	Effect.gen(function* () {
 		yield* enqueueDefaultLineFx({
 			ownerItemId,
@@ -176,7 +176,7 @@ export const enterGeneratedSpaceFx = (ownerItemId: string) =>
 		return yield* readRuntimeFx();
 	});
 
-export const mergeGeneratedSpaceItemsFx = (sourceItemId: string, targetItemId: string) =>
+export const mergeInventoryItemsFx = (sourceItemId: string, targetItemId: string) =>
 	Effect.gen(function* () {
 		const runtime = yield* readRuntimeFx();
 		const source = runtime.items.find((item) => item.id === sourceItemId)!;
@@ -189,7 +189,7 @@ export const mergeGeneratedSpaceItemsFx = (sourceItemId: string, targetItemId: s
 		});
 	});
 
-export const removeGeneratedSpaceItemFx = (itemId: string) =>
+export const removeInventoryItemFx = (itemId: string) =>
 	Effect.gen(function* () {
 		const runtime = yield* readRuntimeFx();
 		const item = runtime.items.find((candidate) => candidate.id === itemId)!;

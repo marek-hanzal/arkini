@@ -3,31 +3,31 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/useGameFx";
 import {
-	generatedSpaceTestConfigFn,
-	generatedSpaceStateFn,
-	enterGeneratedSpaceFx,
-	removeGeneratedSpaceItemFx,
-} from "~test/space/support/generatedSpaceTestConfig";
+	inventoryTestConfigFn,
+	inventoryStateFn,
+	enterInventoryFx,
+	removeInventoryItemFx,
+} from "~test/space/support/inventoryTestConfig";
 import { fromRuntimeFn } from "~/game-persistence/fn/fromRuntimeFn";
 import { StateSchema } from "~/game-persistence/schema/StateSchema";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { readBoardSizeFn } from "~/game-runtime/fn/readBoardSizeFn";
 
-describe("Generated Space", () => {
+describe("Inventory", () => {
 	it("binds separate rooms to identical owners and reuses edited contents across visits and save/load", () => {
-		const config = generatedSpaceTestConfigFn();
+		const config = inventoryTestConfigFn();
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const before = yield* readRuntimeFx();
-				const first = yield* enterGeneratedSpaceFx("first");
+				const first = yield* enterInventoryFx("first");
 				const originalToken = first.items.find(
 					(item) =>
 						item.location.scope === "board" &&
 						item.location.space === first.currentSpace,
 				)!;
-				yield* removeGeneratedSpaceItemFx(originalToken.id);
-				const repeated = yield* enterGeneratedSpaceFx("first");
-				const second = yield* enterGeneratedSpaceFx("second");
+				yield* removeInventoryItemFx(originalToken.id);
+				const repeated = yield* enterInventoryFx("first");
+				const second = yield* enterInventoryFx("second");
 				return {
 					before,
 					first,
@@ -38,14 +38,14 @@ describe("Generated Space", () => {
 			}).pipe(
 				useGameFx({
 					config,
-					state: generatedSpaceStateFn(),
+					state: inventoryStateFn(),
 				}),
 			),
 		);
-		expect(result.before.items.every((item) => item.generatedSpace === undefined)).toBe(true);
+		expect(result.before.items.every((item) => item.inventory === undefined)).toBe(true);
 		expect(result.before.templateUidBySpace).toEqual({});
 		expect(result.first.currentSpace).not.toBe(0);
-		expect(result.first.items.find((item) => item.id === "first")?.generatedSpace).toBe(
+		expect(result.first.items.find((item) => item.id === "first")?.inventory).toBe(
 			result.first.currentSpace,
 		);
 		expect(result.repeated.currentSpace).toBe(result.first.currentSpace);
@@ -88,7 +88,7 @@ describe("Generated Space", () => {
 		const loaded = Effect.runSync(
 			Effect.gen(function* () {
 				const before = yield* readRuntimeFx();
-				const after = yield* enterGeneratedSpaceFx("second");
+				const after = yield* enterInventoryFx("second");
 				return {
 					before,
 					after,
@@ -103,12 +103,12 @@ describe("Generated Space", () => {
 		expect(
 			loaded.before.items.map((item) => [
 				item.id,
-				item.generatedSpace,
+				item.inventory,
 			]),
 		).toEqual(
 			result.second.items.map((item) => [
 				item.id,
-				item.generatedSpace,
+				item.inventory,
 			]),
 		);
 		expect(loaded.after.currentSpace).toBe(result.second.currentSpace);
@@ -117,8 +117,8 @@ describe("Generated Space", () => {
 		);
 	});
 
-	it("reserves empty authored destinations before allocating a generated address", () => {
-		const config = generatedSpaceTestConfigFn();
+	it("reserves empty authored destinations before allocating an Inventory Space address", () => {
+		const config = inventoryTestConfigFn();
 		config.items.token!.merge = [
 			{
 				action: "space",
@@ -161,10 +161,10 @@ describe("Generated Space", () => {
 			}),
 		];
 		const runtime = Effect.runSync(
-			enterGeneratedSpaceFx("first").pipe(
+			enterInventoryFx("first").pipe(
 				useGameFx({
 					config,
-					state: generatedSpaceStateFn(),
+					state: inventoryStateFn(),
 				}),
 			),
 		);
@@ -173,7 +173,7 @@ describe("Generated Space", () => {
 			1,
 			2,
 		]).not.toContain(runtime.currentSpace);
-		expect(runtime.items.find((item) => item.id === "first")?.generatedSpace).toBe(
+		expect(runtime.items.find((item) => item.id === "first")?.inventory).toBe(
 			runtime.currentSpace,
 		);
 	});

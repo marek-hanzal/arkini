@@ -3,7 +3,7 @@ import { z } from "zod";
 /** The finite vocabulary of runtime invariant violations. */
 export const RuntimeCheckIssueEnumSchema = z
 	.enum({
-		GeneratedSpace: "space:generated",
+		Inventory: "space:inventory",
 		DuplicateJobId: "job:id:duplicate",
 		JobOwnerMissing: "job:owner-missing",
 		JobOwnerMultipleActive: "job:owner:multiple-active",

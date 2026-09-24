@@ -653,8 +653,6 @@ General:
   value: General
 General PNG images keep their original dimensions.:
   value: General PNG images keep their original dimensions.
-Generated Space:
-  value: Generated Space
 Global playlist:
   value: Global playlist
 Gone:
@@ -735,6 +733,8 @@ Interval (seconds):
   value: Interval (seconds)
 Introduction:
   value: Introduction
+Inventory:
+  value: Inventory
 Item:
   value: Item
 Item UID:
@@ -1110,8 +1110,8 @@ Missing item marker:
   value: Missing item marker
 Missing reference:
   value: Missing reference
-Move the dropped item into the receiver's private room.:
-  value: Move the dropped item into the receiver's private room.
+Move the dropped item into the receiver's Inventory, an item-owned Space.:
+  value: Move the dropped item into the receiver's Inventory, an item-owned Space.
 Move the dropped item to an exact space number.:
   value: Move the dropped item to an exact space number.
 Move the dropped item to the last space left. Without history, the merge is rejected.:
@@ -1287,8 +1287,8 @@ Open project images:
   value: Open project images
 Open project settings:
   value: Open project settings
-Open this item's private room, initialized from a template on first use.:
-  value: Open this item's private room, initialized from a template on first use.
+Open this item's Inventory, an item-owned Space initialized from a template on first use.:
+  value: Open this item's Inventory, an item-owned Space initialized from a template on first use.
 Open your project:
   value: Open your project
 Optimize:

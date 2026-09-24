@@ -10,7 +10,7 @@ import { editorTestConfig } from "~test/project-authoring/support/editorTestPayl
 
 it("blocks deleting a generated-room template referenced by every outcome owner and receiver transport", () => {
 	const space = {
-		type: "generated",
+		type: "inventory",
 		templateUid: "interior",
 	};
 	const outcome = OutcomeTableSchema.parse({

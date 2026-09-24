@@ -3,10 +3,10 @@ import { IdSchema } from "~/game-value/schema/IdSchema";
 import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckIssueEnumSchema";
 
-export const GeneratedSpaceIssueSchema = z
+export const InventoryIssueSchema = z
 	.object({
 		type: RuntimeCheckIssueEnumSchema.extract([
-			"GeneratedSpace",
+			"Inventory",
 		]),
 		itemId: IdSchema,
 		space: NonNegativeIntegerSchema,
@@ -18,9 +18,9 @@ export const GeneratedSpaceIssueSchema = z
 	})
 	.strict()
 	.meta({
-		id: "GeneratedSpaceIssueSchema",
+		id: "InventoryIssueSchema",
 	});
-export type GeneratedSpaceIssueSchema = typeof GeneratedSpaceIssueSchema;
-export namespace GeneratedSpaceIssueSchema {
-	export type Type = z.infer<GeneratedSpaceIssueSchema>;
+export type InventoryIssueSchema = typeof InventoryIssueSchema;
+export namespace InventoryIssueSchema {
+	export type Type = z.infer<InventoryIssueSchema>;
 }

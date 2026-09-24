@@ -2,17 +2,17 @@ import { Effect } from "effect";
 import { expect, it } from "vitest";
 import { useGameFx } from "~test/support/useGameFx";
 import {
-	generatedSpaceTestConfigFn,
-	generatedSpaceStateFn,
-	mergeGeneratedSpaceItemsFx,
-} from "~test/space/support/generatedSpaceTestConfig";
+	inventoryTestConfigFn,
+	inventoryStateFn,
+	mergeInventoryItemsFx,
+} from "~test/space/support/inventoryTestConfig";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { LineSchema } from "~/production-line/schema/LineSchema";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 
 it("consuming a container destroys its interior producer and detached job reservations without output or returns", () => {
-	const config = generatedSpaceTestConfigFn();
+	const config = inventoryTestConfigFn();
 	config.items.token!.lines = [
 		LineSchema.parse({
 			uid: "consume-container",
@@ -79,7 +79,7 @@ it("consuming a container destroys its interior producer and detached job reserv
 			},
 		}),
 	];
-	const state = generatedSpaceStateFn([]);
+	const state = inventoryStateFn([]);
 	state.currentSpace = 1;
 	state.previousSpace = 0;
 	state.templateUidBySpace = {
@@ -98,7 +98,7 @@ it("consuming a container destroys its interior producer and detached job reserv
 		{
 			id: "container",
 			itemUid: "warehouse",
-			generatedSpace: 1,
+			inventory: 1,
 			location: {
 				scope: "job",
 				jobId: "work",
@@ -160,7 +160,7 @@ it("consuming a container destroys its interior producer and detached job reserv
 });
 
 it("removing a container releases its passive input but destroys the room after the owner was temporarily detached", () => {
-	const config = generatedSpaceTestConfigFn();
+	const config = inventoryTestConfigFn();
 	config.items.warehouse!.lines.push(
 		LineSchema.parse({
 			uid: "storage",
@@ -197,7 +197,7 @@ it("removing a container releases its passive input but destroys the room after 
 			effect: "remove",
 		},
 	];
-	const state = generatedSpaceStateFn([
+	const state = inventoryStateFn([
 		{
 			id: "first",
 			itemUid: "warehouse",
@@ -209,7 +209,7 @@ it("removing a container releases its passive input but destroys the room after 
 			x: 1,
 		},
 	]);
-	state.items[0]!.generatedSpace = 1;
+	state.items[0]!.inventory = 1;
 	state.templateUidBySpace = {
 		1: "room",
 	};
@@ -239,7 +239,7 @@ it("removing a container releases its passive input but destroys the room after 
 	);
 	const result = Effect.runSync(
 		Effect.gen(function* () {
-			yield* mergeGeneratedSpaceItemsFx("tool", "first");
+			yield* mergeInventoryItemsFx("tool", "first");
 			return yield* readRuntimeFx();
 		}).pipe(
 			useGameFx({

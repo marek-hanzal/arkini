@@ -1,4 +1,4 @@
-import { destroyGeneratedSpacesFx } from "~/space/fx/destroyGeneratedSpacesFx";
+import { destroyInventoriesFx } from "~/space/fx/destroyInventoriesFx";
 import { Effect } from "effect";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
 
@@ -56,7 +56,7 @@ export const removeRuntimeItemIdentityFx = Effect.fn("removeRuntimeItemIdentityF
 		returnFromByOwnerItemId,
 		runtime: removedRuntime,
 	});
-	const destroyed = yield* destroyGeneratedSpacesFx({
+	const destroyed = yield* destroyInventoriesFx({
 		ownershipRuntime,
 		removedItems: [
 			liveItem,

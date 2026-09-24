@@ -484,8 +484,8 @@ it.each([
 	false,
 	true,
 ])(
-	"preserves a template outcome in an item draft and rejects a removed template reference (generated=%s)",
-	(generated) => {
+	"preserves a template outcome in an item draft and rejects a removed template reference (inventory=%s)",
+	(inventory) => {
 		const source = createProducerItem({
 			id: "portal",
 		});
@@ -502,11 +502,11 @@ it.each([
 								{
 									type: "guaranteed",
 									outcome: [
-										generated
+										inventory
 											? {
 													type: "space",
 													space: {
-														type: "generated",
+														type: "inventory",
 														templateUid: "destination",
 													},
 													rules: [],
@@ -548,11 +548,11 @@ it.each([
 		expect(parsed.success).toBe(true);
 		if (parsed.success)
 			expect(parsed.data.lines[0]!.outcome!.set[0]!.roll[0]!.outcome[0]).toEqual(
-				generated
+				inventory
 					? {
 							type: "space",
 							space: {
-								type: "generated",
+								type: "inventory",
 								templateUid: "destination",
 							},
 							rules: [],
@@ -587,7 +587,7 @@ it.each([
 							0,
 							"outcome",
 							0,
-							...(generated
+							...(inventory
 								? [
 										"space",
 									]

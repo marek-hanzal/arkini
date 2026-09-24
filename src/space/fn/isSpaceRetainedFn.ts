@@ -1,6 +1,6 @@
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
-/** A recycled numeric address cannot retain a reference to its previous generated owner. */
+/** A recycled numeric address cannot retain a reference to its previous Inventory owner. */
 export const isSpaceRetainedFn = ({
 	space,
 	previousRuntime,
@@ -10,9 +10,9 @@ export const isSpaceRetainedFn = ({
 	readonly previousRuntime: RuntimeSchema.Type;
 	readonly runtime: RuntimeSchema.Type;
 }): boolean => {
-	const owner = previousRuntime.items.find((item) => item.generatedSpace === space);
+	const owner = previousRuntime.items.find((item) => item.inventory === space);
 	return (
 		owner === undefined ||
-		runtime.items.some((item) => item.id === owner.id && item.generatedSpace === space)
+		runtime.items.some((item) => item.id === owner.id && item.inventory === space)
 	);
 };

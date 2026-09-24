@@ -113,26 +113,26 @@ describe("MergeField", () => {
 		await act(async () =>
 			document
 				.querySelector<HTMLButtonElement>(
-					'button[data-ui="ActionMenuOption"][data-ui-id="generated"]',
+					'button[data-ui="ActionMenuOption"][data-ui-id="inventory"]',
 				)!
 				.click(),
 		);
-		const generated = {
+		const inventory = {
 			...transport,
 			space: {
-				type: "generated" as const,
+				type: "inventory" as const,
 				templateUid: "interior",
 			},
 		};
-		expect(onChangeFn).toHaveBeenLastCalledWith(generated);
-		await renderFn(generated);
+		expect(onChangeFn).toHaveBeenLastCalledWith(inventory);
+		await renderFn(inventory);
 		await act(async () =>
 			container.querySelector<HTMLButtonElement>('button[data-template="other"]')!.click(),
 		);
 		expect(onChangeFn).toHaveBeenLastCalledWith({
-			...generated,
+			...inventory,
 			space: {
-				type: "generated",
+				type: "inventory",
 				templateUid: "other",
 			},
 		});

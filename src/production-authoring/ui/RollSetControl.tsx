@@ -399,10 +399,10 @@ const OutcomeList = ({
 							]),
 					},
 					{
-						id: "space-generated",
-						label: translator.textFn("Generated Space"),
+						id: "space-inventory",
+						label: translator.textFn("Inventory"),
 						description: translator.textFn(
-							"Open this item's private room, initialized from a template on first use.",
+							"Open this item's Inventory, an item-owned Space initialized from a template on first use.",
 						),
 						icon: <Sparkles className="size-5" />,
 						onSelectFn: () =>
@@ -411,7 +411,7 @@ const OutcomeList = ({
 								{
 									type: "space",
 									space: {
-										type: "generated",
+										type: "inventory",
 										templateUid: project.config.templates?.[0]?.uid ?? "",
 									},
 									rules: [],

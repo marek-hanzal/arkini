@@ -35,8 +35,8 @@ export const RuntimeItemSchema = z
 			"The optional remaining units of this concrete item instance; undefined means the authored full amount.",
 		),
 		schedule: ScheduleStateSchema.optional(),
-		generatedSpace: NonNegativeIntegerSchema.optional().describe(
-			"The space bound to this exact live identity after its first successful generated-space interaction.",
+		inventory: NonNegativeIntegerSchema.optional().describe(
+			"The numeric Space bound as this live item's Inventory after its first successful interaction.",
 		),
 		/** Persisted merge random-stream cursor; bookkeeping does not make an item impure. */
 		mergeSequence: NonNegativeIntegerSchema.optional().describe(

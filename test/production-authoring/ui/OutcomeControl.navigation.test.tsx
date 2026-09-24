@@ -113,7 +113,7 @@ it("adds each outcome destination and drop placement without replacing existing 
 		for (const id of [
 			"space",
 			"space-previous",
-			"space-generated",
+			"space-inventory",
 			"template",
 			"drop-local",
 			"drop-random",
@@ -150,7 +150,7 @@ it("adds each outcome destination and drop placement without replacing existing 
 			{
 				type: "space",
 				space: {
-					type: "generated",
+					type: "inventory",
 					templateUid: "default-template",
 				},
 				rules: [],

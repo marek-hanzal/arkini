@@ -44,7 +44,7 @@ export const SpaceDestinationControl = ({
 					error={value === "previous" ? error : undefined}
 					value={
 						typeof value === "object"
-							? "generated"
+							? "inventory"
 							: value === "previous"
 								? "previous"
 								: "exact"
@@ -59,17 +59,17 @@ export const SpaceDestinationControl = ({
 							label: translator.textFn("Previous Space"),
 						},
 						{
-							value: "generated",
-							label: translator.textFn("Generated Space"),
+							value: "inventory",
+							label: translator.textFn("Inventory"),
 						},
 					]}
 					onChangeFn={(destination) =>
 						onChangeFn(
 							destination === "previous"
 								? "previous"
-								: destination === "generated"
+								: destination === "inventory"
 									? {
-											type: "generated",
+											type: "inventory",
 											templateUid:
 												typeof value === "object"
 													? value.templateUid
@@ -96,7 +96,7 @@ export const SpaceDestinationControl = ({
 							value={value.templateUid}
 							onChangeFn={(templateUid) =>
 								onChangeFn({
-									type: "generated",
+									type: "inventory",
 									templateUid,
 								})
 							}

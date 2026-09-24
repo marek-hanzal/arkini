@@ -1,17 +1,14 @@
 import { Effect } from "effect";
 import { expect, it } from "vitest";
 import { useGameFx } from "~test/support/useGameFx";
-import {
-	generatedSpaceTestConfigFn,
-	generatedSpaceStateFn,
-} from "~test/space/support/generatedSpaceTestConfig";
+import { inventoryTestConfigFn, inventoryStateFn } from "~test/space/support/inventoryTestConfig";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { LineSchema } from "~/production-line/schema/LineSchema";
 import { enqueueDefaultLineFx } from "~/production-job/fx/enqueueDefaultLineFx";
 
 it("room destruction during first material admission discards later allocations and terminates the producer start", () => {
-	const config = generatedSpaceTestConfigFn();
+	const config = inventoryTestConfigFn();
 	config.items.token!.lines = [
 		LineSchema.parse({
 			uid: "consume-buffers",
@@ -65,7 +62,7 @@ it("room destruction during first material admission discards later allocations 
 			],
 		}),
 	];
-	const state = generatedSpaceStateFn([]);
+	const state = inventoryStateFn([]);
 	state.currentSpace = 1;
 	state.previousSpace = 0;
 	state.templateUidBySpace = {
@@ -107,7 +104,7 @@ it("room destruction during first material admission discards later allocations 
 		{
 			id: "container",
 			itemUid: "warehouse",
-			generatedSpace: 1,
+			inventory: 1,
 			location: {
 				scope: "input",
 				ownerItemId: "first-material",

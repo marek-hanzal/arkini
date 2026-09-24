@@ -19,10 +19,10 @@ export const GraphNodeReference = ({
 		id.startsWith("item:") && Object.hasOwn(project.config.items, id.slice(5))
 			? project.config.items[id.slice(5)]
 			: undefined;
-	const generatedTemplateUid = id.startsWith("space:generated:") ? id.slice(16) : undefined;
+	const inventoryTemplateUid = id.startsWith("space:inventory:") ? id.slice(16) : undefined;
 	const template =
-		generatedTemplateUid !== undefined
-			? project.config.templates?.find((entry) => entry.uid === generatedTemplateUid)
+		inventoryTemplateUid !== undefined
+			? project.config.templates?.find((entry) => entry.uid === inventoryTemplateUid)
 			: id.startsWith("template:")
 				? project.config.templates?.find((entry) => entry.uid === id.slice(9))
 				: undefined;
@@ -60,16 +60,16 @@ export const GraphNodeReference = ({
 			>
 				<span>
 					{translator.textFn(
-						generatedTemplateUid === undefined ? "Template" : "Generated Space",
+						inventoryTemplateUid === undefined ? "Template" : "Inventory",
 					)}{" "}
 					· {template.title}
 				</span>
 			</ButtonLink>
 		);
-	if (generatedTemplateUid !== undefined)
+	if (inventoryTemplateUid !== undefined)
 		return (
 			<span className="break-words text-sm">
-				{translator.textFn("Generated Space")} · {generatedTemplateUid} ·{" "}
+				{translator.textFn("Inventory")} · {inventoryTemplateUid} ·{" "}
 				{translator.textFn("Missing reference")}
 			</span>
 		);

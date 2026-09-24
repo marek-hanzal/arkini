@@ -8,7 +8,7 @@ import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
 import { readAuthoredSpaceIdsFn } from "~/space/fn/readAuthoredSpaceIdsFn";
 import type { AppliedOutcome } from "~/outcome/type/AppliedOutcome";
 
-export namespace resolveGeneratedSpaceFx {
+export namespace resolveInventoryFx {
 	export interface Props {
 		readonly ownerItemId: IdSchema.Type;
 		readonly templateUid: IdSchema.Type;
@@ -22,19 +22,19 @@ export namespace resolveGeneratedSpaceFx {
 }
 
 /** Allocates and initializes only a surviving live owner's first use, in the caller's draft. */
-export const resolveGeneratedSpaceFx = Effect.fn("resolveGeneratedSpaceFx")(function* ({
+export const resolveInventoryFx = Effect.fn("resolveInventoryFx")(function* ({
 	ownerItemId,
 	templateUid,
 	runtime,
-}: resolveGeneratedSpaceFx.Props) {
+}: resolveInventoryFx.Props) {
 	const owner = runtime.items.find(({ id }) => id === ownerItemId);
 	if (owner === undefined) return undefined;
-	if (owner.generatedSpace !== undefined)
+	if (owner.inventory !== undefined)
 		return {
-			space: owner.generatedSpace,
+			space: owner.inventory,
 			runtime,
 			initialization: undefined,
-		} satisfies resolveGeneratedSpaceFx.Result;
+		} satisfies resolveInventoryFx.Result;
 	const config = yield* GameConfigFx;
 	const occupied = new Set(readAuthoredSpaceIdsFn(config));
 	const snapshot = yield* (yield* RuntimeFx).read;
@@ -46,7 +46,7 @@ export const resolveGeneratedSpaceFx = Effect.fn("resolveGeneratedSpaceFx")(func
 		if (state.previousSpace !== undefined) occupied.add(state.previousSpace);
 		for (const key of Object.keys(state.templateUidBySpace)) occupied.add(Number(key));
 		for (const item of state.items) {
-			if (item.generatedSpace !== undefined) occupied.add(item.generatedSpace);
+			if (item.inventory !== undefined) occupied.add(item.inventory);
 			if (item.location.scope === "board") occupied.add(item.location.space);
 			if (item.location.scope === "delivery") {
 				occupied.add(item.location.origin.space);
@@ -65,7 +65,7 @@ export const resolveGeneratedSpaceFx = Effect.fn("resolveGeneratedSpaceFx")(func
 	const bound = yield* reviseRuntimeItemFx({
 		item: {
 			...owner,
-			generatedSpace: space,
+			inventory: space,
 		},
 	});
 	return {
@@ -80,5 +80,5 @@ export const resolveGeneratedSpaceFx = Effect.fn("resolveGeneratedSpaceFx")(func
 			templateUid,
 			removed: initialized.removed,
 		},
-	} satisfies resolveGeneratedSpaceFx.Result;
+	} satisfies resolveInventoryFx.Result;
 });

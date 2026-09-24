@@ -1,6 +1,6 @@
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { readBoardSizeFn } from "~/game-runtime/fn/readBoardSizeFn";
-import { resolveGeneratedSpaceFx } from "~/space/fx/resolveGeneratedSpaceFx";
+import { resolveInventoryFx } from "~/space/fx/resolveInventoryFx";
 import { PreviousSpaceUnavailableError } from "~/item-merge/error/PreviousSpaceUnavailableError";
 import { relocateBoardItemFx } from "~/item-placement/fx/relocateBoardItemFx";
 import { Effect } from "effect";
@@ -276,7 +276,7 @@ const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(function*
 					const replacementWithSequence = {
 						...replacement,
 						mergeSequence: target.mergeSequence,
-						generatedSpace: target.generatedSpace,
+						inventory: target.inventory,
 					};
 					return {
 						facts: [],
@@ -316,9 +316,9 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 	const owner = rule.action === "space" ? target : source;
 	const sourceAction = yield* rule.action === "space"
 		? Effect.gen(function* () {
-				const generated =
+				const inventory =
 					typeof rule.space === "object"
-						? yield* resolveGeneratedSpaceFx({
+						? yield* resolveInventoryFx({
 								ownerItemId: owner.id,
 								templateUid: rule.space.templateUid,
 								runtime,
@@ -326,12 +326,12 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 						: undefined;
 				const space =
 					typeof rule.space === "object"
-						? generated?.space
+						? inventory?.space
 						: rule.space === "previous"
 							? runtime.previousSpace
 							: rule.space;
 				if (space === undefined) return yield* new PreviousSpaceUnavailableError();
-				const destinationRuntime = generated?.runtime ?? runtime;
+				const destinationRuntime = inventory?.runtime ?? runtime;
 				const size = readBoardSizeFn({
 					config: yield* GameConfigFx,
 					runtime: destinationRuntime,
@@ -352,12 +352,12 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 				});
 				return {
 					facts: [
-						...(generated?.initialization === undefined
+						...(inventory?.initialization === undefined
 							? []
 							: [
 									{
 										type: "template:applied",
-										effect: generated.initialization,
+										effect: inventory.initialization,
 									} satisfies EngineFact,
 								]),
 						...moved.events,

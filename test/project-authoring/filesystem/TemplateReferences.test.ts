@@ -15,7 +15,7 @@ beforeEach(async () => {
 });
 afterEach(async () => harness.close());
 
-const outcomeFn = (templateUid: string, generated = false) =>
+const outcomeFn = (templateUid: string, inventory = false) =>
 	OutcomeTableSchema.parse({
 		set: [
 			{
@@ -24,11 +24,11 @@ const outcomeFn = (templateUid: string, generated = false) =>
 					{
 						type: "guaranteed",
 						outcome: [
-							generated
+							inventory
 								? {
 										type: "space",
 										space: {
-											type: "generated",
+											type: "inventory",
 											templateUid,
 										},
 										rules: [],
@@ -49,11 +49,11 @@ it.each([
 	false,
 	true,
 ])(
-	"rejects missing Template references from every item outcome owner before either write path publishes (generated=%s)",
-	async (generated) => {
+	"rejects missing Template references from every item outcome owner before either write path publishes (inventory=%s)",
+	async (inventory) => {
 		const repository = await harness.openRepository();
 		const project = await harness.createProject(repository);
-		const outcome = outcomeFn("missing-template", generated);
+		const outcome = outcomeFn("missing-template", inventory);
 		const patches = [
 			{
 				merge: [
@@ -61,7 +61,7 @@ it.each([
 						action: "space",
 						effect: "keep",
 						space: {
-							type: "generated",
+							type: "inventory",
 							templateUid: "missing-template",
 						},
 					},
@@ -143,8 +143,8 @@ it.each([
 	false,
 	true,
 ])(
-	"allows unrelated unfinished items, but blocks removing a referenced Template until its outcome is repaired (generated=%s)",
-	async (generated) => {
+	"allows unrelated unfinished items, but blocks removing a referenced Template until its outcome is repaired (inventory=%s)",
+	async (inventory) => {
 		const repository = await harness.openRepository();
 		const broken = ItemSchema.parse({
 			...editorTestPayload.config.items.water,
@@ -178,7 +178,7 @@ it.each([
 					...project.config.items.water!,
 					units: {
 						amount: 1,
-						outcome: outcomeFn("initial", generated),
+						outcome: outcomeFn("initial", inventory),
 					},
 				},
 			}),

@@ -5,9 +5,9 @@ import { createProjectGraphFx } from "~/graph/fx/createProjectGraphFx";
 import { configFn, itemFn, lineFn } from "../fn/compileGraphFactsFn.test/fixtures";
 import { projectFn } from "./createProjectGraphFx.test/fixtures";
 
-it("preserves template-qualified generated recipes and distinct owner provenance through graph discovery", async () => {
+it("preserves template-qualified Inventory recipes and distinct owner provenance through graph discovery", async () => {
 	const space = {
-		type: "generated",
+		type: "inventory",
 		templateUid: "T",
 	};
 	const config = configFn({
@@ -51,7 +51,7 @@ it("preserves template-qualified generated recipes and distinct owner provenance
 					action: "space",
 					effect: "keep",
 					space: {
-						type: "generated",
+						type: "inventory",
 						templateUid: "missing",
 					},
 				},
@@ -59,13 +59,13 @@ it("preserves template-qualified generated recipes and distinct owner provenance
 		}),
 	});
 	const facts = compileGraphFactsFn(config);
-	const recipeId = "space:generated:T";
+	const recipeId = "space:inventory:T";
 	expect(facts.nodes.find(({ id }) => id === recipeId)).toMatchObject({
 		kind: "space",
 		templateUid: "T",
 		missing: false,
 	});
-	expect(facts.nodes.find(({ id }) => id === "space:generated:missing")).toMatchObject({
+	expect(facts.nodes.find(({ id }) => id === "space:inventory:missing")).toMatchObject({
 		templateUid: "missing",
 		missing: true,
 	});

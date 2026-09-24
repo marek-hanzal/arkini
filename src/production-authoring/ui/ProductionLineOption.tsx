@@ -59,7 +59,7 @@ const readItemSidesFn = (line: LineSchema.Type) => {
 						({ space }) => {
 							spaces.set(
 								typeof space === "object"
-									? `generated:${space.templateUid}`
+									? `inventory:${space.templateUid}`
 									: String(space),
 								space,
 							);
@@ -166,7 +166,7 @@ export const ProductionLineOption = ({
 					{spaces.map((space) => (
 						<span
 							key={
-								typeof space === "object" ? `generated:${space.templateUid}` : space
+								typeof space === "object" ? `inventory:${space.templateUid}` : space
 							}
 							className="text-xs text-subtle"
 						>

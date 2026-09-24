@@ -1,4 +1,4 @@
-import { GeneratedSpaceIssueSchema } from "~/space/schema/GeneratedSpaceIssueSchema";
+import { InventoryIssueSchema } from "~/space/schema/InventoryIssueSchema";
 import { z } from "zod";
 import { ItemScheduleIssueSchema } from "~/item-schedule/schema/ItemScheduleIssueSchema";
 
@@ -29,7 +29,7 @@ import { LineInputClosedIssueSchema } from "~/production-line/schema/LineInputCl
  */
 export const RuntimeCheckIssueSchema = z
 	.discriminatedUnion("type", [
-		GeneratedSpaceIssueSchema,
+		InventoryIssueSchema,
 		DuplicateJobIdIssueSchema,
 		JobOwnerMissingIssueSchema,
 		JobOwnerMultipleActiveIssueSchema,

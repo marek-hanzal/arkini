@@ -9,7 +9,7 @@ export const SpaceDestinationSchema = z
 		z.literal("previous"),
 		z
 			.object({
-				type: z.literal("generated"),
+				type: z.literal("inventory"),
 				templateUid: IdSchema,
 			})
 			.strict(),
@@ -17,7 +17,7 @@ export const SpaceDestinationSchema = z
 	.meta({
 		id: "SpaceDestinationSchema",
 		description:
-			"An exact Board space, previous navigation destination, or a template-initialized space owned by the live item instance.",
+			"An exact Board space, previous navigation destination, or Inventory: a template-initialized Space owned by the live item instance.",
 	});
 export type SpaceDestinationSchema = typeof SpaceDestinationSchema;
 export namespace SpaceDestinationSchema {

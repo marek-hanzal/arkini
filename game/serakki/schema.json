@@ -897,7 +897,7 @@
 					"properties": {
 						"type": {
 							"type": "string",
-							"const": "generated"
+							"const": "inventory"
 						},
 						"templateUid": {
 							"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
@@ -910,7 +910,7 @@
 					"additionalProperties": false
 				}
 			],
-			"description": "An exact Board space, previous navigation destination, or a template-initialized space owned by the live item instance."
+			"description": "An exact Board space, previous navigation destination, or Inventory: a template-initialized Space owned by the live item instance."
 		},
 		"TemplateOutcomeSchema": {
 			"type": "object",

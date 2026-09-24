@@ -38,20 +38,20 @@ export const compileGraphFactsFn = (config: GameConfigSchema.Type): GraphFacts =
 		if (!nodes.has(id)) {
 			const item =
 				kind === "item" && Object.hasOwn(config.items, key) ? config.items[key] : undefined;
-			const generatedTemplateUid =
-				kind === "space" && key.startsWith("generated:") ? key.slice(10) : undefined;
+			const inventoryTemplateUid =
+				kind === "space" && key.startsWith("inventory:") ? key.slice(10) : undefined;
 			const template = kind === "template" ? templates.get(key) : undefined;
-			const generatedTemplate =
-				generatedTemplateUid === undefined
+			const inventoryTemplate =
+				inventoryTemplateUid === undefined
 					? undefined
-					: templates.get(generatedTemplateUid);
+					: templates.get(inventoryTemplateUid);
 			nodes.set(id, {
 				id,
 				kind,
-				...(generatedTemplateUid === undefined
+				...(inventoryTemplateUid === undefined
 					? {}
 					: {
-							templateUid: generatedTemplateUid,
+							templateUid: inventoryTemplateUid,
 						}),
 				...(item?.clock === undefined
 					? {}
@@ -73,8 +73,8 @@ export const compileGraphFactsFn = (config: GameConfigSchema.Type): GraphFacts =
 					item?.title ??
 					template?.title ??
 					(kind === "space"
-						? generatedTemplateUid !== undefined
-							? `Generated Space · ${generatedTemplate?.title ?? generatedTemplateUid}`
+						? inventoryTemplateUid !== undefined
+							? `Inventory · ${inventoryTemplate?.title ?? inventoryTemplateUid}`
 							: key === "previous"
 								? "Previous Space"
 								: `Space ${key}`
@@ -84,7 +84,7 @@ export const compileGraphFactsFn = (config: GameConfigSchema.Type): GraphFacts =
 					.with("template", () => template === undefined)
 					.with(
 						"space",
-						() => generatedTemplateUid !== undefined && generatedTemplate === undefined,
+						() => inventoryTemplateUid !== undefined && inventoryTemplate === undefined,
 					)
 					.with("start", () => false)
 					.exhaustive(),

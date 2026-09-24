@@ -3,18 +3,18 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/useGameFx";
 import {
-	generatedSpaceTestConfigFn,
-	generatedSpaceStateFn,
-	enterGeneratedSpaceFx,
-	removeGeneratedSpaceItemFx,
-} from "~test/space/support/generatedSpaceTestConfig";
+	inventoryTestConfigFn,
+	inventoryStateFn,
+	enterInventoryFx,
+	removeInventoryItemFx,
+} from "~test/space/support/inventoryTestConfig";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { enqueueDefaultLineFx } from "~/production-job/fx/enqueueDefaultLineFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 
-describe("Generated Space settlement", () => {
+describe("Inventory settlement", () => {
 	it("discards active interior work without settling its output on later ticks", () => {
-		const config = generatedSpaceTestConfigFn();
+		const config = inventoryTestConfigFn();
 		config.items.token!.lines = [
 			LineSchema.parse({
 				...config.items.warehouse!.lines[0]!,
@@ -57,7 +57,7 @@ describe("Generated Space settlement", () => {
 		];
 		const result = Effect.runSync(
 			Effect.gen(function* () {
-				const entered = yield* enterGeneratedSpaceFx("first");
+				const entered = yield* enterInventoryFx("first");
 				const worker = entered.items.find(
 					(item) =>
 						item.location.scope === "board" &&
@@ -70,7 +70,7 @@ describe("Generated Space settlement", () => {
 					elapsedMs: 100,
 				});
 				const working = yield* readRuntimeFx();
-				const removed = yield* removeGeneratedSpaceItemFx("first");
+				const removed = yield* removeInventoryItemFx("first");
 				yield* runTickRuntimeByFx({
 					elapsedMs: 2000,
 				});
@@ -83,7 +83,7 @@ describe("Generated Space settlement", () => {
 			}).pipe(
 				useGameFx({
 					config,
-					state: generatedSpaceStateFn(),
+					state: inventoryStateFn(),
 				}),
 			),
 		);
@@ -98,14 +98,14 @@ describe("Generated Space settlement", () => {
 	});
 
 	it("expiry cannot create a room after destroying its owner", () => {
-		const config = generatedSpaceTestConfigFn();
+		const config = inventoryTestConfigFn();
 		config.items.warehouse!.clock = {
 			durationMs: 100,
 			enable: true,
 			rules: [],
 			onExpire: config.items.warehouse!.lines[0]!.outcome,
 		};
-		const state = generatedSpaceStateFn([
+		const state = inventoryStateFn([
 			{
 				id: "first",
 				itemUid: "warehouse",

@@ -11,8 +11,8 @@ import { LocationSchema } from "~/item-location/schema/LocationSchema";
 export const StateItemSchema = z
 	.object({
 		schedule: ScheduleStateSchema.optional(),
-		generatedSpace: NonNegativeIntegerSchema.optional().describe(
-			"The space bound to this exact live identity after its first successful generated-space interaction.",
+		inventory: NonNegativeIntegerSchema.optional().describe(
+			"The numeric Space bound as this live item's Inventory after its first successful interaction.",
 		),
 		mergeSequence: NonNegativeIntegerSchema.optional().describe(
 			"Successful merges owned by this surviving identity; omitted means zero.",

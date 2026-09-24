@@ -11,9 +11,15 @@ export const readTemplateDeleteBlockersFn = (config: GameConfigSchema.Type, temp
 		provenance: {
 			items: {},
 		},
-	}).filter(
-		(entry) =>
-			entry.code === "config:missing-reference" &&
-			entry.reference === "template" &&
-			entry.referenceId === templateUid,
-	);
+	})
+		.filter(
+			(entry) =>
+				entry.code === "config:missing-reference" &&
+				entry.reference === "template" &&
+				entry.referenceId === templateUid,
+		)
+		.map((entry) => ({
+			...entry,
+			// Removal above is hypothetical: blockers describe existing references, not missing data.
+			message: entry.message.replace("references missing template", "references template"),
+		}));

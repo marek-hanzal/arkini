@@ -336,14 +336,16 @@ it("reports start and nested outcome deletion blockers without removing referenc
 		}),
 	];
 	const { client, project, readFn, notifyFn } = await openProjectFn(config);
-	for (const [templateUid, blocker] of [
+	for (const [templateUid, blocker, reference] of [
 		[
 			"initial",
-			"start",
+			"start.spaces.0.templateUid",
+			"Initial space 0 references template initial.",
 		],
 		[
 			"outcome-template",
-			"water",
+			"items.water.lines.0.outcome.set.0.roll.0.outcome.0.templateUid",
+			"Item references template outcome-template.",
 		],
 	]) {
 		const detail = await client.callTool({
@@ -353,7 +355,9 @@ it("reports start and nested outcome deletion blockers without removing referenc
 			},
 		});
 		expect(detail.isError).not.toBe(true);
-		expect(textFn(detail)).toContain(blocker);
+		expect(textFn(detail)).toContain("Deletion blockers: 1");
+		expect(textFn(detail)).toContain(`${blocker}: ${reference}`);
+		expect(textFn(detail)).not.toContain("references missing template");
 		const result = await client.callTool({
 			name: "delete_template",
 			arguments: {

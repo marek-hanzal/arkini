@@ -1,3 +1,4 @@
+import { match, P } from "ts-pattern";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { ArrowRight, PanelsTopLeft } from "lucide-react";
 import { EditorCollectionOption } from "~/editor-control/ui/EditorCollectionOption";
@@ -15,14 +16,22 @@ const readItemSidesFn = (line: LineSchema.Type) => {
 	const spaces = new Set<number>();
 	const templates = new Set<string>();
 	for (const input of line.input) {
-		switch (input.type) {
-			case "materials":
-			case "units":
-				inputs.add(input.query.selector.itemUid);
-				break;
-			case "simple":
-				break;
-		}
+		match(input)
+			.with(
+				{
+					type: P.union("materials", "units"),
+				},
+				({ query }) => {
+					inputs.add(query.selector.itemUid);
+				},
+			)
+			.with(
+				{
+					type: "simple",
+				},
+				() => {},
+			)
+			.exhaustive();
 	}
 	for (const rule of line.rules)
 		for (const when of rule.when) inputs.add(when.query.selector.itemUid);
@@ -32,9 +41,32 @@ const readItemSidesFn = (line: LineSchema.Type) => {
 		for (const roll of set.roll) {
 			const drops = readDraftRollOutcomesFn(roll);
 			for (const outcome of drops) {
-				if (outcome.type === "item") outputs.add(outcome.itemUid);
-				else if (outcome.type === "space") spaces.add(outcome.space);
-				else templates.add(outcome.templateUid);
+				match(outcome)
+					.with(
+						{
+							type: "item",
+						},
+						({ itemUid }) => {
+							outputs.add(itemUid);
+						},
+					)
+					.with(
+						{
+							type: "space",
+						},
+						({ space }) => {
+							spaces.add(space);
+						},
+					)
+					.with(
+						{
+							type: "template",
+						},
+						({ templateUid }) => {
+							templates.add(templateUid);
+						},
+					)
+					.exhaustive();
 			}
 			for (const drop of drops)
 				for (const rule of drop.rules)
@@ -67,9 +99,7 @@ const ItemImages = ({
 	readonly emptyLabel: string;
 }) =>
 	ids.length === 0 ? (
-		emptyLabel === "" ? null : (
-			<span className="text-xs text-subtle">({emptyLabel})</span>
-		)
+		emptyLabel !== "" && <span className="text-xs text-subtle">({emptyLabel})</span>
 	) : (
 		<span className="flex min-w-0 flex-wrap items-center gap-1">
 			{ids.map((id) => (

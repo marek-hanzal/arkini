@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
@@ -64,60 +65,78 @@ export const createNoteCommandAtomsFx = Effect.fn("createEditorNotesCommandAtoms
 							}
 						>,
 					) => {
-						switch (input.action) {
-							case "create":
-								return repository
-									.createNoteFx({
-										projectId,
-										content: input.content,
-										itemUids: input.itemUids,
-										resourceUids: input.resourceUids,
-									})
-									.pipe(
-										Effect.flatMap((created) =>
-											Atom.update(projectStream, (notes) => [
-												created,
-												...(notes ?? []),
-											]),
-										),
-									);
-							case "update":
-								return repository
-									.updateNoteFx({
-										projectId,
-										noteId: input.noteId,
-										content: input.content,
-										itemUids: input.itemUids,
-										resourceUids: input.resourceUids,
-										expectedUpdatedAtMs: input.expectedUpdatedAtMs,
-									})
-									.pipe(
-										Effect.flatMap((updated) =>
-											Atom.update(projectStream, (notes) => [
-												updated,
-												...(notes ?? []).filter(
-													(note) => note.noteId !== updated.noteId,
-												),
-											]),
-										),
-									);
-							case "delete":
-								return repository
-									.deleteNoteFx({
-										projectId,
-										noteId: input.noteId,
-										expectedUpdatedAtMs: input.expectedUpdatedAtMs,
-									})
-									.pipe(
-										Effect.andThen(
-											Atom.update(projectStream, (notes) =>
-												(notes ?? []).filter(
-													(note) => note.noteId !== input.noteId,
+						return match(input)
+							.with(
+								{
+									action: "create",
+								},
+								(input) => {
+									return repository
+										.createNoteFx({
+											projectId,
+											content: input.content,
+											itemUids: input.itemUids,
+											resourceUids: input.resourceUids,
+										})
+										.pipe(
+											Effect.flatMap((created) =>
+												Atom.update(projectStream, (notes) => [
+													created,
+													...(notes ?? []),
+												]),
+											),
+										);
+								},
+							)
+							.with(
+								{
+									action: "update",
+								},
+								(input) => {
+									return repository
+										.updateNoteFx({
+											projectId,
+											noteId: input.noteId,
+											content: input.content,
+											itemUids: input.itemUids,
+											resourceUids: input.resourceUids,
+											expectedUpdatedAtMs: input.expectedUpdatedAtMs,
+										})
+										.pipe(
+											Effect.flatMap((updated) =>
+												Atom.update(projectStream, (notes) => [
+													updated,
+													...(notes ?? []).filter(
+														(note) => note.noteId !== updated.noteId,
+													),
+												]),
+											),
+										);
+								},
+							)
+							.with(
+								{
+									action: "delete",
+								},
+								(input) => {
+									return repository
+										.deleteNoteFx({
+											projectId,
+											noteId: input.noteId,
+											expectedUpdatedAtMs: input.expectedUpdatedAtMs,
+										})
+										.pipe(
+											Effect.andThen(
+												Atom.update(projectStream, (notes) =>
+													(notes ?? []).filter(
+														(note) => note.noteId !== input.noteId,
+													),
 												),
 											),
-										),
-									);
-						}
+										);
+								},
+							)
+							.exhaustive();
 					},
 				).pipe(Atom.withLabel(`EditorNotesCommand:${projectId}`), Atom.setIdleTTL(0));
 			});

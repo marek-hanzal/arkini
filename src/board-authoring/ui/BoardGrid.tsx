@@ -1,3 +1,4 @@
+import { match, P } from "ts-pattern";
 import "./BoardGrid.css";
 import { Plus } from "lucide-react";
 import {
@@ -133,28 +134,24 @@ const BoardGridSlot = ({
 				return;
 			}
 			if (!event.altKey && !event.metaKey) return;
-			const offset =
-				event.key === "ArrowLeft"
-					? {
-							x: -1,
-							y: 0,
-						}
-					: event.key === "ArrowRight"
-						? {
-								x: 1,
-								y: 0,
-							}
-						: event.key === "ArrowUp"
-							? {
-									x: 0,
-									y: -1,
-								}
-							: event.key === "ArrowDown"
-								? {
-										x: 0,
-										y: 1,
-									}
-								: undefined;
+			const offset = match(event.key)
+				.with("ArrowLeft", () => ({
+					x: -1,
+					y: 0,
+				}))
+				.with("ArrowRight", () => ({
+					x: 1,
+					y: 0,
+				}))
+				.with("ArrowUp", () => ({
+					x: 0,
+					y: -1,
+				}))
+				.with("ArrowDown", () => ({
+					x: 0,
+					y: 1,
+				}))
+				.otherwise(() => undefined);
 			if (offset === undefined) return;
 			event.preventDefault();
 			onMoveFn(offset);
@@ -358,16 +355,43 @@ const BoardGridEdit = ({
 		const next = changeFn(current);
 		if (next === current) return;
 		onCellsChangeFn(
-			index === -1
-				? next === undefined
-					? cells
-					: [
-							...cells,
-							next,
-						]
-				: next === undefined
-					? cells.filter((_, candidateIndex) => candidateIndex !== index)
-					: cells.map((cell, candidateIndex) => (candidateIndex === index ? next : cell)),
+			match({
+				index,
+				next,
+			})
+				.with(
+					{
+						index: -1,
+						next: undefined,
+					},
+					() => cells,
+				)
+				.with(
+					{
+						next: undefined,
+					},
+					() => cells.filter((_, candidateIndex) => candidateIndex !== index),
+				)
+				.with(
+					{
+						index: -1,
+						next: P.nonNullable,
+					},
+					({ next }) => [
+						...cells,
+						next,
+					],
+				)
+				.with(
+					{
+						next: P.nonNullable,
+					},
+					({ next }) =>
+						cells.map((cell, candidateIndex) =>
+							candidateIndex === index ? next : cell,
+						),
+				)
+				.exhaustive(),
 		);
 	};
 

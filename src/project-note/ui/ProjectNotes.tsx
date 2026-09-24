@@ -1,3 +1,4 @@
+import { match, P } from "ts-pattern";
 import { Mx } from "~/translation/ui/Mx";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { NoteForm } from "~/project-note/ui/NoteForm";
@@ -69,151 +70,190 @@ export const ProjectNotes = (props: ProjectNotesProps) => {
 				className="relative grid min-h-0 min-w-0 shrink-0 content-start gap-8 lg:overflow-y-auto lg:overscroll-contain"
 				data-ui="EditorNotesList"
 			>
-				{controller.loading ? (
-					<p className="text-sm text-muted">
-						<Tx label="Loading notes…" />
-					</p>
-				) : !controller.loaded ? (
-					<div className="flex justify-end">
-						<Button onClick={controller.retryFn}>
-							<Tx label="Retry loading notes" />
-						</Button>
-					</div>
-				) : (
-					<AnimatePresence
-						initial={false}
-						mode="popLayout"
-					>
-						{controller.notes.length === 0 ? (
-							<motion.div
-								key="empty"
-								layout="position"
-								{...noteMotion}
-							>
-								<Status
-									dataUi="EditorNotesEmpty"
-									size="large"
-									variant="flat"
-									description={
-										<Mx
-											label={
-												props.requiredCurrentResourceUid !== undefined
-													? "Artwork notes empty description"
-													: props.requiredCurrentItemUid === undefined
-														? "Notes empty description"
-														: "Item notes empty description"
-											}
-										/>
-									}
-									icon={NotebookPen}
-									title={translator.textFn(
-										props.requiredCurrentResourceUid !== undefined
-											? "Artwork notes empty title"
-											: props.requiredCurrentItemUid === undefined
-												? "Notes empty title"
-												: "Item notes empty title",
-									)}
-								/>
-							</motion.div>
-						) : (
-							controller.notes.map((note) => {
-								const editing = controller.editingNoteId === note.noteId;
-								return (
-									<MotionEditorRootCard
-										key={note.noteId}
-										layout="position"
-										className="min-w-0 gap-4 border-b border-line/70 pb-8 last:border-b-0 last:pb-0"
-										dataUi="EditorNote"
-										{...noteMotion}
-									>
-										<header className="flex items-center gap-3">
-											<time className="text-xs text-subtle">
-												{dateFormatter.format(note.updatedAtMs)}
-											</time>
-											{editing ? null : (
-												<div className="ml-auto flex items-center">
-													<Button
-														className={iconButtonClassName}
-														disabled={
-															controller.editingNoteId !==
-																undefined || controller.pending
-														}
-														data-ui="EditorNoteEdit"
-														onClick={() => controller.startEditFn(note)}
-													>
-														<Pencil className="size-4" />
-													</Button>
-
-													<Button
-														className={`${iconButtonClassName} hover:text-danger`}
-														disabled={
-															controller.editingNoteId !==
-																undefined || controller.pending
-														}
-														data-ui="EditorNoteDelete"
-														onClick={() => controller.removeFn(note)}
-													>
-														<Trash2 className="size-4" />
-													</Button>
-												</div>
-											)}
-										</header>
-										{editing ? (
-											<NoteForm
-												content={controller.editContent}
-												itemUids={controller.editItemUids}
-												resourceUids={controller.editResourceUids}
-												artworkFilter={props.artworkFilter}
-												artworkQuery={props.artworkQuery}
-												pending={controller.pending}
-												canSave={controller.canSaveEdit}
-												saveLabel="Save"
-												onContentChangeFn={controller.setEditContentFn}
-												onItemUidsChangeFn={controller.setEditItemUidsFn}
-												onResourceUidsChangeFn={
-													controller.setEditResourceUidsFn
-												}
-												onSaveFn={controller.saveEditFn}
-												onCancelFn={controller.cancelEditFn}
+				{match(controller)
+					.with(
+						{
+							loading: true,
+						},
+						() => (
+							<p className="text-sm text-muted">
+								<Tx label="Loading notes…" />
+							</p>
+						),
+					)
+					.with(
+						{
+							loaded: false,
+						},
+						() => (
+							<div className="flex justify-end">
+								<Button onClick={controller.retryFn}>
+									<Tx label="Retry loading notes" />
+								</Button>
+							</div>
+						),
+					)
+					.otherwise(() => (
+						<AnimatePresence
+							initial={false}
+							mode="popLayout"
+						>
+							{controller.notes.length === 0 ? (
+								<motion.div
+									key="empty"
+									layout="position"
+									{...noteMotion}
+								>
+									<Status
+										dataUi="EditorNotesEmpty"
+										size="large"
+										variant="flat"
+										description={
+											<Mx
+												label={match(props)
+													.with(
+														{
+															requiredCurrentResourceUid: P.string,
+														},
+														() => "Artwork notes empty description",
+													)
+													.with(
+														{
+															requiredCurrentItemUid:
+																P.optional(undefined),
+														},
+														() => "Notes empty description",
+													)
+													.otherwise(
+														() => "Item notes empty description",
+													)}
 											/>
-										) : (
-											<>
-												<div className="min-w-0 break-words">
-													<Markdown>{note.content}</Markdown>
-												</div>
-												<NoteItemLinks
-													itemUids={note.itemUids}
-													disabled={
-														controller.pending ||
-														controller.editingNoteId !== undefined
-													}
-													onUnlinkFn={(itemUid) =>
-														controller.unlinkFn(note, itemUid)
-													}
-												/>
-												<NoteResourceLinks
-													resourceUids={note.resourceUids}
-													disabled={
-														controller.pending ||
-														controller.editingNoteId !== undefined
-													}
-													onUnlinkFn={(resourceUid) =>
-														controller.unlinkResourceFn(
-															note,
-															resourceUid,
-														)
-													}
-													filter={props.artworkFilter}
-													query={props.artworkQuery}
-												/>
-											</>
+										}
+										icon={NotebookPen}
+										title={translator.textFn(
+											match(props)
+												.with(
+													{
+														requiredCurrentResourceUid: P.string,
+													},
+													() => "Artwork notes empty title",
+												)
+												.with(
+													{
+														requiredCurrentItemUid:
+															P.optional(undefined),
+													},
+													() => "Notes empty title",
+												)
+												.otherwise(() => "Item notes empty title"),
 										)}
-									</MotionEditorRootCard>
-								);
-							})
-						)}
-					</AnimatePresence>
-				)}
+									/>
+								</motion.div>
+							) : (
+								controller.notes.map((note) => {
+									const editing = controller.editingNoteId === note.noteId;
+									return (
+										<MotionEditorRootCard
+											key={note.noteId}
+											layout="position"
+											className="min-w-0 gap-4 border-b border-line/70 pb-8 last:border-b-0 last:pb-0"
+											dataUi="EditorNote"
+											{...noteMotion}
+										>
+											<header className="flex items-center gap-3">
+												<time className="text-xs text-subtle">
+													{dateFormatter.format(note.updatedAtMs)}
+												</time>
+												{editing ? null : (
+													<div className="ml-auto flex items-center">
+														<Button
+															className={iconButtonClassName}
+															disabled={
+																controller.editingNoteId !==
+																	undefined || controller.pending
+															}
+															data-ui="EditorNoteEdit"
+															onClick={() =>
+																controller.startEditFn(note)
+															}
+														>
+															<Pencil className="size-4" />
+														</Button>
+
+														<Button
+															className={`${iconButtonClassName} hover:text-danger`}
+															disabled={
+																controller.editingNoteId !==
+																	undefined || controller.pending
+															}
+															data-ui="EditorNoteDelete"
+															onClick={() =>
+																controller.removeFn(note)
+															}
+														>
+															<Trash2 className="size-4" />
+														</Button>
+													</div>
+												)}
+											</header>
+											{editing ? (
+												<NoteForm
+													content={controller.editContent}
+													itemUids={controller.editItemUids}
+													resourceUids={controller.editResourceUids}
+													artworkFilter={props.artworkFilter}
+													artworkQuery={props.artworkQuery}
+													pending={controller.pending}
+													canSave={controller.canSaveEdit}
+													saveLabel="Save"
+													onContentChangeFn={controller.setEditContentFn}
+													onItemUidsChangeFn={
+														controller.setEditItemUidsFn
+													}
+													onResourceUidsChangeFn={
+														controller.setEditResourceUidsFn
+													}
+													onSaveFn={controller.saveEditFn}
+													onCancelFn={controller.cancelEditFn}
+												/>
+											) : (
+												<>
+													<div className="min-w-0 break-words">
+														<Markdown>{note.content}</Markdown>
+													</div>
+													<NoteItemLinks
+														itemUids={note.itemUids}
+														disabled={
+															controller.pending ||
+															controller.editingNoteId !== undefined
+														}
+														onUnlinkFn={(itemUid) =>
+															controller.unlinkFn(note, itemUid)
+														}
+													/>
+													<NoteResourceLinks
+														resourceUids={note.resourceUids}
+														disabled={
+															controller.pending ||
+															controller.editingNoteId !== undefined
+														}
+														onUnlinkFn={(resourceUid) =>
+															controller.unlinkResourceFn(
+																note,
+																resourceUid,
+															)
+														}
+														filter={props.artworkFilter}
+														query={props.artworkQuery}
+													/>
+												</>
+											)}
+										</MotionEditorRootCard>
+									);
+								})
+							)}
+						</AnimatePresence>
+					))}
 			</section>
 			<div
 				className="min-h-0 min-w-0 shrink-0 space-y-3 lg:overflow-y-auto lg:overscroll-contain"

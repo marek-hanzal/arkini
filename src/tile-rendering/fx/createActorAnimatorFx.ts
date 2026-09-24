@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { match } from "ts-pattern";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
@@ -75,26 +76,52 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 
 			const applyWriteFn = (write: PresentationWrite) => {
 				if (write.actor.container.destroyed) return;
-				switch (write.channel) {
-					case "drop-target":
-						write.actor.visualLayer.scale.set(write.factor);
-						write.actor.visualLayer.alpha = Math.min(1, write.factor);
-						break;
-					case "pose":
-						write.actor.container.x = write.x;
-						write.actor.container.y = write.y;
-						if (write.scale !== undefined) write.actor.container.scale.set(write.scale);
-						break;
-					case "lifecycle-opacity":
-						write.actor.container.alpha = write.alpha;
-						break;
-					case "lifecycle-scale":
-						write.actor.lifecycleLayer.scale.set(write.scale);
-						break;
-					case "grab-offset":
-						write.actor.container.pivot.set(write.pivotX, write.pivotY);
-						break;
-				}
+				match(write)
+					.with(
+						{
+							channel: "drop-target",
+						},
+						(write) => {
+							write.actor.visualLayer.scale.set(write.factor);
+							write.actor.visualLayer.alpha = Math.min(1, write.factor);
+						},
+					)
+					.with(
+						{
+							channel: "pose",
+						},
+						(write) => {
+							write.actor.container.x = write.x;
+							write.actor.container.y = write.y;
+							if (write.scale !== undefined)
+								write.actor.container.scale.set(write.scale);
+						},
+					)
+					.with(
+						{
+							channel: "lifecycle-opacity",
+						},
+						(write) => {
+							write.actor.container.alpha = write.alpha;
+						},
+					)
+					.with(
+						{
+							channel: "lifecycle-scale",
+						},
+						(write) => {
+							write.actor.lifecycleLayer.scale.set(write.scale);
+						},
+					)
+					.with(
+						{
+							channel: "grab-offset",
+						},
+						(write) => {
+							write.actor.container.pivot.set(write.pivotX, write.pivotY);
+						},
+					)
+					.exhaustive();
 			};
 
 			const animateFx = Effect.fn("ActorAnimator.animateFx")((animation: ActorAnimation) =>
@@ -150,55 +177,84 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 								from: 0,
 								onUpdateFn: (progress) => {
 									if (closed || actor.container.destroyed) return;
-									switch (animation.channel) {
-										case "artwork-opacity":
-											for (const { visual, from, to } of artworkAlphas) {
-												if (!visual.container.destroyed)
-													visual.container.alpha =
-														from + (to - from) * progress;
-											}
-											break;
-										case "drop-target":
-											actor.visualLayer.scale.set(
-												fromDropScale +
-													(animation.toFactor - fromDropScale) * progress,
-											);
-											actor.visualLayer.alpha =
-												fromDropAlpha +
-												(Math.min(1, animation.toFactor) - fromDropAlpha) *
-													progress;
-											break;
-										case "pose": {
-											const pose = animation.readPoseFn?.(progress);
-											actor.container.x =
-												pose?.x ??
-												fromX +
-													((animation.toX ?? fromX) - fromX) * progress;
-											actor.container.y =
-												pose?.y ??
-												fromY +
-													((animation.toY ?? fromY) - fromY) * progress;
-											const scale =
-												pose?.scale ??
-												fromScale +
-													((animation.toScale ?? fromScale) - fromScale) *
+									match(animation)
+										.with(
+											{
+												channel: "artwork-opacity",
+											},
+											() => {
+												for (const { visual, from, to } of artworkAlphas) {
+													if (!visual.container.destroyed)
+														visual.container.alpha =
+															from + (to - from) * progress;
+												}
+											},
+										)
+										.with(
+											{
+												channel: "drop-target",
+											},
+											(animation) => {
+												actor.visualLayer.scale.set(
+													fromDropScale +
+														(animation.toFactor - fromDropScale) *
+															progress,
+												);
+												actor.visualLayer.alpha =
+													fromDropAlpha +
+													(Math.min(1, animation.toFactor) -
+														fromDropAlpha) *
 														progress;
-											actor.container.scale.set(scale);
-											break;
-										}
-										case "lifecycle-opacity":
-											actor.container.alpha =
-												fromAlpha +
-												(animation.toAlpha - fromAlpha) * progress;
-											break;
-										case "lifecycle-scale":
-											actor.lifecycleLayer.scale.set(
-												fromLifecycleScale +
-													(animation.toScale - fromLifecycleScale) *
-														progress,
-											);
-											break;
-									}
+											},
+										)
+										.with(
+											{
+												channel: "pose",
+											},
+											(animation) => {
+												const pose = animation.readPoseFn?.(progress);
+												actor.container.x =
+													pose?.x ??
+													fromX +
+														((animation.toX ?? fromX) - fromX) *
+															progress;
+												actor.container.y =
+													pose?.y ??
+													fromY +
+														((animation.toY ?? fromY) - fromY) *
+															progress;
+												const scale =
+													pose?.scale ??
+													fromScale +
+														((animation.toScale ?? fromScale) -
+															fromScale) *
+															progress;
+												actor.container.scale.set(scale);
+											},
+										)
+										.with(
+											{
+												channel: "lifecycle-opacity",
+											},
+											(animation) => {
+												actor.container.alpha =
+													fromAlpha +
+													(animation.toAlpha - fromAlpha) * progress;
+											},
+										)
+										.with(
+											{
+												channel: "lifecycle-scale",
+											},
+											(animation) => {
+												actor.lifecycleLayer.scale.set(
+													fromLifecycleScale +
+														(animation.toScale - fromLifecycleScale) *
+															progress,
+												);
+											},
+										)
+										.exhaustive();
 								},
 								onCompleteFn: () => {
 									if (

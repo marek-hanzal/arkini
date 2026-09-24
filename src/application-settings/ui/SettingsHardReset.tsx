@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { useAtom } from "@effect/atom-react";
 import { useState } from "react";
 import { SettingsHardResetAtom } from "~/application-settings/atom/SettingsHardResetAtom";
@@ -39,7 +40,23 @@ export const SettingsHardReset = () => {
 					resetFn(undefined);
 				}}
 			>
-				{pending ? "Resetting…" : armed ? "Really?" : "Hard reset"}
+				{match({
+					pending,
+					armed,
+				})
+					.with(
+						{
+							pending: true,
+						},
+						() => "Resetting…",
+					)
+					.with(
+						{
+							armed: true,
+						},
+						() => "Really?",
+					)
+					.otherwise(() => "Hard reset")}
 			</DangerButton>
 		</div>
 	);

@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { Effect } from "effect";
 
 import type { Project } from "~/project-authoring/type/Project";
@@ -33,7 +34,11 @@ export const mutateItemLineFx = Effect.fn("mutateItemLineFx")(function* ({
 	const lineUid = operation.operation === "create" ? operation.line.uid : operation.lineUid;
 	yield* notifyProjectChangedFx(notifyProjectChangedFn, project.projectId);
 	return [
-		`${input.operation === "create" ? "Created" : input.operation === "delete" ? "Deleted" : "Replaced"} item line.`,
+		`${match(input.operation)
+			.with("create", () => "Created")
+			.with("delete", () => "Deleted")
+			.with("replace", () => "Replaced")
+			.exhaustive()} item line.`,
 		`Item UID: ${input.itemUid}`,
 		`Line UID: ${lineUid}`,
 		`Revision: ${commit.revision}`,

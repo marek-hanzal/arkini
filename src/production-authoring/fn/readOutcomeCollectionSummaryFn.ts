@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import type { OutcomeSchema } from "~/outcome/schema/OutcomeSchema";
 import type { TemplateSchema } from "~/board-template/schema/TemplateSchema";
 
@@ -14,33 +15,50 @@ export const readOutcomeCollectionSummaryFn = ({
 	readonly textFn: (key: string) => string;
 }) => {
 	const entries = outcomes.map((outcome) => {
-		switch (outcome.type) {
-			case "item":
-				return {
-					label: readItemLabelFn(outcome.itemUid, textFn("No item selected")),
-					searchTerms: [
-						outcome.itemUid,
-						readItemLabelFn(outcome.itemUid, ""),
-					],
-				};
-			case "template": {
-				const title = templates?.find(({ uid }) => uid === outcome.templateUid)?.title;
-				return {
-					label: title ?? textFn("No template selected"),
-					searchTerms: [
-						outcome.templateUid,
-						`Template ${title ?? outcome.templateUid}`,
-					],
-				};
-			}
-			case "space":
-				return {
-					label: `${textFn("Space")} ${outcome.space}`,
-					searchTerms: [
-						`Space ${outcome.space}`,
-					],
-				};
-		}
+		return match(outcome)
+			.with(
+				{
+					type: "item",
+				},
+				(outcome) => {
+					return {
+						label: readItemLabelFn(outcome.itemUid, textFn("No item selected")),
+						searchTerms: [
+							outcome.itemUid,
+							readItemLabelFn(outcome.itemUid, ""),
+						],
+					};
+				},
+			)
+			.with(
+				{
+					type: "template",
+				},
+				(outcome) => {
+					const title = templates?.find(({ uid }) => uid === outcome.templateUid)?.title;
+					return {
+						label: title ?? textFn("No template selected"),
+						searchTerms: [
+							outcome.templateUid,
+							`Template ${title ?? outcome.templateUid}`,
+						],
+					};
+				},
+			)
+			.with(
+				{
+					type: "space",
+				},
+				(outcome) => {
+					return {
+						label: `${textFn("Space")} ${outcome.space}`,
+						searchTerms: [
+							`Space ${outcome.space}`,
+						],
+					};
+				},
+			)
+			.exhaustive();
 	});
 	return {
 		label: entries.map(({ label }) => label).join(", "),

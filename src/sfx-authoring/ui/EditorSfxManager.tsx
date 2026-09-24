@@ -1,3 +1,5 @@
+import { EditorResourceOptimizationLabel } from "~/resource-authoring/ui/EditorResourceOptimizationLabel";
+import { match } from "ts-pattern";
 import { useState } from "react";
 import {
 	ChevronRight,
@@ -107,11 +109,11 @@ export const EditorSfxManager = () => {
 					onClick={controller.onOptimizeFn}
 				>
 					<Sparkles className="size-4" />
-					{controller.optimizePending
-						? controller.optimizationProgress?.phase === "saving"
-							? translator.textFn("Saving…")
-							: `${translator.textFn("Optimizing")} ${optimizationPercent}%`
-						: translator.textFn("Optimize")}
+					<EditorResourceOptimizationLabel
+						pending={controller.optimizePending}
+						phase={controller.optimizationProgress?.phase}
+						percent={optimizationPercent}
+					/>
 				</LinkButton>
 			}
 			secondaryNavigation={
@@ -139,7 +141,11 @@ const EditorSfxSlots = ({
 	const canDrop = !blocked && controller.draggedResourceUid !== undefined;
 	const visibleSlots = SfxEventPresentation.filter((option) => {
 		const assigned = controller.resourceUidByEvent[option.event] !== undefined;
-		return controller.view === "all" || (controller.view === "assigned" ? assigned : !assigned);
+		return match(controller.view)
+			.with("all", () => true)
+			.with("assigned", () => assigned)
+			.with("unused", () => !assigned)
+			.exhaustive();
 	});
 	if (visibleSlots.length === 0)
 		return (

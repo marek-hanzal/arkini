@@ -1,3 +1,4 @@
+import { match, P } from "ts-pattern";
 import { createId } from "@paralleldrive/cuid2";
 import { Effect } from "effect";
 import { TemplateSchema } from "~/board-template/schema/TemplateSchema";
@@ -83,31 +84,51 @@ const editCellsFx = Effect.fn("editTemplateCellsFx")(function* (
 					`Change ${index + 1}: cell (${destination.x}, ${destination.y}) is occupied; use replace to overwrite it.`,
 				),
 			);
-		switch (change.type) {
-			case "place":
-				board.push({
-					x: change.x,
-					y: change.y,
-					itemUid: change.itemUid,
-				});
-				break;
-			case "replace":
-				board[sourceIndex] = {
-					x: change.x,
-					y: change.y,
-					itemUid: change.itemUid,
-				};
-				break;
-			case "move":
-				board[sourceIndex] = {
-					...board[sourceIndex]!,
-					...change.to,
-				};
-				break;
-			case "remove":
-				board.splice(sourceIndex, 1);
-				break;
-		}
+		match(change)
+			.with(
+				{
+					type: "place",
+				},
+				(change) => {
+					board.push({
+						x: change.x,
+						y: change.y,
+						itemUid: change.itemUid,
+					});
+				},
+			)
+			.with(
+				{
+					type: "replace",
+				},
+				(change) => {
+					board[sourceIndex] = {
+						x: change.x,
+						y: change.y,
+						itemUid: change.itemUid,
+					};
+				},
+			)
+			.with(
+				{
+					type: "move",
+				},
+				(change) => {
+					board[sourceIndex] = {
+						...board[sourceIndex]!,
+						...change.to,
+					};
+				},
+			)
+			.with(
+				{
+					type: "remove",
+				},
+				() => {
+					board.splice(sourceIndex, 1);
+				},
+			)
+			.exhaustive();
 	}
 	return board;
 });
@@ -142,45 +163,64 @@ export const mutateTemplateFx = Effect.fn("mutateTemplateFx")(function* ({
 				`Template ${uid} does not exist. Read template_collection for available UIDs.`,
 			),
 		);
-	let next: TemplateSchema.Type | undefined;
-	switch (change.type) {
-		case "create":
-			next = {
-				uid,
-				title: change.input.title,
-				width: change.input.width ?? project.config.meta.board.width,
-				height: change.input.height ?? project.config.meta.board.height,
-				board: change.input.board,
-			};
-			break;
-		case "edit":
-			next = {
-				...previous!,
-				...change.input.patch,
-			};
-			break;
-		case "cells":
-			next = {
-				...previous!,
-				board: yield* editCellsFx(previous!, change.input.changes, project.config.items),
-			};
-			break;
-		case "delete": {
-			const blockers = readTemplateDeleteBlockersFn(project.config, uid);
-			if (blockers.length > 0)
-				return yield* Effect.fail(
-					new Error(
-						[
-							`Template ${uid} is referenced. Update these references before deleting:`,
-							...blockers.map(
-								(entry) => `- ${entry.path.join(".")}: ${entry.message}`,
+	let next: TemplateSchema.Type | undefined = yield* match(change)
+		.with(
+			{
+				type: "create",
+			},
+			({ input }) =>
+				Effect.succeed({
+					uid,
+					title: input.title,
+					width: input.width ?? project.config.meta.board.width,
+					height: input.height ?? project.config.meta.board.height,
+					board: input.board,
+				}),
+		)
+		.with(
+			{
+				type: "edit",
+			},
+			({ input }) =>
+				Effect.succeed({
+					...previous!,
+					...input.patch,
+				}),
+		)
+		.with(
+			{
+				type: "cells",
+			},
+			({ input }) =>
+				editCellsFx(previous!, input.changes, project.config.items).pipe(
+					Effect.map((board) => ({
+						...previous!,
+						board,
+					})),
+				),
+		)
+		.with(
+			{
+				type: "delete",
+			},
+			() =>
+				Effect.gen(function* () {
+					const blockers = readTemplateDeleteBlockersFn(project.config, uid);
+					if (blockers.length > 0)
+						return yield* Effect.fail(
+							new Error(
+								[
+									`Template ${uid} is referenced. Update these references before deleting:`,
+									...blockers.map(
+										(entry) => `- ${entry.path.join(".")}: ${entry.message}`,
+									),
+								].join("\n"),
 							),
-						].join("\n"),
-					),
-				);
-			break;
-		}
-	}
+						);
+					return undefined;
+				}),
+		)
+		.exhaustive();
 	if (next !== undefined) {
 		const parsed = TemplateSchema.safeParse(next);
 		if (!parsed.success)
@@ -211,15 +251,33 @@ export const mutateTemplateFx = Effect.fn("mutateTemplateFx")(function* ({
 							candidate!,
 						]
 					: templates.flatMap((template) =>
-							template.uid !== uid
-								? [
+							match({
+								selected: template.uid === uid,
+								candidate,
+							})
+								.with(
+									{
+										selected: false,
+									},
+									() => [
 										template,
-									]
-								: candidate === undefined
-									? []
-									: [
-											candidate,
-										],
+									],
+								)
+								.with(
+									{
+										candidate: undefined,
+									},
+									() => [],
+								)
+								.with(
+									{
+										candidate: P.nonNullable,
+									},
+									({ candidate }) => [
+										candidate,
+									],
+								)
+								.exhaustive(),
 						),
 		},
 		project,
@@ -228,11 +286,11 @@ export const mutateTemplateFx = Effect.fn("mutateTemplateFx")(function* ({
 		notifyProjectChangedFn,
 	});
 	return [
-		change.type === "delete"
-			? "Deleted template."
-			: change.type === "create"
-				? "Created template."
-				: "Edited template.",
+		match(change.type)
+			.with("delete", () => "Deleted template.")
+			.with("create", () => "Created template.")
+			.with("edit", "cells", () => "Edited template.")
+			.exhaustive(),
 		`UID: ${uid}`,
 		`Revision: ${commit.revision}`,
 		...(candidate === undefined

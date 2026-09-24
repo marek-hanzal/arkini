@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { Tx } from "~/translation/ui/Tx";
 import type { Project } from "~/project-authoring/type/Project";
 import { readGameDiagnosticPresentationFn } from "~/game-config-diagnostic/fn/readGameDiagnosticPresentationFn";
@@ -41,52 +42,93 @@ const readItemUidFromPathFn = (path: ReadonlyArray<PropertyKey>) =>
 	path[0] === "items" && typeof path[1] === "string" ? path[1] : undefined;
 
 const readDiagnosticItemUidsFn = (diagnostic: GameDiagnosticSchema.Type): ReadonlyArray<string> => {
-	switch (diagnostic.code) {
-		case "input:units-invalid":
-		case "merge:invalid":
-		case "line:duplicate-uid":
-		case "line:multiple-selections":
-			return [
-				diagnostic.ownerItemUid,
-			];
-		case "units:stochastic-renewal":
-		case "units:missing-renewal":
-			return [
-				diagnostic.itemUid,
-			];
-		case "config:key-uid-mismatch":
-		case "source:duplicate-record":
-			return diagnostic.entity === "item"
-				? [
-						diagnostic.key,
-					]
-				: [];
-		case "input:acceptance-cycle":
-			return diagnostic.cycle;
-		default:
+	return match(diagnostic)
+		.with(
+			{
+				code: "input:units-invalid",
+			},
+			{
+				code: "merge:invalid",
+			},
+			{
+				code: "line:duplicate-uid",
+			},
+			{
+				code: "line:multiple-selections",
+			},
+			(diagnostic) => {
+				return [
+					diagnostic.ownerItemUid,
+				];
+			},
+		)
+		.with(
+			{
+				code: "units:stochastic-renewal",
+			},
+			{
+				code: "units:missing-renewal",
+			},
+			(diagnostic) => {
+				return [
+					diagnostic.itemUid,
+				];
+			},
+		)
+		.with(
+			{
+				code: "config:key-uid-mismatch",
+			},
+			{
+				code: "source:duplicate-record",
+			},
+			(diagnostic) => {
+				return diagnostic.entity === "item"
+					? [
+							diagnostic.key,
+						]
+					: [];
+			},
+		)
+		.with(
+			{
+				code: "input:acceptance-cycle",
+			},
+			(diagnostic) => {
+				return diagnostic.cycle;
+			},
+		)
+		.otherwise((diagnostic) => {
 			return [
 				readItemUidFromPathFn(diagnostic.path),
 			].filter((itemUid): itemUid is string => itemUid !== undefined);
-	}
+		});
 };
 
 const readOwnedItemSectionFn = (diagnostic: GameDiagnosticSchema.Type): SectionId | undefined => {
-	switch (diagnostic.code) {
-		case "merge:invalid":
+	return match(diagnostic.code)
+		.returnType<SectionId | undefined>()
+		.with("merge:invalid", () => {
 			return "merges";
-		case "input:units-invalid":
-		case "input:acceptance-cycle":
-		case "line:duplicate-uid":
-		case "line:multiple-selections":
-			return "production";
-		case "units:stochastic-renewal":
-		case "units:missing-renewal":
+		})
+		.with(
+			"input:units-invalid",
+			"input:acceptance-cycle",
+			"line:duplicate-uid",
+			"line:multiple-selections",
+			() => {
+				return "production";
+			},
+		)
+		.with("units:stochastic-renewal", "units:missing-renewal", () => {
 			return "units";
-		case "resource:missing":
+		})
+		.with("resource:missing", () => {
 			return "artwork";
-		default:
+		})
+		.otherwise(() => {
 			return undefined;
-	}
+		});
 };
 
 const readEditorGameDiagnosticTargetsFn = (
@@ -160,59 +202,77 @@ const EditorDiagnosticLink = ({
 	readonly projectId: string;
 	readonly target: EditorDiagnosticTarget;
 }) => {
-	switch (target.kind) {
-		case "item":
-			return (
-				<ButtonLink
-					className="mt-3 w-fit shadow-none"
-					to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"
-					params={{
-						projectId,
-						itemUid: target.itemUid,
-						sectionId: target.sectionId,
-					}}
-				>
-					<Tx label="Open" /> {target.label}
-				</ButtonLink>
-			);
-		case "resource":
-			return target.resourceType === "artwork" ? (
-				<ButtonLink
-					className="mt-3 w-fit shadow-none"
-					to="/editor/$projectId/artwork/$resourceUid/detail/overview"
-					params={{
-						projectId,
-						resourceUid: target.resourceUid,
-					}}
-				>
-					<Tx label="Open artwork" /> {target.label}
-				</ButtonLink>
-			) : (
-				<ButtonLink
-					className="mt-3 w-fit shadow-none"
-					to="/editor/$projectId/project/detail/$sectionId"
-					params={{
-						projectId,
-						sectionId: "images",
-					}}
-				>
-					<Tx label="Open project images" />
-				</ButtonLink>
-			);
-		case "project":
-			return (
-				<ButtonLink
-					className="mt-3 w-fit shadow-none"
-					to="/editor/$projectId/project/form/$sectionId"
-					params={{
-						projectId,
-						sectionId: target.sectionId,
-					}}
-				>
-					<Tx label="Open project settings" />
-				</ButtonLink>
-			);
-	}
+	return match(target)
+		.with(
+			{
+				kind: "item",
+			},
+			(target) => {
+				return (
+					<ButtonLink
+						className="mt-3 w-fit shadow-none"
+						to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"
+						params={{
+							projectId,
+							itemUid: target.itemUid,
+							sectionId: target.sectionId,
+						}}
+					>
+						<Tx label="Open" /> {target.label}
+					</ButtonLink>
+				);
+			},
+		)
+		.with(
+			{
+				kind: "resource",
+			},
+			(target) => {
+				return target.resourceType === "artwork" ? (
+					<ButtonLink
+						className="mt-3 w-fit shadow-none"
+						to="/editor/$projectId/artwork/$resourceUid/detail/overview"
+						params={{
+							projectId,
+							resourceUid: target.resourceUid,
+						}}
+					>
+						<Tx label="Open artwork" /> {target.label}
+					</ButtonLink>
+				) : (
+					<ButtonLink
+						className="mt-3 w-fit shadow-none"
+						to="/editor/$projectId/project/detail/$sectionId"
+						params={{
+							projectId,
+							sectionId: "images",
+						}}
+					>
+						<Tx label="Open project images" />
+					</ButtonLink>
+				);
+			},
+		)
+		.with(
+			{
+				kind: "project",
+			},
+			(target) => {
+				return (
+					<ButtonLink
+						className="mt-3 w-fit shadow-none"
+						to="/editor/$projectId/project/form/$sectionId"
+						params={{
+							projectId,
+							sectionId: target.sectionId,
+						}}
+					>
+						<Tx label="Open project settings" />
+					</ButtonLink>
+				);
+			},
+		)
+		.exhaustive();
 };
 
 /** Renders structured build diagnostics without discarding their actionable editor context. */

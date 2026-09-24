@@ -425,10 +425,9 @@ export const GraphEdgeRow = ({
 								/>
 							</DetailFacts>
 						) : null}
-						{operation?.kind === "line" || operation?.kind === "clock" ? (
-							operation.data.rules.length > 0 ? (
-								<RulesDetail rules={operation.data.rules} />
-							) : null
+						{(operation.kind === "line" || operation.kind === "clock") &&
+						operation.data.rules.length > 0 ? (
+							<RulesDetail rules={operation.data.rules} />
 						) : null}
 						{set === undefined || set.rules.length === 0 ? null : (
 							<div>

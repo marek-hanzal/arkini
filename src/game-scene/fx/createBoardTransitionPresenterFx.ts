@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { match } from "ts-pattern";
 
 import type { GameTransition } from "~/game-session/type/GameSession";
 import type { PresentationRuntime } from "~/game-scene/service/PresentationRuntime";
@@ -98,28 +99,35 @@ export const createBoardTransitionPresenterFx = Effect.fn("createBoardTransition
 				if (closed || transition.sequence <= highestSequence) return;
 				highestSequence = transition.sequence;
 				const reset = hasTemplateResetFn(transition);
-				if (phase === "visible") {
-					if (transition.runtime.currentSpace !== visibleSpace || reset) {
-						pendingReset = reset;
-						if (!reset) applyTransitionFn(projectVisibleSpaceFn(transition), "hydrate");
-						startExitFn();
-						return;
-					}
-					applyTransitionFn(transition, "present");
-					return;
-				}
-				if (phase === "exiting" && reset) pendingReset = true;
-				if (phase === "exiting" && !pendingReset) {
-					// The outgoing Board keeps showing fresh job results until it vanishes.
-					applyTransitionFn(projectVisibleSpaceFn(transition), "hydrate");
-				} else if (phase === "entering") {
-					if (reset) pendingReset = true;
-					if (pendingReset) return;
-					applyTransitionFn(
-						projectVisibleSpaceFn(transition),
-						transition.runtime.currentSpace === visibleSpace ? "present" : "hydrate",
-					);
-				}
+				match(phase)
+					.with("visible", () => {
+						if (transition.runtime.currentSpace !== visibleSpace || reset) {
+							pendingReset = reset;
+							if (!reset)
+								applyTransitionFn(projectVisibleSpaceFn(transition), "hydrate");
+							startExitFn();
+							return;
+						}
+						applyTransitionFn(transition, "present");
+					})
+					.with("exiting", () => {
+						if (reset) pendingReset = true;
+						// The outgoing Board keeps showing fresh job results until it vanishes.
+						if (!pendingReset)
+							applyTransitionFn(projectVisibleSpaceFn(transition), "hydrate");
+					})
+					.with("entering", () => {
+						if (reset) pendingReset = true;
+						if (pendingReset) return;
+						applyTransitionFn(
+							projectVisibleSpaceFn(transition),
+							transition.runtime.currentSpace === visibleSpace
+								? "present"
+								: "hydrate",
+						);
+					})
+					.with("barrier", () => {})
+					.exhaustive();
 			};
 			const refreshFn = (transition: GameTransition) => {
 				if (closed || transition.sequence < highestSequence) return;

@@ -1,3 +1,4 @@
+import { match, P } from "ts-pattern";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { ItemArtwork } from "~/ui/ui/ItemArtwork";
 import { useResourceUrl } from "~/authoring-session/ui/ResourceUrlSession";
@@ -40,22 +41,44 @@ export const EditorItemSearchThumbnail = ({
 	readonly item: ItemSchema.Type | undefined;
 	readonly selected?: boolean;
 }) =>
-	selected ? (
-		<EditorItemSelectedThumbnail
-			className={className}
-			resourceUids={
-				item?.artwork.default ?? [
-					"",
-				]
-			}
-		/>
-	) : item === undefined ? null : (
-		<EditorItemThumbnail
-			className={className}
-			resourceUids={item.artwork.default}
-			size="lg"
-		/>
-	);
+	match({
+		selected,
+		item,
+	})
+		.with(
+			{
+				selected: true,
+			},
+			() => (
+				<EditorItemSelectedThumbnail
+					className={className}
+					resourceUids={
+						item?.artwork.default ?? [
+							"",
+						]
+					}
+				/>
+			),
+		)
+		.with(
+			{
+				item: undefined,
+			},
+			() => null,
+		)
+		.with(
+			{
+				item: P.nonNullable,
+			},
+			({ item }) => (
+				<EditorItemThumbnail
+					className={className}
+					resourceUids={item.artwork.default}
+					size="lg"
+				/>
+			),
+		)
+		.exhaustive();
 
 /** Renders the complete default item composition from back to front. */
 export const EditorItemThumbnail = ({

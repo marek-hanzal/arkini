@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { ItemHeaderTitle } from "~/item-authoring/ui/ItemHeaderTitle";
 import { Pencil } from "lucide-react";
 import type { PropsWithChildren } from "react";
@@ -22,18 +23,13 @@ import { ItemSectionHelp } from "~/item-authoring/ui/ItemSectionHelp";
 import { useItemSectionShortcuts } from "~/item-authoring/ui/useItemSectionShortcuts";
 
 const showSectionHeadingFn = (sectionId: SectionId) => {
-	switch (sectionId) {
-		case "merges":
-		case "units":
-		case "clock":
-		case "chain":
-		case "connections":
-		case "notes":
-		case "delete":
+	return match(sectionId)
+		.with("merges", "units", "clock", "chain", "connections", "notes", "delete", () => {
 			return false;
-		default:
+		})
+		.otherwise(() => {
 			return true;
-	}
+		});
 };
 
 /** Owns the stable item-detail header while routed sections replace only its body. */
@@ -66,12 +62,10 @@ export const Detail = ({
 		: "identity";
 	const help = ItemSectionHelp[sectionId];
 	const section = sections.find((candidate) => candidate.id === sectionId);
-	const sectionTitle =
-		sectionId === "identity"
-			? translator.textFn("Item details")
-			: sectionId === "delete"
-				? translator.textFn("Delete item")
-				: translator.textFn(section?.label ?? "Item details");
+	const sectionTitle = match(sectionId)
+		.with("identity", () => translator.textFn("Item details"))
+		.with("delete", () => translator.textFn("Delete item"))
+		.otherwise(() => translator.textFn(section?.label ?? "Item details"));
 	const sectionHeading = !showSectionHeadingFn(sectionId) ? null : (
 		<EditorFormSectionDivider title={sectionTitle} />
 	);
@@ -129,29 +123,32 @@ export const Detail = ({
 				</EditorSectionBar>
 			}
 		>
-			{sectionId === "notes" ? (
-				<div
-					className="grid h-full min-h-0 min-w-0 grid-rows-[minmax(0,1fr)]"
-					data-ui="EditorItemDetailPageContent"
-				>
-					{children}
-				</div>
-			) : sectionId === "connections" ? (
-				<div
-					className="grid min-h-0 min-w-0 flex-1 grid-rows-[minmax(0,1fr)]"
-					data-ui="EditorItemDetailPageContent"
-				>
-					{children}
-				</div>
-			) : (
-				<div
-					className="grid min-w-0 content-start gap-[var(--ak-viewport-gap)]"
-					data-ui="EditorItemDetailPageContent"
-				>
-					{sectionHeading}
-					{children}
-				</div>
-			)}
+			{match(sectionId)
+				.with("notes", () => (
+					<div
+						className="grid h-full min-h-0 min-w-0 grid-rows-[minmax(0,1fr)]"
+						data-ui="EditorItemDetailPageContent"
+					>
+						{children}
+					</div>
+				))
+				.with("connections", () => (
+					<div
+						className="grid min-h-0 min-w-0 flex-1 grid-rows-[minmax(0,1fr)]"
+						data-ui="EditorItemDetailPageContent"
+					>
+						{children}
+					</div>
+				))
+				.otherwise(() => (
+					<div
+						className="grid min-w-0 content-start gap-[var(--ak-viewport-gap)]"
+						data-ui="EditorItemDetailPageContent"
+					>
+						{sectionHeading}
+						{children}
+					</div>
+				))}
 		</EditorSectionPage>
 	);
 };

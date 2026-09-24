@@ -1,3 +1,4 @@
+import { match, P } from "ts-pattern";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { useStore } from "@tanstack/react-form";
 import { useEffect, useState } from "react";
@@ -22,14 +23,26 @@ export const ProjectBoardSection = () => {
 	const invalidIndex = firstIssue?.path[0] === "start" ? firstIssue.path[2] : undefined;
 	const invalidTemplateIndex =
 		firstIssue?.path[0] === "templates" ? firstIssue.path[1] : undefined;
-	const invalidSpace =
-		typeof invalidIndex === "number"
-			? start.spaces[invalidIndex]?.space
-			: typeof invalidTemplateIndex === "number"
-				? start.spaces.find(
-						(entry) => entry.templateUid === templates[invalidTemplateIndex]?.uid,
-					)?.space
-				: undefined;
+	const invalidSpace = match({
+		invalidIndex,
+		invalidTemplateIndex,
+	})
+		.with(
+			{
+				invalidIndex: P.number,
+			},
+			({ invalidIndex }) => start.spaces[invalidIndex]?.space,
+		)
+		.with(
+			{
+				invalidTemplateIndex: P.number,
+			},
+			({ invalidTemplateIndex }) =>
+				start.spaces.find(
+					(entry) => entry.templateUid === templates[invalidTemplateIndex]?.uid,
+				)?.space,
+		)
+		.otherwise(() => undefined);
 	useEffect(() => {
 		if (invalidSpace !== undefined) setSelectedSpaceFn(invalidSpace);
 	}, [

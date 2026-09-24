@@ -1,3 +1,5 @@
+import { match } from "ts-pattern";
+
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { makeDropRejectedResultFn } from "~/item-interaction/fn/makeDropRejectedResultFn";
 import { DropItemRejectedReason } from "~/item-interaction/type/DropItemResult";
@@ -20,14 +22,39 @@ export const makeDropActorRejectedResultFn = ({
 }: makeDropActorRejectedResultFn.Props) => {
 	const targetFailed = failedItemId === targetItemId;
 	return makeDropRejectedResultFn({
-		reason:
-			failure === "stale"
-				? targetFailed
-					? DropItemRejectedReason.StaleTarget
-					: DropItemRejectedReason.StaleSource
-				: targetFailed
-					? DropItemRejectedReason.InvalidTarget
-					: DropItemRejectedReason.InvalidSource,
+		reason: match({
+			failure,
+			targetFailed,
+		})
+			.with(
+				{
+					failure: "stale",
+					targetFailed: true,
+				},
+				() => DropItemRejectedReason.StaleTarget,
+			)
+			.with(
+				{
+					failure: "stale",
+					targetFailed: false,
+				},
+				() => DropItemRejectedReason.StaleSource,
+			)
+			.with(
+				{
+					failure: "invalid-location",
+					targetFailed: true,
+				},
+				() => DropItemRejectedReason.InvalidTarget,
+			)
+			.with(
+				{
+					failure: "invalid-location",
+					targetFailed: false,
+				},
+				() => DropItemRejectedReason.InvalidSource,
+			)
+			.exhaustive(),
 		sourceItemId,
 		targetItemId,
 	});

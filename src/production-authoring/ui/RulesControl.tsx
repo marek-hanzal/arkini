@@ -234,23 +234,23 @@ const WhenControl = ({
 					onChangeFn={(type) => {
 						const query = value.query;
 						onChangeFn(
-							type === "exists"
-								? {
-										type,
-										query,
-									}
-								: type === "count"
-									? {
-											type,
-											query,
-											count: 1,
-										}
-									: {
-											type,
-											query,
-											min: 1,
-											max: 1,
-										},
+							match(type)
+								.with("exists", () => ({
+									type: "exists" as const,
+									query,
+								}))
+								.with("count", () => ({
+									type: "count" as const,
+									query,
+									count: 1,
+								}))
+								.with("range", () => ({
+									type: "range" as const,
+									query,
+									min: 1,
+									max: 1,
+								}))
+								.exhaustive(),
 						);
 					}}
 				/>
@@ -478,11 +478,10 @@ const RuleControl = ({
 							rule.when[whenIndex].type === undefined
 								? `${translator.textFn("Condition")} ${whenIndex + 1}`
 								: `${translator.textFn("Condition")} ${whenIndex + 1} — ${translator.textFn(
-										rule.when[whenIndex].type === "count"
-											? "Exact count"
-											: rule.when[whenIndex].type === "range"
-												? "Count range"
-												: "Exists",
+										match(rule.when[whenIndex].type)
+											.with("count", () => "Exact count")
+											.with("range", () => "Count range")
+											.otherwise(() => "Exists"),
 									)}`
 						}
 						itemSearchTermsFn={(whenIndex) => {
@@ -572,15 +571,14 @@ export const RulesControl = ({
 		({
 			type,
 			when: [],
-			...(type === "runtime:multiplier"
-				? {
-						multiplier: 1,
-					}
-				: type === "runtime:adjust"
-					? {
-							adjustMs: 0,
-						}
-					: {}),
+			...match(type)
+				.with("runtime:multiplier", () => ({
+					multiplier: 1,
+				}))
+				.with("runtime:adjust", () => ({
+					adjustMs: 0,
+				}))
+				.otherwise(() => ({})),
 		}) as DraftRule;
 	const emitChangeFn = (next: ReadonlyArray<DraftRule>) => onChangeFn(next as RuleValue[]);
 	return (

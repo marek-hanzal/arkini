@@ -1,3 +1,5 @@
+import { match, P } from "ts-pattern";
+
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { readItemDetailQueueFx } from "~/item-detail-read/fx/readItemDetailQueueFx";
 
@@ -33,16 +35,37 @@ export const readItemLineStatusesFn = (
 		const active = queue.active.find((job) => job.lineUid === lineUid);
 		const requests = queue.request.filter((request) => request.lineUid === lineUid);
 		const first = requests[0];
-		const state =
-			active !== undefined
-				? active.status
-				: queue.active.length > 0
-					? "queued"
-					: first?.status === "waiting-inputs"
-						? "waiting-inputs"
-						: first?.status === "blocked-condition"
-							? "waiting-start"
-							: "queued";
+		const state = match({
+			active,
+			busy: queue.active.length > 0,
+			requestStatus: first?.status,
+		})
+			.returnType<readItemLineStatusesFn.Status["state"]>()
+			.with(
+				{
+					active: P.nonNullable,
+				},
+				({ active }) => active.status,
+			)
+			.with(
+				{
+					busy: true,
+				},
+				() => "queued",
+			)
+			.with(
+				{
+					requestStatus: "waiting-inputs",
+				},
+				() => "waiting-inputs",
+			)
+			.with(
+				{
+					requestStatus: "blocked-condition",
+				},
+				() => "waiting-start",
+			)
+			.otherwise(() => "queued");
 		return {
 			lineUid,
 			state,

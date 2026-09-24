@@ -4,14 +4,8 @@ import type { MainActorStore } from "~/tile-rendering/service/MainActorStore";
 import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 import { destroyTileActorFx } from "~/tile-rendering/fx/destroyTileActorFx";
 
-const readCanonicalSlotKeyFn = (location: PixiTileActor["item"]["location"]) => {
-	switch (location.scope) {
-		case "board":
-			return `board:${location.space}:${location.position.x}:${location.position.y}`;
-		default:
-			return null;
-	}
-};
+const readCanonicalSlotKeyFn = (location: PixiTileActor["item"]["location"]) =>
+	`board:${location.space}:${location.position.x}:${location.position.y}`;
 
 /** Owns canonical item projections and retained actor identity for the main Pixi scene. */
 export const createMainActorStoreFx = Effect.fn("createMainActorStoreFx")(() =>

@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { isDeepStrictEqual } from "node:util";
 import { assertUniqueLineUidsFx } from "~/project-authoring/fx/assertUniqueLineUidsFx";
 import { readTemplateReferenceIssuesFn } from "~/item-authoring/fn/readTemplateReferenceIssuesFn";
@@ -849,11 +850,17 @@ export const createCommitOperationsFx = Effect.fn("createCommitOperationsFx")(fu
 			});
 			const fileResource = ProjectResourceFileReplacementSchema.safeParse(resource);
 			const size = fileResource.success
-				? yield* resource.type === "artwork"
-						? validateArtworkPngFileFx(fileResource.data.path, resource.uid)
-						: resource.type === "image"
-							? validatePngResourceFileFx(fileResource.data.path, resource.uid)
-							: validateOggOpusFileFx(fileResource.data.path, resource.uid)
+				? yield* match(resource.type)
+						.with("artwork", () =>
+							validateArtworkPngFileFx(fileResource.data.path, resource.uid),
+						)
+						.with("image", () =>
+							validatePngResourceFileFx(fileResource.data.path, resource.uid),
+						)
+						.with("music", "sfx", () =>
+							validateOggOpusFileFx(fileResource.data.path, resource.uid),
+						)
+						.exhaustive()
 				: undefined;
 			return yield* commitResourcesFx(
 				"replace-resource",

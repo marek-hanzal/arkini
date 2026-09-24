@@ -1,3 +1,4 @@
+import { match, P } from "ts-pattern";
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
@@ -6,7 +7,10 @@ import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErr
 import { BuildCommandAtoms } from "~/editor-build/atom/BuildCommandAtoms";
 
 const readErrorMessageFn = (error: unknown) =>
-	error === undefined ? undefined : error instanceof Error ? error.message : String(error);
+	match(error)
+		.with(undefined, () => undefined)
+		.with(P.instanceOf(Error), (error) => error.message)
+		.otherwise(String);
 
 export namespace useEditorBuildSaveController {
 	export interface Props {

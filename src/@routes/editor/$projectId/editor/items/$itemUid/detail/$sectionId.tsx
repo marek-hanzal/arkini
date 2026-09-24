@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { ArtworkDetail } from "~/item-authoring/ui/ArtworkDetail";
 import { ClockDetail } from "~/item-authoring/ui/ClockDetail";
 import { UnitsDetail } from "~/item-authoring/ui/CapabilityDetails";
@@ -64,10 +65,11 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/d
 		const item = useItemByUid(itemUid);
 		if (item === undefined) return <NotFound uid={itemUid} />;
 		const section = sectionId as SectionId;
-		switch (section) {
-			case "identity":
+		return match(section)
+			.with("identity", () => {
 				return <IdentityDetail item={item} />;
-			case "artwork":
+			})
+			.with("artwork", () => {
 				return (
 					<EditorRootCard dataUi="EditorItemArtworkDetailCard">
 						<ArtworkDetail
@@ -76,17 +78,23 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/d
 						/>
 					</EditorRootCard>
 				);
-			case "units":
+			})
+			.with("units", () => {
 				return <UnitsDetail item={item} />;
-			case "clock":
+			})
+			.with("clock", () => {
 				return <ClockDetail item={item} />;
-			case "production":
+			})
+			.with("production", () => {
 				return <ProductionDetail item={item} />;
-			case "merges":
+			})
+			.with("merges", () => {
 				return <MergesCollectionDetail item={item} />;
-			case "chain":
+			})
+			.with("chain", () => {
 				return <ItemChain itemUid={item.uid} />;
-			case "connections": {
+			})
+			.with("connections", () => {
 				const filter = search.filter ?? "all";
 				return (
 					<ConnectionsSection
@@ -103,16 +111,18 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/d
 						}
 					/>
 				);
-			}
-			case "notes":
+			})
+			.with("notes", () => {
 				return (
 					<ItemNotes
 						key={item.uid}
 						itemUid={item.uid}
 					/>
 				);
-			case "delete":
+			})
+			.with("delete", () => {
 				return <DeleteSection item={item} />;
-		}
+			})
+			.exhaustive();
 	},
 });

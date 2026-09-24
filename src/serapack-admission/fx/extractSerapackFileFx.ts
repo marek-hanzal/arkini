@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { createReadStream, createWriteStream } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
@@ -75,11 +76,11 @@ export const extractSerapackFileFx = Effect.fn("extractSerapackFileFx")(function
 		const resource = layout.resources[index];
 		const path = join(resourcesRoot, String(index).padStart(6, "0"));
 		yield* copyRangeFx(serapackPath, resource.offset, resource.length, path);
-		yield* resource.type === "artwork"
-			? validateArtworkPngFileFx(path, resource.uid)
-			: resource.type === "image"
-				? validatePngResourceFileFx(path, resource.uid)
-				: validateOggOpusFileFx(path, resource.uid);
+		yield* match(resource.type)
+			.with("artwork", () => validateArtworkPngFileFx(path, resource.uid))
+			.with("image", () => validatePngResourceFileFx(path, resource.uid))
+			.with("music", "sfx", () => validateOggOpusFileFx(path, resource.uid))
+			.exhaustive();
 		resources.push({
 			uid: resource.uid,
 			type: resource.type,

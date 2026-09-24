@@ -1,3 +1,4 @@
+import { match, P } from "ts-pattern";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { GameSaveSlotSchema } from "~/game-persistence/schema/GameSaveSlotSchema";
 import { useAtom } from "@effect/atom-react";
@@ -220,29 +221,66 @@ export const useGameMenuActions = ({
 		return () => window.removeEventListener("keydown", onKeyDownFn);
 	});
 
-	const status = (() => {
-		if (saveAndExitPending) return "Saving and exiting Serakki…";
-		if (savePending) return "Saving…";
-		if (commandFailure !== undefined) {
-			const label = commandFailure.command === "save-and-exit" ? "Save and exit" : "Save";
-			return `${label} failed: ${errorMessageFn(commandFailure.error)}`;
-		}
-		if (navigationError !== undefined) {
-			return `Navigation failed: ${errorMessageFn(navigationError)}`;
-		}
-		if (menu.activeAction === "load") return null;
-		if (
-			menu.activeAction === "settings" ||
-			menu.activeAction === "cheats" ||
-			menu.activeAction === "main-menu" ||
-			menu.activeAction === "hard-reset"
-		) {
-			return "Opening action page…";
-		}
-		if (successfulCommand === "save-and-exit") return "Save and exit requested.";
-		if (successfulCommand === "save") return "Saved.";
-		return null;
-	})();
+	const status = match({
+		saveAndExitPending,
+		savePending,
+		commandFailure,
+		navigationError,
+		activeAction: menu.activeAction,
+		successfulCommand,
+	})
+		.with(
+			{
+				saveAndExitPending: true,
+			},
+			() => "Saving and exiting Serakki…",
+		)
+		.with(
+			{
+				savePending: true,
+			},
+			() => "Saving…",
+		)
+		.with(
+			{
+				commandFailure: P.nonNullable,
+			},
+			({ commandFailure }) => {
+				const label = commandFailure.command === "save-and-exit" ? "Save and exit" : "Save";
+				return `${label} failed: ${errorMessageFn(commandFailure.error)}`;
+			},
+		)
+		.with(
+			{
+				navigationError: P.not(undefined),
+			},
+			({ navigationError }) => `Navigation failed: ${errorMessageFn(navigationError)}`,
+		)
+		.with(
+			{
+				activeAction: "load",
+			},
+			() => null,
+		)
+		.with(
+			{
+				activeAction: P.union("settings", "cheats", "main-menu", "hard-reset"),
+			},
+			() => "Opening action page…",
+		)
+		.with(
+			{
+				successfulCommand: "save-and-exit",
+			},
+			() => "Save and exit requested.",
+		)
+		.with(
+			{
+				successfulCommand: "save",
+			},
+			() => "Saved.",
+		)
+		.otherwise(() => null);
 
 	return {
 		status,

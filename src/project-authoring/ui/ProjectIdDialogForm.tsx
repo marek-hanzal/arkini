@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { Overlay } from "~/ui/ui/Overlay";
 import { useEditorSaveShortcut } from "~/editor-control/ui/useEditorSaveShortcut";
 import { useEffect, useRef, useState, type FormEvent } from "react";
@@ -37,14 +38,30 @@ export const ProjectIdDialogForm = ({
 	const [submitted, setSubmittedFn] = useState(false);
 	const parsed = IdSchema.safeParse(projectId);
 	const projectIdCollisionError = readProjectIdCollisionErrorFn(error);
-	const fieldError =
-		submitted && !parsed.success
-			? translator.textFn("Project ID is required.")
-			: submitted && projectId === unchangedProjectId
-				? translator.textFn("Choose a different Project ID.")
-				: submitted
-					? projectIdCollisionError
-					: undefined;
+	const fieldError = match({
+		submitted,
+		valid: parsed.success,
+		unchanged: projectId === unchangedProjectId,
+	})
+		.with(
+			{
+				submitted: false,
+			},
+			() => undefined,
+		)
+		.with(
+			{
+				valid: false,
+			},
+			() => translator.textFn("Project ID is required."),
+		)
+		.with(
+			{
+				unchanged: true,
+			},
+			() => translator.textFn("Choose a different Project ID."),
+		)
+		.otherwise(() => projectIdCollisionError);
 	useEffect(() => {
 		if (fieldError === undefined) return;
 		requestAnimationFrame(() =>

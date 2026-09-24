@@ -1,4 +1,5 @@
 import { Deferred, Effect } from "effect";
+import { match, P } from "ts-pattern";
 
 import type {
 	CloseItemDetailProps,
@@ -80,18 +81,39 @@ export const createItemDetailControllerFx = Effect.fnUntraced(function* (): Gene
 		(target: ItemDetailTarget) =>
 			Effect.gen(function* () {
 				const current = state;
-				if (current.phase === "closed") return enterFn(target);
-				// Resolve the superseded exit so its close waiter cannot hang.
-				if (current.phase === "exiting") {
-					yield* resolveExitCompletionFx(current.generation);
-					return enterFn(target);
-				}
-				if (sameTargetFn(current.target, target)) return true;
-				publishFn({
-					...current,
-					target,
-				});
-				return true;
+				return yield* match(current)
+					.with(
+						{
+							phase: "closed",
+						},
+						() => Effect.sync(() => enterFn(target)),
+					)
+					.with(
+						{
+							phase: "exiting",
+						},
+						(current) =>
+							Effect.gen(function* () {
+								// Resolve the superseded exit so its close waiter cannot hang.
+								yield* resolveExitCompletionFx(current.generation);
+								return enterFn(target);
+							}),
+					)
+					.with(
+						{
+							phase: P.union("entering", "open"),
+						},
+						(current) =>
+							Effect.sync(() => {
+								if (sameTargetFn(current.target, target)) return true;
+								publishFn({
+									...current,
+									target,
+								});
+								return true;
+							}),
+					)
+					.exhaustive();
 			}),
 	);
 
@@ -99,32 +121,49 @@ export const createItemDetailControllerFx = Effect.fnUntraced(function* (): Gene
 		({ restoreFocus = true }: CloseItemDetailProps = {}) =>
 			Effect.gen(function* () {
 				const current = state;
-				if (current.phase === "closed") return;
-				if (current.phase === "exiting") {
-					if (!restoreFocus && current.restoreFocus) {
-						publishFn({
-							...current,
-							restoreFocus: false,
-						});
-					}
-					if (exitCompletion !== undefined) {
-						yield* Deferred.await(exitCompletion.deferred);
-					}
-					return;
-				}
-
-				const deferred = yield* Deferred.make<void>();
-				exitCompletion = {
-					generation: current.generation,
-					deferred,
-				};
-				publishFn({
-					phase: "exiting",
-					target: current.target,
-					generation: current.generation,
-					restoreFocus,
-				});
-				yield* Deferred.await(deferred);
+				return yield* match(current)
+					.with(
+						{
+							phase: "closed",
+						},
+						() => Effect.void,
+					)
+					.with(
+						{
+							phase: "exiting",
+						},
+						(current) =>
+							Effect.gen(function* () {
+								if (!restoreFocus && current.restoreFocus)
+									publishFn({
+										...current,
+										restoreFocus: false,
+									});
+								if (exitCompletion !== undefined)
+									yield* Deferred.await(exitCompletion.deferred);
+							}),
+					)
+					.with(
+						{
+							phase: P.union("entering", "open"),
+						},
+						(current) =>
+							Effect.gen(function* () {
+								const deferred = yield* Deferred.make<void>();
+								exitCompletion = {
+									generation: current.generation,
+									deferred,
+								};
+								publishFn({
+									phase: "exiting",
+									target: current.target,
+									generation: current.generation,
+									restoreFocus,
+								});
+								yield* Deferred.await(deferred);
+							}),
+					)
+					.exhaustive();
 			}),
 	);
 

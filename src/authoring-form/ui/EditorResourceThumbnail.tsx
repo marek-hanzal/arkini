@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { useResourceUrl } from "~/authoring-session/ui/ResourceUrlSession";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { AudioLines } from "lucide-react";
@@ -27,20 +28,34 @@ export const EditorResourceThumbnail = ({
 			data-ui="EditorResourceThumbnail"
 			className={`grid ${thumbnailSizeClassName[size]} shrink-0 place-items-center overflow-hidden rounded-lg bg-canvas/70`}
 		>
-			{audio ? (
-				<AudioLines className="size-5 text-muted" />
-			) : url === undefined ? (
-				resourceUid ? (
-					<span className="text-sm font-semibold text-subtle">?</span>
-				) : null
-			) : (
-				<img
-					src={url}
-					alt=""
-					className="size-full object-contain"
-					draggable={false}
-				/>
-			)}
+			{match({
+				audio,
+				url,
+				resourceUid,
+			})
+				.with(
+					{
+						audio: true,
+					},
+					() => <AudioLines className="size-5 text-muted" />,
+				)
+				.with(
+					{
+						url: undefined,
+					},
+					() =>
+						resourceUid ? (
+							<span className="text-sm font-semibold text-subtle">?</span>
+						) : null,
+				)
+				.otherwise(({ url }) => (
+					<img
+						src={url}
+						alt=""
+						className="size-full object-contain"
+						draggable={false}
+					/>
+				))}
 		</span>
 	);
 };

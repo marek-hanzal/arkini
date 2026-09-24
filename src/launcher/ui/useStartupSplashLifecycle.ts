@@ -2,7 +2,7 @@ import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { useNavigate } from "@tanstack/react-router";
 import { Cause, Effect, Fiber } from "effect";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 
 import { RendererLifecycleOwnerAtom } from "~/application-runtime/atom/RendererLifecycleOwnerAtom";
 import { RendererLifecycleUnavailableError } from "~/application-runtime/error/RendererLifecycleUnavailableError";
@@ -56,7 +56,6 @@ export const useStartupSplashLifecycle = () => {
 	const [visibilityAttempt, setVisibilityAttemptFn] = useState(0);
 	const [navigationError, setNavigationErrorFn] = useState<unknown | null>(null);
 	const navigationStartedRef = useRef(false);
-	const startupFailed = startup._tag === "Failure" && !startup.waiting;
 	const splashReady = visibleAtMs !== null && visualReady;
 	const canContinue = startup._tag === "Success" && !startup.waiting && splashReady;
 
@@ -155,81 +154,124 @@ export const useStartupSplashLifecycle = () => {
 	]);
 
 	const lifecycleError = visibilityError ?? navigationError;
-	const content: StartupSplashContent =
-		lifecycleError === null
-			? startup.waiting
-				? {
-						kind: "loading",
-					}
-				: match(startup)
-						.with(
-							{
-								_tag: "Initial",
-							},
-							(): StartupSplashContent => ({
-								kind: "loading",
-							}),
-						)
-						.with(
-							{
-								_tag: "Failure",
-							},
-							({ cause }): StartupSplashContent => {
-								const error = Cause.squash(cause);
-								return {
-									kind: "failure",
-									message: error instanceof Error ? error.message : String(error),
-								};
-							},
-						)
-						.with(
-							{
-								_tag: "Success",
-							},
-							(): StartupSplashContent =>
-								match(minimumSplashComplete)
-									.with(true, () => ({
-										kind: "empty" as const,
-									}))
-									.with(false, () => ({
-										kind: "prompt" as const,
-									}))
-									.exhaustive(),
-						)
-						.exhaustive()
-			: {
+	const content = match({
+		lifecycleError,
+		startup,
+		minimumSplashComplete,
+	})
+		.returnType<StartupSplashContent>()
+		.with(
+			{
+				lifecycleError: P.not(null),
+			},
+			({ lifecycleError }) => ({
+				kind: "failure",
+				message:
+					lifecycleError instanceof Error
+						? lifecycleError.message
+						: String(lifecycleError),
+			}),
+		)
+		.with(
+			{
+				startup: {
+					waiting: true,
+				},
+			},
+			{
+				startup: {
+					_tag: "Initial",
+				},
+			},
+			() => ({
+				kind: "loading",
+			}),
+		)
+		.with(
+			{
+				startup: {
+					_tag: "Failure",
+				},
+			},
+			({ startup }) => {
+				const error = Cause.squash(startup.cause);
+				return {
 					kind: "failure",
-					message:
-						lifecycleError instanceof Error
-							? lifecycleError.message
-							: String(lifecycleError),
+					message: error instanceof Error ? error.message : String(error),
 				};
+			},
+		)
+		.with(
+			{
+				startup: {
+					_tag: "Success",
+				},
+				minimumSplashComplete: true,
+			},
+			() => ({
+				kind: "empty",
+			}),
+		)
+		.with(
+			{
+				startup: {
+					_tag: "Success",
+				},
+				minimumSplashComplete: false,
+			},
+			() => ({
+				kind: "prompt",
+			}),
+		)
+		.exhaustive();
 
-	let view: StartupSplashView;
-	if (visibilityError !== null) {
-		view = {
-			kind: "failure",
-			message:
-				visibilityError instanceof Error
-					? visibilityError.message
-					: String(visibilityError),
-		};
-	} else if (startupFailed && !visualReady) {
-		const error = Cause.squash(startup.cause);
-		view = {
-			kind: "failure",
-			message: error instanceof Error ? error.message : String(error),
-		};
-	} else if (splashReady) {
-		view = {
-			kind: "scene",
-			content,
-		};
-	} else {
-		view = {
+	const view = match({
+		visibilityError,
+		startup,
+		visualReady,
+		splashReady,
+	})
+		.returnType<StartupSplashView>()
+		.with(
+			{
+				visibilityError: P.not(null),
+			},
+			({ visibilityError }) => ({
+				kind: "failure",
+				message:
+					visibilityError instanceof Error
+						? visibilityError.message
+						: String(visibilityError),
+			}),
+		)
+		.with(
+			{
+				startup: {
+					_tag: "Failure",
+					waiting: false,
+				},
+				visualReady: false,
+			},
+			({ startup }) => {
+				const error = Cause.squash(startup.cause);
+				return {
+					kind: "failure",
+					message: error instanceof Error ? error.message : String(error),
+				};
+			},
+		)
+		.with(
+			{
+				splashReady: true,
+			},
+			() => ({
+				kind: "scene",
+				content,
+			}),
+		)
+		.otherwise(() => ({
 			kind: "loading",
-		};
-	}
+		}));
 
 	return {
 		skipFn: completeFn,

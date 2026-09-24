@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import type { GameDiagnosticSchema } from "~/game-config-diagnostic/schema/GameDiagnosticSchema";
 import type { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticCodeEnumSchema";
 
@@ -25,42 +26,111 @@ const diagnosticTitles = {
 } satisfies Record<DiagnosticCodeEnumSchema.Type, string>;
 
 const readDiagnosticContextFn = (diagnostic: GameDiagnosticSchema.Type): string | undefined => {
-	switch (diagnostic.code) {
-		case "input:units-invalid":
-			return `${diagnostic.ownerItemUid} · ${diagnostic.lineUid} · input ${diagnostic.inputIndex + 1}`;
-		case "merge:invalid":
-			return `${diagnostic.ownerItemUid} · merge ${diagnostic.mergeIndex + 1}`;
-		case "line:duplicate-uid":
-			return `${diagnostic.ownerItemUid} · ${diagnostic.lineUid}`;
-		case "line:multiple-selections":
-			return `${diagnostic.ownerItemUid} · ${diagnostic.lineUids.join(" / ")}`;
-		case "units:stochastic-renewal":
-		case "units:missing-renewal":
-			return diagnostic.itemUid;
-		case "resource:duplicate":
-		case "resource:missing":
-		case "resource:type-mismatch":
-		case "resource:unused":
-			return diagnostic.resourceUid;
-		case "config:missing-reference":
-			return `${diagnostic.reference} · ${diagnostic.referenceId}`;
-		case "config:key-uid-mismatch":
-			return `${diagnostic.key} / ${diagnostic.uid}`;
-		case "source:duplicate-record":
-			return `${diagnostic.entity} · ${diagnostic.key}`;
-		case "source:duplicate-provider":
-			return diagnostic.provider;
-		case "input:acceptance-cycle":
-			return diagnostic.cycle.join(" → ");
-		case "source:schema-reference-conflict":
-			return diagnostic.values.join(" / ");
-		case "start:invalid":
-			return diagnostic.failureTag;
-		case "source:json-invalid":
-		case "source:schema-invalid":
-		case "config:schema":
-			return undefined;
-	}
+	return match(diagnostic)
+		.with(
+			{
+				code: "input:units-invalid",
+			},
+			(diagnostic) =>
+				`${diagnostic.ownerItemUid} · ${diagnostic.lineUid} · input ${diagnostic.inputIndex + 1}`,
+		)
+		.with(
+			{
+				code: "merge:invalid",
+			},
+			(diagnostic) => `${diagnostic.ownerItemUid} · merge ${diagnostic.mergeIndex + 1}`,
+		)
+		.with(
+			{
+				code: "line:duplicate-uid",
+			},
+			(diagnostic) => `${diagnostic.ownerItemUid} · ${diagnostic.lineUid}`,
+		)
+		.with(
+			{
+				code: "line:multiple-selections",
+			},
+			(diagnostic) => `${diagnostic.ownerItemUid} · ${diagnostic.lineUids.join(" / ")}`,
+		)
+		.with(
+			{
+				code: "units:stochastic-renewal",
+			},
+			{
+				code: "units:missing-renewal",
+			},
+			(diagnostic) => diagnostic.itemUid,
+		)
+		.with(
+			{
+				code: "resource:duplicate",
+			},
+			{
+				code: "resource:missing",
+			},
+			{
+				code: "resource:type-mismatch",
+			},
+			{
+				code: "resource:unused",
+			},
+			(diagnostic) => diagnostic.resourceUid,
+		)
+		.with(
+			{
+				code: "config:missing-reference",
+			},
+			(diagnostic) => `${diagnostic.reference} · ${diagnostic.referenceId}`,
+		)
+		.with(
+			{
+				code: "config:key-uid-mismatch",
+			},
+			(diagnostic) => `${diagnostic.key} / ${diagnostic.uid}`,
+		)
+		.with(
+			{
+				code: "source:duplicate-record",
+			},
+			(diagnostic) => `${diagnostic.entity} · ${diagnostic.key}`,
+		)
+		.with(
+			{
+				code: "source:duplicate-provider",
+			},
+			(diagnostic) => diagnostic.provider,
+		)
+		.with(
+			{
+				code: "input:acceptance-cycle",
+			},
+			(diagnostic) => diagnostic.cycle.join(" → "),
+		)
+		.with(
+			{
+				code: "source:schema-reference-conflict",
+			},
+			(diagnostic) => diagnostic.values.join(" / "),
+		)
+		.with(
+			{
+				code: "start:invalid",
+			},
+			(diagnostic) => diagnostic.failureTag,
+		)
+		.with(
+			{
+				code: "source:json-invalid",
+			},
+			{
+				code: "source:schema-invalid",
+			},
+			{
+				code: "config:schema",
+			},
+			() => undefined,
+		)
+		.exhaustive();
 };
 
 /** Human-facing copy projected from one machine-readable diagnostic. */

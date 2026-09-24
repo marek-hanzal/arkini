@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { useStore } from "@tanstack/react-form";
 import { PowerOff } from "lucide-react";
 
@@ -9,16 +10,20 @@ import { Tooltip } from "~/ui/ui/Tooltip";
 import { Mx } from "~/translation/ui/Mx";
 
 const CapabilityHelp = ({ capability }: { readonly capability: OptionalCapability }) => {
-	switch (capability) {
-		case "production":
+	return match(capability)
+		.with("production", () => {
 			return <Mx label="Disable production help" />;
-		case "merges":
+		})
+		.with("merges", () => {
 			return <Mx label="Disable merges help" />;
-		case "clock":
+		})
+		.with("clock", () => {
 			return <Mx label="Disable Clock help" />;
-		case "units":
+		})
+		.with("units", () => {
 			return <Mx label="Disable Units help" />;
-	}
+		})
+		.exhaustive();
 };
 
 /** Clears only the active capability in the local form; the form session owns persistence. */
@@ -26,18 +31,22 @@ export const ItemSectionDisableControl = ({ sectionId }: { readonly sectionId: S
 	const { form, isSaving } = useFormSession();
 	const translator = useTranslator();
 	const configured = useStore(form.store, ({ values }) => {
-		switch (sectionId) {
-			case "production":
+		return match(sectionId)
+			.with("production", () => {
 				return (values.lines?.length ?? 0) > 0;
-			case "merges":
+			})
+			.with("merges", () => {
 				return (values.merge?.length ?? 0) > 0;
-			case "clock":
+			})
+			.with("clock", () => {
 				return values.clock !== undefined;
-			case "units":
+			})
+			.with("units", () => {
 				return values.units !== undefined;
-			default:
+			})
+			.otherwise(() => {
 				return false;
-		}
+			});
 	});
 	if (
 		!configured ||
@@ -54,20 +63,20 @@ export const ItemSectionDisableControl = ({ sectionId }: { readonly sectionId: S
 				data-ui="ItemSectionDisableControl"
 				disabled={isSaving}
 				onClick={() => {
-					switch (sectionId) {
-						case "production":
+					match(sectionId)
+						.with("production", () => {
 							form.setFieldValue("lines", []);
-							break;
-						case "merges":
+						})
+						.with("merges", () => {
 							form.setFieldValue("merge", undefined);
-							break;
-						case "clock":
+						})
+						.with("clock", () => {
 							form.setFieldValue("clock", undefined);
-							break;
-						case "units":
+						})
+						.with("units", () => {
 							form.setFieldValue("units", undefined);
-							break;
-					}
+						})
+						.exhaustive();
 				}}
 			>
 				<PowerOff className="size-4" />

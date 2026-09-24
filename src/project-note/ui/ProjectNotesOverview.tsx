@@ -1,3 +1,4 @@
+import { match, P } from "ts-pattern";
 import { ArrowRight } from "lucide-react";
 
 import { EditorOverviewCard } from "~/authoring-shell/ui/EditorOverviewCard";
@@ -22,13 +23,20 @@ export const ProjectNotesOverview = ({ projectId }: { readonly projectId: string
 			body={
 				latest === undefined ? (
 					<Tx
-						label={
-							notes.loaded
-								? "Notes empty title"
-								: notes.error === undefined
-									? "Loading notes…"
-									: "Notes unavailable"
-						}
+						label={match(notes)
+							.with(
+								{
+									loaded: true,
+								},
+								() => "Notes empty title",
+							)
+							.with(
+								{
+									error: P.optional(undefined),
+								},
+								() => "Loading notes…",
+							)
+							.otherwise(() => "Notes unavailable")}
 					/>
 				) : (
 					<div className="grid gap-3">

@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { Effect } from "effect";
 
 import type {
@@ -68,36 +69,38 @@ export const createEditorUnsavedChangesOwnerFx = Effect.fn("createEditorUnsavedC
 				decideFn: async (decision) => {
 					const current = activeRequest;
 					if (current === undefined || !snapshot.promptOpen || snapshot.saving) return;
-					if (decision === "cancel") {
-						settleFn(current, false);
-						return;
-					}
-					if (decision === "discard") {
-						for (const session of current.sessions) session.discardFn();
-						settleFn(current, true);
-						return;
-					}
-					if (!snapshot.canSave) return;
-					publishFn({
-						...snapshot,
-						error: undefined,
-						saving: true,
-					});
-					try {
-						for (const session of current.sessions) {
-							if (activeRequest !== current) return;
-							if (!(await session.saveFn()))
-								throw new Error("The editor draft could not be saved.");
-						}
-						settleFn(current, true);
-					} catch (error) {
-						if (activeRequest !== current) return;
-						publishFn({
-							...snapshot,
-							error,
-							saving: false,
-						});
-					}
+					return match(decision)
+						.with("cancel", () => {
+							settleFn(current, false);
+						})
+						.with("discard", () => {
+							for (const session of current.sessions) session.discardFn();
+							settleFn(current, true);
+						})
+						.with("save", async () => {
+							if (!snapshot.canSave) return;
+							publishFn({
+								...snapshot,
+								error: undefined,
+								saving: true,
+							});
+							try {
+								for (const session of current.sessions) {
+									if (activeRequest !== current) return;
+									if (!(await session.saveFn()))
+										throw new Error("The editor draft could not be saved.");
+								}
+								settleFn(current, true);
+							} catch (error) {
+								if (activeRequest !== current) return;
+								publishFn({
+									...snapshot,
+									error,
+									saving: false,
+								});
+							}
+						})
+						.exhaustive();
 				},
 				discardAllFn: () => {
 					const current = activeRequest;

@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { TemplateDetail } from "~/template-authoring/ui/TemplateDetail";
 export const Route = createFileRoute("/editor/$projectId/templates/$templateUid/detail/$sectionId")(
@@ -26,13 +27,10 @@ export const Route = createFileRoute("/editor/$projectId/templates/$templateUid/
 				<TemplateDetail
 					key={templateUid}
 					templateUid={templateUid}
-					section={
-						sectionId === "board"
-							? "board"
-							: sectionId === "delete"
-								? "delete"
-								: "general"
-					}
+					section={match(sectionId)
+						.with("board", () => "board" as const)
+						.with("delete", () => "delete" as const)
+						.otherwise(() => "general" as const)}
 				/>
 			);
 		},

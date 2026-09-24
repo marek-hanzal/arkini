@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { Effect } from "effect";
 
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
@@ -72,31 +73,31 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 			throw new Error(`Unsupported item delete reference path ${blocker.path.join(".")}.`);
 		const cleanup = itemCleanups.get(second) ?? createItemCleanupFn();
 		itemCleanups.set(second, cleanup);
-		switch (third) {
-			case "clock":
+		match(third)
+			.with("clock", () => {
 				if (fourth === "onExpire") cleanup.removeExpiryOutcome = true;
 				else if (fourth === "rules" && typeof fifth === "number")
 					cleanup.clockRuleIndexes.add(fifth);
 				else throw new Error(`Invalid clock reference path ${blocker.path.join(".")}.`);
-				break;
-			case "merge":
+			})
+			.with("merge", () => {
 				if (typeof fourth !== "number")
 					throw new Error(`Invalid merge reference path ${blocker.path.join(".")}.`);
 				cleanup.mergeIndexes.add(fourth);
-				break;
-			case "lines":
+			})
+			.with("lines", () => {
 				if (typeof fourth !== "number")
 					throw new Error(`Invalid line reference path ${blocker.path.join(".")}.`);
 				cleanup.lineIndexes.add(fourth);
-				break;
-			case "units":
+			})
+			.with("units", () => {
 				cleanup.removeUnitsOutcome = true;
-				break;
-			default:
+			})
+			.otherwise(() => {
 				throw new Error(
 					`Unsupported item delete reference path ${blocker.path.join(".")}.`,
 				);
-		}
+			});
 	}
 
 	const removedClockRules: Array<{

@@ -1,3 +1,4 @@
+import { match, P } from "ts-pattern";
 import {
 	Deferred,
 	Effect,
@@ -260,26 +261,44 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 					const claimDisposeFx = lifecycleLock.withPermits(1)(
 						Effect.gen(function* () {
 							const current = MutableRef.get(lifecycle);
-							if (current.type === "disposed") {
-								return {
-									type: "complete",
-								} satisfies DisposeClaim;
-							}
-							if (current.type === "disposing") {
-								return {
-									type: "await",
-									result: current.result,
-								} satisfies DisposeClaim;
-							}
-							const result = yield* Deferred.make<void, unknown>();
-							MutableRef.set(lifecycle, {
-								type: "disposing",
-								result,
-							});
-							return {
-								type: "run",
-								result,
-							} satisfies DisposeClaim;
+							return yield* match(current)
+								.with(
+									{
+										type: "disposed",
+									},
+									() =>
+										Effect.succeed<DisposeClaim>({
+											type: "complete",
+										}),
+								)
+								.with(
+									{
+										type: "disposing",
+									},
+									(current) =>
+										Effect.succeed<DisposeClaim>({
+											type: "await",
+											result: current.result,
+										}),
+								)
+								.with(
+									{
+										type: P.union("running", "frozen"),
+									},
+									() =>
+										Effect.gen(function* () {
+											const result = yield* Deferred.make<void, unknown>();
+											MutableRef.set(lifecycle, {
+												type: "disposing",
+												result,
+											});
+											return {
+												type: "run",
+												result,
+											} satisfies DisposeClaim;
+										}),
+								)
+								.exhaustive();
 						}),
 					);
 
@@ -287,34 +306,55 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 						Effect.uninterruptibleMask((restoreFx) =>
 							Effect.gen(function* () {
 								const claim = yield* claimDisposeFx;
-								if (claim.type === "complete") return;
-								if (claim.type === "await") {
-									return yield* restoreFx(Deferred.await(claim.result));
-								}
-
-								/**
-								 * Quiesce every runtime producer before observing the final
-								 * save. Reordering flush ahead of command-scope closure can
-								 * persist a snapshot while an admitted command is still committing.
-								 */
-								const attempt = stopGameLoopFx.pipe(
-									Effect.andThen(stopCommandsFx),
-									Effect.andThen(
-										saveMode === "discard" ? discardSaveFx : flushSaveFx,
-									),
-									Effect.andThen(releaseSessionFx),
-								);
-								const exit = yield* Effect.exit(attempt);
-								yield* lifecycleLock.withPermits(1)(
-									Effect.sync(() => {
-										MutableRef.set(lifecycle, {
-											type: Exit.isSuccess(exit) ? "disposed" : "frozen",
-										});
-									}),
-								);
-								yield* Deferred.done(claim.result, exit);
-								if (Exit.isFailure(exit))
-									return yield* Effect.failCause(exit.cause);
+								return yield* match(claim)
+									.with(
+										{
+											type: "complete",
+										},
+										() => Effect.void,
+									)
+									.with(
+										{
+											type: "await",
+										},
+										(claim) => restoreFx(Deferred.await(claim.result)),
+									)
+									.with(
+										{
+											type: "run",
+										},
+										(claim) =>
+											Effect.gen(function* () {
+												/**
+												 * Quiesce every runtime producer before observing the final
+												 * save. Reordering flush ahead of command-scope closure can
+												 * persist a snapshot while an admitted command is still committing.
+												 */
+												const attempt = stopGameLoopFx.pipe(
+													Effect.andThen(stopCommandsFx),
+													Effect.andThen(
+														saveMode === "discard"
+															? discardSaveFx
+															: flushSaveFx,
+													),
+													Effect.andThen(releaseSessionFx),
+												);
+												const exit = yield* Effect.exit(attempt);
+												yield* lifecycleLock.withPermits(1)(
+													Effect.sync(() => {
+														MutableRef.set(lifecycle, {
+															type: Exit.isSuccess(exit)
+																? "disposed"
+																: "frozen",
+														});
+													}),
+												);
+												yield* Deferred.done(claim.result, exit);
+												if (Exit.isFailure(exit))
+													return yield* Effect.failCause(exit.cause);
+											}),
+									)
+									.exhaustive();
 							}),
 						);
 

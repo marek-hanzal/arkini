@@ -1,3 +1,4 @@
+import { compareSerapackSourcesFn } from "~/serapack-catalog/fn/compareSerapackSourcesFn";
 import { Effect } from "effect";
 
 import { SerakkiVersionSchema } from "~/application-version/schema/SerakkiVersionSchema";
@@ -27,9 +28,7 @@ export const listSerapacksFx = Effect.fn("listSerapacksFx")(function* (
 		Effect.gen(function* () {
 			const ordered = [
 				...candidates,
-			].sort((left, right) =>
-				left.source === right.source ? 0 : left.source === "user" ? -1 : 1,
-			);
+			].sort((left, right) => compareSerapackSourcesFn(left.source, right.source));
 			for (const file of ordered) {
 				const descriptor = yield* Effect.sync(() => {
 					try {

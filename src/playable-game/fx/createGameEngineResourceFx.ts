@@ -1,4 +1,5 @@
 import { Effect, Exit, Option } from "effect";
+import { match, P } from "ts-pattern";
 
 import {
 	CriticalGameLifecycleError,
@@ -44,11 +45,15 @@ export const createGameEngineResourceFx = Effect.fn("createGameEngineResourceFx"
 				const fatal = game.getFatalErrorFn();
 				if (fatal === null) return;
 				markCriticalFailureFn(
-					fatal.source === "autosave"
-						? "game-save"
-						: fatal.source === "presentation"
-							? "game-presentation"
-							: "game-runtime",
+					match(fatal.source)
+						.returnType<CriticalGameLifecycleOperation>()
+						.with("autosave", () => "game-save")
+						.with("presentation", () => "game-presentation")
+						.with(
+							P.union("runtime", "subscription", "tick", "ui"),
+							() => "game-runtime",
+						)
+						.exhaustive(),
 					fatal,
 				);
 			};

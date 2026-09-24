@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { match } from "ts-pattern";
 import type { FederatedPointerEvent } from "pixi.js";
 
 import type { GameEngine } from "~/playable-game/type/GameEngine";
@@ -490,12 +491,23 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 					}
 					const point = application.stage.toLocal(event.global);
 					activeDrag = {
-						activationIntent:
-							event.button === 0
-								? "detail"
-								: event.ctrlKey && !event.altKey && !event.metaKey
-									? "fill-default-line-queue"
-									: "primary",
+						activationIntent: match(event)
+							.returnType<MainActivationIntent>()
+							.with(
+								{
+									button: 0,
+								},
+								() => "detail",
+							)
+							.with(
+								{
+									ctrlKey: true,
+									altKey: false,
+									metaKey: false,
+								},
+								() => "fill-default-line-queue",
+							)
+							.otherwise(() => "primary"),
 						actor,
 						pointerId: event.pointerId,
 						pressScreenX: event.global.x,

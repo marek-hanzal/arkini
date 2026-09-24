@@ -2112,8 +2112,6 @@ from:
   value: from
 from the game.:
   value: from the game.
-keep:
-  value: keep
 kill-switch:
   value: stop immediately
 managed:
@@ -2130,8 +2128,6 @@ reference must be removed first.:
   value: use must be removed first.
 references must be removed first.:
   value: uses must be removed first.
-remove:
-  value: remove
 rolls:
   value: rolls
 saved:
@@ -2142,8 +2138,6 @@ simple:
   value: simple
 space:
   value: space
-spend:
-  value: spend
 unit from owner:
   value: unit from this item
 unit from target:
@@ -2154,8 +2148,6 @@ units from target:
   value: units from target
 update:
   value: update
-use:
-  value: use
 warning:
   value: warning
 warnings:

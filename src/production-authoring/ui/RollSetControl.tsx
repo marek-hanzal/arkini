@@ -100,22 +100,22 @@ const OutcomeFields = ({
 					onChangeFn={(type) => {
 						if (type === value.type) return;
 						onChangeFn(
-							type === "item"
-								? {
-										...structuredClone(DraftDefaults.itemOutcome),
-										rules: value.rules,
-									}
-								: type === "template"
-									? {
-											type: "template",
-											templateUid: "",
-											rules: value.rules,
-										}
-									: {
-											type: "space",
-											space: 0,
-											rules: value.rules,
-										},
+							match(type)
+								.with("item", () => ({
+									...structuredClone(DraftDefaults.itemOutcome),
+									rules: value.rules,
+								}))
+								.with("template", () => ({
+									type: "template" as const,
+									templateUid: "",
+									rules: value.rules,
+								}))
+								.with("space", () => ({
+									type: "space" as const,
+									space: 0,
+									rules: value.rules,
+								}))
+								.exhaustive(),
 						);
 					}}
 				/>
@@ -133,96 +133,118 @@ const OutcomeFields = ({
 					/>
 				) : null}
 			</div>
-			{value.type === "item" ? (
-				<>
-					<EditorItemReferenceControl
-						error={readEditorFormValidationErrorFn(validationIssues, "itemUid")}
-						label={translator.textFn("Item")}
-						value={value.itemUid}
-						onChangeFn={(itemUid) =>
-							onChangeFn({
-								...value,
-								itemUid,
-							})
-						}
-					/>
-					<div className="flex flex-wrap items-end justify-between gap-3">
-						<div className="min-w-0 basis-1/2">
-							<QuantityControl
-								minimumError={readEditorFormValidationErrorFn(
-									validationIssues,
-									"quantity",
-									"min",
-								)}
-								maximumError={readEditorFormValidationErrorFn(
-									validationIssues,
-									"quantity",
-									"max",
-								)}
-								value={value.quantity}
-								onChangeFn={(quantity) =>
+			{match(value)
+				.with(
+					{
+						type: "item",
+					},
+					(value) => (
+						<>
+							<EditorItemReferenceControl
+								error={readEditorFormValidationErrorFn(validationIssues, "itemUid")}
+								label={translator.textFn("Item")}
+								value={value.itemUid}
+								onChangeFn={(itemUid) =>
 									onChangeFn({
 										...value,
-										quantity,
+										itemUid,
 									})
 								}
 							/>
-						</div>
-						<EditorChoiceControl
-							error={readEditorFormValidationErrorFn(validationIssues, "placement")}
-							label={translator.textFn("Board placement")}
-							value={value.placement}
-							options={[
-								{
-									description: <Mx label="Local drop placement help" />,
-									label: translator.textFn("Local drop"),
-									icon: <MapPin className="size-4" />,
-									value: "drop",
-								},
-								{
-									description: <Mx label="Random drop placement help" />,
-									label: translator.textFn("Random"),
-									icon: <Shuffle className="size-4" />,
-									value: "random",
-								},
-							]}
-							onChangeFn={(placement) =>
+							<div className="flex flex-wrap items-end justify-between gap-3">
+								<div className="min-w-0 basis-1/2">
+									<QuantityControl
+										minimumError={readEditorFormValidationErrorFn(
+											validationIssues,
+											"quantity",
+											"min",
+										)}
+										maximumError={readEditorFormValidationErrorFn(
+											validationIssues,
+											"quantity",
+											"max",
+										)}
+										value={value.quantity}
+										onChangeFn={(quantity) =>
+											onChangeFn({
+												...value,
+												quantity,
+											})
+										}
+									/>
+								</div>
+								<EditorChoiceControl
+									error={readEditorFormValidationErrorFn(
+										validationIssues,
+										"placement",
+									)}
+									label={translator.textFn("Board placement")}
+									value={value.placement}
+									options={[
+										{
+											description: <Mx label="Local drop placement help" />,
+											label: translator.textFn("Local drop"),
+											icon: <MapPin className="size-4" />,
+											value: "drop",
+										},
+										{
+											description: <Mx label="Random drop placement help" />,
+											label: translator.textFn("Random"),
+											icon: <Shuffle className="size-4" />,
+											value: "random",
+										},
+									]}
+									onChangeFn={(placement) =>
+										onChangeFn({
+											...value,
+											placement,
+										})
+									}
+								/>
+							</div>
+						</>
+					),
+				)
+				.with(
+					{
+						type: "space",
+					},
+					(value) => (
+						<EditorNumberControl
+							error={readEditorFormValidationErrorFn(validationIssues, "space")}
+							description={<Mx label="Target space help" />}
+							label={translator.textFn("Target space")}
+							min={0}
+							value={value.space}
+							onChangeFn={(space) =>
 								onChangeFn({
 									...value,
-									placement,
+									space,
 								})
+							}
+							trailing={
+								<LinkButton
+									className="whitespace-nowrap"
+									onClick={() =>
+										onChangeFn({
+											...value,
+											space: Math.floor(Math.random() * 897) + 128,
+										})
+									}
+								>
+									{translator.textFn("Pick random space")}
+								</LinkButton>
 							}
 						/>
-					</div>
-				</>
-			) : value.type === "space" ? (
-				<EditorNumberControl
-					error={readEditorFormValidationErrorFn(validationIssues, "space")}
-					description={<Mx label="Target space help" />}
-					label={translator.textFn("Target space")}
-					min={0}
-					value={value.space}
-					onChangeFn={(space) =>
-						onChangeFn({
-							...value,
-							space,
-						})
-					}
-					trailing={
-						<LinkButton
-							className="whitespace-nowrap"
-							onClick={() =>
-								onChangeFn({
-									...value,
-									space: Math.floor(Math.random() * 897) + 128,
-								})
-							}
-						>
-							{translator.textFn("Pick random space")}
-						</LinkButton>
-					}
-				/>
-			) : null}
+					),
+				)
+				.with(
+					{
+						type: "template",
+					},
+					() => null,
+				)
+				.exhaustive()}
 			<SectionEnd />
 			<RulesControl
 				initialRuleIndex={initialRuleIndex}
@@ -284,25 +306,53 @@ const OutcomeList = ({
 				key={initialOutcomeIndex}
 				itemLabelFn={(index) => {
 					const outcome = value[index];
-					const label =
-						outcome.type === "item"
-							? readItemLabelFn(
-									outcome.itemUid,
-									translator.textFn("No item selected"),
-								)
-							: outcome.type === "template"
-								? (project.config.templates?.find(
-										(template) => template.uid === outcome.templateUid,
-									)?.title ?? translator.textFn("No template selected"))
-								: `${translator.textFn("Space")} ${outcome.space}`;
+					const label = match(outcome)
+						.with(
+							{
+								type: "item",
+							},
+							({ itemUid }) =>
+								readItemLabelFn(itemUid, translator.textFn("No item selected")),
+						)
+						.with(
+							{
+								type: "template",
+							},
+							({ templateUid }) =>
+								project.config.templates?.find(
+									(template) => template.uid === templateUid,
+								)?.title ?? translator.textFn("No template selected"),
+						)
+						.with(
+							{
+								type: "space",
+							},
+							({ space }) => `${translator.textFn("Space")} ${space}`,
+						)
+						.exhaustive();
 					return `${translator.textFn("Outcome")} ${index + 1} — ${label}`;
 				}}
 				itemSearchTermsFn={(index) => [
-					value[index].type === "item"
-						? value[index].itemUid
-						: value[index].type === "template"
-							? value[index].templateUid
-							: `${translator.textFn("Space")} ${value[index].space}`,
+					match(value[index])
+						.with(
+							{
+								type: "item",
+							},
+							({ itemUid }) => itemUid,
+						)
+						.with(
+							{
+								type: "template",
+							},
+							({ templateUid }) => templateUid,
+						)
+						.with(
+							{
+								type: "space",
+							},
+							({ space }) => `${translator.textFn("Space")} ${space}`,
+						)
+						.exhaustive(),
 				]}
 				label={translator.textFn("Outcomes")}
 				itemMetaFn={(index) => readOutcomeSummaryFn(value[index], translator.textFn)}
@@ -320,9 +370,23 @@ const OutcomeList = ({
 						item={
 							index === undefined
 								? undefined
-								: value[index].type === "item"
-									? items[value[index].itemUid]
-									: undefined
+								: match(value[index])
+										.with(
+											{
+												type: "item",
+											},
+											({ itemUid }) => items[itemUid],
+										)
+										.with(
+											{
+												type: "template",
+											},
+											{
+												type: "space",
+											},
+											() => undefined,
+										)
+										.exhaustive()
 						}
 						selected
 					/>

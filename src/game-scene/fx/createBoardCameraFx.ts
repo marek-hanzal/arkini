@@ -1,4 +1,5 @@
 import { Clock, Effect } from "effect";
+import { match } from "ts-pattern";
 import { Rectangle } from "pixi.js";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
@@ -311,7 +312,11 @@ export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 		const x = ((event.clientX - bounds.left) * width) / bounds.width;
 		const y = ((event.clientY - bounds.top) * height) / bounds.height;
 		const delta =
-			event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? height : 1);
+			event.deltaY *
+			match(event.deltaMode)
+				.with(1, () => 16)
+				.with(2, () => height)
+				.otherwise(() => 1);
 		const nextScale = Math.max(
 			0.08,
 			Math.min(1.65, stage.scale.x * Math.exp(-delta * (event.ctrlKey ? 0.01 : 0.002))),

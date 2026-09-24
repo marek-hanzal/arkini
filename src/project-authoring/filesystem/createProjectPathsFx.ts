@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { Effect, Path } from "effect";
 
 import {
@@ -48,13 +49,12 @@ export const createProjectPathsFx = Effect.fn("createProjectPathsFx")(function* 
 		readonly uid: string;
 		readonly type: ResourceTypeSchema.Type;
 	}) =>
-		type === "artwork"
-			? readResourceFileFx(artwork, uid, ".png")
-			: type === "image"
-				? readResourceFileFx(image, uid, ".png")
-				: type === "music"
-					? readResourceFileFx(music, uid, ".ogg")
-					: readResourceFileFx(sfx, uid, ".ogg");
+		match(type)
+			.with("artwork", () => readResourceFileFx(artwork, uid, ".png"))
+			.with("image", () => readResourceFileFx(image, uid, ".png"))
+			.with("music", () => readResourceFileFx(music, uid, ".ogg"))
+			.with("sfx", () => readResourceFileFx(sfx, uid, ".ogg"))
+			.exhaustive();
 
 	return {
 		root,
@@ -75,13 +75,12 @@ export const createProjectPathsFx = Effect.fn("createProjectPathsFx")(function* 
 		resourceFileFx,
 		resourceMetadataFileFx: ({ uid, type }) =>
 			readResourceFileFx(
-				type === "artwork"
-					? artwork
-					: type === "image"
-						? image
-						: type === "music"
-							? music
-							: sfx,
+				match(type)
+					.with("artwork", () => artwork)
+					.with("image", () => image)
+					.with("music", () => music)
+					.with("sfx", () => sfx)
+					.exhaustive(),
 				uid,
 				".json",
 			),

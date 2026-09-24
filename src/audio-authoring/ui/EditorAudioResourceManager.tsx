@@ -1,3 +1,4 @@
+import { match, P } from "ts-pattern";
 import { type DragEvent, type ReactNode, useLayoutEffect, useRef } from "react";
 import { AudioLines, LoaderCircle, Music2, Pause, Play, Plus, Trash2 } from "lucide-react";
 
@@ -73,8 +74,10 @@ export const EditorAudioResourceManager = ({
 		: translator.textFn("No matching sound effects");
 	const dataUiPrefix = music ? "EditorMusic" : "EditorSfx";
 	const error = controller.importError ?? extraError ?? controller.playbackError;
-	const errorMessage =
-		error === undefined ? undefined : error instanceof Error ? error.message : String(error);
+	const errorMessage = match(error)
+		.with(undefined, () => undefined)
+		.with(P.instanceOf(Error), (error) => error.message)
+		.otherwise((error) => String(error));
 	const importButton = (
 		<PrimaryButton
 			className="h-10 min-h-10 gap-2 px-3 py-2 text-sm"
@@ -88,13 +91,39 @@ export const EditorAudioResourceManager = ({
 			) : (
 				<Plus className="size-4" />
 			)}
-			{controller.importPending
-				? music
-					? translator.textFn("Importing music…")
-					: translator.textFn("Importing SFX…")
-				: music
-					? translator.textFn("Import music")
-					: translator.textFn("Import SFX")}
+			{match({
+				pending: controller.importPending,
+				type: controller.type,
+			})
+				.with(
+					{
+						pending: true,
+						type: "music",
+					},
+					() => translator.textFn("Importing music…"),
+				)
+				.with(
+					{
+						pending: true,
+						type: "sfx",
+					},
+					() => translator.textFn("Importing SFX…"),
+				)
+				.with(
+					{
+						pending: false,
+						type: "music",
+					},
+					() => translator.textFn("Import music"),
+				)
+				.with(
+					{
+						pending: false,
+						type: "sfx",
+					},
+					() => translator.textFn("Import SFX"),
+				)
+				.exhaustive()}
 		</PrimaryButton>
 	);
 

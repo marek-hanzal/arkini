@@ -1,3 +1,5 @@
+import { EditorResourceOptimizationLabel } from "~/resource-authoring/ui/EditorResourceOptimizationLabel";
+import { match, P } from "ts-pattern";
 import { Tx } from "~/translation/ui/Tx";
 import type { ArtworkCatalogFilterSchema } from "~/artwork-authoring/schema/ArtworkCatalogFilterSchema";
 import { readGameResourceUsagesFn } from "~/game-config-resource/fn/readGameResourceUsagesFn";
@@ -353,55 +355,75 @@ export const EditorArtworkManager = (props: EditorArtworkManagerProps) => {
 		controller.catalogState === undefined
 			? undefined
 			: artworkCatalogStatuses[controller.catalogState];
-	const importError =
-		controller.importError === undefined
-			? undefined
-			: controller.importError instanceof Error
-				? controller.importError.message
-				: String(controller.importError);
+	const importError = match(controller.importError)
+		.with(undefined, () => undefined)
+		.with(P.instanceOf(Error), (error) => error.message)
+		.otherwise((error) => String(error));
 	const importSuccess =
 		controller.importedCount === undefined
 			? undefined
 			: `${translator.textFn("Imported artwork")}: ${controller.importedCount}`;
-	const optimizeError =
-		controller.optimizeError === undefined
-			? undefined
-			: controller.optimizeError instanceof Error
-				? controller.optimizeError.message
-				: String(controller.optimizeError);
-	const optimizationSuccess =
-		controller.optimization === undefined
-			? undefined
-			: controller.optimization.optimizedResourceCount === 0
-				? `${translator.textFn("Already optimized")}: ${controller.optimization.processedResourceCount} PNG`
-				: `${translator.textFn("Optimized")}: ${controller.optimization.optimizedResourceCount}/${controller.optimization.processedResourceCount} PNG · ${formatByteSizeFn(Math.abs(controller.optimization.originalBytes - controller.optimization.optimizedBytes))} ${translator.textFn(controller.optimization.optimizedBytes <= controller.optimization.originalBytes ? "saved" : "added by invisible color cleanup")}`;
-	const optimizationAlert =
-		optimizeError === undefined
-			? optimizationSuccess === undefined
-				? undefined
-				: {
-						message: optimizationSuccess,
-						tone: "success" as const,
-					}
-			: {
-					message: optimizeError,
-					tone: "danger" as const,
-				};
+	const optimizeError = match(controller.optimizeError)
+		.with(undefined, () => undefined)
+		.with(P.instanceOf(Error), (error) => error.message)
+		.otherwise((error) => String(error));
+	const optimizationSuccess = match(controller.optimization)
+		.with(undefined, () => undefined)
+		.with(
+			{
+				optimizedResourceCount: 0,
+			},
+			(optimization) =>
+				`${translator.textFn("Already optimized")}: ${optimization.processedResourceCount} PNG`,
+		)
+		.otherwise(
+			(optimization) =>
+				`${translator.textFn("Optimized")}: ${optimization.optimizedResourceCount}/${optimization.processedResourceCount} PNG · ${formatByteSizeFn(Math.abs(optimization.originalBytes - optimization.optimizedBytes))} ${translator.textFn(optimization.optimizedBytes <= optimization.originalBytes ? "saved" : "added by invisible color cleanup")}`,
+		);
+	const optimizationAlert = match({
+		optimizeError,
+		optimizationSuccess,
+	})
+		.with(
+			{
+				optimizeError: P.string,
+			},
+			({ optimizeError }) => ({
+				message: optimizeError,
+				tone: "danger" as const,
+			}),
+		)
+		.with(
+			{
+				optimizationSuccess: P.string,
+			},
+			({ optimizationSuccess }) => ({
+				message: optimizationSuccess,
+				tone: "success" as const,
+			}),
+		)
+		.otherwise(() => undefined);
 	const busy = controller.importPending || controller.optimizePending;
-	const optimizationPercent =
-		controller.optimizationProgress === undefined ||
-		controller.optimizationProgress.totalResourceCount === 0
-			? 0
-			: controller.optimizationProgress.phase === "saving"
-				? 100
-				: Math.min(
-						95,
-						Math.round(
-							(controller.optimizationProgress.completedResourceCount /
-								controller.optimizationProgress.totalResourceCount) *
-								95,
-						),
-					);
+	const optimizationPercent = match(controller.optimizationProgress)
+		.with(
+			undefined,
+			{
+				totalResourceCount: 0,
+			},
+			() => 0,
+		)
+		.with(
+			{
+				phase: "saving",
+			},
+			() => 100,
+		)
+		.otherwise((progress) =>
+			Math.min(
+				95,
+				Math.round((progress.completedResourceCount / progress.totalResourceCount) * 95),
+			),
+		);
 	const importButton = (
 		<EditorArtworkImportMenu
 			onImportSerapackFn={controller.openSerapackImportFn}
@@ -462,11 +484,11 @@ export const EditorArtworkManager = (props: EditorArtworkManagerProps) => {
 							onClick={controller.onOptimizeFn}
 						>
 							<Sparkles className="size-4" />
-							{controller.optimizePending
-								? controller.optimizationProgress?.phase === "saving"
-									? translator.textFn("Saving…")
-									: `${translator.textFn("Optimizing")} ${optimizationPercent}%`
-								: translator.textFn("Optimize")}
+							<EditorResourceOptimizationLabel
+								pending={controller.optimizePending}
+								phase={controller.optimizationProgress?.phase}
+								percent={optimizationPercent}
+							/>
 						</LinkButton>
 					}
 					help={

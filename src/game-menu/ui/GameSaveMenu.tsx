@@ -1,3 +1,4 @@
+import { match, P } from "ts-pattern";
 import {
 	autoUpdate,
 	flip,
@@ -136,16 +137,34 @@ export const GameSaveMenu = ({
 										{slot === "manual" ? " · F9" : ""}
 									</span>
 									<span className="text-xs text-muted">
-										{savedAt != null
-											? DateTime.fromMillis(savedAt).toRelative({
-													locale: "en",
-													style: "short",
-												})
-											: error !== undefined
-												? "Could not check availability"
-												: saves === undefined
-													? "Checking…"
-													: "Not available"}
+										{match({
+											savedAt,
+											error,
+											saves,
+										})
+											.with(
+												{
+													savedAt: P.number,
+												},
+												({ savedAt }) =>
+													DateTime.fromMillis(savedAt).toRelative({
+														locale: "en",
+														style: "short",
+													}),
+											)
+											.with(
+												{
+													error: P.nonNullable,
+												},
+												() => "Could not check availability",
+											)
+											.with(
+												{
+													saves: undefined,
+												},
+												() => "Checking…",
+											)
+											.otherwise(() => "Not available")}
 									</span>
 								</Button>
 							);

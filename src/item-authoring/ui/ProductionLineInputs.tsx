@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { Tx } from "~/translation/ui/Tx";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import type { InputSchema as LineInputSchema } from "~/production-input/schema/InputSchema";
@@ -23,11 +24,28 @@ const LineInput = ({ input }: { readonly input: LineInputSchema.Type }) => {
 		);
 	const eyebrow = (
 		<span className="mb-1 block text-xs font-medium uppercase tracking-[0.08em] text-muted">
-			{input.type === "materials"
-				? input.mode === "consume"
-					? translator.textFn("Consumed")
-					: translator.textFn("Reserved")
-				: translator.textFn("Required units")}
+			{match(input)
+				.with(
+					{
+						type: "materials",
+						mode: "consume",
+					},
+					() => translator.textFn("Consumed"),
+				)
+				.with(
+					{
+						type: "materials",
+						mode: "reserve",
+					},
+					() => translator.textFn("Reserved"),
+				)
+				.with(
+					{
+						type: "units",
+					},
+					() => translator.textFn("Required units"),
+				)
+				.exhaustive()}
 		</span>
 	);
 	const description =

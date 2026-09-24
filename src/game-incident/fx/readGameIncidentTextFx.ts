@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { Effect, FileSystem } from "effect";
 import { join } from "node:path";
 
@@ -17,20 +18,17 @@ export const readGameIncidentTextFx = Effect.fn("readGameIncidentTextFx")(functi
 		fileSystem
 			.readFileString(join(input, filename))
 			.pipe(Effect.mapError(() => new Error(`Could not read incident file ${filename}.`)));
-	switch (section) {
-		case "summary":
-			return yield* readFileFx(GameIncidentFiles.incident);
-		case "failure":
-			return yield* readFileFx(GameIncidentFiles.failure);
-		case "history":
-			return yield* readFileFx(GameIncidentFiles.history);
-		case "runtime":
-			return yield* readFileFx(GameIncidentFiles.runtimeState);
-		case "all":
-			return (yield* Effect.all([
+	return yield* match(section)
+		.with("summary", () => readFileFx(GameIncidentFiles.incident))
+		.with("failure", () => readFileFx(GameIncidentFiles.failure))
+		.with("history", () => readFileFx(GameIncidentFiles.history))
+		.with("runtime", () => readFileFx(GameIncidentFiles.runtimeState))
+		.with("all", () =>
+			Effect.all([
 				readFileFx(GameIncidentFiles.incident),
 				readFileFx(GameIncidentFiles.failure),
 				readFileFx(GameIncidentFiles.history),
-			])).join("\n\n---\n\n");
-	}
+			]).pipe(Effect.map((parts) => parts.join("\n\n---\n\n"))),
+		)
+		.exhaustive();
 });

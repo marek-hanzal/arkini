@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Search } from "lucide-react";
@@ -407,26 +408,28 @@ export const EditorSearchCombobox = ({
 						onClick={beginSearchFn}
 						onFocus={beginSearchFn}
 						onKeyDown={(event) => {
-							if (event.key === "Escape") {
-								handleOpenChangeFn(false);
-								return;
-							}
-							if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-								event.preventDefault();
-								keyboardScrollPendingRef.current = true;
-								setOpenFn(true);
-								setActiveIndexFn((current) => {
-									if (matches.length === 0) return 0;
-									const offset = event.key === "ArrowDown" ? 1 : -1;
-									return (current + offset + matches.length) % matches.length;
-								});
-								return;
-							}
-							if (event.key === "Enter" && open) {
-								event.preventDefault();
-								if (matches[activeIndex] !== undefined)
-									chooseFn(matches[activeIndex]);
-							}
+							match(event.key)
+								.with("Escape", () => {
+									handleOpenChangeFn(false);
+								})
+								.with("ArrowDown", "ArrowUp", () => {
+									event.preventDefault();
+									keyboardScrollPendingRef.current = true;
+									setOpenFn(true);
+									setActiveIndexFn((current) => {
+										if (matches.length === 0) return 0;
+										const offset = event.key === "ArrowDown" ? 1 : -1;
+										return (current + offset + matches.length) % matches.length;
+									});
+								})
+								.with("Enter", () => {
+									if (!open) return;
+
+									event.preventDefault();
+									if (matches[activeIndex] !== undefined)
+										chooseFn(matches[activeIndex]);
+								})
+								.otherwise(() => undefined);
 						}}
 						{...readDataUiFn({
 							dataUi: "EditorSearchComboboxInput",

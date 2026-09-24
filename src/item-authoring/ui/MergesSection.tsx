@@ -1,3 +1,4 @@
+import { match, P } from "ts-pattern";
 import { MergeOption } from "~/item-authoring/ui/MergeOption";
 import { readCapabilityRelatedTermsFn } from "~/item-authoring/fn/readCapabilityRelatedTermsFn";
 import { useTranslator } from "~/translation/ui/useTranslator";
@@ -114,21 +115,25 @@ const MergeFields = ({
 								merge={merges[index]}
 								onChangeFn={(merge) => updateFn(index, merge)}
 								sourceUnitsEnabled={sourceUnitsEnabled}
-								targetUnitsEnabled={
-									merges[index].action === "space"
-										? sourceUnitsEnabled
-										: targetItems[
-													"target" in merges[index]
-														? merges[index].target.itemUid
-														: ""
-												]?.uid === currentItemUid
-											? sourceUnitsEnabled
-											: targetItems[
-													"target" in merges[index]
-														? merges[index].target.itemUid
-														: ""
-												]?.units !== undefined
-								}
+								targetUnitsEnabled={match(merges[index])
+									.with(
+										{
+											action: "space",
+										},
+										() => sourceUnitsEnabled,
+									)
+									.with(
+										{
+											action: P.union("use", "consume", "spend"),
+										},
+										({ target }) => {
+											const item = targetItems[target.itemUid];
+											return item?.uid === currentItemUid
+												? sourceUnitsEnabled
+												: item?.units !== undefined;
+										},
+									)
+									.exhaustive()}
 							/>
 						)}
 					</EditorCollectionSelector>

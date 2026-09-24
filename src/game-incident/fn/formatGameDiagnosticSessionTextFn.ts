@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import {
 	formatGameDiagnosticItemPointerTextFn,
 	formatGameDiagnosticItemReferenceTextFn,
@@ -208,18 +209,16 @@ export const formatGameDiagnosticSessionTextFn = ({
 	readonly section: GameDiagnosticSessionTextSection;
 	readonly session: GameDiagnosticSession;
 }): string => {
-	switch (section) {
-		case "summary":
-			return formatSummaryFn(session);
-		case "failure":
-			return formatGameDiagnosticFailureTextFn(session.failure);
-		case "history":
-			return formatGameDiagnosticHistoryTextFn(session.history);
-		case "all":
-			return [
+	return match(section)
+		.with("summary", () => formatSummaryFn(session))
+		.with("failure", () => formatGameDiagnosticFailureTextFn(session.failure))
+		.with("history", () => formatGameDiagnosticHistoryTextFn(session.history))
+		.with("all", () =>
+			[
 				formatSummaryFn(session),
 				formatGameDiagnosticFailureTextFn(session.failure),
 				formatGameDiagnosticHistoryTextFn(session.history),
-			].join("\n\n---\n\n");
-	}
+			].join("\n\n---\n\n"),
+		)
+		.exhaustive();
 };

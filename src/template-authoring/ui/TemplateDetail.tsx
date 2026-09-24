@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { readTemplateDeleteBlockersFn } from "~/template-authoring/fn/readTemplateDeleteBlockersFn";
 import { Status } from "~/ui/ui/Status";
 import { TemplateSectionBar } from "~/template-authoring/ui/TemplateSectionBar";
@@ -161,41 +162,45 @@ export const TemplateDetail = ({
 						}
 					/>
 				) : null}
-				{section === "general" ? (
-					<EditorRootCard dataUi="TemplateGeneralDetail">
-						<DetailSection title={translator.textFn("General")}>
-							<DetailFacts columns={2}>
-								<DetailFact
-									label={translator.textFn("Title")}
-									value={template.title}
-								/>
-								<DetailFact
-									label="UID"
-									value={<code>{template.uid}</code>}
-								/>
-								<DetailFact
-									label={translator.textFn("Capacity")}
-									value={`${template.width} × ${template.height} = ${template.width * template.height}`}
-								/>
-								<DetailFact
-									label={translator.textFn("Items")}
-									value={template.board.length}
-								/>
-							</DetailFacts>
-						</DetailSection>
-					</EditorRootCard>
-				) : section === "board" ? (
-					<EditorRootCard dataUi="TemplateBoardDetail">
-						<BoardGrid
-							mode="detail"
-							cells={template.board}
-							width={template.width}
-							height={template.height}
-							items={project.config.items}
-							projectId={project.projectId}
-						/>
-					</EditorRootCard>
-				) : null}
+				{match(section)
+					.with("general", () => (
+						<EditorRootCard dataUi="TemplateGeneralDetail">
+							<DetailSection title={translator.textFn("General")}>
+								<DetailFacts columns={2}>
+									<DetailFact
+										label={translator.textFn("Title")}
+										value={template.title}
+									/>
+									<DetailFact
+										label="UID"
+										value={<code>{template.uid}</code>}
+									/>
+									<DetailFact
+										label={translator.textFn("Capacity")}
+										value={`${template.width} × ${template.height} = ${template.width * template.height}`}
+									/>
+									<DetailFact
+										label={translator.textFn("Items")}
+										value={template.board.length}
+									/>
+								</DetailFacts>
+							</DetailSection>
+						</EditorRootCard>
+					))
+					.with("board", () => (
+						<EditorRootCard dataUi="TemplateBoardDetail">
+							<BoardGrid
+								mode="detail"
+								cells={template.board}
+								width={template.width}
+								height={template.height}
+								items={project.config.items}
+								projectId={project.projectId}
+							/>
+						</EditorRootCard>
+					))
+					.with("delete", () => null)
+					.exhaustive()}
 			</div>
 		</EditorSectionPage>
 	);

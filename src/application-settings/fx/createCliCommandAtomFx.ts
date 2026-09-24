@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { Cause, Effect, Exit, Option } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
@@ -34,11 +35,11 @@ type CliStatus =
 	  };
 
 const admitsMutationFn = (command: Exclude<CliCommand, "read">, status: CliStatus) =>
-	command === "install"
-		? status.type === "not-installed" || status.type === "repairable"
-		: command === "replace"
-			? status.type === "conflict" && status.replaceable
-			: status.type === "installed" || status.type === "repairable";
+	match(command)
+		.with("install", () => status.type === "not-installed" || status.type === "repairable")
+		.with("replace", () => status.type === "conflict" && status.replaceable)
+		.with("uninstall", () => status.type === "installed" || status.type === "repairable")
+		.exhaustive();
 
 interface CreateCliCommandAtomFxProps<Status extends CliStatus> {
 	readonly readFx: () => Effect.Effect<Status, unknown, never>;
@@ -64,13 +65,12 @@ export const createCliCommandAtomFx = Effect.fn("createCliCommandAtomFx")(
 					Effect.gen(function* () {
 						const priorState = get(stateAtom);
 						const result = yield* Effect.exit(
-							command === "read"
-								? readFx()
-								: command === "install"
-									? installFx()
-									: command === "replace"
-										? replaceFx()
-										: uninstallFx(),
+							match(command)
+								.with("read", readFx)
+								.with("install", installFx)
+								.with("replace", replaceFx)
+								.with("uninstall", uninstallFx)
+								.exhaustive(),
 						);
 						if (Exit.isSuccess(result)) {
 							yield* Atom.set(stateAtom, {

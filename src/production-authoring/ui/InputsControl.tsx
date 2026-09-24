@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
@@ -75,22 +76,45 @@ export const InputsControl = ({
 					1,
 					translator.textFn("Add at least one input."),
 				)}
-				itemLabelFn={(index) => {
-					const input = value[index];
-					if (input.type === "materials")
-						return `${translator.textFn("Material input")} ${index + 1} — ${readItemLabelFn(
-							input.query.selector.itemUid,
-							translator.textFn("No item selected"),
-						)}`;
-					if (input.type === "units" && input.units?.from === "self")
-						return `${translator.textFn("Self-paid units input")} ${index + 1}`;
-					if (input.type === "units")
-						return `${translator.textFn("Units input")} ${index + 1} — ${readItemLabelFn(
-							input.query.selector.itemUid,
-							translator.textFn("No item selected"),
-						)}`;
-					return `${translator.textFn("Simple input")} ${index + 1}`;
-				}}
+				itemLabelFn={(index) =>
+					match(value[index])
+						.with(
+							{
+								type: "materials",
+							},
+							(input) =>
+								`${translator.textFn("Material input")} ${index + 1} — ${readItemLabelFn(
+									input.query.selector.itemUid,
+									translator.textFn("No item selected"),
+								)}`,
+						)
+						.with(
+							{
+								type: "units",
+								units: {
+									from: "self",
+								},
+							},
+							() => `${translator.textFn("Self-paid units input")} ${index + 1}`,
+						)
+						.with(
+							{
+								type: "units",
+							},
+							(input) =>
+								`${translator.textFn("Units input")} ${index + 1} — ${readItemLabelFn(
+									input.query.selector.itemUid,
+									translator.textFn("No item selected"),
+								)}`,
+						)
+						.with(
+							{
+								type: "simple",
+							},
+							() => `${translator.textFn("Simple input")} ${index + 1}`,
+						)
+						.exhaustive()
+				}
 				itemSearchTermsFn={(index) => {
 					const input = value[index];
 					if (input.type === "materials")

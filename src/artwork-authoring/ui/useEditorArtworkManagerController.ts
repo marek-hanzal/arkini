@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
@@ -102,13 +103,35 @@ export const useEditorArtworkManagerController = ({
 		optimizationState.kind === "optimizing" && optimizationState.type === "artwork"
 			? optimizationState.progress
 			: undefined;
-	const catalogState: useEditorArtworkManagerController.CatalogState | undefined = library.empty
-		? "empty"
-		: library.notesLoading || library.notesError !== undefined || library.resources.length > 0
-			? undefined
-			: filter === "unused" && query.trim() === ""
-				? "unused-empty"
-				: "no-matches";
+	const catalogState = match({
+		library,
+		filter,
+		query: query.trim(),
+	})
+		.returnType<useEditorArtworkManagerController.CatalogState | undefined>()
+		.with(
+			{
+				library: {
+					empty: true,
+				},
+			},
+			() => "empty",
+		)
+		.when(
+			({ library }) =>
+				library.notesLoading ||
+				library.notesError !== undefined ||
+				library.resources.length > 0,
+			() => undefined,
+		)
+		.with(
+			{
+				filter: "unused",
+				query: "",
+			},
+			() => "unused-empty",
+		)
+		.otherwise(() => "no-matches");
 	const openSerapackImportFn = () => {
 		serapackInputRef.current?.click();
 	};

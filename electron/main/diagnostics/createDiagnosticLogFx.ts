@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { getRotatingFileSink } from "@logtape/file";
 import {
 	configureSync,
@@ -134,46 +135,26 @@ const writeRecordFn = (logger: Logger, record: DiagnosticRecord) => {
 		category,
 		...subcategory,
 	]);
-	switch (record.level) {
-		case "debug":
-			eventLogger.debug(record.event, properties);
-			break;
-		case "info":
-			eventLogger.info(record.event, properties);
-			break;
-		case "warning":
-			eventLogger.warn(record.event, properties);
-			break;
-		case "error":
-			eventLogger.error(record.event, properties);
-			break;
-		case "fatal":
-			eventLogger.fatal(record.event, properties);
-			break;
-	}
+	match(record.level)
+		.with("debug", () => eventLogger.debug(record.event, properties))
+		.with("info", () => eventLogger.info(record.event, properties))
+		.with("warning", () => eventLogger.warn(record.event, properties))
+		.with("error", () => eventLogger.error(record.event, properties))
+		.with("fatal", () => eventLogger.fatal(record.event, properties))
+		.exhaustive();
 };
 
 const writeApplicationRecordFn = (logger: Logger, record: ApplicationLogRecordSchema.Type) => {
 	const properties = {
 		body: record.body === "" ? "" : "Details omitted from support log.",
 	};
-	switch (record.level) {
-		case "debug":
-			logger.debug(record.message, properties);
-			break;
-		case "info":
-			logger.info(record.message, properties);
-			break;
-		case "warning":
-			logger.warn(record.message, properties);
-			break;
-		case "error":
-			logger.error(record.message, properties);
-			break;
-		case "fatal":
-			logger.fatal(record.message, properties);
-			break;
-	}
+	match(record.level)
+		.with("debug", () => logger.debug(record.message, properties))
+		.with("info", () => logger.info(record.message, properties))
+		.with("warning", () => logger.warn(record.message, properties))
+		.with("error", () => logger.error(record.message, properties))
+		.with("fatal", () => logger.fatal(record.message, properties))
+		.exhaustive();
 };
 
 const readLastGameFn = (record: DiagnosticRecord): DiagnosticLog.LastGame | undefined => {

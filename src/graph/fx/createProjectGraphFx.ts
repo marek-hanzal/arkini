@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import datascript from "datascript";
 import { Clock, Effect } from "effect";
 import { compileGraphFactsFn } from "~/graph/fn/compileGraphFactsFn";
@@ -266,7 +267,24 @@ export const createProjectGraphFx = Effect.fn("createProjectGraphFx")(
 			const result: GraphResult = {
 				projectId: project.projectId,
 				revision: project.revision,
-				status: found ? "yes" : reasons.size > 0 ? "unknown" : "no",
+				status: match({
+					found,
+					truncated: reasons.size > 0,
+				})
+					.returnType<GraphResult["status"]>()
+					.with(
+						{
+							found: true,
+						},
+						() => "yes",
+					)
+					.with(
+						{
+							truncated: true,
+						},
+						() => "unknown",
+					)
+					.otherwise(() => "no"),
 				truncated: reasons.size > 0,
 				reasons: [
 					...reasons,

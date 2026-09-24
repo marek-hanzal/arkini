@@ -31,19 +31,35 @@ const isSameEditorArtworkDetailTransitionFn = (from: string, to: string) => {
 	);
 };
 
-const resolveVisualRouteIdFn = (pathname: string): VisualRouteId => {
-	if (pathname === "/") return "startup";
-	if (pathname === "/main-menu") return "main-menu";
-	if (settingsPattern.test(pathname)) return "settings";
-	if (pathname === "/about") return "about";
-	if (pathname === "/serapacks") return "serapacks";
-	if (pathname === "/editor" || pathname === "/editor/") return "serapacks";
-	if (editorProjectPattern.test(pathname)) return "editor";
-	if (gameBoardPattern.test(pathname)) return "board";
-	if (gameCheatsPattern.test(pathname)) return "cheats";
-	if (pathname.startsWith("/action/") || gameActionPattern.test(pathname)) return "action";
-	throw new Error(`Missing View Transition classification for route: ${pathname}`);
-};
+const resolveVisualRouteIdFn = (pathname: string): VisualRouteId =>
+	match(pathname)
+		.with("/", () => "startup" as const)
+		.with("/main-menu", () => "main-menu" as const)
+		.when(
+			(pathname) => settingsPattern.test(pathname),
+			() => "settings" as const,
+		)
+		.with("/about", () => "about" as const)
+		.with("/serapacks", "/editor", "/editor/", () => "serapacks" as const)
+		.when(
+			(pathname) => editorProjectPattern.test(pathname),
+			() => "editor" as const,
+		)
+		.when(
+			(pathname) => gameBoardPattern.test(pathname),
+			() => "board" as const,
+		)
+		.when(
+			(pathname) => gameCheatsPattern.test(pathname),
+			() => "cheats" as const,
+		)
+		.when(
+			(pathname) => pathname.startsWith("/action/") || gameActionPattern.test(pathname),
+			() => "action" as const,
+		)
+		.otherwise(() => {
+			throw new Error(`Missing View Transition classification for route: ${pathname}`);
+		});
 
 const isHeroRouteFn = (route: VisualRouteId) =>
 	route !== "board" && route !== "cheats" && route !== "editor";

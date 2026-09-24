@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { match, P } from "ts-pattern";
 
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
@@ -25,35 +26,57 @@ export const readItemPhysicalContextFx = Effect.fn("readItemPhysicalContextFx")(
 	while (!seen.has(current.id)) {
 		seen.add(current.id);
 		const location = current.location;
-		switch (location.scope) {
-			case "board":
-				return {
-					origin: location,
-				} satisfies readItemPhysicalContextFx.Result;
-			case "delivery":
-				return {
-					origin: location.origin,
-				} satisfies readItemPhysicalContextFx.Result;
-			case "input":
-				current = yield* readRuntimeItemByIdFx({
-					itemId: location.ownerItemId,
-					runtime,
-				});
-				break;
-			case "job":
-			case "reserved": {
-				const job = runtime.jobs.find((candidate) => candidate.id === location.jobId);
-				if (job === undefined)
-					return yield* Effect.die(
-						new Error(`Item ${current.id} job ${location.jobId} is missing.`),
-					);
-				current = yield* readRuntimeItemByIdFx({
-					itemId: job.ownerItemId,
-					runtime,
-				});
-				break;
-			}
-		}
+		const origin = yield* match(location)
+			.with(
+				{
+					scope: "board",
+				},
+				(location) => Effect.succeed(location),
+			)
+			.with(
+				{
+					scope: "delivery",
+				},
+				(location) => Effect.succeed(location.origin),
+			)
+			.with(
+				{
+					scope: "input",
+				},
+				(location) =>
+					Effect.gen(function* () {
+						current = yield* readRuntimeItemByIdFx({
+							itemId: location.ownerItemId,
+							runtime,
+						});
+						return undefined;
+					}),
+			)
+			.with(
+				{
+					scope: P.union("job", "reserved"),
+				},
+				(location) =>
+					Effect.gen(function* () {
+						const job = runtime.jobs.find(
+							(candidate) => candidate.id === location.jobId,
+						);
+						if (job === undefined)
+							return yield* Effect.die(
+								new Error(`Item ${current.id} job ${location.jobId} is missing.`),
+							);
+						current = yield* readRuntimeItemByIdFx({
+							itemId: job.ownerItemId,
+							runtime,
+						});
+						return undefined;
+					}),
+			)
+			.exhaustive();
+		if (origin !== undefined)
+			return {
+				origin,
+			} satisfies readItemPhysicalContextFx.Result;
 	}
 	return yield* Effect.die(new Error(`Item ${item.id} has cyclic ownership.`));
 });

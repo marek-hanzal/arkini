@@ -1,3 +1,4 @@
+import { match, P } from "ts-pattern";
 import { Cause, Effect, Exit, Option } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
@@ -190,34 +191,61 @@ export const ProjectCatalogCommandAtom = Atom.writable(
 	(get) => get(ProjectCatalogCommandStateAtom),
 	(context, input: ProjectCatalogCommandAtom.Input) => {
 		const state = context.get(ProjectCatalogCommandStateAtom);
-		if (input.action === "navigation-started") {
-			if (state.kind !== "ready") return;
-			context.set(ProjectCatalogCommandStateAtom, {
-				kind: "navigating",
-				action: state.action,
-			});
-			return;
-		}
-		if (input.action === "navigation-complete") {
-			if (state.kind !== "navigating") return;
-			context.set(ProjectCatalogCommandStateAtom, {
-				kind: "idle",
-			});
-			return;
-		}
-		if (input.action === "navigation-failed") {
-			if (state.kind !== "navigating") return;
-			context.set(ProjectCatalogCommandStateAtom, {
-				kind: "error",
-				error: input.error,
-			});
-			return;
-		}
-		if (isCommandActiveFn(state)) return;
-		context.set(ProjectCatalogCommandStateAtom, {
-			kind: "pending",
-			action: input.action,
-		});
-		context.set(ProjectCatalogCommandRunnerAtom, input);
+		match(input)
+			.with(
+				{
+					action: "navigation-started",
+				},
+				() => {
+					if (state.kind !== "ready") return;
+					context.set(ProjectCatalogCommandStateAtom, {
+						kind: "navigating",
+						action: state.action,
+					});
+				},
+			)
+			.with(
+				{
+					action: "navigation-complete",
+				},
+				() => {
+					if (state.kind !== "navigating") return;
+					context.set(ProjectCatalogCommandStateAtom, {
+						kind: "idle",
+					});
+				},
+			)
+			.with(
+				{
+					action: "navigation-failed",
+				},
+				({ error }) => {
+					if (state.kind !== "navigating") return;
+					context.set(ProjectCatalogCommandStateAtom, {
+						kind: "error",
+						error,
+					});
+				},
+			)
+			.with(
+				{
+					action: P.union(
+						"create",
+						"delete-project",
+						"dismiss-invalid-project",
+						"open-project-folder",
+						"import-json",
+					),
+				},
+				(input) => {
+					if (isCommandActiveFn(state)) return;
+					context.set(ProjectCatalogCommandStateAtom, {
+						kind: "pending",
+						action: input.action,
+					});
+					context.set(ProjectCatalogCommandRunnerAtom, input);
+				},
+			)
+			.exhaustive();
 	},
 ).pipe(Atom.keepAlive);

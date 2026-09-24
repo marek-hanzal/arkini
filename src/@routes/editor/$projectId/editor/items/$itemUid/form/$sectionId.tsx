@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { ClockSection } from "~/item-authoring/ui/ClockSection";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
@@ -25,19 +26,25 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 	component: () => {
 		const { sectionId } = Route.useParams();
 		const section = sectionId as SectionId;
-		switch (section) {
-			case "identity":
+		return match(section)
+			.with("identity", () => {
 				return <IdentitySection />;
-			case "artwork":
+			})
+			.with("artwork", () => {
 				return <ArtworkSection />;
-			case "units":
+			})
+			.with("units", () => {
 				return <UnitsSection />;
-			case "merges":
+			})
+			.with("merges", () => {
 				return <MergesSection />;
-			case "clock":
+			})
+			.with("clock", () => {
 				return <ClockSection />;
-			case "production":
+			})
+			.with("production", () => {
 				return <ProductionSection />;
-		}
+			})
+			.otherwise(() => undefined);
 	},
 });

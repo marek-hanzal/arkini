@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import type { RefObject } from "react";
 
 import { SearchInput } from "~/ui/ui/SearchInput";
@@ -31,22 +32,24 @@ export const SpotlightSearchInput = ({
 		value={query}
 		onValueChangeFn={onQueryChangeFn}
 		onKeyDown={(event) => {
-			if (event.key === "ArrowDown") {
-				event.preventDefault();
-				onSelectedIndexChangeFn(resultCount === 0 ? 0 : (selectedIndex + 1) % resultCount);
-				return;
-			}
-			if (event.key === "ArrowUp") {
-				event.preventDefault();
-				onSelectedIndexChangeFn(
-					resultCount === 0 ? 0 : (selectedIndex - 1 + resultCount) % resultCount,
-				);
-				return;
-			}
-			if (event.key === "Enter") {
-				event.preventDefault();
-				onEnterFn();
-			}
+			match(event.key)
+				.with("ArrowDown", () => {
+					event.preventDefault();
+					onSelectedIndexChangeFn(
+						resultCount === 0 ? 0 : (selectedIndex + 1) % resultCount,
+					);
+				})
+				.with("ArrowUp", () => {
+					event.preventDefault();
+					onSelectedIndexChangeFn(
+						resultCount === 0 ? 0 : (selectedIndex - 1 + resultCount) % resultCount,
+					);
+				})
+				.with("Enter", () => {
+					event.preventDefault();
+					onEnterFn();
+				})
+				.otherwise(() => undefined);
 		}}
 	/>
 );

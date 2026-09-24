@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { createId } from "@paralleldrive/cuid2";
 import { Effect } from "effect";
 
@@ -75,17 +76,32 @@ export const editLinesFx = Effect.fn("editItemLinesFx")(function* ({
 						},
 					};
 		applied.push(canonical);
-		const lines =
-			canonical.operation === "create"
-				? [
-						...item.lines,
-						canonical.line,
-					]
-				: canonical.operation === "delete"
-					? item.lines.filter((_line, lineIndex) => lineIndex !== selectedIndex)
-					: item.lines.map((line, lineIndex) =>
-							lineIndex === selectedIndex ? canonical.line : line,
-						);
+		const lines = match(canonical)
+			.with(
+				{
+					operation: "create",
+				},
+				({ line }) => [
+					...item.lines,
+					line,
+				],
+			)
+			.with(
+				{
+					operation: "delete",
+				},
+				() => item.lines.filter((_line, lineIndex) => lineIndex !== selectedIndex),
+			)
+			.with(
+				{
+					operation: "replace",
+				},
+				(canonical) =>
+					item.lines.map((line, lineIndex) =>
+						lineIndex === selectedIndex ? canonical.line : line,
+					),
+			)
+			.exhaustive();
 		items[itemUid] = {
 			...item,
 			lines,

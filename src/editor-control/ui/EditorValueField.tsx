@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import type { ReactNode } from "react";
 
 import { EditorInfoTooltip } from "~/editor-control/ui/EditorInfoTooltip";
@@ -59,7 +60,23 @@ export const EditorValueField = ({
 				},
 			})}
 		>
-			{labelVisible ? Root === "fieldset" ? <legend>{heading}</legend> : heading : null}
+			{match({
+				labelVisible,
+				Root,
+			})
+				.with(
+					{
+						labelVisible: false,
+					},
+					() => null,
+				)
+				.with(
+					{
+						Root: "fieldset",
+					},
+					() => <legend>{heading}</legend>,
+				)
+				.otherwise(() => heading)}
 			{children}
 			{error === undefined ? null : (
 				<span className="mt-1.5 text-xs leading-5 text-danger">{error}</span>

@@ -16,15 +16,16 @@ const publishEditorBoardGameFx = Effect.fn("publishEditorBoardGameFx")(
 		command: EditorProjectAtom.Command,
 	) =>
 		Atom.get(EditorBoardGameResourceOwnerAtom).pipe(
-			Effect.flatMap((owner) =>
-				owner === undefined
-					? Effect.void
-					: boardMode === "advance-noop" &&
-							command.commit !== undefined &&
-							project.revision === command.commit.revision
-						? owner.advanceNoopFx(project, command.commit.previousRevision)
-						: owner.publishFx(project),
-			),
+			Effect.flatMap((owner) => {
+				if (owner === undefined) return Effect.void;
+				if (
+					boardMode === "advance-noop" &&
+					command.commit !== undefined &&
+					project.revision === command.commit.revision
+				)
+					return owner.advanceNoopFx(project, command.commit.previousRevision);
+				return owner.publishFx(project);
+			}),
 		),
 );
 

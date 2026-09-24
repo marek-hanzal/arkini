@@ -1,3 +1,4 @@
+import { match, P } from "ts-pattern";
 import { execFile } from "node:child_process";
 import { constants } from "node:fs";
 import { access } from "node:fs/promises";
@@ -91,28 +92,52 @@ export const createCompletionFx = Effect.fn("createCompletionFx")(function* ({
 			};
 		}
 		const inspection = await requireManagedFileFn().inspectFn();
-		if (inspection.type === "conflict") {
-			return {
-				type: "conflict",
-				completionPath: completion.path,
-				shell: completion.shell,
-				message: inspection.message,
-				replaceable: inspection.replaceable,
-			};
-		}
-		if (inspection.type === "repairable") {
-			return {
-				type: "repairable",
-				completionPath: completion.path,
-				shell: completion.shell,
-				message: `${completion.shell} completion no longer matches this Serakki installation.`,
-			};
-		}
-		return {
-			type: inspection.type === "installed" ? "installed" : "not-installed",
-			completionPath: completion.path,
-			shell: completion.shell,
-		};
+		return match(inspection)
+			.returnType<CompletionStatus>()
+			.with(
+				{
+					type: "conflict",
+				},
+				(inspection) => ({
+					type: "conflict",
+					completionPath: completion.path,
+					shell: completion.shell,
+					message: inspection.message,
+					replaceable: inspection.replaceable,
+				}),
+			)
+			.with(
+				{
+					type: "repairable",
+				},
+				() => ({
+					type: "repairable",
+					completionPath: completion.path,
+					shell: completion.shell,
+					message: `${completion.shell} completion no longer matches this Serakki installation.`,
+				}),
+			)
+			.with(
+				{
+					type: "installed",
+				},
+				() => ({
+					type: "installed",
+					completionPath: completion.path,
+					shell: completion.shell,
+				}),
+			)
+			.with(
+				{
+					type: "missing",
+				},
+				() => ({
+					type: "not-installed",
+					completionPath: completion.path,
+					shell: completion.shell,
+				}),
+			)
+			.exhaustive();
 	};
 
 	const operationFx = (name: string, runFn: () => Promise<CompletionStatus>) =>
@@ -128,40 +153,105 @@ export const createCompletionFx = Effect.fn("createCompletionFx")(function* ({
 	const readStatusFx = operationFx("read the CLI completion installation", readStatusFn);
 	const installFx = semaphore.withPermits(1)(
 		operationFx("install CLI shell completion", async () => {
-			const status = await readStatusFn();
-			if (status.type === "installed") return status;
-			if (status.type !== "not-installed" && status.type !== "repairable") {
-				throw new Error(status.message);
-			}
-			if (status.type === "repairable") {
-				await requireManagedFileFn().repairFn();
-			} else {
-				await requireManagedFileFn().publishFn(false);
-			}
-			return readStatusFn();
+			return match(await readStatusFn())
+				.returnType<CompletionStatus | Promise<CompletionStatus>>()
+				.with(
+					{
+						type: "installed",
+					},
+					(status) => status,
+				)
+				.with(
+					{
+						type: P.union("unavailable", "conflict"),
+					},
+					(status) => {
+						throw new Error(status.message);
+					},
+				)
+				.with(
+					{
+						type: "repairable",
+					},
+					async () => {
+						await requireManagedFileFn().repairFn();
+						return readStatusFn();
+					},
+				)
+				.with(
+					{
+						type: "not-installed",
+					},
+					async () => {
+						await requireManagedFileFn().publishFn(false);
+						return readStatusFn();
+					},
+				)
+				.exhaustive();
 		}),
 	);
 	const replaceFx = semaphore.withPermits(1)(
 		operationFx("replace CLI shell completion", async () => {
-			const status = await readStatusFn();
-			if (status.type === "installed") return status;
-			if (status.type === "unavailable") throw new Error(status.message);
-			if (status.type === "conflict" && !status.replaceable) {
-				throw new Error(status.message);
-			}
-			await requireManagedFileFn().publishFn(status.type !== "not-installed");
-			return readStatusFn();
+			return match(await readStatusFn())
+				.returnType<CompletionStatus | Promise<CompletionStatus>>()
+				.with(
+					{
+						type: "installed",
+					},
+					(status) => status,
+				)
+				.with(
+					{
+						type: "unavailable",
+					},
+					{
+						type: "conflict",
+						replaceable: false,
+					},
+					(status) => {
+						throw new Error(status.message);
+					},
+				)
+				.with(
+					{
+						type: P.union("conflict", "repairable", "not-installed"),
+					},
+					async (status) => {
+						await requireManagedFileFn().publishFn(status.type !== "not-installed");
+						return readStatusFn();
+					},
+				)
+				.exhaustive();
 		}),
 	);
 	const uninstallFx = semaphore.withPermits(1)(
 		operationFx("uninstall CLI shell completion", async () => {
-			const status = await readStatusFn();
-			if (status.type === "not-installed") return status;
-			if (status.type !== "installed" && status.type !== "repairable") {
-				throw new Error(status.message);
-			}
-			await requireManagedFileFn().removeFn();
-			return readStatusFn();
+			return match(await readStatusFn())
+				.returnType<CompletionStatus | Promise<CompletionStatus>>()
+				.with(
+					{
+						type: "not-installed",
+					},
+					(status) => status,
+				)
+				.with(
+					{
+						type: P.union("unavailable", "conflict"),
+					},
+					(status) => {
+						throw new Error(status.message);
+					},
+				)
+				.with(
+					{
+						type: P.union("installed", "repairable"),
+					},
+					async () => {
+						await requireManagedFileFn().removeFn();
+						return readStatusFn();
+					},
+				)
+				.exhaustive();
 		}),
 	);
 

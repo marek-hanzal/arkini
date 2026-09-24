@@ -1,3 +1,4 @@
+import { match, P } from "ts-pattern";
 import { constants } from "node:fs";
 import { access } from "node:fs/promises";
 import { resolve } from "node:path";
@@ -63,26 +64,49 @@ export const createInstallationFx = Effect.fn("createInstallationFx")(function* 
 		}
 
 		const inspection = await managedFile.inspectFn();
-		if (inspection.type === "conflict") {
-			return {
-				type: "conflict",
-				commandPath,
-				message: inspection.message,
-				replaceable: inspection.replaceable,
-			};
-		}
-		if (inspection.type === "repairable") {
-			return {
-				type: "repairable",
-				commandPath,
-				message:
-					"serakki-cli no longer matches this app or its executable permissions changed. Repair the command to use this Serakki installation.",
-			};
-		}
-		return {
-			type: inspection.type === "installed" ? "installed" : "not-installed",
-			commandPath,
-		};
+		return match(inspection)
+			.returnType<InstallationStatus>()
+			.with(
+				{
+					type: "conflict",
+				},
+				(inspection) => ({
+					type: "conflict",
+					commandPath,
+					message: inspection.message,
+					replaceable: inspection.replaceable,
+				}),
+			)
+			.with(
+				{
+					type: "repairable",
+				},
+				() => ({
+					type: "repairable",
+					commandPath,
+					message:
+						"serakki-cli no longer matches this app or its executable permissions changed. Repair the command to use this Serakki installation.",
+				}),
+			)
+			.with(
+				{
+					type: "installed",
+				},
+				() => ({
+					type: "installed",
+					commandPath,
+				}),
+			)
+			.with(
+				{
+					type: "missing",
+				},
+				() => ({
+					type: "not-installed",
+					commandPath,
+				}),
+			)
+			.exhaustive();
 	};
 
 	const operationFx = (name: string, runFn: () => Promise<InstallationStatus>) =>
@@ -98,40 +122,105 @@ export const createInstallationFx = Effect.fn("createInstallationFx")(function* 
 	const readStatusFx = operationFx("read the CLI installation", readStatusFn);
 	const installFx = semaphore.withPermits(1)(
 		operationFx("install the CLI command", async () => {
-			const status = await readStatusFn();
-			if (status.type === "installed") return status;
-			if (status.type !== "not-installed" && status.type !== "repairable") {
-				throw new Error(status.message);
-			}
-			if (status.type === "repairable") {
-				await managedFile.repairFn();
-			} else {
-				await managedFile.publishFn(false);
-			}
-			return readStatusFn();
+			return match(await readStatusFn())
+				.returnType<InstallationStatus | Promise<InstallationStatus>>()
+				.with(
+					{
+						type: "installed",
+					},
+					(status) => status,
+				)
+				.with(
+					{
+						type: P.union("unavailable", "conflict"),
+					},
+					(status) => {
+						throw new Error(status.message);
+					},
+				)
+				.with(
+					{
+						type: "repairable",
+					},
+					async () => {
+						await managedFile.repairFn();
+						return readStatusFn();
+					},
+				)
+				.with(
+					{
+						type: "not-installed",
+					},
+					async () => {
+						await managedFile.publishFn(false);
+						return readStatusFn();
+					},
+				)
+				.exhaustive();
 		}),
 	);
 	const replaceFx = semaphore.withPermits(1)(
 		operationFx("replace the CLI command", async () => {
-			const status = await readStatusFn();
-			if (status.type === "installed") return status;
-			if (status.type === "unavailable") throw new Error(status.message);
-			if (status.type === "conflict" && !status.replaceable) {
-				throw new Error(status.message);
-			}
-			await managedFile.publishFn(status.type !== "not-installed");
-			return readStatusFn();
+			return match(await readStatusFn())
+				.returnType<InstallationStatus | Promise<InstallationStatus>>()
+				.with(
+					{
+						type: "installed",
+					},
+					(status) => status,
+				)
+				.with(
+					{
+						type: "unavailable",
+					},
+					{
+						type: "conflict",
+						replaceable: false,
+					},
+					(status) => {
+						throw new Error(status.message);
+					},
+				)
+				.with(
+					{
+						type: P.union("conflict", "repairable", "not-installed"),
+					},
+					async (status) => {
+						await managedFile.publishFn(status.type !== "not-installed");
+						return readStatusFn();
+					},
+				)
+				.exhaustive();
 		}),
 	);
 	const uninstallFx = semaphore.withPermits(1)(
 		operationFx("uninstall the CLI command", async () => {
-			const status = await readStatusFn();
-			if (status.type === "not-installed") return status;
-			if (status.type !== "installed" && status.type !== "repairable") {
-				throw new Error(status.message);
-			}
-			await managedFile.removeFn();
-			return readStatusFn();
+			return match(await readStatusFn())
+				.returnType<InstallationStatus | Promise<InstallationStatus>>()
+				.with(
+					{
+						type: "not-installed",
+					},
+					(status) => status,
+				)
+				.with(
+					{
+						type: P.union("unavailable", "conflict"),
+					},
+					(status) => {
+						throw new Error(status.message);
+					},
+				)
+				.with(
+					{
+						type: P.union("installed", "repairable"),
+					},
+					async () => {
+						await managedFile.removeFn();
+						return readStatusFn();
+					},
+				)
+				.exhaustive();
 		}),
 	);
 

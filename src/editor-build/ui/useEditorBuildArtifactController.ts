@@ -35,28 +35,28 @@ const DismissedEditorBuildValidationAtom = Atom.family((_projectId: string) =>
 	Atom.make<DismissedEditorBuildValidation | undefined>(undefined).pipe(Atom.keepAlive),
 );
 
-const readEditorBuildFailureFn = (error: unknown): EditorBuildFailure | undefined => {
-	if (error === undefined) return undefined;
-	if (error instanceof GameValidationError)
-		return {
+const readEditorBuildFailureFn = (error: unknown): EditorBuildFailure | undefined =>
+	match(error)
+		.returnType<EditorBuildFailure | undefined>()
+		.with(undefined, () => undefined)
+		.with(P.instanceOf(GameValidationError), (error) => ({
 			type: "validation",
 			diagnostics: error.diagnostics,
-		};
-	if (error instanceof ProjectRepositoryError) {
-		if (error.diagnostics !== undefined)
-			return {
-				type: "validation",
-				diagnostics: error.diagnostics,
-			};
-		return {
+		}))
+		.with(P.instanceOf(ProjectRepositoryError), (error) =>
+			error.diagnostics === undefined
+				? {
+						type: "operational",
+						detail: error.message,
+					}
+				: {
+						type: "validation",
+						diagnostics: error.diagnostics,
+					},
+		)
+		.otherwise(() => ({
 			type: "operational",
-			detail: error.message,
-		};
-	}
-	return {
-		type: "operational",
-	};
-};
+		}));
 
 export namespace useEditorBuildArtifactController {
 	export interface Props {

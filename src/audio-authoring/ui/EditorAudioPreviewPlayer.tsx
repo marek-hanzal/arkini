@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { Music, Pause, Play } from "lucide-react";
 import { LinkButton } from "~/ui/ui/LinkButton";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
@@ -81,13 +82,25 @@ export const EditorAudioPreviewPlayer = ({
 						toggleFn();
 					}}
 				>
-					{placeholder ? (
-						<Music className="size-4" />
-					) : playing ? (
-						<Pause className="size-4" />
-					) : (
-						<Play className="size-4" />
-					)}
+					{match({
+						placeholder: Boolean(placeholder),
+						playing,
+					})
+						.with(
+							{
+								placeholder: true,
+							},
+							() => <Music className="size-4" />,
+						)
+						.with(
+							{
+								playing: true,
+							},
+							() => <Pause className="size-4" />,
+						)
+						.otherwise(() => (
+							<Play className="size-4" />
+						))}
 				</LinkButton>
 			</div>
 		</div>

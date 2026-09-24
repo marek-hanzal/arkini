@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { Cause, Deferred, Effect, Exit, Fiber, Option, Ref, Scope, Semaphore } from "effect";
 
 import { CriticalGameLifecycleError } from "~/playable-game/error/CriticalGameLifecycleError";
@@ -187,11 +188,11 @@ export const createGameEngineResourceServiceFx = Effect.fn("createGameEngineReso
 					const failure = readExactCauseFailureFn(exit.cause);
 					return Exit.fail(
 						finalization.resource.markCriticalFailureFn(
-							finalization.operation === "release"
-								? "game-leave"
-								: finalization.operation === "restore"
-									? "game-restore"
-									: "game-reset",
+							match(finalization.operation)
+								.with("release", () => "game-leave" as const)
+								.with("restore", () => "game-restore" as const)
+								.with("reset", () => "game-reset" as const)
+								.exhaustive(),
 							Option.isSome(failure) ? failure.value : exit.cause,
 						),
 					);
@@ -294,15 +295,29 @@ export const createGameEngineResourceServiceFx = Effect.fn("createGameEngineReso
 						),
 					).pipe(
 						Effect.flatMap((decision) => {
-							switch (decision._tag) {
-								case "Done":
-									return Effect.void;
-								case "Failure":
-									return Effect.fail(decision.cause);
-								case "Lead":
-								case "Wait":
-									return Deferred.await(decision.completion);
-							}
+							return match(decision)
+								.with(
+									{
+										_tag: "Done",
+									},
+									() => Effect.void,
+								)
+								.with(
+									{
+										_tag: "Failure",
+									},
+									(decision) => Effect.fail(decision.cause),
+								)
+								.with(
+									{
+										_tag: "Lead",
+									},
+									{
+										_tag: "Wait",
+									},
+									(decision) => Deferred.await(decision.completion),
+								)
+								.exhaustive();
 						}),
 					),
 			);
@@ -716,54 +731,88 @@ export const createGameEngineResourceServiceFx = Effect.fn("createGameEngineReso
 					),
 				).pipe(
 					Effect.flatMap((decision) => {
-						switch (decision._tag) {
-							case "Failure":
-								return Effect.fail(decision.cause);
-							case "CauseFailure":
-								return Effect.failCause(decision.cause);
-							case "Resource":
-								return makeLeaseFx(decision.resource, decision.record);
-							case "Wait":
-								return Effect.exit(decision.waitFx).pipe(
-									Effect.andThen(
-										acquireLeaseFx({
-											packageId,
-										}),
+						return match(decision)
+							.with(
+								{
+									_tag: "Failure",
+								},
+								(decision) => Effect.fail(decision.cause),
+							)
+							.with(
+								{
+									_tag: "CauseFailure",
+								},
+								(decision) => Effect.failCause(decision.cause),
+							)
+							.with(
+								{
+									_tag: "Resource",
+								},
+								(decision) => makeLeaseFx(decision.resource, decision.record),
+							)
+							.with(
+								{
+									_tag: "Wait",
+								},
+								(decision) =>
+									Effect.exit(decision.waitFx).pipe(
+										Effect.andThen(
+											acquireLeaseFx({
+												packageId,
+											}),
+										),
 									),
-								);
-							case "Replace":
-								return beginCancellationFx(decision.owner, true).pipe(
-									Effect.andThen(
-										acquireLeaseFx({
-											packageId,
-										}),
+							)
+							.with(
+								{
+									_tag: "Replace",
+								},
+								(decision) =>
+									beginCancellationFx(decision.owner, true).pipe(
+										Effect.andThen(
+											acquireLeaseFx({
+												packageId,
+											}),
+										),
 									),
-								);
-							case "ReplaceActive":
-								return finalizeFx(
-									decision.resource,
-									"release",
-									Effect.suspend(() => decision.resource.game.disposeFx),
-									false,
-								).pipe(
-									Effect.andThen(
-										acquireLeaseFx({
-											packageId,
-										}),
+							)
+							.with(
+								{
+									_tag: "ReplaceActive",
+								},
+								(decision) =>
+									finalizeFx(
+										decision.resource,
+										"release",
+										Effect.suspend(() => decision.resource.game.disposeFx),
+										false,
+									).pipe(
+										Effect.andThen(
+											acquireLeaseFx({
+												packageId,
+											}),
+										),
 									),
-								);
-							case "Owner": {
-								const record = {
-									owner: decision.owner,
-									token: decision.token,
-								} satisfies LeaseRecord;
-								return Effect.addFinalizer(() => releaseLeaseRecordFx(record)).pipe(
-									Effect.andThen(Deferred.await(decision.owner.result)),
-									Effect.flatMap((resource) => makeLeaseFx(resource, record)),
-									Effect.onInterrupt(() => releaseLeaseRecordFx(record)),
-								);
-							}
-						}
+							)
+							.with(
+								{
+									_tag: "Owner",
+								},
+								(decision) => {
+									const record = {
+										owner: decision.owner,
+										token: decision.token,
+									} satisfies LeaseRecord;
+									return Effect.addFinalizer(() =>
+										releaseLeaseRecordFx(record),
+									).pipe(
+										Effect.andThen(Deferred.await(decision.owner.result)),
+										Effect.flatMap((resource) => makeLeaseFx(resource, record)),
+										Effect.onInterrupt(() => releaseLeaseRecordFx(record)),
+									);
+								},
+							)
+							.exhaustive();
 					}),
 				),
 			);
@@ -955,13 +1004,23 @@ export const createGameEngineResourceServiceFx = Effect.fn("createGameEngineReso
 						),
 					).pipe(
 						Effect.flatMap((decision) => {
-							switch (decision._tag) {
-								case "Failure":
-									return Effect.fail(decision.cause);
-								case "Lead":
-								case "Wait":
-									return Deferred.await(decision.completion);
-							}
+							return match(decision)
+								.with(
+									{
+										_tag: "Failure",
+									},
+									(decision) => Effect.fail(decision.cause),
+								)
+								.with(
+									{
+										_tag: "Lead",
+									},
+									{
+										_tag: "Wait",
+									},
+									(decision) => Deferred.await(decision.completion),
+								)
+								.exhaustive();
 						}),
 					),
 				);
@@ -977,100 +1036,159 @@ export const createGameEngineResourceServiceFx = Effect.fn("createGameEngineReso
 					withLifecycleLockFx(
 						Effect.gen(function* () {
 							const state = yield* Ref.get(stateRef);
-							switch (state._tag) {
-								case "Idle":
-								case "BootstrapFailed":
-								case "RecoveringFailedSave":
-									return {
-										_tag: "None",
-									} satisfies ClaimDecision;
-								case "OwnershipFailed":
-									return state.finalization === undefined
-										? yield* Effect.fail(state.error)
-										: ({
-												_tag: "Resource",
-												resource: state.finalization.resource,
-											} satisfies ClaimDecision);
-								case "Active":
-									return {
-										_tag: "Resource",
-										resource: state.resource,
-									} satisfies ClaimDecision;
-								case "Finalizing":
-									return {
-										_tag: "Resource",
-										resource: state.finalization.resource,
-									} satisfies ClaimDecision;
-								case "Cancelling":
-									return {
-										_tag: "WaitCancellation",
-										completion: state.cancellation.completion,
-									} satisfies ClaimDecision;
-								case "Acquiring":
-								case "Provisional": {
-									const token = Symbol();
-									state.owner.closeClaims.add(token);
-									return {
-										_tag: "Owner",
-										owner: state.owner,
-										token,
-									} satisfies ClaimDecision;
-								}
-							}
+							return yield* match(state)
+								.returnType<
+									Effect.Effect<ClaimDecision, CriticalGameLifecycleError>
+								>()
+								.with(
+									{
+										_tag: "Idle",
+									},
+									{
+										_tag: "BootstrapFailed",
+									},
+									{
+										_tag: "RecoveringFailedSave",
+									},
+									() =>
+										Effect.succeed({
+											_tag: "None",
+										}),
+								)
+								.with(
+									{
+										_tag: "OwnershipFailed",
+									},
+									(state) =>
+										state.finalization === undefined
+											? Effect.fail(state.error)
+											: Effect.succeed({
+													_tag: "Resource",
+													resource: state.finalization.resource,
+												}),
+								)
+								.with(
+									{
+										_tag: "Active",
+									},
+									(state) =>
+										Effect.succeed({
+											_tag: "Resource",
+											resource: state.resource,
+										}),
+								)
+								.with(
+									{
+										_tag: "Finalizing",
+									},
+									(state) =>
+										Effect.succeed({
+											_tag: "Resource",
+											resource: state.finalization.resource,
+										}),
+								)
+								.with(
+									{
+										_tag: "Cancelling",
+									},
+									(state) =>
+										Effect.succeed({
+											_tag: "WaitCancellation",
+											completion: state.cancellation.completion,
+										}),
+								)
+								.with(
+									{
+										_tag: "Acquiring",
+									},
+									{
+										_tag: "Provisional",
+									},
+									(state) =>
+										Effect.sync(() => {
+											const token = Symbol();
+											state.owner.closeClaims.add(token);
+											return {
+												_tag: "Owner",
+												owner: state.owner,
+												token,
+											};
+										}),
+								)
+								.exhaustive();
 						}),
 					).pipe(
 						Effect.flatMap((decision) => {
-							switch (decision._tag) {
-								case "None":
-									return Effect.succeed(null);
-								case "Resource":
-									return Effect.succeed(decision.resource);
-								case "WaitCancellation":
-									return Effect.exit(Deferred.await(decision.completion)).pipe(
-										Effect.andThen(claimForCloseFx),
-									);
-								case "Owner":
-									return Deferred.await(decision.owner.result).pipe(
-										Effect.flatMap((resource) =>
-											withLifecycleLockFx(
-												Effect.gen(function* () {
-													const state = yield* Ref.get(stateRef);
-													if (
-														state._tag === "Provisional" &&
-														state.owner === decision.owner &&
-														state.resource === resource
-													) {
-														yield* Ref.set(stateRef, {
-															_tag: "Active",
-															resource,
-														});
-														return resource;
-													}
-													if (
-														state._tag === "Active" &&
-														state.resource === resource
-													) {
-														return resource;
-													}
-													if (state._tag === "OwnershipFailed") {
-														return yield* Effect.fail(state.error);
-													}
-													return null;
-												}),
+							return match(decision)
+								.with(
+									{
+										_tag: "None",
+									},
+									() => Effect.succeed(null),
+								)
+								.with(
+									{
+										_tag: "Resource",
+									},
+									(decision) => Effect.succeed(decision.resource),
+								)
+								.with(
+									{
+										_tag: "WaitCancellation",
+									},
+									(decision) =>
+										Effect.exit(Deferred.await(decision.completion)).pipe(
+											Effect.andThen(claimForCloseFx),
+										),
+								)
+								.with(
+									{
+										_tag: "Owner",
+									},
+									(decision) =>
+										Deferred.await(decision.owner.result).pipe(
+											Effect.flatMap((resource) =>
+												withLifecycleLockFx(
+													Effect.gen(function* () {
+														const state = yield* Ref.get(stateRef);
+														if (
+															state._tag === "Provisional" &&
+															state.owner === decision.owner &&
+															state.resource === resource
+														) {
+															yield* Ref.set(stateRef, {
+																_tag: "Active",
+																resource,
+															});
+															return resource;
+														}
+														if (
+															state._tag === "Active" &&
+															state.resource === resource
+														) {
+															return resource;
+														}
+														if (state._tag === "OwnershipFailed") {
+															return yield* Effect.fail(state.error);
+														}
+														return null;
+													}),
+												),
 											),
+											Effect.onInterrupt(() =>
+												releaseCloseClaimFx(decision.owner, decision.token),
+											),
+											Effect.catchCause((cause) => {
+												const failure = readExactCauseFailureFn(cause);
+												return Option.isSome(failure) &&
+													failure.value instanceof
+														CriticalGameLifecycleError
+													? Effect.fail(failure.value)
+													: Effect.succeed(null);
+											}),
 										),
-										Effect.onInterrupt(() =>
-											releaseCloseClaimFx(decision.owner, decision.token),
-										),
-										Effect.catchCause((cause) => {
-											const failure = readExactCauseFailureFn(cause);
-											return Option.isSome(failure) &&
-												failure.value instanceof CriticalGameLifecycleError
-												? Effect.fail(failure.value)
-												: Effect.succeed(null);
-										}),
-									);
-							}
+								)
+								.exhaustive();
 						}),
 					),
 				),
@@ -1081,58 +1199,105 @@ export const createGameEngineResourceServiceFx = Effect.fn("createGameEngineReso
 					withLifecycleLockFx(
 						Effect.gen(function* () {
 							const state = yield* Ref.get(stateRef);
-							switch (state._tag) {
-								case "Acquiring":
-								case "Provisional":
-									return {
+							return match(state)
+								.with(
+									{
+										_tag: "Acquiring",
+									},
+									{
+										_tag: "Provisional",
+									},
+									(state) => ({
 										_tag: "Cancel" as const,
 										owner: state.owner,
-									};
-								case "Cancelling":
-									return {
+									}),
+								)
+								.with(
+									{
+										_tag: "Cancelling",
+									},
+									(state) => ({
 										_tag: "Wait" as const,
 										waitFx: Deferred.await(state.cancellation.completion),
-									};
-								case "Active":
-									return {
+									}),
+								)
+								.with(
+									{
+										_tag: "Active",
+									},
+									(state) => ({
 										_tag: "Release" as const,
 										resource: state.resource,
-									};
-								case "Finalizing":
-									return {
+									}),
+								)
+								.with(
+									{
+										_tag: "Finalizing",
+									},
+									(state) => ({
 										_tag: "Wait" as const,
 										waitFx: Deferred.await(state.finalization.completion),
-									};
-								case "RecoveringFailedSave":
-									return {
+									}),
+								)
+								.with(
+									{
+										_tag: "RecoveringFailedSave",
+									},
+									(state) => ({
 										_tag: "Wait" as const,
 										waitFx: Deferred.await(state.recovery.completion),
-									};
-								case "Idle":
-								case "BootstrapFailed":
-								case "OwnershipFailed":
-									return {
+									}),
+								)
+								.with(
+									{
+										_tag: "Idle",
+									},
+									{
+										_tag: "BootstrapFailed",
+									},
+									{
+										_tag: "OwnershipFailed",
+									},
+									() => ({
 										_tag: "Done" as const,
-									};
-							}
+									}),
+								)
+								.exhaustive();
 						}),
 					).pipe(
 						Effect.flatMap((decision) => {
-							switch (decision._tag) {
-								case "Cancel":
-									return beginCancellationFx(decision.owner, true);
-								case "Wait":
-									return decision.waitFx;
-								case "Release":
-									return finalizeFx(
-										decision.resource,
-										"release",
-										Effect.suspend(() => decision.resource.game.disposeFx),
-										true,
-									);
-								case "Done":
-									return Effect.void;
-							}
+							return match(decision)
+								.with(
+									{
+										_tag: "Cancel",
+									},
+									(decision) => beginCancellationFx(decision.owner, true),
+								)
+								.with(
+									{
+										_tag: "Wait",
+									},
+									(decision) => decision.waitFx,
+								)
+								.with(
+									{
+										_tag: "Release",
+									},
+									(decision) =>
+										finalizeFx(
+											decision.resource,
+											"release",
+											Effect.suspend(() => decision.resource.game.disposeFx),
+											true,
+										),
+								)
+								.with(
+									{
+										_tag: "Done",
+									},
+									() => Effect.void,
+								)
+								.exhaustive();
 						}),
 						Effect.catchCause(() => Effect.void),
 					),
@@ -1168,32 +1333,72 @@ export const createGameEngineResourceServiceFx = Effect.fn("createGameEngineReso
 									(
 										state,
 									): GameEngineResourceFxService["prepareEditorHandoffFx"] => {
-										switch (state._tag) {
-											case "Idle":
-											case "BootstrapFailed":
-												return Effect.succeed(null);
-											case "OwnershipFailed":
-												return Effect.fail(state.error);
-											case "Active":
-												return Effect.succeed(state.resource);
-											case "Acquiring":
-											case "Provisional":
-												return beginCancellationFx(state.owner, true).pipe(
-													Effect.andThen(prepareEditorHandoffFx),
-												);
-											case "Cancelling":
-												return retryAfterFx(
-													Deferred.await(state.cancellation.completion),
-												);
-											case "Finalizing":
-												return retryAfterFx(
-													Deferred.await(state.finalization.completion),
-												);
-											case "RecoveringFailedSave":
-												return retryAfterFx(
-													Deferred.await(state.recovery.completion),
-												);
-										}
+										return match(state)
+											.with(
+												{
+													_tag: "Idle",
+												},
+												{
+													_tag: "BootstrapFailed",
+												},
+												() => Effect.succeed(null),
+											)
+											.with(
+												{
+													_tag: "OwnershipFailed",
+												},
+												(state) => Effect.fail(state.error),
+											)
+											.with(
+												{
+													_tag: "Active",
+												},
+												(state) => Effect.succeed(state.resource),
+											)
+											.with(
+												{
+													_tag: "Acquiring",
+												},
+												{
+													_tag: "Provisional",
+												},
+												(state) =>
+													beginCancellationFx(state.owner, true).pipe(
+														Effect.andThen(prepareEditorHandoffFx),
+													),
+											)
+											.with(
+												{
+													_tag: "Cancelling",
+												},
+												(state) =>
+													retryAfterFx(
+														Deferred.await(
+															state.cancellation.completion,
+														),
+													),
+											)
+											.with(
+												{
+													_tag: "Finalizing",
+												},
+												(state) =>
+													retryAfterFx(
+														Deferred.await(
+															state.finalization.completion,
+														),
+													),
+											)
+											.with(
+												{
+													_tag: "RecoveringFailedSave",
+												},
+												(state) =>
+													retryAfterFx(
+														Deferred.await(state.recovery.completion),
+													),
+											)
+											.exhaustive();
 									},
 								),
 							),

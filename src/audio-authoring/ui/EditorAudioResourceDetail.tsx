@@ -1,3 +1,4 @@
+import { match, P } from "ts-pattern";
 import { ShortcutLabel } from "~/ui/ui/ShortcutLabel";
 import { EditorAudioPreviewPlayer } from "~/audio-authoring/ui/EditorAudioPreviewPlayer";
 import { Overlay } from "~/ui/ui/Overlay";
@@ -95,14 +96,24 @@ const EditorAudioResourceUsage = ({
 		(usage) => usage.resourceUid === resourceUid,
 	);
 	const usageLabels = usages.map((usage) =>
-		usage.owner === "item"
-			? usage.ownerLabel
-			: usage.resourceType === "sfx"
-				? translator.textFn(
+		match(usage)
+			.with(
+				{
+					owner: "item",
+				},
+				({ ownerLabel }) => ownerLabel,
+			)
+			.with(
+				{
+					resourceType: "sfx",
+				},
+				(usage) =>
+					translator.textFn(
 						SfxEventPresentation.find(({ event }) => event === usage.roleLabel)
 							?.label ?? usage.roleLabel,
-					)
-				: translator.textFn("Playlist"),
+					),
+			)
+			.otherwise(() => translator.textFn("Playlist")),
 	);
 	if (asFact)
 		return (
@@ -418,75 +429,100 @@ export const EditorAudioResourceDetail = ({
 				)
 			}
 		>
-			{resource === undefined ? (
-				<Status
-					dataUi="EditorAudioResourceNotFound"
-					icon={FileQuestion}
-					title={translator.textFn("Audio not found")}
-				/>
-			) : section === "delete" ? (
-				<EditorAudioResourceDelete
-					key={`${project.projectId}:${type}:${resource.uid}`}
-					resource={resource}
-					type={type}
-				/>
-			) : (
-				<div
-					data-ui="EditorAudioResourceView"
-					className="grid min-w-0 gap-[var(--ak-viewport-gap)]"
-				>
-					<EditorFormSectionDivider
-						title={translator.textFn(
-							type === "music" ? "Music details" : "SFX details",
-						)}
-					/>
-					<div className="grid grid-cols-2 items-start gap-[var(--ak-viewport-gap)]">
-						<section
-							className="grid min-w-0 gap-3"
-							data-ui="EditorAudioResourceMetadata"
+			{match({
+				resource,
+				section,
+			})
+				.with(
+					{
+						resource: undefined,
+					},
+					() => (
+						<Status
+							dataUi="EditorAudioResourceNotFound"
+							icon={FileQuestion}
+							title={translator.textFn("Audio not found")}
+						/>
+					),
+				)
+				.with(
+					{
+						resource: P.nonNullable,
+						section: "delete",
+					},
+					({ resource }) => (
+						<EditorAudioResourceDelete
+							key={`${project.projectId}:${type}:${resource.uid}`}
+							resource={resource}
+							type={type}
+						/>
+					),
+				)
+				.with(
+					{
+						resource: P.nonNullable,
+					},
+					({ resource }) => (
+						<div
+							data-ui="EditorAudioResourceView"
+							className="grid min-w-0 gap-[var(--ak-viewport-gap)]"
 						>
 							<EditorFormSectionDivider
-								title={translator.textFn(type === "music" ? "Music" : "SFX")}
-								action={
-									<LinkButtonLink
-										className="inline-flex items-center gap-1.5"
-										to={to}
-										params={{
-											projectId: project.projectId,
-											resourceUid,
-											sectionId: "edit",
-										}}
-									>
-										<Pencil className="size-4" />
-										<Tx label="Edit" />
-									</LinkButtonLink>
-								}
+								title={translator.textFn(
+									type === "music" ? "Music details" : "SFX details",
+								)}
 							/>
-							<EditorRootCard dataUi="EditorAudioResourceMetadataCard">
-								<FactList>
-									<Fact
-										label={translator.textFn("Name")}
-										value={resource.title}
+							<div className="grid grid-cols-2 items-start gap-[var(--ak-viewport-gap)]">
+								<section
+									className="grid min-w-0 gap-3"
+									data-ui="EditorAudioResourceMetadata"
+								>
+									<EditorFormSectionDivider
+										title={translator.textFn(
+											type === "music" ? "Music" : "SFX",
+										)}
+										action={
+											<LinkButtonLink
+												className="inline-flex items-center gap-1.5"
+												to={to}
+												params={{
+													projectId: project.projectId,
+													resourceUid,
+													sectionId: "edit",
+												}}
+											>
+												<Pencil className="size-4" />
+												<Tx label="Edit" />
+											</LinkButtonLink>
+										}
 									/>
-									<Fact
-										label={translator.textFn("Size")}
-										value={formatByteSizeFn(resource.size)}
-									/>
-									<Fact
-										label="ID"
-										mono
-										value={resource.uid}
-									/>
-									<EditorAudioResourceUsage
-										resourceUid={resourceUid}
-										asFact
-									/>
-								</FactList>
-							</EditorRootCard>
-						</section>
-					</div>
-				</div>
-			)}
+									<EditorRootCard dataUi="EditorAudioResourceMetadataCard">
+										<FactList>
+											<Fact
+												label={translator.textFn("Name")}
+												value={resource.title}
+											/>
+											<Fact
+												label={translator.textFn("Size")}
+												value={formatByteSizeFn(resource.size)}
+											/>
+											<Fact
+												label="ID"
+												mono
+												value={resource.uid}
+											/>
+											<EditorAudioResourceUsage
+												resourceUid={resourceUid}
+												asFact
+											/>
+										</FactList>
+									</EditorRootCard>
+								</section>
+							</div>
+						</div>
+					),
+				)
+				.exhaustive()}
 		</EditorSectionPage>
 	);
 };

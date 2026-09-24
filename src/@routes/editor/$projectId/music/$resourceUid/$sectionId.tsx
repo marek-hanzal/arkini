@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { EditorAudioResourceDetail } from "~/audio-authoring/ui/EditorAudioResourceDetail";
 export const Route = createFileRoute("/editor/$projectId/music/$resourceUid/$sectionId")({
@@ -25,7 +26,10 @@ export const Route = createFileRoute("/editor/$projectId/music/$resourceUid/$sec
 				key={`${resourceUid}:${sectionId}`}
 				type="music"
 				resourceUid={resourceUid}
-				section={sectionId === "edit" ? "edit" : sectionId === "delete" ? "delete" : "view"}
+				section={match(sectionId)
+					.with("edit", () => "edit" as const)
+					.with("delete", () => "delete" as const)
+					.otherwise(() => "view" as const)}
 			/>
 		);
 	},

@@ -1,3 +1,4 @@
+import { match, P } from "ts-pattern";
 import { Tx } from "~/translation/ui/Tx";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { Globe, Laptop } from "lucide-react";
@@ -31,12 +32,22 @@ export const EditorMcpServer = ({
 		overview.local.type === "ready"
 			? `http://127.0.0.1:${overview.local.port}/editor/mcp`
 			: `http://127.0.0.1:${overview.port}/editor/mcp`;
-	const remoteUrl =
-		overview.remote.type === "ready"
-			? overview.remote.url
-			: overview.ngrokDomain === undefined
-				? undefined
-				: `https://${overview.ngrokDomain}/remote/mcp`;
+	const remoteUrl = match(overview)
+		.with(
+			{
+				remote: {
+					type: "ready",
+				},
+			},
+			({ remote }) => remote.url,
+		)
+		.with(
+			{
+				ngrokDomain: P.string,
+			},
+			({ ngrokDomain }) => `https://${ngrokDomain}/remote/mcp`,
+		)
+		.otherwise(() => undefined);
 	return (
 		<div
 			className="grid items-start gap-6 md:grid-cols-2"
@@ -47,13 +58,23 @@ export const EditorMcpServer = ({
 					variant="flat"
 					size="large"
 					icon={Laptop}
-					iconTone={
-						overview.local.type === "ready"
-							? "primary"
-							: startingLocal
-								? "warning"
-								: "muted"
-					}
+					iconTone={match({
+						type: overview.local.type,
+						startingLocal,
+					})
+						.with(
+							{
+								type: "ready",
+							},
+							() => "primary" as const,
+						)
+						.with(
+							{
+								startingLocal: true,
+							},
+							() => "warning" as const,
+						)
+						.otherwise(() => "muted" as const)}
 					title={<Tx label="Local MCP" />}
 					action={
 						<div className="grid justify-items-center gap-4">
@@ -88,13 +109,10 @@ export const EditorMcpServer = ({
 					variant="flat"
 					size="large"
 					icon={Globe}
-					iconTone={
-						overview.remote.type === "ready"
-							? "primary"
-							: overview.remote.type === "starting"
-								? "warning"
-								: "muted"
-					}
+					iconTone={match(overview.remote.type)
+						.with("ready", () => "primary" as const)
+						.with("starting", () => "warning" as const)
+						.otherwise(() => "muted" as const)}
 					title={<Tx label="Remote MCP" />}
 					action={
 						<div className="grid justify-items-center gap-4">

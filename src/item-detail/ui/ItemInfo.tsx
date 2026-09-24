@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import type { useItemDetailSceneController } from "~/item-detail/ui/useItemDetailSceneController";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Fact, FactList } from "~/ui/ui/FactList";
@@ -42,13 +43,17 @@ export const ItemInfo = ({ detail }: ItemInfoProps) => {
 						<FactList columns={1}>
 							<Fact
 								label={translator.textFn("Units remaining")}
-								value={
-									detail.units === undefined
-										? translator.textFn("This item doesn't use units.")
-										: detail.units.remaining === 0
-											? translator.textFn("Depleted")
-											: `${detail.units.remaining}/${detail.units.total}`
-								}
+								value={match(detail.units)
+									.with(undefined, () =>
+										translator.textFn("This item doesn't use units."),
+									)
+									.with(
+										{
+											remaining: 0,
+										},
+										() => translator.textFn("Depleted"),
+									)
+									.otherwise(({ remaining, total }) => `${remaining}/${total}`)}
 							/>
 						</FactList>
 					</div>

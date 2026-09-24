@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import type { InputSchema as LineInputSchema } from "~/production-input/schema/InputSchema";
-import { match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 import { DraftDefaults } from "~/production-authoring/ui/DraftDefaults";
 import { QuantityFields } from "~/production-authoring/ui/QuantityControl";
 import { BoardDistanceControl } from "~/production-authoring/ui/BoardDistanceControl";
@@ -87,18 +87,29 @@ const UnitsPaidByControl = ({
 						...units,
 						from,
 					},
-					query:
-						from === "self"
-							? {
-									distance: "self",
-									selector: {
-										type: "item",
-										itemUid: ownerItemUid,
-									},
-								}
-							: switchingBackToTarget
-								? structuredClone(DraftDefaults.inputs.units.query)
-								: input.query,
+					query: match({
+						from,
+						switchingBackToTarget,
+					})
+						.with(
+							{
+								from: "self",
+							},
+							() => ({
+								distance: "self" as const,
+								selector: {
+									type: "item" as const,
+									itemUid: ownerItemUid,
+								},
+							}),
+						)
+						.with(
+							{
+								switchingBackToTarget: true,
+							},
+							() => structuredClone(DraftDefaults.inputs.units.query),
+						)
+						.otherwise(() => input.query),
 				});
 			}}
 		/>
@@ -274,13 +285,25 @@ const UnitsTargetUnitCostControl = ({
 			/>
 			<SelectorControl
 				emptyLabel={translator.textFn("No item with Units enabled matches this search.")}
-				error={
-					targetMissingUnits
-						? translator.textFn("Selected target must have Units enabled.")
-						: input.query.selector.itemUid === "" && selectedItemError !== undefined
-							? translator.textFn("Select an item with Units enabled.")
-							: selectedItemError
-				}
+				error={match({
+					targetMissingUnits,
+					itemUid: input.query.selector.itemUid,
+					selectedItemError,
+				})
+					.with(
+						{
+							targetMissingUnits: true,
+						},
+						() => translator.textFn("Selected target must have Units enabled."),
+					)
+					.with(
+						{
+							itemUid: "",
+							selectedItemError: P.string,
+						},
+						() => translator.textFn("Select an item with Units enabled."),
+					)
+					.otherwise(() => selectedItemError)}
 				includeItemFn={hasUnitsFn}
 				labelVisible={false}
 				value={input.query.selector}
@@ -399,21 +422,40 @@ export const InputControl = ({
 					)}
 					onChangeFn={(type) => onChangeFn(structuredClone(DraftDefaults.inputs[type]))}
 				/>
-				{input.type === "materials" ? (
-					<MaterialModeControl
-						error={readEditorFormValidationErrorFn(issues, "mode")}
-						input={input}
-						onChangeFn={onChangeFn}
-					/>
-				) : input.type === "units" ? (
-					<UnitsPaidByControl
-						error={readEditorFormValidationErrorFn(issues, "units", "from")}
-						input={input}
-						ownerItemUid={ownerItemUid}
-						selfUnitsEnabled={selfUnitsEnabled}
-						onChangeFn={onChangeFn}
-					/>
-				) : null}
+				{match(input)
+					.with(
+						{
+							type: "materials",
+						},
+						(input) => (
+							<MaterialModeControl
+								error={readEditorFormValidationErrorFn(issues, "mode")}
+								input={input}
+								onChangeFn={onChangeFn}
+							/>
+						),
+					)
+					.with(
+						{
+							type: "units",
+						},
+						(input) => (
+							<UnitsPaidByControl
+								error={readEditorFormValidationErrorFn(issues, "units", "from")}
+								input={input}
+								ownerItemUid={ownerItemUid}
+								selfUnitsEnabled={selfUnitsEnabled}
+								onChangeFn={onChangeFn}
+							/>
+						),
+					)
+					.with(
+						{
+							type: "simple",
+						},
+						() => null,
+					)
+					.exhaustive()}
 			</div>
 			{match(input)
 				.with(

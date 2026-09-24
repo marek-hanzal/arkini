@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { match } from "ts-pattern";
 
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
@@ -46,61 +47,80 @@ export const projectCommittedEngineFactsFx = Effect.fn("projectCommittedEngineFa
 	);
 	const candidates: Candidate[] = [];
 	for (const fact of facts) {
-		if (fact.type === "outcome:applied") {
-			for (const effect of fact.effects) {
-				if (effect.type === "template") {
-					candidates.push(...projectTemplateEventsFn(effect));
-					continue;
-				}
-				for (const spawned of effect.placement.spawn) {
+		match(fact)
+			.with(
+				{
+					type: "outcome:applied",
+				},
+				(fact) => {
+					for (const effect of fact.effects) {
+						if (effect.type === "template") {
+							candidates.push(...projectTemplateEventsFn(effect));
+							continue;
+						}
+						for (const spawned of effect.placement.spawn) {
+							candidates.push({
+								type: GameEventEnumSchema.enum.ItemSpawned,
+								itemId: spawned.id,
+								itemUid: spawned.item.uid,
+								originItemId: fact.originItemId,
+								location: spawned.location,
+							});
+						}
+					}
+				},
+			)
+			.with(
+				{
+					type: "template:applied",
+				},
+				(fact) => {
+					candidates.push(...projectTemplateEventsFn(fact.effect));
+				},
+			)
+			.with(
+				{
+					type: "autofill:admitted",
+				},
+				(fact) => {
+					const quantity = fact.deliveries.filter(({ id, revision }) => {
+						const item = finalItemsById.get(id);
+						return (
+							item?.revision === revision &&
+							item.location.scope === "delivery" &&
+							item.location.phase === "outbound" &&
+							item.location.target.kind === "line-input" &&
+							item.location.target.ownerItemId === fact.ownerItemId &&
+							item.location.target.lineUid === fact.lineUid
+						);
+					}).length;
+					if (quantity > 0)
+						candidates.push({
+							type: GameEventEnumSchema.enum.LineInputAutofillStarted,
+							ownerItemId: fact.ownerItemId,
+							itemUid: fact.itemUid,
+							lineUid: fact.lineUid,
+							scheduledQuantity: quantity,
+						});
+				},
+			)
+			.with(
+				{
+					type: "job:admitted",
+				},
+				(fact) => {
 					candidates.push({
-						type: GameEventEnumSchema.enum.ItemSpawned,
-						itemId: spawned.id,
-						itemUid: spawned.item.uid,
-						originItemId: fact.originItemId,
-						location: spawned.location,
+						type: GameEventEnumSchema.enum.JobStarted,
+						jobId: fact.jobId,
+						ownerItemId: fact.ownerItemId,
+						itemUid: fact.itemUid,
+						lineUid: fact.lineUid,
 					});
-				}
-			}
-			continue;
-		}
-		if (fact.type === "template:applied") {
-			candidates.push(...projectTemplateEventsFn(fact.effect));
-			continue;
-		}
-		if (fact.type === "autofill:admitted") {
-			const quantity = fact.deliveries.filter(({ id, revision }) => {
-				const item = finalItemsById.get(id);
-				return (
-					item?.revision === revision &&
-					item.location.scope === "delivery" &&
-					item.location.phase === "outbound" &&
-					item.location.target.kind === "line-input" &&
-					item.location.target.ownerItemId === fact.ownerItemId &&
-					item.location.target.lineUid === fact.lineUid
-				);
-			}).length;
-			if (quantity > 0)
-				candidates.push({
-					type: GameEventEnumSchema.enum.LineInputAutofillStarted,
-					ownerItemId: fact.ownerItemId,
-					itemUid: fact.itemUid,
-					lineUid: fact.lineUid,
-					scheduledQuantity: quantity,
-				});
-			continue;
-		}
-		if (fact.type === "job:admitted") {
-			candidates.push({
-				type: GameEventEnumSchema.enum.JobStarted,
-				jobId: fact.jobId,
-				ownerItemId: fact.ownerItemId,
-				itemUid: fact.itemUid,
-				lineUid: fact.lineUid,
+				},
+			)
+			.otherwise((fact) => {
+				candidates.push(fact);
 			});
-			continue;
-		}
-		candidates.push(fact);
 	}
 
 	const previousIds = new Set(previousRuntime.items.map((item) => item.id));
@@ -161,12 +181,14 @@ export const projectCommittedEngineFactsFx = Effect.fn("projectCommittedEngineFa
 				events.push(candidate);
 			continue;
 		}
-		if (candidate.cause === "depleted" || candidate.cause === "expired")
+		const lifecycleEventType = match(candidate.cause)
+			.with("depleted", () => GameEventEnumSchema.enum.ItemDepleted)
+			.with("expired", () => GameEventEnumSchema.enum.ItemExpired)
+			.with("removed", () => undefined)
+			.exhaustive();
+		if (lifecycleEventType !== undefined)
 			events.push({
-				type:
-					candidate.cause === "depleted"
-						? GameEventEnumSchema.enum.ItemDepleted
-						: GameEventEnumSchema.enum.ItemExpired,
+				type: lifecycleEventType,
 				itemId: candidate.itemId,
 				itemUid: candidate.itemUid,
 				location: candidate.location,

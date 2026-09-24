@@ -104,12 +104,11 @@ const SettingsCommandRunnerAtom = Atom.fn(
 							}
 						: {
 								kind: "save-error",
-								label:
-									command.action === "cheat-tools"
-										? "Cheat tools"
-										: command.action === "window-mode"
-											? "Window"
-											: "Theme",
+								label: match(command.action)
+									.with("cheat-tools", () => "Cheat tools" as const)
+									.with("window-mode", () => "Window" as const)
+									.with("theme", () => "Theme" as const)
+									.exhaustive(),
 								error,
 							},
 				);
@@ -123,12 +122,11 @@ const SettingsCommandRunnerAtom = Atom.fn(
 						}
 					: {
 							kind: "saved",
-							label:
-								command.action === "cheat-tools"
-									? "Cheat tools"
-									: command.action === "window-mode"
-										? "Window"
-										: "Theme",
+							label: match(command.action)
+								.with("cheat-tools", () => "Cheat tools" as const)
+								.with("window-mode", () => "Window" as const)
+								.with("theme", () => "Theme" as const)
+								.exhaustive(),
 						},
 			);
 		}),

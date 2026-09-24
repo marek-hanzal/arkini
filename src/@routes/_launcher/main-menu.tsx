@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { useAtom, useAtomValue } from "@effect/atom-react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
@@ -70,8 +71,8 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 				)
 					return;
 
-				switch (event.key) {
-					case "c":
+				match(event.key)
+					.with("c", () => {
 						if (!defaultPackageAvailable || !canContinue) return;
 						event.preventDefault();
 						void navigateFn({
@@ -80,30 +81,31 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 								packageId: SerakkiDefaultPackageId,
 							},
 						});
-						return;
-					case "g":
+					})
+					.with("g", () => {
 						event.preventDefault();
 						void navigateFn({
 							to: "/serapacks",
 						});
-						return;
-					case "s":
+					})
+					.with("s", () => {
 						event.preventDefault();
 						void navigateFn({
 							to: "/settings",
 						});
-						return;
-					case "a":
+					})
+					.with("a", () => {
 						event.preventDefault();
 						void navigateFn({
 							to: "/about",
 						});
-						return;
-					case "e":
+					})
+					.with("e", () => {
 						if (exitPending) return;
 						event.preventDefault();
 						requestExitFn(undefined);
-				}
+					})
+					.otherwise(() => undefined);
 			};
 			window.addEventListener("keydown", onKeyDownFn);
 			return () => window.removeEventListener("keydown", onKeyDownFn);
@@ -304,25 +306,70 @@ export const Route = createFileRoute("/_launcher/main-menu")({
 							Export diagnostics
 						</button>
 					</div>
-					{catalogState.type === "failed" ? (
-						<p className="text-center text-sm text-danger">
-							Catalog failed: {String(catalogState.error)}
-						</p>
-					) : AsyncResult.isFailure(startup) && !startup.waiting ? (
-						<p className="text-center text-sm text-danger">
-							Startup failed: {String(Cause.squash(startup.cause))}
-						</p>
-					) : exitState.kind === "error" ? (
-						<p className="text-center text-sm text-danger">
-							Exit failed: {String(exitState.error)}
-						</p>
-					) : diagnosticsExportState.kind === "error" ? (
-						<p className="text-center text-sm text-danger">
-							Export failed: {String(diagnosticsExportState.error)}
-						</p>
-					) : exitState.kind === "requested" ? (
-						<p className="text-center text-sm text-muted">Exit requested.</p>
-					) : null}
+					{match({
+						catalogState,
+						startup,
+						exitState,
+						diagnosticsExportState,
+					})
+						.with(
+							{
+								catalogState: {
+									type: "failed",
+								},
+							},
+							({ catalogState }) => (
+								<p className="text-center text-sm text-danger">
+									Catalog failed: {String(catalogState.error)}
+								</p>
+							),
+						)
+						.with(
+							{
+								startup: {
+									_tag: "Failure",
+									waiting: false,
+								},
+							},
+							({ startup }) => (
+								<p className="text-center text-sm text-danger">
+									Startup failed: {String(Cause.squash(startup.cause))}
+								</p>
+							),
+						)
+						.with(
+							{
+								exitState: {
+									kind: "error",
+								},
+							},
+							({ exitState }) => (
+								<p className="text-center text-sm text-danger">
+									Exit failed: {String(exitState.error)}
+								</p>
+							),
+						)
+						.with(
+							{
+								diagnosticsExportState: {
+									kind: "error",
+								},
+							},
+							({ diagnosticsExportState }) => (
+								<p className="text-center text-sm text-danger">
+									Export failed: {String(diagnosticsExportState.error)}
+								</p>
+							),
+						)
+						.with(
+							{
+								exitState: {
+									kind: "requested",
+								},
+							},
+							() => <p className="text-center text-sm text-muted">Exit requested.</p>,
+						)
+						.otherwise(() => null)}
 				</nav>
 			</LauncherPageLayout>
 		);

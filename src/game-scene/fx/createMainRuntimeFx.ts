@@ -1,5 +1,6 @@
 import { readBoardSizeFn } from "~/game-runtime/fn/readBoardSizeFn";
 import { Effect } from "effect";
+import { match } from "ts-pattern";
 
 import type { GameEngine } from "~/playable-game/type/GameEngine";
 import type { GameTransition } from "~/game-session/type/GameSession";
@@ -229,11 +230,11 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 				);
 			}
 			RendererRuntime.runSync(
-				mode === "hydrate"
-					? reconciler.hydrateFx(transition)
-					: mode === "board-arrive"
-						? reconciler.boardArriveFx(transition)
-						: reconciler.reconcileFx(transition),
+				match(mode)
+					.with("hydrate", () => reconciler.hydrateFx(transition))
+					.with("board-arrive", () => reconciler.boardArriveFx(transition))
+					.with("present", () => reconciler.reconcileFx(transition))
+					.exhaustive(),
 			);
 		};
 		const transitionPresenter = yield* createBoardTransitionPresenterFx({

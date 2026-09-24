@@ -1,3 +1,4 @@
+import { match, P } from "ts-pattern";
 import { useAtom } from "@effect/atom-react";
 import { useEffect } from "react";
 
@@ -5,25 +6,54 @@ import type { CompletionStatus } from "~electron/contract/cli/CompletionStatus";
 import { CompletionCommandAtom } from "~/application-settings/atom/CompletionCommandAtom";
 
 const shellLabelFn = (status: CompletionStatus) =>
-	status.type === "unavailable"
-		? "Shell"
-		: status.shell === "zsh"
-			? "Zsh"
-			: status.shell === "bash"
-				? "Bash"
-				: "Fish";
+	match(status)
+		.with(
+			{
+				type: "unavailable",
+			},
+			() => "Shell",
+		)
+		.with(
+			{
+				shell: "zsh",
+			},
+			() => "Zsh",
+		)
+		.with(
+			{
+				shell: "bash",
+			},
+			() => "Bash",
+		)
+		.with(
+			{
+				shell: "fish",
+			},
+			() => "Fish",
+		)
+		.exhaustive();
 
-const describeCompletionFn = (status: CompletionStatus | undefined) => {
-	if (status === undefined) return "Checking shell completion support…";
-	if (status.type === "unavailable") return status.message;
-	if (status.type === "repairable" || status.type === "conflict") return status.message;
-	const location = `${shellLabelFn(status)} completion ${
-		status.type === "installed" ? "is installed" : "can be installed"
-	} at ${status.completionPath}.`;
-	return status.shell === "zsh"
-		? `${location} Add ~/.zsh/completions to fpath and run compinit once if that directory is not already loaded.`
-		: location;
-};
+const describeCompletionFn = (status: CompletionStatus | undefined) =>
+	match(status)
+		.with(undefined, () => "Checking shell completion support…")
+		.with(
+			{
+				type: P.union("unavailable", "repairable", "conflict"),
+			},
+			({ message }) => message,
+		)
+		.with(
+			{
+				type: P.union("installed", "not-installed"),
+			},
+			(status) => {
+				const location = `${shellLabelFn(status)} completion ${status.type === "installed" ? "is installed" : "can be installed"} at ${status.completionPath}.`;
+				return status.shell === "zsh"
+					? `${location} Add ~/.zsh/completions to fpath and run compinit once if that directory is not already loaded.`
+					: location;
+			},
+		)
+		.exhaustive();
 
 export const useCliCompletionModel = ({
 	commandInstalled,
@@ -52,22 +82,66 @@ export const useCliCompletionModel = ({
 			(state.kind === "error" && status === undefined) ||
 			(status?.type === "conflict" && !status.replaceable) ||
 			status?.type === "unavailable",
-		completionActionLabel: cleanupWithoutCommand
-			? "Uninstall"
-			: status?.type === "installed"
-				? "Uninstall"
-				: status?.type === "repairable"
-					? "Repair"
-					: status?.type === "conflict"
-						? "Replace"
-						: "Install",
+		completionActionLabel: match({
+			cleanupWithoutCommand,
+			type: status?.type,
+		})
+			.with(
+				{
+					cleanupWithoutCommand: true,
+				},
+				{
+					type: "installed",
+				},
+				() => "Uninstall",
+			)
+			.with(
+				{
+					type: "repairable",
+				},
+				() => "Repair",
+			)
+			.with(
+				{
+					type: "conflict",
+				},
+				() => "Replace",
+			)
+			.with(
+				{
+					type: P.union(undefined, "not-installed", "unavailable"),
+				},
+				() => "Install",
+			)
+			.exhaustive(),
 		toggleCompletionFn: () =>
 			runCommandFn(
-				cleanupWithoutCommand || status?.type === "installed"
-					? "uninstall"
-					: status?.type === "conflict"
-						? "replace"
-						: "install",
+				match({
+					cleanupWithoutCommand,
+					type: status?.type,
+				})
+					.with(
+						{
+							cleanupWithoutCommand: true,
+						},
+						{
+							type: "installed",
+						},
+						() => "uninstall" as const,
+					)
+					.with(
+						{
+							type: "conflict",
+						},
+						() => "replace" as const,
+					)
+					.with(
+						{
+							type: P.union(undefined, "repairable", "not-installed", "unavailable"),
+						},
+						() => "install" as const,
+					)
+					.exhaustive(),
 			),
 	};
 };

@@ -1,3 +1,4 @@
+import { match, P } from "ts-pattern";
 import { Tx } from "~/translation/ui/Tx";
 import { Trash2 } from "lucide-react";
 
@@ -47,64 +48,84 @@ export const NoteResourceLinks = ({
 							key={resourceUid}
 							className="flex min-w-0 items-center gap-1 rounded-xl border border-line bg-canvas/50 p-1"
 						>
-							{resource?.type === "artwork" ? (
-								<EditorArtworkDetailLink
-									resourceUid={resourceUid}
-									filter={filter}
-									query={query}
-									className="flex min-w-0 items-center gap-2 pr-2 text-sm"
-								>
-									<EditorResourceThumbnail
-										resourceUid={resourceUid}
-										size="sm"
-									/>
-									<span className="truncate">{resource.title}</span>
-								</EditorArtworkDetailLink>
-							) : resource?.type === "image" ? (
-								<ButtonLink
-									to="/editor/$projectId/project/detail/$sectionId"
-									params={{
-										projectId: project.projectId,
-										sectionId: "images",
-									}}
-									className="flex min-h-0 min-w-0 items-center gap-2 border-0 bg-transparent p-0 pr-2 text-left text-sm font-normal text-accent shadow-none hover:bg-transparent hover:text-accent-hover"
-								>
-									<EditorResourceThumbnail
-										resourceUid={resourceUid}
-										size="sm"
-									/>
-									<span className="truncate">{resource.title}</span>
-								</ButtonLink>
-							) : resource?.type === "music" || resource?.type === "sfx" ? (
-								<ButtonLink
-									to={
-										resource.type === "music"
-											? "/editor/$projectId/music/$resourceUid/$sectionId"
-											: "/editor/$projectId/sfx/$resourceUid/$sectionId"
-									}
-									params={{
-										projectId: project.projectId,
-										resourceUid,
-										sectionId: "view",
-									}}
-									className="flex min-h-0 min-w-0 items-center gap-2 border-0 bg-transparent p-0 pr-2 text-left text-sm font-normal text-accent shadow-none hover:bg-transparent hover:text-accent-hover"
-								>
-									<EditorResourceThumbnail
-										resourceUid={resourceUid}
-										size="sm"
-									/>
-									<span className="truncate">
-										{resource.title ?? resourceUid}
+							{match(resource)
+								.with(
+									{
+										type: "artwork",
+									},
+									(resource) => (
+										<EditorArtworkDetailLink
+											resourceUid={resourceUid}
+											filter={filter}
+											query={query}
+											className="flex min-w-0 items-center gap-2 pr-2 text-sm"
+										>
+											<EditorResourceThumbnail
+												resourceUid={resourceUid}
+												size="sm"
+											/>
+											<span className="truncate">{resource.title}</span>
+										</EditorArtworkDetailLink>
+									),
+								)
+								.with(
+									{
+										type: "image",
+									},
+									(resource) => (
+										<ButtonLink
+											to="/editor/$projectId/project/detail/$sectionId"
+											params={{
+												projectId: project.projectId,
+												sectionId: "images",
+											}}
+											className="flex min-h-0 min-w-0 items-center gap-2 border-0 bg-transparent p-0 pr-2 text-left text-sm font-normal text-accent shadow-none hover:bg-transparent hover:text-accent-hover"
+										>
+											<EditorResourceThumbnail
+												resourceUid={resourceUid}
+												size="sm"
+											/>
+											<span className="truncate">{resource.title}</span>
+										</ButtonLink>
+									),
+								)
+								.with(
+									{
+										type: P.union("music", "sfx"),
+									},
+									(resource) => (
+										<ButtonLink
+											to={
+												resource.type === "music"
+													? "/editor/$projectId/music/$resourceUid/$sectionId"
+													: "/editor/$projectId/sfx/$resourceUid/$sectionId"
+											}
+											params={{
+												projectId: project.projectId,
+												resourceUid,
+												sectionId: "view",
+											}}
+											className="flex min-h-0 min-w-0 items-center gap-2 border-0 bg-transparent p-0 pr-2 text-left text-sm font-normal text-accent shadow-none hover:bg-transparent hover:text-accent-hover"
+										>
+											<EditorResourceThumbnail
+												resourceUid={resourceUid}
+												size="sm"
+											/>
+											<span className="truncate">
+												{resource.title ?? resourceUid}
+											</span>
+										</ButtonLink>
+									),
+								)
+								.with(undefined, () => (
+									<span
+										className="px-2 text-sm text-muted"
+										data-ui="EditorNoteMissingResource"
+									>
+										<Tx label="Unavailable resource" /> · {resourceUid}
 									</span>
-								</ButtonLink>
-							) : (
-								<span
-									className="px-2 text-sm text-muted"
-									data-ui="EditorNoteMissingResource"
-								>
-									<Tx label="Unavailable resource" /> · {resourceUid}
-								</span>
-							)}
+								))
+								.exhaustive()}
 
 							<Button
 								className="size-8 min-h-0 shrink-0 border-0 bg-transparent p-0 text-muted shadow-none hover:text-danger"

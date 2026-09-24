@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { ProjectIntroductionSection } from "~/project-authoring/ui/ProjectIntroductionSection";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
@@ -22,15 +23,19 @@ export const Route = createFileRoute("/editor/$projectId/project/form/$sectionId
 	component: () => {
 		const { sectionId } = Route.useParams();
 		const { avatar } = Route.useSearch();
-		switch (sectionId as ProjectSectionId) {
-			case "introduction":
+		return match(sectionId as ProjectSectionId)
+			.with("introduction", () => {
 				return <ProjectIntroductionSection />;
-			case "general":
+			})
+			.with("general", () => {
 				return <ProjectGeneralSection />;
-			case "images":
+			})
+			.with("images", () => {
 				return <ProjectImagesSection initialAvatarIndex={avatar} />;
-			case "board":
+			})
+			.with("board", () => {
 				return <ProjectBoardSection />;
-		}
+			})
+			.exhaustive();
 	},
 });

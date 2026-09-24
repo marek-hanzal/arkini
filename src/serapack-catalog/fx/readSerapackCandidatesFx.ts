@@ -1,3 +1,4 @@
+import { compareSerapackSourcesFn } from "~/serapack-catalog/fn/compareSerapackSourcesFn";
 import { Effect } from "effect";
 
 import { SerakkiVersionIncompatibleError } from "~/application-version/error/SerakkiVersionIncompatibleError";
@@ -30,7 +31,7 @@ export const readSerapackCandidatesFx = Effect.fn("readSerapackCandidatesFx")(fu
 ) {
 	const candidates = [
 		...files,
-	].sort((left, right) => (left.source === right.source ? 0 : left.source === "user" ? -1 : 1));
+	].sort((left, right) => compareSerapackSourcesFn(left.source, right.source));
 	let incompatibility: SerakkiVersionIncompatibleError | undefined;
 	for (const file of candidates) {
 		const result = yield* Effect.result(

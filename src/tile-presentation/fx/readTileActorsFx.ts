@@ -1,6 +1,7 @@
 import { readItemScheduleFn } from "~/item-schedule/fn/readItemScheduleFn";
 import { resolveItemScheduleEnabledFx } from "~/item-schedule/fx/resolveItemScheduleEnabledFx";
 import { Array, Effect } from "effect";
+import { match, P } from "ts-pattern";
 
 import type { GameEngine } from "~/playable-game/type/GameEngine";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
@@ -85,12 +86,24 @@ export const readTileActorsFx = Effect.fnUntraced(function* ({
 			});
 			const hasUnits = item.item.units !== undefined;
 			const badgeCount = queueBadgeCount ?? readItemRemainingUnitsFn(item);
-			const badgeKind =
-				queueBadgeCount !== undefined
-					? ("queue" as const)
-					: hasUnits
-						? ("units" as const)
-						: undefined;
+			const badgeKind = match({
+				queueBadgeCount,
+				hasUnits,
+			})
+				.returnType<"queue" | "units" | undefined>()
+				.with(
+					{
+						queueBadgeCount: P.nonNullable,
+					},
+					() => "queue",
+				)
+				.with(
+					{
+						hasUnits: true,
+					},
+					() => "units",
+				)
+				.otherwise(() => undefined);
 			const progressRatio = readProgressRatioFn({
 				activeJob,
 				item,

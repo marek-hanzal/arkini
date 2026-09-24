@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { createId } from "@paralleldrive/cuid2";
 import { assertUniqueLineUidsFx } from "~/project-authoring/fx/assertUniqueLineUidsFx";
 import { Clock, FileSystem, Path } from "effect";
@@ -301,17 +302,59 @@ export const createLifecycleOperationsFx = Effect.fn("createLifecycleOperationsF
 				project: materializeDescriptorFn(state.project),
 			});
 		}
-		return candidates.sort((left, right) => {
-			if (left.type === "valid" && right.type === "valid")
-				return (
-					right.project.updatedAtMs - left.project.updatedAtMs ||
-					left.project.projectId.localeCompare(right.project.projectId)
-				);
-			if (left.type !== right.type) return left.type === "valid" ? -1 : 1;
-			return left.type === "invalid" && right.type === "invalid"
-				? left.root.localeCompare(right.root)
-				: 0;
-		});
+		return candidates.sort((left, right) =>
+			match([
+				left,
+				right,
+			])
+				.with(
+					[
+						{
+							type: "valid",
+						},
+						{
+							type: "valid",
+						},
+					],
+					([left, right]) =>
+						right.project.updatedAtMs - left.project.updatedAtMs ||
+						left.project.projectId.localeCompare(right.project.projectId),
+				)
+				.with(
+					[
+						{
+							type: "valid",
+						},
+						{
+							type: "invalid",
+						},
+					],
+					() => -1,
+				)
+				.with(
+					[
+						{
+							type: "invalid",
+						},
+						{
+							type: "valid",
+						},
+					],
+					() => 1,
+				)
+				.with(
+					[
+						{
+							type: "invalid",
+						},
+						{
+							type: "invalid",
+						},
+					],
+					([left, right]) => left.root.localeCompare(right.root),
+				)
+				.exhaustive(),
+		);
 	}).pipe(
 		Effect.mapError((cause) =>
 			errorFn("list-projects", "The Editor project catalog could not be refreshed.", cause),

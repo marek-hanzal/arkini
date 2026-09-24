@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { useMatchRoute } from "@tanstack/react-router";
 import {
 	FolderKanban,
@@ -129,13 +130,23 @@ export const YourGamesList = ({
 						data-row-kind={project === undefined ? "serapack" : "project"}
 						data-ui="YourGamesRow"
 					>
-						{project === undefined ? (
-							<PackageOpen className="size-5 shrink-0 text-accent" />
-						) : openingProject && openingProject.projectId === project.projectId ? (
-							<LoaderCircle className="size-5 shrink-0 animate-spin text-accent" />
-						) : (
-							<FolderKanban className="size-5 shrink-0 text-accent" />
-						)}
+						{match(project)
+							.with(undefined, () => (
+								<PackageOpen className="size-5 shrink-0 text-accent" />
+							))
+							.when(
+								(project) =>
+									Boolean(
+										openingProject &&
+											openingProject.projectId === project.projectId,
+									),
+								() => (
+									<LoaderCircle className="size-5 shrink-0 animate-spin text-accent" />
+								),
+							)
+							.otherwise(() => (
+								<FolderKanban className="size-5 shrink-0 text-accent" />
+							))}
 						<div className="min-w-0 flex-1">
 							<div className="flex min-w-0 items-center gap-2">
 								<h2 className="truncate text-sm font-semibold">

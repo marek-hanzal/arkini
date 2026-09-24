@@ -1,3 +1,4 @@
+import { match, P } from "ts-pattern";
 import { useAtom } from "@effect/atom-react";
 import { useEffect } from "react";
 
@@ -5,20 +6,29 @@ import type { InstallationStatus } from "~electron/contract/cli/InstallationStat
 import { CliCommandAtom } from "~/application-settings/atom/CliCommandAtom";
 import { useCliCompletionModel } from "~/application-settings/ui/useCliCompletionModel";
 
-const describeInstallationFn = (status: InstallationStatus | undefined) => {
-	if (status === undefined) return "Checking whether serakki-cli can be installed…";
-	switch (status.type) {
-		case "installed":
-			return `serakki-cli is installed at ${status.commandPath}.`;
-		case "not-installed":
-			return `Install serakki-cli at ${status.commandPath}. Its directory must be on your shell PATH.`;
-		case "repairable":
-			return status.message;
-		case "conflict":
-		case "unavailable":
-			return status.message;
-	}
-};
+const describeInstallationFn = (status: InstallationStatus | undefined) =>
+	match(status)
+		.with(undefined, () => "Checking whether serakki-cli can be installed…")
+		.with(
+			{
+				type: "installed",
+			},
+			({ commandPath }) => `serakki-cli is installed at ${commandPath}.`,
+		)
+		.with(
+			{
+				type: "not-installed",
+			},
+			({ commandPath }) =>
+				`Install serakki-cli at ${commandPath}. Its directory must be on your shell PATH.`,
+		)
+		.with(
+			{
+				type: P.union("repairable", "conflict", "unavailable"),
+			},
+			({ message }) => message,
+		)
+		.exhaustive();
 
 export const useCliModel = () => {
 	const [state, runCommandFn] = useAtom(CliCommandAtom);
@@ -44,21 +54,25 @@ export const useCliModel = () => {
 			(state.kind === "error" && status === undefined) ||
 			(status?.type === "conflict" && !status.replaceable) ||
 			status?.type === "unavailable",
-		installationActionLabel:
-			status?.type === "installed"
-				? "Uninstall"
-				: status?.type === "repairable"
-					? "Repair"
-					: status?.type === "conflict"
-						? "Replace"
-						: "Install",
+		installationActionLabel: match(status?.type)
+			.with("installed", () => "Uninstall")
+			.with("repairable", () => "Repair")
+			.with("conflict", () => "Replace")
+			.with(undefined, "not-installed", "unavailable", () => "Install")
+			.exhaustive(),
 		toggleInstallationFn: () =>
 			runCommandFn(
-				status?.type === "installed"
-					? "uninstall"
-					: status?.type === "conflict"
-						? "replace"
-						: "install",
+				match(status?.type)
+					.with("installed", () => "uninstall" as const)
+					.with("conflict", () => "replace" as const)
+					.with(
+						undefined,
+						"repairable",
+						"not-installed",
+						"unavailable",
+						() => "install" as const,
+					)
+					.exhaustive(),
 			),
 	};
 };

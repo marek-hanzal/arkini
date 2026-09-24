@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { app, BrowserWindow, dialog, nativeTheme, protocol } from "electron";
 import { fileURLToPath } from "node:url";
 import { basename, dirname, join, resolve } from "node:path";
@@ -226,13 +227,34 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	const packagedCliLauncherPath = join(dirname(process.execPath), "serakki-cli");
 	const transientMacAppPath =
 		process.execPath.startsWith("/Volumes/") || process.execPath.includes("/AppTranslocation/");
-	const cliUnavailableMessage = !app.isPackaged
-		? "serakki-cli can be installed from a packaged Serakki build."
-		: process.platform === "darwin"
-			? transientMacAppPath
-				? "Move Serakki.app from the disk image to Applications before installing serakki-cli."
-				: undefined
-			: `serakki-cli installation is not available on ${process.platform} yet.`;
+	const cliUnavailableMessage = match({
+		packaged: app.isPackaged,
+		platform: process.platform,
+		transientMacAppPath,
+	})
+		.with(
+			{
+				packaged: false,
+			},
+			() => "serakki-cli can be installed from a packaged Serakki build.",
+		)
+		.with(
+			{
+				platform: "darwin",
+				transientMacAppPath: true,
+			},
+			() =>
+				"Move Serakki.app from the disk image to Applications before installing serakki-cli.",
+		)
+		.with(
+			{
+				platform: "darwin",
+			},
+			() => undefined,
+		)
+		.otherwise(
+			({ platform }) => `serakki-cli installation is not available on ${platform} yet.`,
+		);
 	const homePath = app.getPath("home");
 	const cliInstallation = yield* createInstallationFx({
 		commandPath: join(homePath, ".local", "bin", "serakki-cli"),
@@ -241,36 +263,27 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	});
 	const shellName = basename(process.env.SHELL ?? "");
 	const cliCompletion = yield* createCompletionFx({
-		completion:
-			shellName === "zsh"
-				? {
-						path: join(homePath, ".zsh", "completions", "_serakki-cli"),
-						shell: "zsh",
-					}
-				: shellName === "bash"
-					? {
-							path: join(
-								homePath,
-								".local",
-								"share",
-								"bash-completion",
-								"completions",
-								"serakki-cli",
-							),
-							shell: "bash",
-						}
-					: shellName === "fish"
-						? {
-								path: join(
-									homePath,
-									".config",
-									"fish",
-									"completions",
-									"serakki-cli.fish",
-								),
-								shell: "fish",
-							}
-						: undefined,
+		completion: match(shellName)
+			.with("zsh", (shell) => ({
+				shell,
+				path: join(homePath, ".zsh", "completions", "_serakki-cli"),
+			}))
+			.with("bash", (shell) => ({
+				shell,
+				path: join(
+					homePath,
+					".local",
+					"share",
+					"bash-completion",
+					"completions",
+					"serakki-cli",
+				),
+			}))
+			.with("fish", (shell) => ({
+				shell,
+				path: join(homePath, ".config", "fish", "completions", "serakki-cli.fish"),
+			}))
+			.otherwise(() => undefined),
 		launcherPath: packagedCliLauncherPath,
 		unavailableMessage: cliUnavailableMessage,
 	});

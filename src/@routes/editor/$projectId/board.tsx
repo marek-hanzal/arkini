@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { Mx } from "~/translation/ui/Mx";
 import { Tx } from "~/translation/ui/Tx";
 import { useAtomValue } from "@effect/atom-react";
@@ -81,21 +82,38 @@ export const Route = createFileRoute("/editor/$projectId/board")({
 					className="size-full min-h-0"
 					data-ui="EditorBoard"
 				>
-					{ready ? (
-						<EditorBoardReady resource={state.resource} />
-					) : state.type === "failed" &&
-						state.projectId === project.projectId &&
-						state.projectRevision === project.revision ? (
-						<EditorBoardStatus
-							detail={String(state.error)}
-							title={<Tx label="Editor game could not synchronize" />}
-						/>
-					) : (
-						<EditorBoardStatus
-							detail={<Mx label="Editor Board preparing description" />}
-							title={<Tx label="Preparing editor game…" />}
-						/>
-					)}
+					{match(state)
+						.with(
+							{
+								type: "ready",
+								resource: {
+									game: {
+										projectId: project.projectId,
+										projectRevision: project.revision,
+									},
+								},
+							},
+							(state) => <EditorBoardReady resource={state.resource} />,
+						)
+						.with(
+							{
+								type: "failed",
+								projectId: project.projectId,
+								projectRevision: project.revision,
+							},
+							(state) => (
+								<EditorBoardStatus
+									detail={String(state.error)}
+									title={<Tx label="Editor game could not synchronize" />}
+								/>
+							),
+						)
+						.otherwise(() => (
+							<EditorBoardStatus
+								detail={<Mx label="Editor Board preparing description" />}
+								title={<Tx label="Preparing editor game…" />}
+							/>
+						))}
 				</section>
 			</EditorSectionPage>
 		);

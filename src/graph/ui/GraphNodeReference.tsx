@@ -1,3 +1,4 @@
+import { match, P } from "ts-pattern";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
 import type { GraphNode } from "~/graph/type/GraphFacts";
@@ -87,11 +88,23 @@ export const GraphNodeReference = ({
 			className="break-words text-sm"
 			title={id}
 		>
-			{space !== undefined
-				? `${translator.textFn("Space")} ${id.slice(6)}`
-				: id === "start"
-					? translator.textFn("Starting configuration")
-					: (node?.title ?? id)}
+			{match({
+				space,
+				id,
+			})
+				.with(
+					{
+						space: P.nonNullable,
+					},
+					() => `${translator.textFn("Space")} ${id.slice(6)}`,
+				)
+				.with(
+					{
+						id: "start",
+					},
+					() => translator.textFn("Starting configuration"),
+				)
+				.otherwise(() => node?.title ?? id)}
 			{node?.missing || id.startsWith("item:") || id.startsWith("template:")
 				? ` · ${translator.textFn("Missing reference")}`
 				: ""}

@@ -2,6 +2,7 @@ import { ItemProductionControlUnavailableError } from "~/production-line/error/I
 import { createRevisionFx } from "~/item-revision/fx/createRevisionFx";
 import { assertItemProductionPlayerControlFx } from "~/production-line/fx/assertItemProductionPlayerControlFx";
 import { Effect, Option } from "effect";
+import { match, P } from "ts-pattern";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { ItemNotFoundError } from "~/item-resolution/error/ItemNotFoundError";
@@ -59,15 +60,33 @@ export const setLineSelectionFx = Effect.fn("setLineSelectionFx")(function* (
 					}),
 				);
 			const lines = ownerItem === undefined ? undefined : ownerItem.lines;
-			const invalidLineUid = (
-				selection === "clock"
-					? lineUids
-					: lineUid === null
-						? []
-						: [
-								lineUid,
-							]
-			).find((id) => lines?.some((line) => line.uid === id) !== true);
+			const selectedLineUids = match(props)
+				.with(
+					{
+						selection: "clock",
+					},
+					() => lineUids,
+				)
+				.with(
+					{
+						selection: "default",
+						lineUid: null,
+					},
+					() => [],
+				)
+				.with(
+					{
+						selection: "default",
+						lineUid: P.string,
+					},
+					({ lineUid }) => [
+						lineUid,
+					],
+				)
+				.exhaustive();
+			const invalidLineUid = selectedLineUids.find(
+				(id) => lines?.some((line) => line.uid === id) !== true,
+			);
 			if (invalidLineUid !== undefined) {
 				return yield* Effect.fail(
 					new LineNotFoundError({
@@ -88,49 +107,59 @@ export const setLineSelectionFx = Effect.fn("setLineSelectionFx")(function* (
 					}),
 				);
 			}
-			const current =
-				selection === "default"
-					? Object.hasOwn(runtime.defaultLineByOwnerItemId, ownerItemId)
+			const unchanged = match(selection)
+				.with("default", () => {
+					const current = Object.hasOwn(runtime.defaultLineByOwnerItemId, ownerItemId)
 						? runtime.defaultLineByOwnerItemId[ownerItemId]
-						: undefined
-					: schedule?.lineUids;
-			if (
-				selection === "default"
-					? current === lineUid
-					: Array.isArray(current) &&
+						: undefined;
+					return current === lineUid;
+				})
+				.with("clock", () => {
+					const current = schedule?.lineUids;
+					return (
+						Array.isArray(current) &&
 						current.length === lineUids.length &&
 						current.every((id, index) => id === lineUids[index])
-			)
+					);
+				})
+				.exhaustive();
+			if (unchanged)
 				return [
 					props,
 					runtime,
 				] as const;
 			const revision = selection === "clock" ? yield* createRevisionFx() : owner.revision;
-			const selectedRuntime = {
-				...runtime,
-				defaultLineByOwnerItemId:
-					selection === "default"
-						? {
-								...runtime.defaultLineByOwnerItemId,
-								[ownerItemId]: lineUid,
-							}
-						: runtime.defaultLineByOwnerItemId,
-				items:
-					selection === "clock" && schedule !== undefined
-						? runtime.items.map((item) =>
-								item.id === ownerItemId
-									? {
-											...item,
-											revision,
-											schedule: {
-												...schedule,
-												lineUids,
-											},
-										}
-									: item,
-							)
-						: runtime.items,
-			} satisfies RuntimeSchema.Type;
+			const selectedRuntime = match(selection)
+				.returnType<RuntimeSchema.Type>()
+				.with("default", () => ({
+					...runtime,
+					defaultLineByOwnerItemId: {
+						...runtime.defaultLineByOwnerItemId,
+						[ownerItemId]: lineUid,
+					},
+				}))
+				.with("clock", () => {
+					if (schedule === undefined)
+						return {
+							...runtime,
+						};
+					return {
+						...runtime,
+						items: runtime.items.map((item) =>
+							item.id === ownerItemId
+								? {
+										...item,
+										revision,
+										schedule: {
+											...schedule,
+											lineUids,
+										},
+									}
+								: item,
+						),
+					};
+				})
+				.exhaustive();
 			return [
 				props,
 				selectedRuntime,

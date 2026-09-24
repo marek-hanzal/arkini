@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import type { FormValues } from "~/item-authoring/schema/FormSchema";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
@@ -14,48 +15,43 @@ export const copyItemSectionFn = (
 	productionLines: readonly LineSchema.Type[],
 ): FormValues => {
 	if (current.uid === source.uid) return current;
-	switch (section) {
-		case "identity":
-			return {
-				...current,
-				title: source.title,
-				description: source.description ?? "",
-				ui: source.ui,
-				music: source.music,
-			};
-		case "artwork":
-			return {
-				...current,
-				artwork: {
-					scale: source.artwork.scale,
-					default: [
-						source.artwork.default[0],
-						source.artwork.default[1] ?? "",
-					],
-				},
-			};
-		case "production":
-			return {
-				...current,
-				lines: structuredClone([
-					...productionLines,
-				]),
-				maxQueueSize: source.maxQueueSize,
-			};
-		case "merges":
-			return {
-				...current,
-				merge: structuredClone(source.merge),
-			};
-		case "units":
-			return {
-				...current,
-				units: structuredClone(source.units),
-			};
-		case "clock":
-			return {
-				...current,
-				clock: structuredClone(source.clock),
-			};
-	}
+	return match(section)
+		.returnType<FormValues>()
+		.with("identity", () => ({
+			...current,
+			title: source.title,
+			description: source.description ?? "",
+			ui: source.ui,
+			music: source.music,
+		}))
+		.with("artwork", () => ({
+			...current,
+			artwork: {
+				scale: source.artwork.scale,
+				default: [
+					source.artwork.default[0],
+					source.artwork.default[1] ?? "",
+				],
+			},
+		}))
+		.with("production", () => ({
+			...current,
+			lines: structuredClone([
+				...productionLines,
+			]),
+			maxQueueSize: source.maxQueueSize,
+		}))
+		.with("merges", () => ({
+			...current,
+			merge: structuredClone(source.merge),
+		}))
+		.with("units", () => ({
+			...current,
+			units: structuredClone(source.units),
+		}))
+		.with("clock", () => ({
+			...current,
+			clock: structuredClone(source.clock),
+		}))
+		.exhaustive();
 };

@@ -41,7 +41,23 @@ const resolveSourceReferenceFn = (sourcePath: string, reference: string) => {
 		}
 		segments.push(segment);
 	}
-	const prefix = drive === undefined ? (absolute ? "/" : "") : `${drive}/`;
+	const prefix = match({
+		drive,
+		absolute,
+	})
+		.with(
+			{
+				drive: P.string,
+			},
+			({ drive }) => `${drive}/`,
+		)
+		.with(
+			{
+				absolute: true,
+			},
+			() => "/",
+		)
+		.otherwise(() => "");
 	return `${prefix}${segments.join("/")}` || (absolute ? prefix : ".");
 };
 

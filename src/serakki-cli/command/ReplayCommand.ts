@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { CliError, Command, Flag } from "effect/unstable/cli";
 import { Clock, Console, Effect, FileSystem, Option } from "effect";
 import { join } from "node:path";
@@ -43,21 +44,51 @@ const resolveReplayPathsFn = ({
 	readonly incident: Option.Option<string>;
 	readonly save: Option.Option<string>;
 }): ReplayPaths | Error => {
-	if (Option.isSome(incident) && Option.isNone(serapack) && Option.isNone(save)) {
-		return {
-			serapack: join(incident.value, GameIncidentFiles.serapack),
-			save: join(incident.value, GameIncidentFiles.save),
-		};
-	}
-	if (Option.isNone(incident) && Option.isSome(serapack) && Option.isSome(save)) {
-		return {
-			serapack: serapack.value,
-			save: save.value,
-		};
-	}
-	return new Error(
-		"Use either --incident <directory> or both --serapack <file> and --save <file>.",
-	);
+	return match({
+		incident,
+		serapack,
+		save,
+	})
+		.with(
+			{
+				incident: {
+					_tag: "Some",
+				},
+				serapack: {
+					_tag: "None",
+				},
+				save: {
+					_tag: "None",
+				},
+			},
+			({ incident }) => ({
+				serapack: join(incident.value, GameIncidentFiles.serapack),
+				save: join(incident.value, GameIncidentFiles.save),
+			}),
+		)
+		.with(
+			{
+				incident: {
+					_tag: "None",
+				},
+				serapack: {
+					_tag: "Some",
+				},
+				save: {
+					_tag: "Some",
+				},
+			},
+			({ serapack, save }) => ({
+				serapack: serapack.value,
+				save: save.value,
+			}),
+		)
+		.otherwise(
+			() =>
+				new Error(
+					"Use either --incident <directory> or both --serapack <file> and --save <file>.",
+				),
+		);
 };
 
 const waitForFatalFx = (session: GameSession, timeoutMs: number) =>

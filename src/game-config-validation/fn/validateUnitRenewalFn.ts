@@ -1,5 +1,5 @@
 import { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
-import { match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 import { DiagnosticCodeEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticCodeEnumSchema";
 import { DiagnosticSeverityEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticSeverityEnumSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
@@ -78,9 +78,41 @@ const strongerCertaintyFn = (
 	current: OutcomeRecreationCertainty,
 	candidate: OutcomeRecreationCertainty,
 ): OutcomeRecreationCertainty => {
-	if (current === "guaranteed" || candidate === "guaranteed") return "guaranteed";
-	if (current === "stochastic" || candidate === "stochastic") return "stochastic";
-	return "none";
+	return match([
+		current,
+		candidate,
+	])
+		.returnType<OutcomeRecreationCertainty>()
+		.with(
+			[
+				"guaranteed",
+				P._,
+			],
+			[
+				P._,
+				"guaranteed",
+			],
+			() => "guaranteed",
+		)
+		.with(
+			[
+				"stochastic",
+				P._,
+			],
+			[
+				P._,
+				"stochastic",
+			],
+			() => "stochastic",
+		)
+		.with(
+			[
+				"none",
+				"none",
+			],
+			() => "none",
+		)
+		.exhaustive();
 };
 
 /** Warns when a item with units lacks a deterministic configured recreation path. */

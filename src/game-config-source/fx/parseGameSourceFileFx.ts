@@ -1,3 +1,4 @@
+import { match, P } from "ts-pattern";
 import { Effect } from "effect";
 
 import { GameSourceFileSchema } from "~/game-config-source/schema/GameSourceFileSchema";
@@ -79,12 +80,23 @@ export const parseGameSourceFileFx = Effect.fn("parseGameSourceFileFx")(
 				const item = value.item;
 				const segments = relative.split("/");
 				const expectedFilename = `${encodeGameProjectFileStemFn(item.uid)}.json`;
-				const formatError =
-					segments.length !== 2 || segments[0] !== "items"
-						? "Expected items/<encoded uid>.json."
-						: segments[1] !== expectedFilename
-							? `Item UID ${JSON.stringify(item.uid)} requires filename ${JSON.stringify(expectedFilename)}.`
-							: undefined;
+				const formatError = match(segments)
+					.with(
+						[
+							"items",
+							expectedFilename,
+						],
+						() => undefined,
+					)
+					.with(
+						[
+							"items",
+							P.string,
+						],
+						() =>
+							`Item UID ${JSON.stringify(item.uid)} requires filename ${JSON.stringify(expectedFilename)}.`,
+					)
+					.otherwise(() => "Expected items/<encoded uid>.json.");
 				if (formatError !== undefined) {
 					return {
 						diagnostics: [

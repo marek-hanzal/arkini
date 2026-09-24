@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { Tx } from "~/translation/ui/Tx";
 import { DisabledCapabilityDetail } from "~/item-authoring/ui/DisabledCapabilityDetail";
 import { useTranslator } from "~/translation/ui/useTranslator";
@@ -110,15 +111,12 @@ export const MergeDetail = ({
 				<DetailFact
 					label={translator.textFn("Source action")}
 					description={<Mx label="Authored merge source action summary help" />}
-					value={translator.textFn(
-						merge.action === "space"
-							? "Space"
-							: merge.action === "spend"
-								? "Spend"
-								: merge.action === "use"
-									? "Use"
-									: "Consume",
-					)}
+					value={match(merge.action)
+						.with("space", () => translator.textFn("Space"))
+						.with("spend", () => translator.textFn("Spend"))
+						.with("use", () => translator.textFn("Use"))
+						.with("consume", () => translator.textFn("Consume"))
+						.exhaustive()}
 				/>
 				{"result" in merge ? (
 					<DetailFact
@@ -129,15 +127,12 @@ export const MergeDetail = ({
 				<DetailFact
 					label={translator.textFn("Target effect")}
 					description={<Mx label="Authored merge target effect summary help" />}
-					value={translator.textFn(
-						merge.effect === "spend"
-							? "Spend"
-							: merge.effect === "keep"
-								? "Keep"
-								: merge.effect === "remove"
-									? "Remove"
-									: "Replace",
-					)}
+					value={match(merge.effect)
+						.with("spend", () => translator.textFn("Spend"))
+						.with("keep", () => translator.textFn("Keep"))
+						.with("remove", () => translator.textFn("Remove"))
+						.with("replace", () => translator.textFn("Replace"))
+						.exhaustive()}
 				/>
 			</DetailFacts>
 			<OutcomeDetail

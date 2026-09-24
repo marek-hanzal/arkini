@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { createId } from "@paralleldrive/cuid2";
 import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
 import { copyItemSectionFn } from "~/item-authoring/fn/copyItemSectionFn";
@@ -84,18 +85,22 @@ const readFormValuesFn = (item: ItemSchema.Type): FormValues => ({
 const readFormValidationMessageFn = (issue: z.core.$ZodIssue, textFn: (key: string) => string) => {
 	if (issue.path.at(-1) === "itemUid" && issue.code === "too_small")
 		return textFn("Select an item.");
-	switch (issue.message) {
-		case "Enable Units on this item before selecting Spend.":
+	return match(issue.message)
+		.with("Enable Units on this item before selecting Spend.", () => {
 			return textFn("Enable Units on this item before selecting Spend.");
-		case "Selected target must have Units enabled before choosing Spend.":
+		})
+		.with("Selected target must have Units enabled before choosing Spend.", () => {
 			return textFn("Selected target must have Units enabled before choosing Spend.");
-		case "Enable Units on this item before selecting Self.":
+		})
+		.with("Enable Units on this item before selecting Self.", () => {
 			return textFn("Enable Units on this item before selecting Self.");
-		case "Selected target must have Units enabled.":
+		})
+		.with("Selected target must have Units enabled.", () => {
 			return textFn("Selected target must have Units enabled.");
-		default:
+		})
+		.otherwise(() => {
 			return readSharedValidationMessageFn(issue, textFn);
-	}
+		});
 };
 
 /** Owns the one local TanStack Form session shared by all item section leaves. */
@@ -222,28 +227,28 @@ export const useFormController = ({
 	useLayoutEffect(() => {
 		if (initializedCapability.current || enableCapability === undefined) return;
 		initializedCapability.current = true;
-		switch (enableCapability) {
-			case "production":
+		match(enableCapability)
+			.with("production", () => {
 				enableProductionFn();
-				break;
-			case "clock":
+			})
+			.with("clock", () => {
 				enableClockFn();
-				break;
-			case "units":
+			})
+			.with("units", () => {
 				if (form.state.values.units === undefined) {
 					form.setFieldValue("units", {
 						amount: 1,
 					});
 				}
-				break;
-			case "merges":
+			})
+			.with("merges", () => {
 				if (form.state.values.merge === undefined || form.state.values.merge.length === 0) {
 					form.setFieldValue("merge", [
 						structuredClone(MergeDraftDefault),
 					]);
 				}
-				break;
-		}
+			})
+			.exhaustive();
 	}, [
 		enableCapability,
 		enableProductionFn,

@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { createHash, randomUUID } from "node:crypto";
 import { createReadStream, createWriteStream } from "node:fs";
 import { open, stat } from "node:fs/promises";
@@ -187,12 +188,13 @@ const packDirectoryUnlockedFx = Effect.fn("packDirectoryFx.unlocked")(function* 
 			const target = path.join(resourcesRoot, String(index).padStart(6, "0"));
 			// Validate and pack the same owned bytes; external editors do not take editor.lock.
 			if (resource.type !== "artwork") yield* fileSystem.copyFile(resource.path, target);
-			const length =
-				resource.type === "artwork"
-					? yield* normalizeArtworkPngFileFx(resource.path, target, resource.uid)
-					: resource.type === "image"
-						? yield* validatePngResourceFileFx(target, resource.uid)
-						: yield* validateOggOpusFileFx(target, resource.uid);
+			const length = yield* match(resource.type)
+				.with("artwork", () =>
+					normalizeArtworkPngFileFx(resource.path, target, resource.uid),
+				)
+				.with("image", () => validatePngResourceFileFx(target, resource.uid))
+				.with("music", "sfx", () => validateOggOpusFileFx(target, resource.uid))
+				.exhaustive();
 			resources.push({
 				uid: resource.uid,
 				type: resource.type,

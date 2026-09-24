@@ -26,12 +26,10 @@ const readAxisFn = (
 ): number => {
 	if (boardSize <= viewportSize) return position;
 	const threshold = Math.min(edgeThreshold, viewportSize / 2);
-	const direction =
-		pointer < threshold
-			? 1 - pointer / threshold
-			: pointer > viewportSize - threshold
-				? -(1 - (viewportSize - pointer) / threshold)
-				: 0;
+	let direction = 0;
+	if (pointer < threshold) direction = 1 - pointer / threshold;
+	else if (pointer > viewportSize - threshold)
+		direction = -(1 - (viewportSize - pointer) / threshold);
 	const movement = (direction * maximumSpeed * deltaMs) / 1000;
 	const minimum = viewportSize - boardStart - boardSize - tileSize;
 	const maximum = tileSize - boardStart;

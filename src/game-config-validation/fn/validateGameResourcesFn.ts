@@ -1,3 +1,4 @@
+import { match, P } from "ts-pattern";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { GameSourceProvenanceSchema } from "~/game-config-source/schema/GameSourceProvenanceSchema";
 import type { ResourceDescriptorSchema } from "~/game-config-resource/schema/ResourceDescriptorSchema";
@@ -46,13 +47,40 @@ export const validateGameResourcesFn = ({
 
 	const usages = readGameResourceUsagesFn(config);
 	const readUsageSourceFn = (usage: readGameResourceUsagesFn.Usage) =>
-		usage.owner === "item"
-			? provenance.items[usage.ownerId]
-			: usage.path[0] === "music"
-				? provenance.music
-				: usage.path[0] === "sfx"
-					? provenance.sfx
-					: provenance.resources;
+		match(usage)
+			.with(
+				{
+					owner: "item",
+				},
+				({ ownerId }) => provenance.items[ownerId],
+			)
+			.with(
+				{
+					owner: "project",
+					path: [
+						"music",
+						...P.array(),
+					],
+				},
+				() => provenance.music,
+			)
+			.with(
+				{
+					owner: "project",
+					path: [
+						"sfx",
+						...P.array(),
+					],
+				},
+				() => provenance.sfx,
+			)
+			.with(
+				{
+					owner: "project",
+				},
+				() => provenance.resources,
+			)
+			.exhaustive();
 	const referenced = new Set(usages.map(({ resourceUid }) => resourceUid));
 	for (const usage of usages) {
 		const resource = firstByUid.get(usage.resourceUid);

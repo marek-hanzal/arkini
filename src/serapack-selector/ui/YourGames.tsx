@@ -1,3 +1,4 @@
+import { match, P } from "ts-pattern";
 import { FileJson2, FilePlus2, FolderOpen, PackageOpen, RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -224,13 +225,10 @@ export const YourGames = ({ projects, projectCatalogError }: YourGamesProps) => 
 			{play.majorUpdate === undefined ? null : (
 				<EditorBuildMajorUpdateDialog
 					confirmation={play.majorUpdate.confirmation}
-					error={
-						play.error === undefined
-							? undefined
-							: play.error instanceof Error
-								? play.error.message
-								: String(play.error)
-					}
+					error={match(play.error)
+						.with(undefined, () => undefined)
+						.with(P.instanceOf(Error), (error) => error.message)
+						.otherwise((error) => String(error))}
 					pending={play.pendingProjectId !== undefined}
 					onCancelFn={play.cancelMajorUpdateFn}
 					onConfirmFn={() => void play.confirmMajorUpdateFn()}

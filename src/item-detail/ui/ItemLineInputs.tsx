@@ -1,3 +1,4 @@
+import { match, P } from "ts-pattern";
 import { X } from "lucide-react";
 import { useItemLineInputController } from "~/item-detail/ui/useItemLineInputController";
 import { Equal, Exit } from "effect";
@@ -66,19 +67,44 @@ export const ItemLineInputs = ({
 				const unavailable =
 					input.filled === 0 && input.availableQuantity === 0 && !input.committed;
 				const colorFraction = input.committed ? 1 : input.filled / total;
-				const status = input.committed
-					? input.type === "units"
-						? translator.textFn("Units already spent for this job.")
-						: translator.textFn("In use for this job.")
-					: input.filled > 0
-						? input.filled >= input.quantity.min
-							? translator.textFn("Ready for this job.")
-							: input.available
-								? translator.textFn("Partly ready. More is available.")
-								: translator.textFn("Partly ready. You'll need to find more.")
-						: input.available
-							? translator.textFn("Available for this job.")
-							: translator.textFn("None available right now.");
+				const status = match(input)
+					.with(
+						{
+							committed: true,
+							type: "units",
+						},
+						() => translator.textFn("Units already spent for this job."),
+					)
+					.with(
+						{
+							committed: true,
+						},
+						() => translator.textFn("In use for this job."),
+					)
+					.when(
+						({ filled, quantity }) => filled > 0 && filled >= quantity.min,
+						() => translator.textFn("Ready for this job."),
+					)
+					.with(
+						{
+							filled: P.number.gt(0),
+							available: true,
+						},
+						() => translator.textFn("Partly ready. More is available."),
+					)
+					.with(
+						{
+							filled: P.number.gt(0),
+						},
+						() => translator.textFn("Partly ready. You'll need to find more."),
+					)
+					.with(
+						{
+							available: true,
+						},
+						() => translator.textFn("Available for this job."),
+					)
+					.otherwise(() => translator.textFn("None available right now."));
 				return (
 					<Tooltip
 						key={input.inputIndex}

@@ -12,9 +12,8 @@ it("hydrates only selected canonical operations and rejects a revision changed s
 	const { client, config, repository } = await createGraphDiscoveryFixtureFn();
 	const discovery = graphTextFn(
 		await client.callTool({
-			name: "graph_query",
+			name: "graph_operations",
 			arguments: {
-				kind: "operations",
 				owner: "item:puppy",
 			},
 		}),
@@ -125,7 +124,6 @@ it("hydrates only selected canonical operations and rejects a revision changed s
 it("pins operation continuation and hydration to content even after a same-revision merge reorder", async () => {
 	const { client, config, repository } = await createGraphDiscoveryFixtureFn();
 	const query = {
-		kind: "operations",
 		operationKinds: [
 			"merge",
 		],
@@ -134,7 +132,7 @@ it("pins operation continuation and hydration to content even after a same-revis
 	};
 	const first = graphTextFn(
 		await client.callTool({
-			name: "graph_query",
+			name: "graph_operations",
 			arguments: query,
 		}),
 	);
@@ -144,7 +142,7 @@ it("pins operation continuation and hydration to content even after a same-revis
 	expect(first.nextCursor).toBeTypeOf("string");
 	const second = graphTextFn(
 		await client.callTool({
-			name: "graph_query",
+			name: "graph_operations",
 			arguments: {
 				...query,
 				cursor: first.nextCursor,
@@ -165,7 +163,7 @@ it("pins operation continuation and hydration to content even after a same-revis
 	await Effect.runPromise(repository.refreshProjectFx(config.meta.id));
 	const changed = graphTextFn(
 		await client.callTool({
-			name: "graph_query",
+			name: "graph_operations",
 			arguments: query,
 		}),
 	);
@@ -191,7 +189,7 @@ it("pins operation continuation and hydration to content even after a same-revis
 	expect(
 		(
 			await client.callTool({
-				name: "graph_query",
+				name: "graph_operations",
 				arguments: {
 					...query,
 					cursor: first.nextCursor,

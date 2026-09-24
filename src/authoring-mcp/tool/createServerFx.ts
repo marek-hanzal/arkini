@@ -44,12 +44,6 @@ const ProjectInputSchema = z.object({}).strict().meta({
 	description: "The project summary tool accepts no arguments.",
 });
 
-const ItemMetaInputSchema = z.object({}).strict().meta({
-	$id: "urn:serakki:schema:mcp:item-meta-input",
-	title: "Item metadata tool input",
-	description: "The item metadata summary tool accepts no arguments.",
-});
-
 const ItemDetailInputSchema = z
 	.object({
 		itemUid: IdSchema.describe("The exact item UID returned by item_collection."),
@@ -195,13 +189,6 @@ const readProjectTextFn = (project: Project) => {
 		`Templates: ${project.config.templates?.length ?? 0} (template_collection)`,
 	].join("\n");
 };
-
-const readItemMetaTextFn = (project: Project) =>
-	[
-		`Project ID: ${project.projectId}`,
-		`Revision: ${project.revision}`,
-		`Total: ${Object.keys(project.config.items).length}`,
-	].join("\n");
 
 /** Admit exact stored identities before any single-item projection. */
 const readItemFx = Effect.fn("readMcpItemFx")(function* (project: Project, itemUid: string) {
@@ -650,15 +637,6 @@ const createServerFn = (
 			inputSchema: ProjectInputSchema,
 		},
 		async () => runToolFn(readProjectFx().pipe(Effect.map(readProjectTextFn))),
-	);
-	server.registerTool(
-		"item_meta",
-		{
-			annotations: EditorToolAnnotations.readOnly,
-			description: "Count items in the open project.",
-			inputSchema: ItemMetaInputSchema,
-		},
-		async () => runToolFn(readProjectFx().pipe(Effect.map(readItemMetaTextFn))),
 	);
 	server.registerTool(
 		"item_collection",

@@ -2,7 +2,6 @@ import { Effect } from "effect";
 import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { afterEach, expect, it } from "vitest";
-import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { graphTextFn } from "./graphQuery.test/fixture";
 import { createJobTestConfig } from "~test/production-job/support/jobTestConfig";
 import {
@@ -12,136 +11,6 @@ import {
 } from "./support/createMcpHarness";
 
 afterEach(cleanupMcpHarnesses);
-
-it("keeps MCP convenience queries on the canonical graph with exact edge identities and directions", async () => {
-	const { ownership, port, repository } = await createMcpHarness();
-	const config = createJobTestConfig();
-	const root = ItemSchema.parse({
-		...config.items.forge,
-		merge: [
-			{
-				target: {
-					type: "item",
-					itemUid: "water",
-				},
-				action: "consume",
-				effect: "replace",
-				result: "tool",
-			},
-		],
-	});
-	await Effect.runPromise(
-		repository.createProjectFx({
-			version: {
-				major: 1,
-				minor: 0,
-			},
-			config: {
-				...config,
-				meta: {
-					...config.meta,
-					id: "graph-tools",
-				},
-				items: {
-					...config.items,
-					forge: root,
-				},
-			},
-			resources: [],
-		}),
-	);
-	ownership.setProjectContextFn("graph-tools");
-	await Effect.runPromise(ownership.startLocalFx);
-	const client = await connectMcpClient(port);
-
-	for (const entry of [
-		{
-			name: "item_input",
-			itemUid: "water",
-			direction: "out",
-			kinds: [
-				"line-material",
-				"line-unit-selector",
-				"line-unit-cost",
-			],
-		},
-		{
-			name: "item_outcome",
-			itemUid: "tool",
-			direction: "in",
-			kinds: [
-				"line-item-outcome",
-				"merge-item-outcome",
-				"merge-replacement",
-				"clock-item-outcome",
-				"depletion-item-outcome",
-			],
-		},
-	]) {
-		const direct = graphTextFn(
-			await client.callTool({
-				name: "graph_query",
-				arguments: {
-					kind: "connections",
-					from: `item:${entry.itemUid}`,
-					direction: entry.direction,
-					kinds: entry.kinds,
-					maxDepth: 1,
-				},
-			}),
-		);
-		const convenience = graphTextFn(
-			await client.callTool({
-				name: entry.name,
-				arguments: {
-					itemUid: entry.itemUid,
-				},
-			}),
-		);
-		expect(convenience.text).toBe(direct.text);
-		expect(convenience.operationIds).toEqual(direct.operationIds);
-		expect(convenience.text).toMatch(
-			/--(?:line-material|line-unit-selector|line-unit-cost|line-item-outcome|merge-item-outcome|merge-replacement|clock-item-outcome|depletion-item-outcome)-->/,
-		);
-	}
-	const direct = graphTextFn(
-		await client.callTool({
-			name: "graph_query",
-			arguments: {
-				kind: "traverse",
-				from: "item:forge",
-				direction: "out",
-				kinds: [
-					"line-item-outcome",
-					"merge-replacement",
-					"merge-target-replacement",
-					"merge-item-outcome",
-					"clock-item-outcome",
-					"depletion-item-outcome",
-					"merge-space",
-					"space-outcome",
-					"template-outcome",
-					"start-template",
-					"template-item",
-				],
-				maxDepth: 5,
-			},
-		}),
-	);
-	const chain = graphTextFn(
-		await client.callTool({
-			name: "item_chain",
-			arguments: {
-				itemUid: "forge",
-			},
-		}),
-	);
-	expect(chain.text).toBe(direct.text);
-	expect(chain.operationIds).toEqual(direct.operationIds);
-	expect(chain.text).toContain("merge-replacement");
-	expect(chain.text).toContain("[item:forge]");
-	expect(chain.text).toContain("[item:tool]");
-});
 
 it("refreshes graph results after writes and project switches, rejecting stale revisions", async () => {
 	const { ownership, port, repository } = await createMcpHarness();
@@ -177,12 +46,11 @@ it("refreshes graph results after writes and project switches, rejecting stale r
 	await Effect.runPromise(ownership.startLocalFx);
 	const client = await connectMcpClient(port);
 	const query = {
-		kind: "node",
-		from: "item:water",
+		query: "item:water",
 	};
 	const first = graphTextFn(
 		await client.callTool({
-			name: "graph_query",
+			name: "graph_search",
 			arguments: query,
 		}),
 	);
@@ -200,7 +68,7 @@ it("refreshes graph results after writes and project switches, rejecting stale r
 	expect(
 		(
 			await client.callTool({
-				name: "graph_query",
+				name: "graph_search",
 				arguments: {
 					...query,
 					revision: first.revision,
@@ -210,7 +78,7 @@ it("refreshes graph results after writes and project switches, rejecting stale r
 	).toBe(true);
 	const changed = graphTextFn(
 		await client.callTool({
-			name: "graph_query",
+			name: "graph_search",
 			arguments: query,
 		}),
 	);
@@ -225,7 +93,7 @@ it("refreshes graph results after writes and project switches, rejecting stale r
 	await Effect.runPromise(repository.refreshProjectFx("graph-first"));
 	const refreshed = graphTextFn(
 		await client.callTool({
-			name: "graph_query",
+			name: "graph_search",
 			arguments: query,
 		}),
 	);
@@ -235,7 +103,7 @@ it("refreshes graph results after writes and project switches, rejecting stale r
 	ownership.setProjectContextFn("graph-second");
 	const second = graphTextFn(
 		await client.callTool({
-			name: "graph_query",
+			name: "graph_search",
 			arguments: query,
 		}),
 	);
@@ -259,9 +127,20 @@ it("admits only bounded graph requests and exposes discovery without project con
 			}[]
 		)[0]!.text,
 	);
-	expect(discovery.querySchema.properties).toHaveProperty("maxExpansions");
-	expect(discovery.querySchema.properties).not.toHaveProperty("detail");
-	expect(discovery.querySchema.properties.kind.enum).toContain("operations");
+	const variants = discovery.querySchema.oneOf as {
+		properties: Record<string, unknown>;
+	}[];
+	expect(variants).toHaveLength(6);
+	const operations = variants.find(
+		({ properties }) =>
+			(
+				properties.kind as {
+					const: string;
+				}
+			).const === "operations",
+	)!;
+	expect(operations.properties).toHaveProperty("maxExpansions");
+	expect(operations.properties).not.toHaveProperty("detail");
 	expect(discovery.batchSchema.properties.queries.maxItems).toBe(8);
 	expect(discovery.operationReadSchema.required).toEqual(
 		expect.arrayContaining([
@@ -271,10 +150,9 @@ it("admits only bounded graph requests and exposes discovery without project con
 		]),
 	);
 	const noProject = await client.callTool({
-		name: "graph_query",
+		name: "graph_search",
 		arguments: {
-			kind: "node",
-			from: "item:water",
+			query: "item:water",
 		},
 	});
 	expect(noProject.isError).toBe(true);
@@ -290,61 +168,61 @@ it("admits only bounded graph requests and exposes discovery without project con
 		}),
 	);
 	ownership.setProjectContextFn(config.meta.id);
-	for (const query of [
+	for (const request of [
 		{
-			kind: "node",
-			from: "item:water",
-			detail: "full",
+			name: "graph_search",
+			arguments: {
+				query: "item:water",
+				detail: "full",
+			},
 		},
 		{
-			kind: "path",
-			from: "item:water",
+			name: "graph_path",
+			arguments: {
+				from: "item:water",
+			},
 		},
 		{
-			kind: "connections",
-			from: "item:water",
-			limit: 201,
+			name: "graph_connections",
+			arguments: {
+				from: "item:water",
+				limit: 201,
+			},
 		},
 		{
-			kind: "traverse",
-			from: "item:water",
-			maxDepth: 13,
+			name: "graph_traverse",
+			arguments: {
+				from: "item:water",
+				maxDepth: 13,
+			},
 		},
 		{
-			kind: "traverse",
-			from: "item:water",
-			maxExpansions: 100001,
+			name: "graph_traverse",
+			arguments: {
+				from: "item:water",
+				maxDepth: 2,
+			},
 		},
 		{
-			kind: "node",
-			from: "item:water",
-			query: "[:find ?x :where [?x]]",
+			name: "graph_traverse",
+			arguments: {
+				from: "item:water",
+				maxExpansions: 100001,
+			},
+		},
+		{
+			name: "graph_connections",
+			arguments: {
+				from: "item:water",
+				query: "[:find ?x :where [?x]]",
+			},
 		},
 	])
-		expect(
-			(
-				await client.callTool({
-					name: "graph_query",
-					arguments: query,
-				})
-			).isError,
-		).toBe(true);
-	expect(
-		(
-			await client.callTool({
-				name: "item_input",
-				arguments: {
-					itemUid: "water",
-					detail: "full",
-				},
-			})
-		).isError,
-	).toBe(true);
+		expect((await client.callTool(request)).isError).toBe(true);
 	const limited = graphTextFn(
 		await client.callTool({
-			name: "graph_query",
+			name: "graph_connections",
 			arguments: {
-				kind: "connections",
 				from: "item:forge",
 				direction: "in",
 				limit: 1,

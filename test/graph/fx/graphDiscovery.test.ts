@@ -207,7 +207,7 @@ it("hydrates only selected canonical operations, deduplicates requests and rejec
 	expect(reread.operations[0]).toEqual(original);
 	const unchanged = await Effect.runPromise(
 		graph.discoveryFx(structuredClone(project), {
-			kind: "node",
+			kind: "connections",
 			from: "item:A",
 		}),
 	);
@@ -271,7 +271,7 @@ it("keeps every batch query on one captured snapshot during interleaved revision
 					{
 						id: "missing",
 						query: {
-							kind: "node",
+							kind: "connections",
 							from: "item:absent",
 						},
 					},

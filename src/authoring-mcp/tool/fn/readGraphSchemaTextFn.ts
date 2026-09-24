@@ -32,7 +32,7 @@ const edgeKinds: Record<GraphEdgeKindSchema.Type, string> = {
 		"Board template → initially placed item; repeated placements remain separate edges.",
 	"start-template": "Initial space → assigned template.",
 	"start-space":
-		"Initial configuration → current initial space and every configured initial space; distinct occurrences keep distinct edge IDs.",
+		"Initial configuration → current initial space and every configured initial space; distinct authored occurrences remain separate.",
 };
 
 /** The advertised request schemas are the exact compact discovery and hydration contracts. */
@@ -57,37 +57,77 @@ export const readGraphSchemaTextFn = () =>
 		querySchema: z.toJSONSchema(GraphDiscoveryQuerySchema),
 		batchSchema: z.toJSONSchema(GraphBatchQuerySchema),
 		operationReadSchema: z.toJSONSchema(GraphOperationReadSchema),
+		tools: {
+			graph_search:
+				"Find a node by title or identity; returns title, exact node ID and kind.",
+			graph_connections:
+				"Read direct authored relationships of one node, optionally against an exact counterpart.",
+			graph_operations: "Search and audit authored operations without a root node.",
+			graph_path: "Find structural paths between two nodes; not gameplay recipes.",
+			graph_flow: "Find potential causal transformations through atomic authored operations.",
+			graph_traverse:
+				"Advanced broad structural exploration across explicitly bounded relationship hops.",
+			graph_batch: "Ask 1–8 named focused questions against one immutable snapshot.",
+			graph_operations_json:
+				"Hydrate only selected operation references at the discovered revision and snapshot.",
+		},
 		semantics: {
+			inputs: "querySchema is the discriminated union for graph_batch entries and backend dispatch. Each focused tool accepts only its matching variant fields with kind omitted. Batch entries are {id, query:{kind, ...focusedFields}}. Unknown fields are rejected; no generic graph_query tool or compatibility aliases exist.",
 			purpose:
-				"graph_query, graph_query_batch and convenience tools return compact formatted text, not JSON graph dumps. Structured readers end in _json and return one JSON document, including plural batch reads. No JSONL readers are exposed. The graph is a discovery index; read only selected authored documents after discovery.",
-			metadata:
-				"Discovery omits set/roll IDs and indices, outcome indices and rule/condition bookkeeping. Meaningful scalar facts remain: quantities, consume/reserve, distance, unit source/cost, input index, participant role, probability, alternative branches, board-local semantics and template position. Exact authored grouping belongs to graph_operations_json.",
-			text: "Titles are primary; node IDs, short opaque operation references, line UIDs, revision, snapshot and compact continuation tokens stay available. Ordinary identities are bare, for example Puppy [item:puppy] and operationId=op_abc. Only identities containing whitespace, delimiters or control characters use JSON string quoting; decode those quoted values before reuse. Internal edge IDs are never printed. Participant/role-filtered operations include occurrence-level match evidence directly below their summary.",
-			direction:
-				"Edges keep authored from/to direction even when traversed backwards. Local queries default to both directions; select out or in explicitly where needed. Merge-target is owner → target, not production.",
-			occurrences:
-				"Parallel relationships and repeated references stay separate internally. Never collapse relationships by endpoint pair. Text omits their internal edge IDs and carries short operation references where applicable.",
+				"Unsuffixed discovery tools return compact formatted text. graph_schema_json and graph_operations_json return one JSON document. Discovery never returns authored configuration bodies; hydrate selected operations only after discovering their references.",
+			search: "graph_search requires query and optionally nodeKinds (item, template, space, start). It searches human titles and node identities with the canonical Editor exact-first Fuse logic, returning relevance-ordered titled identities. It can inspect unfinished projects with missing referenced nodes. No item_collection lookup is needed before graph navigation.",
+			connections:
+				"graph_connections requires from, optionally to as an exact direct counterpart. direction defaults both; kinds restricts relationship occurrences. Results are relationship-oriented and may group occurrences belonging to the same authored operation without losing distinct facts. limit counts relationship occurrences, not visual groups. Pages may return Cursor for remaining relationships.",
 			operations:
-				"Use kind operations without from to list operations directly. Combine operationKinds, owner, participant, role, search and filter. Search uses the same exact-first Fuse configuration as the Editor, with scope title, owner, participant or all (default). It is fuzzy matching, not an exact substring predicate; search results retain relevance order across pages. Scalar filters are AND-combined: hasOutcomes; merge action/effect/ownership; line clock/default/show; line or Clock enable; runtimeMs, clockWeight, durationMs and intervalMs numeric ranges (min/max inclusive, gt/lt exclusive). A missing property never matches, including false. Owner is always a participant; target identifies an explicit merge target or the owner as receiver for Space transport; input/output identify actual providers/results and reference identifies a rule mention. Role does not reinterpret an authored edge's direction. Query operations even when they have no edges.",
+				"graph_operations has no root node. Combine operationKinds, owner, participant, role, search and filter. Search scopes title, owner, participant or all (default) reuse the Editor exact-first Fuse configuration; matching is fuzzy, not a strict substring predicate, and relevance order persists across pages. Scalar filters combine with AND: hasOutcomes; merge action/effect/ownership; line clock/default/show; line or Clock enable; runtimeMs, clockWeight, durationMs and intervalMs ranges (min/max inclusive, gt/lt exclusive). A missing property never matches, including false. Operations with no edges remain discoverable.",
+			participants:
+				"Owner is always a participant; target identifies an explicit merge target or the owner as receiver for Space transport. Inputs identify material/unit providers, outputs identify actual authored results, and reference identifies a rule mention. Participant/role filters include occurrence-level match evidence: titled input with quantity, consume/reserve, distance and unit cost; output with quantity; target or rule reference. Repeated and alternative outcomes remain separate; exclusive outcomes are never summed.",
+			path: "graph_path requires from and to. It finds structural/topological paths, not gameplay recipes or proof of runtime feasibility. With direction both (default), a path can pass through a shared producer, consumer or owner. Ordered steps preserve authored edge direction even when traversed backwards. maxDepth counts relationship hops; kinds applies at every hop. A node has a zero-hop structural path to itself.",
+			flow: "graph_flow requires from and to. It follows potential causal transitions belonging to one atomic authored operation at a time. maxDepth counts operation steps; operationKinds optionally restricts line, merge, clock and depletion. A line input cannot lead to an output of another line sharing its owner. Rule references, structural proximity and reversed production edges never form flow steps. Authored potential does not prove runtime feasibility, inventory, guards or simultaneous outcomes. Space/template outcomes are terminal operation effects; Start/template placement edges are not additional transformation steps. Receiver-owned Space transport requires an unspecified incoming item and never converts the receiver into its destination space. Text presents ordered transformations; no result after incomplete exploration is unknown, never definitive absence.",
+			traverse:
+				"graph_traverse is advanced broad structural exploration, not operation listing, a path or a causal flow. It requires from and defaults to direction out and depth 1. Depth above one requires an explicit nonempty kinds list to avoid accidental unrestricted expansion. maxDepth counts relationship hops; edge directions remain authored even during reverse exploration.",
+			direction:
+				"Connections/path default both, traverse defaults out. Choose out or in explicitly where appropriate. Every displayed relationship retains authored from/to direction. Merge-target is owner → target, not production. An empty kinds list selects no relationships where accepted.",
+			text: "Titles are primary. Exact node IDs, short opaque operation references, line UIDs, revision, snapshot and compact Cursor tokens remain reusable. Ordinary identities are bare, for example Puppy [item:puppy]. Only identities containing whitespace, delimiters or control characters use lossless JSON string quoting; decode those quoted values before reuse. Internal edge IDs are never printed. No internal node/edge storage tables are rendered.",
+			metadata:
+				"Compact output omits source paths, set/roll IDs and indices, outcome indices and rule/condition bookkeeping. It preserves meaningful scalar facts: quantity, consume/reserve, distance, unit source/cost, input index, participant role, probability, alternatives, board-local semantics and template position. Exact authored grouping belongs to operation hydration.",
 			navigation:
-				"Operation summaries identify owner and any explicit merge target/replacement, with human-readable names and exact node IDs in the text. A lineUid pairs with the owner item UID for item_lines_json. operationIds accepts the short opaque references returned in text directly. References are scoped to the captured snapshot; never decode them or submit internal tuple IDs. Matching input/output/reference details preserve each authored occurrence, quantities, mode, distance, unit cost and chance/alternatives without combining mutually exclusive outcomes.",
-			paths: "Paths render ordered steps with node identities and short operation references, retaining authored edge direction including backwards traversal. Edge identities remain internal. maxDepth counts relationship hops. Edge-kind filters apply at every hop. A structural path is not a feasible runtime execution plan.",
+				"Operation references are short, opaque and bound to the captured snapshot. Pass them unchanged in graph_operations_json.operationIds; never decode them or submit internal tuple IDs. A lineUid pairs with its owner item UID for item_lines_json. Summaries carry human names and exact node identities for owners and relevant participants.",
 			results:
-				"status yes means a match was found; no means the selected search scope was exhausted without a match; unknown means an incomplete search found none. Inspect truncated and reasons even for yes. Partial absence is never proof of no relationship.",
-			limits: "Discovery defaults to depth 1 and 50 results, with at most depth 12 and 200 results per query. Expansion and cooperative timeout bounds apply; timeout excludes snapshot compilation and synchronous indexed lookups. Path limits count paths, whose edges can span maxDepth; operation limits count operations. Operation pages expose nextCursor when scanning can continue.",
-			pagination:
-				"For kind operations, pass the compact Cursor token back as cursor with the same search/filter/participant selection and the returned revision and snapshotId. Tokens bind the immutable snapshot, normalized filters and continuation position; stale, unknown or incompatible continuations fail. The session retains at most 1024 issued continuations; rediscover when an old token has expired. A page limited before a match is unknown, not no.",
+				"status yes means a match was found; no means the selected scope was exhausted without a match; unknown means incomplete exploration found none. Inspect truncated and reasons even when status is yes, because omitted alternatives may exist. Depth, result, expansion and timeout limits can make search incomplete; partial absence is not proof of no relationship or no flow.",
+			limits: "Result limit defaults 50, maximum 200. Path/flow depth defaults 5, traverse depth 1; depth maximum 12. Expansion defaults 10000, maximum 100000; cooperative timeout defaults 1000 ms, maximum 5000 ms. Search only exposes result bounds; connections are direct. Limit counts relationships for connections/traverse, operations for operations, nodes for search, paths for path and transformation sequences for flow. Paths and flows may contain up to maxDepth steps per result. Timeout excludes synchronous snapshot compilation, index lookups, Fuse search and scalar candidate filtering; it is not an end-to-end deadline.",
+			continuation:
+				"Connections and operations may return a compact Cursor. Repeat the same focused query and filters with cursor and returned revision/snapshotId. Tokens bind snapshot, normalized filters and continuation position; unknown, stale or incompatible tokens fail. The session retains at most 1024 issued continuations in FIFO order; rediscover after expiry. A page with no match but remaining scan is unknown.",
 			revision:
-				"Every response displays project ID, revision and snapshot ID. Optional revision/snapshotId pin discovery; operation hydration requires both. Snapshot identity also detects external content changes that retain the on-disk revision. Snapshot tokens belong to the current graph session; rediscover after a session restart.",
-			batch: "graph_query_batch accepts 1–8 uniquely identified queries and captures one immutable snapshot for the entire request. Nodes, edges and operations are internally deduplicated by ID. Text starts with common project, revision and snapshot, then separate query-ID sections with their own status, truncation, reasons and exact identities; storage tables are not rendered. One query's truncation does not imply another is truncated. Paths, relevance ordering and participant match evidence belong to their own query result, even when queries share the same operation.",
+				"Each response carries project ID, revision and snapshot ID. Optional revision/snapshotId pin discovery; hydration requires both. Snapshot identity detects external content changes even with an unchanged revision. Session-local tokens expire on graph session restart; rediscover then.",
+			batch: "graph_batch captures one immutable snapshot and accepts 1–8 uniquely named focused queries. Each query object is admitted separately, so invalid fields produce an error only for that query. Text renders shared project/revision/snapshot once, then one query-ID section with that query's presentation, status, truncation, reasons, continuation and match evidence. Internally deduplicated storage never appears as tables. One query's failure or truncation does not contaminate siblings. Batch-level stale revision/snapshot admission fails before queries run.",
 			hydration:
-				"graph_operations_json reads only 1–20 requested operation IDs from the discovered revision and snapshot. Returns canonical configurations, deduplicates requested IDs and reports missing IDs. Use existing items_json (itemUids) and item_lines_json (itemUid/lineUid pairs) for complete item or line documents; check their returned revision against discovery before combining data.",
+				"graph_operations_json requires revision and snapshotId and reads only 1–20 selected operation references. It returns canonical operation configurations, deduplicates repeated references and reports missing ones. items_json and item_lines_json remain available for complete item/line documents; compare their revision before combining reads.",
 		},
 		examples: [
 			{
-				tool: "graph_query",
+				tool: "graph_search",
 				arguments: {
-					kind: "operations",
+					query: "Candle",
+					nodeKinds: [
+						"item",
+					],
+				},
+			},
+			{
+				tool: "graph_connections",
+				arguments: {
+					from: "item:candle",
+					direction: "in",
+					kinds: [
+						"line-item-outcome",
+						"merge-replacement",
+					],
+				},
+			},
+			{
+				tool: "graph_operations",
+				arguments: {
 					operationKinds: [
 						"line",
 					],
@@ -106,26 +146,8 @@ export const readGraphSchemaTextFn = () =>
 				},
 			},
 			{
-				tool: "graph_query",
+				tool: "graph_operations",
 				arguments: {
-					kind: "connections",
-					from: "item:puppy",
-					direction: "both",
-				},
-			},
-			{
-				tool: "graph_query",
-				arguments: {
-					kind: "operations",
-					operationKinds: [
-						"merge",
-					],
-				},
-			},
-			{
-				tool: "graph_query",
-				arguments: {
-					kind: "operations",
 					operationKinds: [
 						"merge",
 					],
@@ -134,39 +156,53 @@ export const readGraphSchemaTextFn = () =>
 				},
 			},
 			{
-				tool: "graph_query",
+				tool: "graph_path",
 				arguments: {
-					kind: "connections",
-					from: "item:puppy",
-					direction: "in",
+					from: "item:unlit-candle",
+					to: "item:candle",
+					direction: "both",
+				},
+			},
+			{
+				tool: "graph_flow",
+				arguments: {
+					from: "item:unlit-candle",
+					to: "item:candle",
+					maxDepth: 5,
+				},
+			},
+			{
+				tool: "graph_traverse",
+				arguments: {
+					from: "item:candle",
+					maxDepth: 2,
 					kinds: [
-						"merge-target",
+						"line-material",
+						"line-item-outcome",
 					],
 				},
 			},
 			{
-				tool: "graph_query_batch",
+				tool: "graph_batch",
 				arguments: {
 					queries: [
 						{
-							id: "pillow",
+							id: "puppy-merges",
 							query: {
-								kind: "connections",
-								from: "item:pillow",
+								kind: "operations",
+								operationKinds: [
+									"merge",
+								],
+								participant: "item:puppy",
+								role: "target",
 							},
 						},
 						{
-							id: "sword",
+							id: "candle-flow",
 							query: {
-								kind: "connections",
-								from: "item:sword",
-							},
-						},
-						{
-							id: "fawn",
-							query: {
-								kind: "connections",
-								from: "item:fawn",
+								kind: "flow",
+								from: "item:unlit-candle",
+								to: "item:candle",
 							},
 						},
 					],

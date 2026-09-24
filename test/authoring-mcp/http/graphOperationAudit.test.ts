@@ -10,10 +10,9 @@ it("admits operation search and scalar filters over MCP and roundtrips compact c
 	const { client, config, repository } = await createGraphDiscoveryFixtureFn();
 	const initial = graphTextFn(
 		await client.callTool({
-			name: "graph_query",
+			name: "graph_search",
 			arguments: {
-				kind: "node",
-				from: "item:puppy",
+				query: "item:puppy",
 			},
 		}),
 	);
@@ -41,7 +40,6 @@ it("admits operation search and scalar filters over MCP and roundtrips compact c
 		}),
 	);
 	const query = {
-		kind: "operations",
 		operationKinds: [
 			"line",
 		],
@@ -61,7 +59,7 @@ it("admits operation search and scalar filters over MCP and roundtrips compact c
 	};
 	const first = graphTextFn(
 		await client.callTool({
-			name: "graph_query",
+			name: "graph_operations",
 			arguments: query,
 		}),
 	);
@@ -75,7 +73,7 @@ it("admits operation search and scalar filters over MCP and roundtrips compact c
 	};
 	const next = graphTextFn(
 		await client.callTool({
-			name: "graph_query",
+			name: "graph_operations",
 			arguments: {
 				...query,
 				...pins,
@@ -118,7 +116,7 @@ it("admits operation search and scalar filters over MCP and roundtrips compact c
 	expect(
 		(
 			await client.callTool({
-				name: "graph_query",
+				name: "graph_operations",
 				arguments: {
 					...query,
 					...pins,
@@ -136,7 +134,7 @@ it("keeps participant match evidence local to each MCP batch section sharing the
 	const { client } = await createGraphDiscoveryFixtureFn();
 	const batch = graphTextFn(
 		await client.callTool({
-			name: "graph_query_batch",
+			name: "graph_batch",
 			arguments: {
 				queries: [
 					{

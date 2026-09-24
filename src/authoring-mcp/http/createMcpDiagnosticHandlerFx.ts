@@ -4,14 +4,15 @@ import { Clock, Effect } from "effect";
 const MAX_CAPTURE_BYTES = 256 * 1024;
 const MAX_DETAIL_LENGTH = 16 * 1024;
 const graphTools = new Set([
-	"graph_query",
-	"graph_query_batch",
+	"graph_search",
+	"graph_connections",
+	"graph_operations",
+	"graph_path",
+	"graph_flow",
+	"graph_traverse",
+	"graph_batch",
 	"graph_operations_json",
-	"item_input",
-	"item_outcome",
-	"graph_schema",
 	"graph_schema_json",
-	"item_chain",
 ]);
 const graphArgumentKeys = new Set([
 	"kind",
@@ -19,6 +20,7 @@ const graphArgumentKeys = new Set([
 	"to",
 	"direction",
 	"kinds",
+	"nodeKinds",
 	"operationKinds",
 	"search",
 	"text",

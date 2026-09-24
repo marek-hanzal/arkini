@@ -2,53 +2,18 @@ import { EditorToolAnnotations } from "./EditorToolAnnotations";
 import type { CallToolResult, McpServer } from "@modelcontextprotocol/server";
 import { Effect } from "effect";
 import { z } from "zod";
-import { IdSchema } from "~/game-value/schema/IdSchema";
 import type { Project } from "~/project-authoring/type/Project";
 import type { ProjectGraph } from "~/graph/type/ProjectGraph";
-import { GraphDiscoveryQuerySchema } from "~/graph/schema/GraphDiscoveryQuerySchema";
+import { GraphSearchQuerySchema } from "~/graph/schema/GraphSearchQuerySchema";
+import { GraphConnectionsQuerySchema } from "~/graph/schema/GraphConnectionsQuerySchema";
+import { GraphOperationsQuerySchema } from "~/graph/schema/GraphOperationsQuerySchema";
+import { GraphPathQuerySchema } from "~/graph/schema/GraphPathQuerySchema";
+import { GraphFlowQuerySchema } from "~/graph/schema/GraphFlowQuerySchema";
+import { GraphTraverseQuerySchema } from "~/graph/schema/GraphTraverseQuerySchema";
 import { GraphBatchQuerySchema } from "~/graph/schema/GraphBatchQuerySchema";
 import { GraphOperationReadSchema } from "~/graph/schema/GraphOperationReadSchema";
-import { readItemChainQueryFn } from "~/graph/fn/readItemChainQueryFn";
-import { readItemConnectionQueryFn } from "~/graph/fn/readItemConnectionQueryFn";
 import { readGraphDiscoveryTextFn, readGraphBatchTextFn } from "./fn/readGraphDiscoveryTextFn";
 import { readGraphSchemaTextFn } from "./fn/readGraphSchemaTextFn";
-
-const itemRelationInputSchemaFn = (role: "input" | "output") =>
-	z
-		.object({
-			itemUid: IdSchema.describe("The exact root item UID returned by item_collection."),
-			level: z
-				.number()
-				.int()
-				.positive()
-				.max(12)
-				.default(1)
-				.describe("Relationship-hop depth; defaults to 1."),
-		})
-		.strict()
-		.meta({
-			$id: `urn:serakki:schema:mcp:item-${role === "input" ? "input" : "outcome"}-relation`,
-			title: `Item ${role} relation tool input`,
-			description: `The root item and traversal depth for the item ${role} relation tool.`,
-		});
-
-const ItemChainInputSchema = z
-	.object({
-		itemUid: IdSchema.describe("The exact starting item UID returned by item_collection."),
-		maxDepth: z
-			.number()
-			.int()
-			.min(1)
-			.max(12)
-			.default(5)
-			.describe("Maximum relationship-hop depth; defaults to 5."),
-	})
-	.strict()
-	.meta({
-		$id: "urn:serakki:schema:mcp:item-chain-input",
-		title: "Item Chain tool input",
-		description: "The starting item and bounded traversal depth for the Chain projection.",
-	});
 
 /** MCP exposes compact discovery and selective hydration over one graph capability. */
 export const registerGraphToolsFn = ({
@@ -77,26 +42,136 @@ export const registerGraphToolsFn = ({
 		async () => runToolFn(Effect.succeed(readGraphSchemaTextFn())),
 	);
 	server.registerTool(
-		"graph_query",
+		"graph_search",
 		{
 			description:
-				"Discover the authored project graph as concise formatted text with titled entities, directed relationships and operation summaries. Query local connections, traversal, paths or operations directly without a root (for example kind operations with operationKinds merge). Filter operations by owner, participant and role; matching participant facts are included without hydration. Search operation/owner/participant titles with search {text, scope} using Editor Fuse semantics; combine scalar filter properties such as clock, show, enable, clockWeight {gt:15}, hasOutcomes and merge action/effect/ownership. Read graph_schema_json for continuation and bounds; hydrate selected operation IDs through graph_operations_json or use items_json/item_lines_json. No authored configuration bodies or executable queries are returned or accepted.",
-			inputSchema: GraphDiscoveryQuerySchema,
+				"Find a graph node by human title or exact identity using the same fuzzy search as the Editor. Returns titled node IDs and kinds, without authored configurations. Use these IDs in focused graph tools.",
+			inputSchema: GraphSearchQuerySchema,
 			annotations: EditorToolAnnotations.readOnly,
 		},
-		async (input) =>
-			runToolFn(
+		async (input) => {
+			const query = {
+				...input,
+				kind: "search" as const,
+			};
+			return runToolFn(
 				readProjectFx().pipe(
-					Effect.flatMap((project) => graph.discoveryFx(project, input)),
-					Effect.map((result) => readGraphDiscoveryTextFn(result, input)),
+					Effect.flatMap((project) => graph.discoveryFx(project, query)),
+					Effect.map((result) => readGraphDiscoveryTextFn(result, query)),
 				),
-			),
+			);
+		},
 	);
 	server.registerTool(
-		"graph_query_batch",
+		"graph_connections",
 		{
 			description:
-				"Run 1–8 uniquely named graph queries against one immutable project snapshot and revision. Returns formatted text with common snapshot metadata and separate named query sections, each with its status, truncation, reasons and exact navigation identities. Use after discovery to expand several interesting branches without repeated graph payloads. Read graph_schema_json for bounds and continuation.",
+				"Read direct authored relationships of one node, optionally restricted to an exact counterpart, direction and edge kinds. Returns compact relationship-oriented text, operation references and paginated continuation. Continue with unchanged filters plus cursor and returned revision/snapshotId.",
+			inputSchema: GraphConnectionsQuerySchema,
+			annotations: EditorToolAnnotations.readOnly,
+		},
+		async (input) => {
+			const query = {
+				...input,
+				kind: "connections" as const,
+			};
+			return runToolFn(
+				readProjectFx().pipe(
+					Effect.flatMap((project) => graph.discoveryFx(project, query)),
+					Effect.map((result) => readGraphDiscoveryTextFn(result, query)),
+				),
+			);
+		},
+	);
+	server.registerTool(
+		"graph_operations",
+		{
+			description:
+				"Search the authored operation index without a root node: merge, line, Clock and depletion. Filter by kind, owner, participant/role and scalar properties. Search operation, owner or participant titles with canonical Editor Fuse semantics. Matching participant facts explain each result without hydration; selected operation references feed graph_operations_json. Supports pinned continuation.",
+			inputSchema: GraphOperationsQuerySchema,
+			annotations: EditorToolAnnotations.readOnly,
+		},
+		async (input) => {
+			const query = {
+				...input,
+				kind: "operations" as const,
+			};
+			return runToolFn(
+				readProjectFx().pipe(
+					Effect.flatMap((project) => graph.discoveryFx(project, query)),
+					Effect.map((result) => readGraphDiscoveryTextFn(result, query)),
+				),
+			);
+		},
+	);
+	server.registerTool(
+		"graph_path",
+		{
+			description:
+				"Find bounded structural/topological paths between two exact graph nodes, preserving authored edge direction. This is not a gameplay recipe or proof of runtime feasibility. With direction both, paths may pass through a shared producer, consumer or owner. Use graph_flow for potential causal transformations.",
+			inputSchema: GraphPathQuerySchema,
+			annotations: EditorToolAnnotations.readOnly,
+		},
+		async (input) => {
+			const query = {
+				...input,
+				kind: "path" as const,
+			};
+			return runToolFn(
+				readProjectFx().pipe(
+					Effect.flatMap((project) => graph.discoveryFx(project, query)),
+					Effect.map((result) => readGraphDiscoveryTextFn(result, query)),
+				),
+			);
+		},
+	);
+	server.registerTool(
+		"graph_flow",
+		{
+			description:
+				"Find potential causal transformations from A to B through atomic authored gameplay operations. Inputs and outputs must belong to the same operation; rule references, shared-owner proximity and reversed production edges are not transformations. Returns ordered operation steps, not raw edges. Authored possibility is not proof of runtime feasibility. Truncated no-match results remain unknown.",
+			inputSchema: GraphFlowQuerySchema,
+			annotations: EditorToolAnnotations.readOnly,
+		},
+		async (input) => {
+			const query = {
+				...input,
+				kind: "flow" as const,
+			};
+			return runToolFn(
+				readProjectFx().pipe(
+					Effect.flatMap((project) => graph.discoveryFx(project, query)),
+					Effect.map((result) => readGraphDiscoveryTextFn(result, query)),
+				),
+			);
+		},
+	);
+	server.registerTool(
+		"graph_traverse",
+		{
+			description:
+				"Advanced broad structural exploration around a node across relationship hops. Depth above one requires explicit nonempty edge kinds. Prefer graph_connections for direct relationships, graph_operations for listing, graph_path for structural paths and graph_flow for potential causal transformations.",
+			inputSchema: GraphTraverseQuerySchema,
+			annotations: EditorToolAnnotations.readOnly,
+		},
+		async (input) => {
+			const query = {
+				...input,
+				kind: "traverse" as const,
+			};
+			return runToolFn(
+				readProjectFx().pipe(
+					Effect.flatMap((project) => graph.discoveryFx(project, query)),
+					Effect.map((result) => readGraphDiscoveryTextFn(result, query)),
+				),
+			);
+		},
+	);
+	server.registerTool(
+		"graph_batch",
+		{
+			description:
+				"Run 1–8 uniquely named focused graph queries (search, connections, operations, path, flow or traverse) against one immutable project snapshot and revision. Returns formatted text with common snapshot metadata and separate named query sections, each with its status, truncation, reasons and exact navigation identities. Use after discovery to expand several interesting branches without repeated graph payloads. Read graph_schema_json for bounds and continuation.",
 			inputSchema: GraphBatchQuerySchema,
 			annotations: EditorToolAnnotations.readOnly,
 		},
@@ -121,76 +196,6 @@ export const registerGraphToolsFn = ({
 				readProjectFx().pipe(
 					Effect.flatMap((project) => graph.readOperationsFx(project, input)),
 					Effect.map((result) => JSON.stringify(result)),
-				),
-			),
-	);
-	for (const role of [
-		"input",
-		"output",
-	] as const) {
-		server.registerTool(
-			role === "input" ? "item_input" : "item_outcome",
-			{
-				description:
-					role === "input"
-						? "Discover where an item is used as a line material, unit provider or unit cost. Formatted text of outgoing input relationships; level is bounded relationship-hop depth (1–12). Hydrate only selected details with graph_operations_json, items_json or item_lines_json."
-						: "Discover what produces an item through lines, merge outcomes/replacement, Clock or depletion. Formatted text of incoming output relationships; level is bounded relationship-hop depth (1–12). Hydrate only selected details with graph_operations_json, items_json or item_lines_json.",
-				inputSchema: itemRelationInputSchemaFn(role),
-				annotations: EditorToolAnnotations.readOnly,
-			},
-			async ({ itemUid, level }) =>
-				runToolFn(
-					readProjectFx().pipe(
-						Effect.flatMap((project) => {
-							const preset = readItemConnectionQueryFn(
-								itemUid,
-								role === "input" ? "required-by" : "produced-by",
-							);
-							return graph.discoveryFx(project, {
-								kind: level === 1 ? "connections" : "traverse",
-								from: preset.from,
-								direction: preset.direction,
-								kinds: preset.kinds,
-								maxDepth: level,
-							});
-						}),
-						Effect.map((result) =>
-							readGraphDiscoveryTextFn(result, {
-								kind: level === 1 ? "connections" : "traverse",
-								from: `item:${itemUid}`,
-							}),
-						),
-					),
-				),
-		);
-	}
-	server.registerTool(
-		"item_chain",
-		{
-			description:
-				"Discover bounded outgoing authored consequences: lines, merges, Clock, depletion, spaces and templates. Returns concise formatted relationship text; maxDepth counts relationship hops (1–12, default 5). Use graph_query for other edge kinds or direction, and batch readers for selected configurations.",
-			inputSchema: ItemChainInputSchema,
-			annotations: EditorToolAnnotations.readOnly,
-		},
-		async ({ itemUid, maxDepth }) =>
-			runToolFn(
-				readProjectFx().pipe(
-					Effect.flatMap((project) => {
-						const preset = readItemChainQueryFn(itemUid, maxDepth);
-						return graph.discoveryFx(project, {
-							kind: preset.kind,
-							from: preset.from,
-							direction: preset.direction,
-							kinds: preset.kinds,
-							maxDepth,
-						});
-					}),
-					Effect.map((result) =>
-						readGraphDiscoveryTextFn(result, {
-							kind: "traverse",
-							from: `item:${itemUid}`,
-						}),
-					),
 				),
 			),
 	);

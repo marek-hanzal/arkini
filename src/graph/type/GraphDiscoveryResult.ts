@@ -1,3 +1,4 @@
+import type { GraphFlow } from "~/graph/type/GraphFlow";
 import type { GraphEdge, GraphNode, GraphOperation } from "~/graph/type/GraphFacts";
 import type { GraphResult } from "~/graph/type/GraphResult";
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
@@ -94,6 +95,7 @@ export interface GraphDiscoveryResult {
 	readonly operations: readonly GraphDiscoveryOperation[];
 	readonly matches?: readonly GraphDiscoveryMatch[];
 	readonly paths: GraphResult["paths"];
+	readonly flows?: readonly GraphFlow[];
 	readonly nextCursor?: string;
 }
 
@@ -115,6 +117,7 @@ export interface GraphBatchResult {
 		readonly operationIds: readonly string[];
 		readonly matches?: readonly GraphDiscoveryMatch[];
 		readonly paths: GraphResult["paths"];
+		readonly flows?: readonly GraphFlow[];
 		readonly nextCursor?: string;
 		readonly error?: {
 			readonly reason: string;

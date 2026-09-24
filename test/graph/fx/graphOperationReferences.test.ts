@@ -15,8 +15,8 @@ it("keeps opaque references consistent across discovery, batch and hydration wit
 	);
 	const discovered = await Effect.runPromise(
 		graph.discoveryFx(project, {
-			kind: "node",
-			from: "item:A",
+			kind: "operations",
+			owner: "item:A",
 		}),
 	);
 	const reference = discovered.operations[0].id;
@@ -78,8 +78,8 @@ it("keeps opaque references consistent across discovery, batch and hydration wit
 	const other = await Effect.runPromise(createProjectGraphFx());
 	const otherDiscovery = await Effect.runPromise(
 		other.discoveryFx(project, {
-			kind: "node",
-			from: "item:A",
+			kind: "operations",
+			owner: "item:A",
 		}),
 	);
 	const wrongSession = await Effect.runPromise(

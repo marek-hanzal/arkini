@@ -12,9 +12,8 @@ it("explains local and rootless merge interactions in text with exact identities
 	const { client } = await createGraphDiscoveryFixtureFn();
 	const local = graphTextFn(
 		await client.callTool({
-			name: "graph_query",
+			name: "graph_connections",
 			arguments: {
-				kind: "connections",
 				from: "item:puppy",
 			},
 		}),
@@ -27,9 +26,8 @@ it("explains local and rootless merge interactions in text with exact identities
 	expect(local.text.trimStart().startsWith("{")).toBe(false);
 	const all = graphTextFn(
 		await client.callTool({
-			name: "graph_query",
+			name: "graph_operations",
 			arguments: {
-				kind: "operations",
 				operationKinds: [
 					"merge",
 				],
@@ -48,9 +46,8 @@ it("explains local and rootless merge interactions in text with exact identities
 	expect(all.text).not.toContain("PRIVATE_");
 	const target = graphTextFn(
 		await client.callTool({
-			name: "graph_query",
+			name: "graph_operations",
 			arguments: {
-				kind: "operations",
 				operationKinds: [
 					"merge",
 				],
@@ -85,9 +82,7 @@ it("explains local and rootless merge interactions in text with exact identities
 it("renders per-query batch results over one project read while preserving reusable IDs and isolated errors", async () => {
 	const { client, repository } = await createGraphDiscoveryFixtureFn();
 	const catalog = await client.listTools();
-	expect(
-		catalog.tools.find(({ name }) => name === "graph_query_batch")?.inputSchema,
-	).toMatchObject({
+	expect(catalog.tools.find(({ name }) => name === "graph_batch")?.inputSchema).toMatchObject({
 		properties: {
 			queries: {
 				items: {
@@ -102,30 +97,33 @@ it("renders per-query batch results over one project read while preserving reusa
 		},
 	});
 	const query = {
-		kind: "connections",
 		from: "item:puppy",
 	};
 	const direct = graphTextFn(
 		await client.callTool({
-			name: "graph_query",
+			name: "graph_connections",
 			arguments: query,
 		}),
 	);
 	const readSpy = vi.spyOn(repository, "readProjectFx");
 	const batch = graphTextFn(
 		await client.callTool({
-			name: "graph_query_batch",
+			name: "graph_batch",
 			arguments: {
 				revision: direct.revision,
 				snapshotId: direct.snapshotId,
 				queries: [
 					{
 						id: "puppy",
-						query,
+						query: {
+							kind: "connections",
+							...query,
+						},
 					},
 					{
 						id: "overlap",
 						query: {
+							kind: "connections",
 							...query,
 							limit: 1,
 						},
@@ -133,6 +131,7 @@ it("renders per-query batch results over one project read while preserving reusa
 					{
 						id: "invalid",
 						query: {
+							kind: "connections",
 							...query,
 							maxDepth: 13,
 						},
@@ -179,24 +178,33 @@ it("renders per-query batch results over one project read while preserving reusa
 			},
 			(_, index) => ({
 				id: `query-${index}`,
-				query,
+				query: {
+					kind: "connections",
+					...query,
+				},
 			}),
 		),
 		[
 			{
 				id: "same",
-				query,
+				query: {
+					kind: "connections",
+					...query,
+				},
 			},
 			{
 				id: "same",
-				query,
+				query: {
+					kind: "connections",
+					...query,
+				},
 			},
 		],
 	])
 		expect(
 			(
 				await client.callTool({
-					name: "graph_query_batch",
+					name: "graph_batch",
 					arguments: {
 						queries,
 					},
@@ -209,9 +217,8 @@ it("shows a reverse-discovered path with its original authored edge direction", 
 	const { client } = await createGraphDiscoveryFixtureFn();
 	const path = graphTextFn(
 		await client.callTool({
-			name: "graph_query",
+			name: "graph_path",
 			arguments: {
-				kind: "path",
 				from: "item:paired",
 				to: "item:puppy",
 				direction: "in",

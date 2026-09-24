@@ -1,6 +1,6 @@
 import type { GraphQuerySchema } from "~/graph/schema/GraphQuerySchema";
 
-/** Shared authored-consequence policy for Editor Chain and MCP. */
+/** Authored-consequence policy for Editor Chain. */
 export const readItemChainQueryFn = (
 	itemUid: string,
 	maxDepth = 5,

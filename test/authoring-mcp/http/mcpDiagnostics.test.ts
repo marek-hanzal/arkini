@@ -21,9 +21,8 @@ it("records pre-callback admission and stale tool errors without authored inputs
 	await Effect.runPromise(ownership.startLocalFx);
 	const client = await connectMcpClient(port);
 	const result = await client.callTool({
-		name: "graph_query",
+		name: "graph_operations",
 		arguments: {
-			kind: "operations",
 			kinds: [],
 			search: {
 				text: "Digest",
@@ -39,7 +38,7 @@ it("records pre-callback admission and stale tool errors without authored inputs
 	});
 	expect(result.isError).toBe(true);
 	await expect
-		.poll(() => records.some((record) => record.body.includes("kinds is not supported")))
+		.poll(() => records.some((record) => record.body.includes('Unrecognized key: "kinds"')))
 		.toBe(true);
 	const start = records.find((record) => record.message === "Editor MCP tool started")!;
 	const end = records.find((record) => record.message === "Editor MCP tool completed")!;
@@ -113,14 +112,14 @@ it("records per-query batch errors while preserving successful siblings and omit
 	await Effect.runPromise(ownership.startLocalFx);
 	const client = await connectMcpClient(port);
 	const response = await client.callTool({
-		name: "graph_query_batch",
+		name: "graph_batch",
 		arguments: {
 			queries: [
 				{
 					id: "valid",
 					query: {
-						kind: "node",
-						from: "item:forge",
+						kind: "search",
+						query: "item:forge",
 					},
 				},
 				{
@@ -148,7 +147,8 @@ it("records per-query batch errors while preserving successful siblings and omit
 	expect(end.body).toContain("Query: valid");
 	expect(end.body).toContain("Status: yes");
 	expect(end.body).toContain("Query: invalid");
-	expect(end.body).toContain("kinds is not supported");
+	expect(end.body).toContain("unrecognized_keys");
+	expect(end.body).toContain("kinds");
 	expect(end.body).not.toContain("Nodes:");
 });
 
@@ -188,10 +188,8 @@ it("stops pending response observation on close without recording a false comple
 				id: 1,
 				method: "tools/call",
 				params: {
-					name: "graph_query",
-					arguments: {
-						kind: "operations",
-					},
+					name: "graph_operations",
+					arguments: {},
 				},
 			}),
 		}),

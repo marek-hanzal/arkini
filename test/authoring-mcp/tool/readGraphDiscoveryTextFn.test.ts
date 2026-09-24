@@ -169,7 +169,8 @@ it("retains line hydration identity without replaying operation details for ever
 	);
 	expect(readTokenFn(text, "lineUid")).toBe(lineUid);
 	expect(text.match(/lineUid=/g)).toHaveLength(1);
-	expect(text.match(/operationId=/g)).toHaveLength(2);
+	expect(text.match(/operationId=/g)).toHaveLength(1);
+	expect(text.match(/--line-material-->/g)).toHaveLength(2);
 	expect(text).toContain("mode=reserve; distance=far; quantityMin=1; quantityMax=2");
 });
 

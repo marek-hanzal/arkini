@@ -6,6 +6,10 @@ import { createFuzzySearchFn } from "~/fuzzy-search/fn/createFuzzySearchFn";
 import { readGraphOperationSummaryFn } from "~/graph/fn/readGraphOperationSummaryFn";
 import type { GraphDiscoveryOperation } from "~/graph/type/GraphDiscoveryResult";
 import { compileGraphFactsFn } from "~/graph/fn/compileGraphFactsFn";
+import type { GraphOperationsQuerySchema } from "~/graph/schema/GraphOperationsQuerySchema";
+import { compileGraphFlowFn } from "~/graph/fn/compileGraphFlowFn";
+import { queryGraphFlowFx } from "~/graph/fx/queryGraphFlowFx";
+import type { GraphFlowIndex } from "~/graph/type/GraphFlow";
 import { GraphDiscoveryQuerySchema } from "~/graph/schema/GraphDiscoveryQuerySchema";
 import { GraphBatchQuerySchema } from "~/graph/schema/GraphBatchQuerySchema";
 import { GraphOperationReadSchema } from "~/graph/schema/GraphOperationReadSchema";
@@ -39,12 +43,14 @@ interface Snapshot {
 	readonly configKey: string;
 	readonly facts: GraphFacts;
 	readonly db: ReturnType<typeof datascript.init_db>;
+	readonly searchNodesFn: (query: string) => readonly number[];
+	readonly flowIndex: GraphFlowIndex;
 	readonly operationReferences: readonly string[];
 	readonly operationByReference: ReadonlyMap<string, number>;
 	readonly operationParticipants: readonly readGraphOperationParticipantsFn.Participant[];
 	readonly operationSummaries: readonly GraphDiscoveryOperation[];
 	readonly searchOperationsFn: (
-		search: NonNullable<GraphDiscoveryQuerySchema.Type["search"]>,
+		search: NonNullable<GraphOperationsQuerySchema.Type["search"]>,
 	) => readonly number[];
 	readonly operationById: ReadonlyMap<string, number>;
 	readonly operationKinds: ReadonlyMap<string, ReadonlySet<number>>;
@@ -63,7 +69,7 @@ interface Continuation {
 const ContinuationLimit = 1024;
 const readOperationFilterFn = (
 	operation: GraphDiscoveryOperation,
-	filter: GraphDiscoveryQuerySchema.Type["filter"],
+	filter: GraphOperationsQuerySchema.Type["filter"],
 ) => {
 	if (filter === undefined) return true;
 	return Object.entries(filter).every(([key, expected]) => {
@@ -102,6 +108,17 @@ const readOperationReferencesFn = (
 						operationId: referenceFn(edge.operationId),
 					},
 		),
+		...(result.flows === undefined
+			? {}
+			: {
+					flows: result.flows.map((flow) => ({
+						...flow,
+						steps: flow.steps.map((step) => ({
+							...step,
+							operationId: referenceFn(step.operationId),
+						})),
+					})),
+				}),
 		...(result.matches === undefined
 			? {}
 			: {
@@ -113,20 +130,42 @@ const readOperationReferencesFn = (
 	};
 };
 
-const filterKeyFn = (query: GraphDiscoveryQuerySchema.Type) =>
-	JSON.stringify({
-		operationKinds:
-			query.operationKinds === undefined
-				? null
-				: [
-						...new Set(query.operationKinds),
-					].sort(),
-		owner: query.owner ?? null,
-		participant: query.participant ?? null,
-		role: query.role ?? null,
-		search: query.search ?? null,
-		filter: query.filter ?? null,
-	});
+type PagedQuery = Extract<
+	GraphDiscoveryQuerySchema.Type,
+	{
+		kind: "operations" | "connections";
+	}
+>;
+const filterKeyFn = (query: PagedQuery) =>
+	JSON.stringify(
+		query.kind === "connections"
+			? {
+					kind: query.kind,
+					from: query.from,
+					to: query.to ?? null,
+					direction: query.direction,
+					kinds:
+						query.kinds === undefined
+							? null
+							: [
+									...new Set(query.kinds),
+								].sort(),
+				}
+			: {
+					kind: query.kind,
+					operationKinds:
+						query.operationKinds === undefined
+							? null
+							: [
+									...new Set(query.operationKinds),
+								].sort(),
+					owner: query.owner ?? null,
+					participant: query.participant ?? null,
+					role: query.role ?? null,
+					search: query.search ?? null,
+					filter: query.filter ?? null,
+				},
+	);
 
 const readQueryStatusFn = (found: boolean, truncated: boolean): GraphResult["status"] =>
 	match({
@@ -342,6 +381,17 @@ export const createProjectGraphFx = Effect.fn("createProjectGraphFx")(
 							.exhaustive();
 					snapshot = {
 						snapshotId,
+						searchNodesFn: createFuzzySearchFn({
+							candidates: facts.nodes.map((node, index) => ({
+								terms: [
+									node.title,
+									node.id,
+									node.id.slice(node.id.indexOf(":") + 1),
+								],
+								value: index,
+							})),
+						}),
+						flowIndex: compileGraphFlowFn(facts),
 						operationReferences,
 						operationByReference,
 						operationParticipants,
@@ -586,17 +636,90 @@ export const createProjectGraphFx = Effect.fn("createProjectGraphFx")(
 		): Effect.fn.Return<GraphDiscoveryResult, GraphQueryError> {
 			const query = yield* parseInputFx(GraphDiscoveryQuerySchema, input);
 			yield* assertPinsFx(captured, query);
-			if (query.kind !== "operations") {
+			if (query.kind === "search") {
+				const matches = captured
+					.searchNodesFn(query.query)
+					.filter(
+						(index) =>
+							query.nodeKinds === undefined ||
+							query.nodeKinds.includes(captured.facts.nodes[index].kind),
+					);
+				const truncated = matches.length > query.limit;
+				return {
+					projectId: captured.projectId,
+					revision: captured.revision,
+					snapshotId: captured.snapshotId,
+					status: readQueryStatusFn(matches.length > 0, truncated),
+					truncated,
+					reasons: truncated
+						? [
+								"limit",
+							]
+						: [],
+					expansions: 0,
+					nodes: matches.slice(0, query.limit).map((index) => {
+						const node = captured.facts.nodes[index];
+						return {
+							id: node.id,
+							title: node.title,
+							kind: node.kind,
+							...(node.missing
+								? {
+										missing: true,
+									}
+								: {}),
+						};
+					}),
+					edges: [],
+					operations: [],
+					paths: [],
+				};
+			}
+			if (query.kind === "flow") {
+				const result = yield* queryGraphFlowFx(captured.flowIndex, query);
+				const nodes = new Set([
+					query.from,
+					query.to,
+				]);
+				const operationIds = new Set<string>();
+				for (const flow of result.flows)
+					for (const step of flow.steps) {
+						nodes.add(step.from);
+						nodes.add(step.to);
+						nodes.add(step.owner);
+						for (const node of step.evidence.prerequisiteNodes) nodes.add(node);
+						operationIds.add(step.operationId);
+					}
+				const projected = readGraphDiscoveryFn(
+					{
+						projectId: captured.projectId,
+						revision: captured.revision,
+						status: result.status,
+						truncated: result.truncated,
+						reasons: result.reasons,
+						expansions: result.expansions,
+						nodes: captured.facts.nodes.filter((node) => nodes.has(node.id)),
+						edges: [],
+						paths: [],
+						operations: captured.facts.operations.filter((operation) =>
+							operationIds.has(operation.id),
+						),
+					},
+					captured.snapshotId,
+					captured.facts,
+				);
+				return readOperationReferencesFn(
+					{
+						...projected,
+						flows: result.flows,
+					},
+					captured,
+				);
+			}
+			if (query.kind === "path" || query.kind === "traverse") {
+				const { snapshotId: _snapshotId, ...editorInput } = query;
 				const editorQuery = yield* parseInputFx(GraphQuerySchema, {
-					kind: query.kind,
-					from: query.from,
-					to: query.to,
-					direction: query.direction,
-					kinds: query.kinds,
-					maxDepth: query.maxDepth,
-					limit: query.limit,
-					maxExpansions: query.maxExpansions,
-					timeoutMs: query.timeoutMs,
+					...editorInput,
 					detail: "full",
 				});
 				const result = yield* runQueryFx(captured, editorQuery);
@@ -605,10 +728,17 @@ export const createProjectGraphFx = Effect.fn("createProjectGraphFx")(
 					captured,
 				);
 			}
-			for (const nodeId of [
-				query.owner,
-				query.participant,
-			]) {
+			const requiredNodes =
+				query.kind === "connections"
+					? [
+							query.from,
+							query.to,
+						]
+					: [
+							query.owner,
+							query.participant,
+						];
+			for (const nodeId of requiredNodes) {
 				if (nodeId !== undefined && datascript.q(NodeQuery, captured.db, nodeId) == null)
 					return yield* Effect.fail(
 						new GraphQueryError({
@@ -626,7 +756,7 @@ export const createProjectGraphFx = Effect.fn("createProjectGraphFx")(
 						new GraphQueryError({
 							reason: "invalid-query",
 							message:
-								"Unknown or expired operation continuation cursor. Repeat discovery.",
+								"Unknown or expired graph continuation cursor. Repeat discovery.",
 						}),
 					);
 				yield* assertPinsFx(captured, cursor);
@@ -634,66 +764,84 @@ export const createProjectGraphFx = Effect.fn("createProjectGraphFx")(
 					return yield* Effect.fail(
 						new GraphQueryError({
 							reason: "invalid-query",
-							message:
-								"Operation continuation filters do not match the original query.",
+							message: "Graph continuation filters do not match the original query.",
 						}),
 					);
 				offset = cursor.offset;
 			}
-			const indexes: ReadonlySet<number>[] = [];
-			if (query.operationKinds !== undefined)
-				indexes.push(
-					new Set(
-						query.operationKinds.flatMap((kind) => [
-							...(captured.operationKinds.get(kind) ?? []),
-						]),
+			let candidates: readonly number[];
+			if (query.kind === "connections") {
+				candidates = [
+					...new Set(
+						(
+							datascript.q(
+								AdjacentQuery,
+								captured.db,
+								DirectionRules[query.direction],
+								query.from,
+							) as [
+								number,
+								string,
+							][]
+						)
+							.filter(
+								([index, next]) =>
+									(query.to === undefined || next === query.to) &&
+									(query.kinds === undefined ||
+										query.kinds.includes(captured.facts.edges[index].kind)),
+							)
+							.map(([index]) => index),
 					),
+				].sort((a, b) => a - b);
+			} else {
+				const indexes: ReadonlySet<number>[] = [];
+				if (query.operationKinds !== undefined)
+					indexes.push(
+						new Set(
+							query.operationKinds.flatMap((kind) => [
+								...(captured.operationKinds.get(kind) ?? []),
+							]),
+						),
+					);
+				if (query.owner !== undefined)
+					indexes.push(captured.owners.get(query.owner) ?? new Set());
+				if (query.participant !== undefined)
+					indexes.push(
+						query.role === undefined
+							? (captured.participants.get(query.participant) ?? new Set())
+							: (captured.participantRoles.get(
+									JSON.stringify([
+										query.participant,
+										query.role,
+									]),
+								) ?? new Set()),
+					);
+				else if (query.role !== undefined)
+					indexes.push(captured.roles.get(query.role) ?? new Set());
+				indexes.sort((a, b) => a.size - b.size);
+				const indexed =
+					indexes.length === 0
+						? captured.facts.operations.map((_, index) => index)
+						: [
+								...indexes[0],
+							];
+				const ordered =
+					query.search === undefined
+						? indexed.sort((a, b) => a - b)
+						: captured.searchOperationsFn(query.search);
+				candidates = ordered.filter(
+					(index) =>
+						indexes.every((values) => values.has(index)) &&
+						readOperationFilterFn(captured.operationSummaries[index], query.filter),
 				);
-			if (query.owner !== undefined)
-				indexes.push(captured.owners.get(query.owner) ?? new Set());
-			if (query.participant !== undefined)
-				indexes.push(
-					query.role === undefined
-						? (captured.participants.get(query.participant) ?? new Set())
-						: (captured.participantRoles.get(
-								JSON.stringify([
-									query.participant,
-									query.role,
-								]),
-							) ?? new Set()),
-				);
-			else if (query.role !== undefined)
-				indexes.push(captured.roles.get(query.role) ?? new Set());
-			indexes.sort((a, b) => a.size - b.size);
-			const indexed =
-				indexes.length === 0
-					? captured.facts.operations.map((_, index) => index)
-					: [
-							...indexes[0],
-						];
-			const ordered =
-				query.search === undefined
-					? indexed.sort((a, b) => a - b)
-					: captured.searchOperationsFn(query.search);
-			const candidates = ordered.filter(
-				(index) =>
-					indexes.every((values) => values.has(index)) &&
-					readOperationFilterFn(captured.operationSummaries[index], query.filter),
-			);
-			if (offset > candidates.length)
-				return yield* Effect.fail(
-					new GraphQueryError({
-						reason: "invalid-query",
-						message: "Operation continuation offset is outside the matching result.",
-					}),
-				);
+			}
 			const started = yield* Clock.currentTimeMillis;
 			const reasons = new Set<GraphResult["reasons"][number]>();
-			const operations: GraphFacts["operations"][number][] = [];
+			const selected: number[] = [];
 			let expansions = 0;
 			let position = offset;
 			for (; position < candidates.length; position++) {
-				if (operations.length >= query.limit) {
+				if (selected.length >= query.limit) {
 					reasons.add("limit");
 					break;
 				}
@@ -709,27 +857,38 @@ export const createProjectGraphFx = Effect.fn("createProjectGraphFx")(
 					}
 				}
 				expansions++;
-				operations.push(captured.facts.operations[candidates[position]]);
+				selected.push(candidates[position]);
 			}
+			const operations =
+				query.kind === "operations"
+					? selected.map((index) => captured.facts.operations[index])
+					: [];
 			const selectedOperationIds = new Set(operations.map((operation) => operation.id));
 			const result = readGraphDiscoveryFn(
 				{
 					projectId: captured.projectId,
 					revision: captured.revision,
-					status: readQueryStatusFn(operations.length > 0, reasons.size > 0),
+					status: readQueryStatusFn(selected.length > 0, reasons.size > 0),
 					truncated: reasons.size > 0,
 					reasons: [
 						...reasons,
 					].sort(),
 					expansions,
-					nodes: [],
-					edges: [],
+					nodes:
+						query.kind === "connections"
+							? captured.facts.nodes.filter((node) => node.id === query.from)
+							: [],
+					edges:
+						query.kind === "connections"
+							? selected.map((index) => captured.facts.edges[index])
+							: [],
 					operations,
 					paths: [],
 				},
 				captured.snapshotId,
 				captured.facts,
-				query.participant === undefined && query.role === undefined
+				query.kind !== "operations" ||
+					(query.participant === undefined && query.role === undefined)
 					? []
 					: captured.operationParticipants.filter(
 							(participant) =>
@@ -823,6 +982,11 @@ export const createProjectGraphFx = Effect.fn("createProjectGraphFx")(
 					edgeIds: found.edges.map((edge) => edge.id),
 					operationIds: found.operations.map((operation) => operation.id),
 					paths: found.paths,
+					...(found.flows === undefined
+						? {}
+						: {
+								flows: found.flows,
+							}),
 					...(found.matches === undefined
 						? {}
 						: {

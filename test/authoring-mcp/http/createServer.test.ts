@@ -53,7 +53,6 @@ describe("editor MCP server", () => {
 			"edit_template_cells",
 			"delete_template",
 			"project",
-			"item_meta",
 			"item_collection",
 			"artwork_collection",
 			"note_collection",
@@ -68,12 +67,14 @@ describe("editor MCP server", () => {
 			"item_lines_json",
 			"item_line_json",
 			"graph_schema_json",
-			"graph_query",
-			"graph_query_batch",
+			"graph_search",
+			"graph_connections",
+			"graph_operations",
+			"graph_path",
+			"graph_flow",
+			"graph_traverse",
+			"graph_batch",
 			"graph_operations_json",
-			"item_input",
-			"item_outcome",
-			"item_chain",
 		]);
 		const artworkCollectionSchema = tools.tools.find(
 			({ name }) => name === "artwork_collection",
@@ -134,9 +135,7 @@ describe("editor MCP server", () => {
 				const expectedId =
 					name === "template_detail" || name === "template_json"
 						? "urn:serakki:schema:mcp:template-read-input"
-						: name === "item_input" || name === "item_outcome"
-							? `urn:serakki:schema:mcp:${name.replaceAll("_", "-")}-relation`
-							: `urn:serakki:schema:mcp:${name.replaceAll("_", "-")}-input`;
+						: `urn:serakki:schema:mcp:${name.replaceAll("_", "-")}-input`;
 				expectNamedJsonSchemaGraph(inputSchema, {
 					id: expectedId,
 				});
@@ -149,15 +148,6 @@ describe("editor MCP server", () => {
 				type: "boolean",
 			},
 		});
-		for (const toolName of [
-			"item_input",
-			"item_outcome",
-		]) {
-			const properties = tools.tools.find(({ name }) => name === toolName)?.inputSchema
-				.properties;
-			expect(properties).toHaveProperty("itemUid");
-			expect(properties).toHaveProperty("level");
-		}
 		const missing = await client.callTool({
 			name: "project",
 			arguments: {},

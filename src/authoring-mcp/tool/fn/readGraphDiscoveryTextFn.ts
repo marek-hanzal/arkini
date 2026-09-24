@@ -10,7 +10,10 @@ import type {
 	GraphDiscoveryResult,
 } from "~/graph/type/GraphDiscoveryResult";
 
-type Query = Pick<GraphDiscoveryQuerySchema.Type, "kind" | "from">;
+type Query = {
+	readonly kind: GraphDiscoveryQuerySchema.Type["kind"];
+	readonly from?: string;
+};
 type NodeLabelFn = (id: string) => string;
 
 // Ordinary identities copy directly; unusual delimiters or controls use a lossless JSON string literal.
@@ -230,16 +233,57 @@ const bodyFn = (result: GraphDiscoveryResult, query: Query): string => {
 				])
 				.join("\n"),
 		)
-		.with("node", () =>
-			[
-				...(query.from === undefined
-					? []
-					: [
-							labelFn(query.from),
-						]),
-				...result.operations.map((operation) => operationRowFn(operation, labelFn)),
-			].join("\n"),
+		.with("search", () =>
+			result.nodes.map((node) => `- ${labelFn(node.id)}; kind=${node.kind}`).join("\n"),
 		)
+		.with("flow", () => {
+			if ((result.flows?.length ?? 0) === 0)
+				return result.truncated
+					? "No flow found within the search bounds; existence remains unknown."
+					: "No authored transformation flow exists in the selected operation scope.";
+			return [
+				"Potential authored transformations; other prerequisites and runtime conditions must hold.",
+				...(result.flows ?? []).map((flow, index) =>
+					[
+						`Flow ${index + 1}${flow.steps.length === 0 ? `: ${flow.nodes.map(labelFn).join(" → ")} (same node; no transformation)` : ":"}`,
+						...flow.steps.flatMap((step, stepIndex) => {
+							const operation = operations.get(step.operationId);
+							const evidence = step.evidence;
+							const properties = [
+								`via ${step.kind}; role=${evidence.fromRole}; output=${evidence.output}`,
+								...(evidence.chance === undefined
+									? []
+									: [
+											`chance=${evidence.chance}`,
+										]),
+								...(evidence.alternative === undefined
+									? []
+									: [
+											`alternative=${evidence.alternative}`,
+										]),
+								...(operation === undefined
+									? [
+											`operationId=${identityFn(step.operationId)}`,
+										]
+									: operationDetailsFn(operation)),
+							];
+							return [
+								`  ${stepIndex + 1}. ${labelFn(step.from)} → ${labelFn(step.to)}${quantityFn(evidence.quantityMin, evidence.quantityMax)}; ${properties.join("; ")}`,
+								`     owner: ${labelFn(step.owner)}`,
+								...(evidence.prerequisiteNodes.length === 0
+									? []
+									: [
+											`     requires: ${evidence.prerequisiteNodes.map(labelFn).join(", ")}`,
+										]),
+								...evidence.prerequisites.map(
+									(requirement) => `     ${titleFn(requirement)}`,
+								),
+							];
+						}),
+					].join("\n"),
+				),
+			].join("\n\n");
+		})
 		.with("path", () => {
 			const edges = new Map(
 				result.edges.map((edge) => [
@@ -259,12 +303,45 @@ const bodyFn = (result: GraphDiscoveryResult, query: Query): string => {
 				)
 				.join("\n\n");
 		})
-		.with("connections", "traverse", () =>
-			result.edges.length === 0
-				? query.from === undefined
-					? ""
-					: labelFn(query.from)
-				: result.edges.map((edge) => `- ${edgeRowFn(edge)}`).join("\n"),
+		.with("connections", () => {
+			const grouped = new Map<string, GraphDiscoveryEdge[]>();
+			for (const edge of result.edges) {
+				const key = edge.operationId ?? edge.id;
+				const group = grouped.get(key) ?? [];
+				group.push(edge);
+				grouped.set(key, group);
+			}
+			return (
+				[
+					...grouped.values(),
+				]
+					.flatMap((edges) => {
+						const operation = operations.get(edges[0].operationId ?? "");
+						if (edges.length === 1 || operation === undefined)
+							return edges.map((edge) => `- ${edgeRowFn(edge)}`);
+						return [
+							operationRowFn(operation, labelFn),
+							...edges.map(
+								(edge) =>
+									`  ${labelFn(edge.from)} --${edge.kind}--> ${labelFn(edge.to)}; ${edgeDetailsFn(
+										{
+											...edge,
+											operationId: undefined,
+										},
+										undefined,
+										labelFn,
+									)}`,
+							),
+						];
+					})
+					.join("\n") || (query.from === undefined ? "" : labelFn(query.from))
+			);
+		})
+		.with(
+			"traverse",
+			() =>
+				result.edges.map((edge) => `- ${edgeRowFn(edge)}`).join("\n") ||
+				(query.from === undefined ? "" : labelFn(query.from)),
 		)
 		.exhaustive();
 };
@@ -292,7 +369,12 @@ export const readGraphBatchTextFn = (
 	);
 	const sections = result.queries.map((query) => {
 		const parsed = GraphDiscoveryQuerySchema.safeParse(requested.get(query.id));
-		const nodeIds = new Set(query.nodeIds);
+		const nodesById = new Map(
+			result.nodes.map((node) => [
+				node.id,
+				node,
+			]),
+		);
 		const edgeIds = new Set(query.edgeIds);
 		const operationsById = new Map(
 			result.operations.map((operation) => [
@@ -311,7 +393,14 @@ export const readGraphBatchTextFn = (
 							truncated: query.truncated,
 							reasons: query.reasons,
 							expansions: query.expansions,
-							nodes: result.nodes.filter((node) => nodeIds.has(node.id)),
+							nodes: query.nodeIds.flatMap((id) => {
+								const node = nodesById.get(id);
+								return node === undefined
+									? []
+									: [
+											node,
+										];
+							}),
 							edges: result.edges.filter((edge) => edgeIds.has(edge.id)),
 							operations: query.operationIds.flatMap((id) => {
 								const operation = operationsById.get(id);
@@ -323,6 +412,7 @@ export const readGraphBatchTextFn = (
 							}),
 							matches: query.matches,
 							paths: query.paths,
+							flows: query.flows,
 						},
 						parsed.data,
 					)

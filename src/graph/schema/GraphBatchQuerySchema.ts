@@ -15,7 +15,7 @@ export const GraphBatchQuerySchema = z
 							// Spell the open object explicitly for MCP clients instead of Zod's empty schema.
 							additionalProperties: true,
 							description:
-								"A compact graph query object matching graph_schema_json.querySchema. Invalid query fields report per-entry errors without discarding valid siblings.",
+								"A focused query object with kind search, connections, operations, path, flow or traverse and the corresponding fields from graph_schema_json.querySchema. Invalid query fields report per-entry errors without discarding valid siblings.",
 						}),
 					})
 					.strict(),
@@ -41,7 +41,7 @@ export const GraphBatchQuerySchema = z
 		}
 	})
 	.meta({
-		$id: "urn:serakki:schema:mcp:graph-query-batch-input",
+		$id: "urn:serakki:schema:mcp:graph-batch-input",
 		title: "Graph discovery batch",
 		description:
 			"Up to eight independently admitted discovery queries over one captured immutable snapshot.",

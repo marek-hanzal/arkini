@@ -24,6 +24,7 @@ const formatRuntimeFn = (report: GameIncidentReport) => {
 		"# Last committed runtime state",
 		"",
 		`- Current space: ${runtime.currentSpace}`,
+		`- Previous space: ${runtime.previousSpace ?? "none"}`,
 		`- Cheats enabled: ${runtime.cheats.enabled ? "yes" : "no"}`,
 		`- Cheats ever enabled: ${runtime.cheats.everEnabled ? "yes" : "no"}`,
 		`- Speed up: ${runtime.cheats.speedUpGameplay ? "yes" : "no"}`,

@@ -147,6 +147,7 @@ export const commitMergeDropFx = Effect.fn("commitMergeDropFx")(function* ({
 				),
 		}),
 		Effect.catchTags({
+			PreviousSpaceUnavailableError: rejectBlockedFx,
 			ItemUnitsUnavailableError: rejectBlockedFx,
 			ItemStatefulError: rejectBlockedFx,
 			PlacementUnavailableError: rejectBlockedFx,

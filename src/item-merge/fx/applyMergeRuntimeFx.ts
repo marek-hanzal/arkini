@@ -1,3 +1,4 @@
+import { PreviousSpaceUnavailableError } from "~/item-merge/error/PreviousSpaceUnavailableError";
 import { relocateBoardItemFx } from "~/item-placement/fx/relocateBoardItemFx";
 import { Effect } from "effect";
 import { match } from "ts-pattern";
@@ -311,13 +312,15 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 	const owner = rule.action === "space" ? target : source;
 	const sourceAction = yield* rule.action === "space"
 		? Effect.gen(function* () {
+				const space = rule.space === "previous" ? runtime.previousSpace : rule.space;
+				if (space === undefined) return yield* new PreviousSpaceUnavailableError();
 				const moved = yield* relocateBoardItemFx({
 					itemId: source.id,
 					originItemId: owner.id,
 					runtime,
 					origin: {
 						...owner.location,
-						space: rule.space,
+						space,
 					},
 				});
 				return {

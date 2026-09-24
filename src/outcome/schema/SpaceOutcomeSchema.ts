@@ -1,13 +1,13 @@
 import { z } from "zod";
 import { OutcomeEnumSchema } from "./OutcomeEnumSchema";
 import { OutcomeRuleSchema } from "./OutcomeRuleSchema";
-import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
+import { SpaceDestinationSchema } from "~/game-value/schema/SpaceDestinationSchema";
 export const SpaceOutcomeSchema = z
 	.object({
 		type: OutcomeEnumSchema.extract([
 			"Space",
 		]),
-		space: NonNegativeIntegerSchema.describe("The destination Board space."),
+		space: SpaceDestinationSchema.describe("The destination Board space."),
 		rules: z.array(OutcomeRuleSchema),
 	})
 	.strict()

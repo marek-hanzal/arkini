@@ -363,3 +363,71 @@ it("retains authored Clock flags and outcomes even when no executable schedule c
 		]),
 	);
 });
+
+it("preserves Previous Space as a dynamic destination with separate outcome and transport provenance", () => {
+	const config = configFn({
+		A: itemFn("A", {
+			lines: [
+				lineFn("return", {
+					outcome: {
+						set: [
+							{
+								rules: [],
+								roll: [
+									{
+										type: "guaranteed",
+										outcome: [
+											{
+												type: "space",
+												space: "previous",
+												rules: [],
+											},
+										],
+									},
+								],
+							},
+						],
+					},
+				}),
+			],
+			merge: [
+				{
+					action: "space",
+					space: "previous",
+					effect: "keep",
+				},
+			],
+		}),
+	});
+	const facts = compileGraphFactsFn(config);
+	expect(facts.nodes.find(({ id }) => id === "space:previous")).toMatchObject({
+		kind: "space",
+		missing: false,
+	});
+	const edges = facts.edges.filter(({ to }) => to === "space:previous");
+	expect(edges.map(({ kind }) => kind).sort()).toEqual([
+		"merge-space",
+		"space-outcome",
+	]);
+	expect(edges.find(({ kind }) => kind === "space-outcome")?.source).toEqual([
+		"items",
+		"A",
+		"lines",
+		0,
+		"outcome",
+		"set",
+		0,
+		"roll",
+		0,
+		"outcome",
+		0,
+		"space",
+	]);
+	expect(edges.find(({ kind }) => kind === "merge-space")?.source).toEqual([
+		"items",
+		"A",
+		"merge",
+		0,
+		"space",
+	]);
+});

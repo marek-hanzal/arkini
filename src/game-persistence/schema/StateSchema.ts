@@ -12,6 +12,9 @@ export const StateSchema = z
 		currentSpace: NonNegativeIntegerSchema.describe(
 			"The persistent board space currently presented to the player.",
 		),
+		previousSpace: NonNegativeIntegerSchema.optional().describe(
+			"The space last left by a committed navigation; absent before the first transition.",
+		),
 		templateUidBySpace: TemplateUidBySpaceSchema,
 		items: z.array(StateItemSchema),
 		jobs: z.array(JobSchema),

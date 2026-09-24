@@ -1,135 +1,22 @@
+import {
+	origin,
+	itemOutcome,
+	tableFn,
+	spaceFn,
+	configFn,
+	spawnOwnerFx,
+	settleFx,
+} from "./OutcomeSettlement.test/fixture";
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/useGameFx";
-import { spawnItemFx } from "~test/support/spawnItemFx";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
-import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import { enqueueDefaultLineFx } from "~/production-job/fx/enqueueDefaultLineFx";
 import { resolveOutcomeTableFx } from "~/outcome/fx/resolveOutcomeTableFx";
-import { applyOutcomeTableFx } from "~/outcome/fx/applyOutcomeTableFx";
 import { expireItemRuntimeFx } from "~/item-expiry/fx/expireItemRuntimeFx";
-import { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
-import type { OutcomeSchema } from "~/outcome/schema/OutcomeSchema";
-
-const origin = {
-	scope: "board" as const,
-	space: 0,
-	position: {
-		x: 0,
-		y: 0,
-	},
-};
-const itemOutcome = {
-	type: "item",
-	itemUid: "reward",
-	quantity: {
-		min: 1,
-		max: 1,
-	},
-	placement: "drop",
-	rules: [],
-} as const;
-const tableFn = (outcome: readonly OutcomeSchema.Type[]) =>
-	OutcomeTableSchema.parse({
-		set: [
-			{
-				weight: 1,
-				rules: [],
-				roll: [
-					{
-						type: "guaranteed",
-						outcome,
-					},
-				],
-			},
-		],
-	});
-const spaceFn = (space: number): OutcomeSchema.Type => ({
-	type: "space",
-	space,
-	rules: [],
-});
-const definitionFn = (id: string) => ({
-	uid: id,
-
-	title: id,
-	artwork: {
-		scale: 1,
-		default: [
-			id,
-		],
-	},
-	lines: [],
-});
-const configFn = (outcome: OutcomeTableSchema.Type, width = 3) =>
-	GameConfigSchema.parse({
-		resources: {
-			hero: "hero",
-		},
-		meta: {
-			id: "outcome-settlement",
-			title: "Outcomes",
-			board: {
-				width,
-				height: 1,
-			},
-		},
-		start: {
-			currentSpace: 0,
-			spaces: [],
-		},
-		items: {
-			owner: {
-				...definitionFn("owner"),
-				lines: [
-					{
-						uid: "run",
-						title: "Run",
-						description: "Run",
-						default: true,
-						show: true,
-						enable: true,
-						runtimeMs: 0,
-						input: [
-							{
-								type: "simple",
-							},
-						],
-						rules: [],
-						outcome,
-					},
-				],
-			},
-			reward: definitionFn("reward"),
-		},
-	});
-const spawnOwnerFx = () =>
-	spawnItemFx({
-		id: "owner-live",
-		itemUid: "owner",
-		location: origin,
-	});
-
-const settleFx = (outcome: OutcomeTableSchema.Type) =>
-	modifyRuntimeFx((runtime) =>
-		Effect.gen(function* () {
-			const resolved = yield* resolveOutcomeTableFx({
-				origin,
-				outcome,
-			});
-			const [placement, next] = yield* applyOutcomeTableFx({
-				outcome: resolved,
-				runtime,
-			});
-			return [
-				placement,
-				next,
-			] as const;
-		}),
-	);
 
 describe("Outcome settlement", () => {
 	it("retains the complete mixed roll and owner origin while only publishing the last Space", () => {
@@ -181,6 +68,7 @@ describe("Outcome settlement", () => {
 			},
 		]);
 		expect(result.transition.runtime.currentSpace).toBe(2);
+		expect(result.transition.runtime.previousSpace).toBe(0);
 		expect(
 			result.transition.runtime.items.find((item) => item.item.uid === "reward")?.location,
 		).toMatchObject({
@@ -413,6 +301,7 @@ describe("Outcome settlement", () => {
 			),
 		);
 		expect(result.runtime.currentSpace).toBe(0);
+		expect(result.runtime.previousSpace).toBeUndefined();
 		expect(result.events.filter((event) => event.type === "current-space:changed")).toEqual([]);
 	});
 });

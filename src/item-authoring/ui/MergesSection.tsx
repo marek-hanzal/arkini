@@ -71,7 +71,9 @@ const MergeFields = ({
 						itemLabelFn={(index) => {
 							const merge = merges[index];
 							if (merge.action === "space")
-								return `${translator.textFn("Space")} ${merge.space}`;
+								return merge.space === "previous"
+									? translator.textFn("Previous Space")
+									: `${translator.textFn("Space")} ${merge.space}`;
 							const itemUid = merge.target.itemUid;
 							return `${translator.textFn("Merge")} ${index + 1} — ${readItemLabelFn(
 								itemUid,

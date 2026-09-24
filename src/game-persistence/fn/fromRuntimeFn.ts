@@ -46,6 +46,11 @@ export const fromRuntimeFn = ({ runtime }: Props) => {
 			...runtime.cheats,
 		},
 		currentSpace: runtime.currentSpace,
+		...(runtime.previousSpace === undefined
+			? {}
+			: {
+					previousSpace: runtime.previousSpace,
+				}),
 		templateUidBySpace: runtime.templateUidBySpace,
 		items,
 		jobs: runtime.jobs,

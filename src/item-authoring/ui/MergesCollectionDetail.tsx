@@ -36,7 +36,9 @@ export const MergesCollectionDetail = ({ item }: { readonly item: ItemSchema.Typ
 					itemLabelFn={(index) => {
 						const merge = merges[index];
 						if (merge.action === "space")
-							return `${translator.textFn("Space")} ${merge.space}`;
+							return merge.space === "previous"
+								? translator.textFn("Previous Space")
+								: `${translator.textFn("Space")} ${merge.space}`;
 						const targetId = merge.target.itemUid;
 						return `${translator.textFn("Merge")} ${index + 1} — ${project.config.items[targetId]?.title || targetId}`;
 					}}

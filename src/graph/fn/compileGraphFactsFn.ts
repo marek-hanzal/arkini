@@ -57,7 +57,14 @@ export const compileGraphFactsFn = (config: GameConfigSchema.Type): GraphFacts =
 										}),
 							},
 						}),
-				title: item?.title ?? template?.title ?? (kind === "space" ? `Space ${key}` : key),
+				title:
+					item?.title ??
+					template?.title ??
+					(kind === "space"
+						? key === "previous"
+							? "Previous Space"
+							: `Space ${key}`
+						: key),
 				missing: match(kind)
 					.with("item", () => item === undefined)
 					.with("template", () => template === undefined)

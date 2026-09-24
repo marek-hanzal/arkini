@@ -1407,6 +1407,18 @@ Preparing artwork preview…:
   value: Preparing artwork preview…
 Preparing editor game…:
   value: Preparing editor game…
+Previous Space:
+  value: Previous Space
+Previous Space outcome help:
+  value: |
+    **Space** navigates to an exact space number. **Previous Space** returns the player to the space they last left successfully, using history when the outcome settles.
+
+    A new game has no previous space: this outcome then does nothing, while other outcomes settle normally. Returning updates history, so the next return goes back the other way.
+Previous Space transport help:
+  value: |
+    **Space** sends the dropped item to an exact space number. **Previous Space** sends it to the space the player last left successfully, preserving its identity and state.
+
+    The player stays here and navigation history does not change. Before the first navigation, the drop is rejected without changing either item or applying merge effects and outcomes.
 Produced by:
   value: Produced by
   dynamic: true
@@ -1855,11 +1867,6 @@ Target effect:
   value: Target item
 Target space:
   value: Target space
-Target space help:
-  value: |
-    The Board Space entered when the action succeeds.
-
-    Dropping an item onto this portal sends the item there without moving the player. Spaces start at `0`.
 Target unit cost help:
   value: |
     Choose a Board item that pays the Unit cost.

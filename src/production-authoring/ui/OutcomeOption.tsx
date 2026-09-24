@@ -44,7 +44,9 @@ export const OutcomeOption = ({
 						key={`space:${index}`}
 						className="text-xs"
 					>
-						{translator.textFn("Space")} {outcome.space}
+						{outcome.space === "previous"
+							? translator.textFn("Previous Space")
+							: `${translator.textFn("Space")} ${outcome.space}`}
 					</span>
 				))}
 			{outcomes

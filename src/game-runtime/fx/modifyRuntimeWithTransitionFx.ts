@@ -44,6 +44,20 @@ export const modifyRuntimeWithTransitionFx = Effect.fn("modifyRuntimeWithTransit
 			Effect.provideService(RuntimeFx, {
 				read: Effect.succeed(transition.runtime),
 			}),
+			Effect.map(
+				([result, nextRuntime, facts]) =>
+					[
+						result,
+						// Only the final committed transition records history, never draft hops.
+						nextRuntime.currentSpace === transition.runtime.currentSpace
+							? nextRuntime
+							: {
+									...nextRuntime,
+									previousSpace: transition.runtime.currentSpace,
+								},
+						facts,
+					] as const,
+			),
 			Effect.tap(([, nextRuntime]) => {
 				if (nextRuntime === transition.runtime) return Effect.void;
 				return assertRuntimeFx({

@@ -1,3 +1,4 @@
+import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import { Effect } from "effect";
 import type { SpaceOutcomeSchema } from "~/outcome/schema/SpaceOutcomeSchema";
 import type { BoardLocationSchema } from "~/item-location/schema/BoardLocationSchema";
@@ -18,8 +19,13 @@ export const resolveSpaceOutcomeFx = Effect.fn("resolveSpaceOutcomeFx")(function
 		}))
 	)
 		return undefined;
+	const space =
+		outcome.space === "previous"
+			? (yield* (yield* RuntimeFx).read).previousSpace
+			: outcome.space;
+	if (space === undefined) return undefined;
 	return {
 		type: "space",
-		space: outcome.space,
+		space,
 	} satisfies ResolvedOutcome.Space;
 });

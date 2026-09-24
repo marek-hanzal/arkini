@@ -24,6 +24,7 @@ export interface GameDiagnosticRuntimeDefaultLine {
 
 export interface GameDiagnosticRuntime {
 	readonly currentSpace: number;
+	readonly previousSpace?: number;
 	readonly cheats: {
 		readonly enabled: boolean;
 		readonly everEnabled: boolean;

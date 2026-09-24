@@ -105,8 +105,40 @@ const attemptFx = (drop = false) =>
 	});
 
 describe("receiver-owned Space merge", () => {
-	it("transports the existing lifetime and units without a production line or player navigation", () => {
-		const config = makeConfig();
+	it("rejects Previous Space without history before target effects or outcomes and never swaps", () => {
+		const result = Effect.runSync(
+			attemptFx(true).pipe(
+				useGameFx({
+					config: makeConfig({
+						action: "space",
+						space: "previous",
+						effect: "replace",
+						result: "result",
+						outcome: guaranteedMergeOutput(),
+					}),
+					state: makeState(),
+				}),
+			),
+		);
+		expect(result.attempt).toMatchObject({
+			_tag: "Success",
+			success: {
+				kind: "reject",
+				reason: "blocked",
+			},
+		});
+		expect(result.after).toBe(result.before);
+	});
+
+	it.each([
+		7,
+		"previous",
+	] as const)("transports to %s with lifetime and units, without player navigation", (space) => {
+		const config = makeConfig({
+			action: "space",
+			space,
+			effect: "keep",
+		});
 		config.items.source.units = {
 			amount: 10,
 		};
@@ -116,6 +148,7 @@ describe("receiver-owned Space merge", () => {
 			rules: [],
 		};
 		const state = makeState();
+		state.previousSpace = 7;
 		state.items[0]!.mergeSequence = 9;
 		state.items[1]!.mergeSequence = 5;
 		state.items[0]!.remainingUnits = 4;
@@ -150,6 +183,7 @@ describe("receiver-owned Space merge", () => {
 			},
 		});
 		expect(result.after.currentSpace).toBe(0);
+		expect(result.after.previousSpace).toBe(7);
 		expect(result.after.items.find((item) => item.id === "runtime:target")?.mergeSequence).toBe(
 			6,
 		);
@@ -346,51 +380,69 @@ describe("receiver-owned Space merge", () => {
 		});
 	});
 
-	it("rolls back successful transport and receiver replacement when later item outcomes cannot fit", () => {
-		const config = makeConfig({
-			action: "space",
-			space: 7,
-			effect: "replace",
-			result: "result",
-			outcome: guaranteedMergeOutput({
-				quantity: 9,
-			}),
-		});
-		const result = Effect.runSync(
-			attemptFx().pipe(
-				useGameFx({
-					config,
-					state: makeState(),
+	it.each([
+		7,
+		"previous",
+	] as const)(
+		"rolls back successful transport and receiver replacement when later item outcomes cannot fit (%s)",
+		(space) => {
+			const config = makeConfig({
+				action: "space",
+				space,
+				effect: "replace",
+				result: "result",
+				outcome: guaranteedMergeOutput({
+					quantity: 9,
 				}),
-			),
-		);
-		expect(result.attempt._tag === "Failure").toBe(true);
-		expect(result.after).toEqual(result.before);
-	});
+			});
+			const result = Effect.runSync(
+				attemptFx().pipe(
+					useGameFx({
+						config,
+						state: {
+							...makeState(),
+							previousSpace: 7,
+						},
+					}),
+				),
+			);
+			expect(result.attempt._tag === "Failure").toBe(true);
+			expect(result.after).toEqual(result.before);
+		},
+	);
 
-	it("rolls back transport, target replacement and outcomes when the destination is full", () => {
-		const config = makeConfig({
-			action: "space",
-			space: 7,
-			effect: "replace",
-			result: "result",
-			outcome: guaranteedMergeOutput(),
-		});
-		const state = makeState();
-		for (let y = 0; y < 2; y++)
-			for (let x = 0; x < 4; x++)
-				state.items.push(boardItem(`blocker:${x}:${y}`, "blocker", x, 7, y));
-		const result = Effect.runSync(
-			attemptFx().pipe(
-				useGameFx({
-					config,
-					state,
-				}),
-			),
-		);
-		expect(result.attempt._tag === "Failure").toBe(true);
-		expect(result.after).toEqual(result.before);
-	});
+	it.each([
+		7,
+		"previous",
+	] as const)(
+		"rolls back transport, target replacement and outcomes when the destination is full (%s)",
+		(space) => {
+			const config = makeConfig({
+				action: "space",
+				space,
+				effect: "replace",
+				result: "result",
+				outcome: guaranteedMergeOutput(),
+			});
+			const state = {
+				...makeState(),
+				previousSpace: 7,
+			};
+			for (let y = 0; y < 2; y++)
+				for (let x = 0; x < 4; x++)
+					state.items.push(boardItem(`blocker:${x}:${y}`, "blocker", x, 7, y));
+			const result = Effect.runSync(
+				attemptFx().pipe(
+					useGameFx({
+						config,
+						state,
+					}),
+				),
+			);
+			expect(result.attempt._tag === "Failure").toBe(true);
+			expect(result.after).toEqual(result.before);
+		},
+	);
 
 	it("executes an explicit source merge instead of the receiver transport", () => {
 		const config = makeConfig();

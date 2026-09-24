@@ -102,7 +102,11 @@ export const MergeDetail = ({
 					description={<Mx label="Authored merge target summary help" />}
 					value={
 						merge.action === "space" ? (
-							`${translator.textFn("Space")} ${merge.space}`
+							merge.space === "previous" ? (
+								translator.textFn("Previous Space")
+							) : (
+								`${translator.textFn("Space")} ${merge.space}`
+							)
 						) : (
 							<SelectorDetail selector={merge.target} />
 						)

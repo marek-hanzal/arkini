@@ -1,3 +1,4 @@
+import { SpaceDestinationControl } from "~/authoring-form/ui/SpaceDestinationControl";
 import { MousePointer2, Flame, Coins, DoorOpen, ShieldCheck, Trash2, Replace } from "lucide-react";
 import { useTranslator } from "~/translation/ui/useTranslator";
 
@@ -5,7 +6,7 @@ import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { SectionEnd } from "~/ui/ui/SectionEnd";
 import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
-import { EditorNumberControl, EditorChoiceControl } from "~/editor-control/ui/EditorValueControls";
+import { EditorChoiceControl } from "~/editor-control/ui/EditorValueControls";
 import { OutcomeControl } from "~/production-authoring/ui/OutcomeControl";
 import { SelectorControl } from "~/production-authoring/ui/SelectorControl";
 import { EditorItemReferenceControl } from "~/authoring-form/ui/EditorItemAutocompleteField";
@@ -107,10 +108,9 @@ export const MergeField = ({
 						}}
 					/>
 					{merge.action === "space" ? (
-						<EditorNumberControl
+						<SpaceDestinationControl
 							error={readEditorFormValidationErrorFn(validationIssues, "space")}
-							label={translator.textFn("Target space")}
-							min={0}
+							description={<Mx label="Previous Space transport help" />}
 							value={merge.space}
 							onChangeFn={(space) =>
 								onChangeFn({

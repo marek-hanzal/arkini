@@ -101,7 +101,13 @@ const OutcomeRoll = <Item extends OutcomeProjection.Item>({
 							{eyebrow}
 							{item.type === "space" ? (
 								<>
-									<Tx label="Space" /> {item.space}
+									{item.space === "previous" ? (
+										<Tx label="Previous Space" />
+									) : (
+										<>
+											<Tx label="Space" /> {item.space}
+										</>
+									)}
 								</>
 							) : (
 								<>

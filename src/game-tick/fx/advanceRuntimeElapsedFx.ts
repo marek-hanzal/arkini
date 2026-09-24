@@ -66,7 +66,11 @@ export const advanceRuntimeElapsedFx: (
 			});
 			return [
 				{
-					stableRuntime: replay.isStable ? replay.runtime : null,
+					// Committing navigation changes history, invalidating the draft stability proof.
+					stableRuntime:
+						replay.isStable && replay.runtime.currentSpace === runtime.currentSpace
+							? replay.runtime
+							: null,
 				} satisfies AdvanceRuntimeElapsedResult,
 				replay.runtime,
 				replay.facts,

@@ -59,6 +59,8 @@ export const GraphNodeReference = ({
 				</span>
 			</ButtonLink>
 		);
+	if (id === "space:previous")
+		return <span className="break-words text-sm">{translator.textFn("Previous Space")}</span>;
 	const space = id.startsWith("space:") ? Number(id.slice(6)) : undefined;
 	if (
 		id === "start" ||

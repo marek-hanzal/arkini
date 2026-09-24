@@ -10,7 +10,9 @@ export const GraphQuerySchema = z
 			"traverse",
 			"path",
 		]),
-		from: IdSchema.describe("Node ID: item:<UID>, template:<UID>, space:<number>, or start."),
+		from: IdSchema.describe(
+			"Node ID: item:<UID>, template:<UID>, space:<number>, space:previous, or start.",
+		),
 		to: IdSchema.optional().describe(
 			"For path: exact destination. For connections: optional direct counterpart.",
 		),

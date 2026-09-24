@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
+import { SpaceDestinationSchema } from "~/game-value/schema/SpaceDestinationSchema";
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { SelectorSchema } from "~/item-definition/schema/SelectorSchema";
 import { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
@@ -84,7 +84,7 @@ const SpaceBaseSchema = z
 		action: SourceActionSchema.extract([
 			"Space",
 		]),
-		space: NonNegativeIntegerSchema.describe(
+		space: SpaceDestinationSchema.describe(
 			"The destination Board space for the incoming item.",
 		),
 		outcome: OutcomeTableSchema.optional(),

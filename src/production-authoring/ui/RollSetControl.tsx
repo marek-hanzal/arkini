@@ -1,3 +1,4 @@
+import { SpaceDestinationControl } from "~/authoring-form/ui/SpaceDestinationControl";
 import { readOutcomeCollectionSummaryFn } from "~/production-authoring/fn/readOutcomeCollectionSummaryFn";
 import { TemplateSelector } from "~/template-authoring/ui/TemplateSelector";
 import {
@@ -45,7 +46,8 @@ const readChancePercentFn = (chance: number) => Number((chance * 100).toFixed(6)
 const readOutcomeSummaryFn = (outcome: OutcomeSchema.Type, textFn: (key: string) => string) => {
 	const rules = outcome.rules.length;
 	const ruleSummary = rules === 0 ? "" : ` · ${rules} ${textFn(rules === 1 ? "rule" : "rules")}`;
-	if (outcome.type === "space") return `${textFn("Space")} ${outcome.space}${ruleSummary}`;
+	if (outcome.type === "space")
+		return `${outcome.space === "previous" ? textFn("Previous Space") : `${textFn("Space")} ${outcome.space}`}${ruleSummary}`;
 	if (outcome.type === "template") return `${textFn("Template")}${ruleSummary}`;
 	const { min, max } = outcome.quantity;
 	const quantity = min === max ? `×${min}` : `×${min}–${max}`;
@@ -210,11 +212,9 @@ const OutcomeFields = ({
 						type: "space",
 					},
 					(value) => (
-						<EditorNumberControl
+						<SpaceDestinationControl
 							error={readEditorFormValidationErrorFn(validationIssues, "space")}
-							description={<Mx label="Target space help" />}
-							label={translator.textFn("Target space")}
-							min={0}
+							description={<Mx label="Previous Space outcome help" />}
 							value={value.space}
 							onChangeFn={(space) =>
 								onChangeFn({

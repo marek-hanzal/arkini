@@ -51,9 +51,14 @@ export const readOutcomeCollectionSummaryFn = ({
 				},
 				(outcome) => {
 					return {
-						label: `${textFn("Space")} ${outcome.space}`,
+						label:
+							outcome.space === "previous"
+								? textFn("Previous Space")
+								: `${textFn("Space")} ${outcome.space}`,
 						searchTerms: [
-							`Space ${outcome.space}`,
+							outcome.space === "previous"
+								? "Previous Space"
+								: `Space ${outcome.space}`,
 						],
 					};
 				},

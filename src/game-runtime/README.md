@@ -38,6 +38,7 @@ Important invariants:
 - Calculation builds a Runtime draft and ordered internal `EngineFact` receipts. The commit validates the complete draft, projects public events once against that final Runtime, then publishes both in the same `CommittedTransition`; events are never a second store. Successful removal operations emit `item:removed` with the complete terminal `RuntimeItem` snapshot. The snapshot follows the unpublished draft through the result/fact flow, so abandoned plans and rejected commits publish nothing. Presentation may retain the exact removed instance while its detail stays open; it never reconstructs terminal state from earlier renders or uses retained data as gameplay authority.
 - Nested `RuntimeFx` reads inside a write default to the pinned pre-transition snapshot passed to the update. Explicit-snapshot operations scope nested reads to their own immutable input, so successive Tick lifecycle operations see earlier results without exposing their partially built candidates.
 - Failure, interruption and an unchanged event-free result publish nothing.
+- Runtime owns optional `previousSpace`, persisted by State projection/hydration. The commit boundary records only the final navigation from the original current space; draft outcomes and receiver transport never write history. Previous Space resolution reads committed history from the operation snapshot. Navigation invalidates Tick's draft stability proof because commit adds the new history value.
 
 ## Neighboring owners
 

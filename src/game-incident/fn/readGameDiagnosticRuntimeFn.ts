@@ -21,6 +21,7 @@ export const readGameDiagnosticRuntimeFn = ({
 		});
 	return {
 		currentSpace: runtime.currentSpace,
+		previousSpace: runtime.previousSpace,
 		cheats: runtime.cheats,
 		items: runtime.items.map((item) => ({
 			item: readOwnerFn(item.id),

@@ -193,11 +193,16 @@ export const formatGameRuntimeDiffTextFn = ({
 		`- Queued requests: ${initial.queue.length} → ${latest.queue.length}`,
 		`- Default lines: ${initial.defaultLines.length} → ${latest.defaultLines.length}`,
 		`- Current space: ${initial.currentSpace} → ${latest.currentSpace}`,
+		`- Previous space: ${initial.previousSpace ?? "none"} → ${latest.previousSpace ?? "none"}`,
 	];
 	for (const section of sections) {
 		lines.push("", `### ${section.heading}`, ...section.lines);
 	}
-	if (initial.currentSpace === latest.currentSpace && sections.length === 0) {
+	if (
+		initial.currentSpace === latest.currentSpace &&
+		initial.previousSpace === latest.previousSpace &&
+		sections.length === 0
+	) {
 		lines.push("", "No runtime change was observed.");
 	}
 	return lines.join("\n");

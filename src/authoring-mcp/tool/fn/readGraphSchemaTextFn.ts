@@ -41,7 +41,7 @@ export const readGraphSchemaTextFn = () =>
 		nodes: {
 			item: "item:<exact item UID>",
 			template: "template:<exact template UID>",
-			space: "space:<space number>",
+			space: "space:<space number> or space:previous (dynamic navigation history destination)",
 			start: "start",
 			semantics:
 				"Every node carries id, kind and a required human-readable title. Missing authored references remain inspectable. Node identity is distinct from operation identity. Titles travel with references so discovery needs no item lookup just to name an entity.",

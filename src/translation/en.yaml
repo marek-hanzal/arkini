@@ -386,6 +386,8 @@ Continue:
   value: Continue
 Copied:
   value: Copied
+Copy:
+  value: Copy
 Copy Clock section help:
   value: |
     Copying a Clock removes the destination Action.
@@ -609,6 +611,8 @@ Enter the ngrok hostname without https:// or a path.:
   value: Enter the ngrok hostname without https:// or a path.
 Every slot has a sound assigned. Switch to All to see them.:
   value: Every slot has a sound assigned. Switch to All to see them.
+Every template is in use.:
+  value: Every template is in use.
 Exact count:
   value: Exact count
 Exists:
@@ -1246,6 +1250,8 @@ No templates yet:
   value: No templates yet
 No unassigned slots:
   value: No unassigned slots
+No unused templates:
+  value: No unused templates
 None:
   value: None
 None available right now.:

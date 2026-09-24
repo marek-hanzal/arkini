@@ -7,7 +7,9 @@ import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { useEditorEditShortcut } from "~/authoring-shell/ui/useEditorEditShortcut";
 import { useLayoutEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { ChevronRight, PanelsTopLeft, Pencil, ShieldCheck, ShieldAlert } from "lucide-react";
+import { ChevronRight, Copy, PanelsTopLeft, Pencil, ShieldCheck, ShieldAlert } from "lucide-react";
+import { createId } from "@paralleldrive/cuid2";
+import { copyTemplateFn } from "~/template-authoring/fn/copyTemplateFn";
 import { BoardGrid } from "~/board-authoring/ui/BoardGrid";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorItemThumbnail } from "~/authoring-form/ui/EditorItemThumbnail";
@@ -15,6 +17,7 @@ import { EditorSectionPage } from "~/authoring-shell/ui/EditorSectionPage";
 import { EditorSectionNavigation } from "~/authoring-shell/ui/EditorSectionNavigation";
 import { EditorHistoryBackButton } from "~/authoring-shell/ui/EditorHistoryBackButton";
 import { ButtonLink, DangerButton, PrimaryButtonLink } from "~/ui/ui/Button";
+import { LinkButton } from "~/ui/ui/LinkButton";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { saveProjectConfigFx } from "~/project-authoring/fx/saveProjectConfigFx";
@@ -193,6 +196,43 @@ export const TemplateDetail = ({
 		},
 		[],
 	);
+	const duplicateFn = async () => {
+		if (inFlight.current || template === undefined) return;
+		inFlight.current = true;
+		setPendingFn(true);
+		setErrorFn(undefined);
+		const ownGeneration = generation.current;
+		const copy = copyTemplateFn(template, createId());
+		try {
+			await RendererRuntime.runPromise(
+				saveProjectConfigFx({
+					projectId: project.projectId,
+					expectedRevision: project.revision,
+					config: {
+						...project.config,
+						templates: [
+							...(project.config.templates ?? []),
+							copy,
+						],
+					},
+				}),
+			);
+			if (ownGeneration === generation.current)
+				await navigateFn({
+					to: "/editor/$projectId/templates/$templateUid/form/$sectionId",
+					params: {
+						projectId: project.projectId,
+						templateUid: copy.uid,
+						sectionId: "general",
+					},
+				});
+		} catch (cause) {
+			if (ownGeneration === generation.current) setErrorFn(String(cause));
+		} finally {
+			inFlight.current = false;
+			if (ownGeneration === generation.current) setPendingFn(false);
+		}
+	};
 	const deleteFn = async () => {
 		if (inFlight.current || references.length > 0) return;
 		inFlight.current = true;
@@ -233,6 +273,20 @@ export const TemplateDetail = ({
 			contentClassName={section === "delete" ? "mx-auto w-full" : "mx-auto w-3/4"}
 			secondaryNavigation={
 				<TemplateSectionBar
+					actions={
+						section === "delete" ? undefined : (
+							<LinkButton
+								className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap"
+								cursorIntent={pending ? "progress" : undefined}
+								data-ui="TemplateDuplicate"
+								disabled={pending}
+								onClick={() => void duplicateFn()}
+							>
+								<Copy className="size-4" />
+								{translator.textFn("Copy")}
+							</LinkButton>
+						)
+					}
 					section={section}
 					projectId={project.projectId}
 					templateUid={templateUid}

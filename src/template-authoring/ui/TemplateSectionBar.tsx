@@ -1,4 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
+import type { ReactNode } from "react";
 import { EditorPageHelp } from "~/authoring-shell/ui/EditorPageHelp";
 import { EditorSectionBar } from "~/authoring-shell/ui/EditorSectionBar";
 import { Mx } from "~/translation/ui/Mx";
@@ -9,10 +10,12 @@ import { ShortcutLabel } from "~/ui/ui/ShortcutLabel";
 import { useSectionShortcuts } from "~/ui/ui/useSectionShortcuts";
 
 export const TemplateSectionBar = ({
+	actions,
 	projectId,
 	templateUid,
 	destination,
 }: {
+	readonly actions?: ReactNode;
 	readonly projectId: string;
 	readonly templateUid: string;
 	readonly section: "general" | "board" | "delete";
@@ -60,6 +63,7 @@ export const TemplateSectionBar = ({
 	});
 	return (
 		<EditorSectionBar
+			actions={actions}
 			help={
 				<EditorPageHelp
 					title={translator.textFn("Templates")}

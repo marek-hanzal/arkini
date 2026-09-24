@@ -29,11 +29,12 @@ const state = vi.hoisted(() => ({
 	navigate: vi.fn().mockResolvedValue(undefined),
 }));
 vi.mock("~/ui/ui/LinkButton", () => ({
+	LinkButton: (props: ButtonHTMLAttributes<HTMLButtonElement>) => createElement("button", props),
 	LinkButtonLink: ({ children }: { children: ReactNode }) =>
 		createElement("span", null, children),
 }));
 vi.mock("~/template-authoring/ui/TemplateSectionBar", () => ({
-	TemplateSectionBar: () => null,
+	TemplateSectionBar: ({ actions }: { actions?: ReactNode }) => actions,
 }));
 
 vi.mock("~/authoring-session/ui/useEditorProject", () => ({
@@ -199,6 +200,42 @@ const beginDeleteFn = async () => {
 };
 
 describe("template draft and deletion settlement", () => {
+	it("duplicates a template under a fresh UID without changing the original or its board", async () => {
+		await act(async () =>
+			root.render(
+				<TemplateDetail
+					templateUid="template"
+					section="general"
+				/>,
+			),
+		);
+		const duplicate = container.querySelector<HTMLButtonElement>(
+			'[data-ui="TemplateDuplicate"]',
+		);
+		await act(async () => duplicate!.click());
+		const saved = state.save.mock.lastCall?.[0] as {
+			expectedRevision: number;
+			config: {
+				templates: TemplateSchema.Type[];
+			};
+		};
+		expect(saved.expectedRevision).toBe(1);
+		expect(saved.config.templates[0]).toEqual(template);
+		const copy = saved.config.templates[1]!;
+		expect(copy.uid).not.toBe(template.uid);
+		expect(copy.title).toBe("Template (copy)");
+		expect(copy.board).toEqual(template.board);
+		expect(copy.board).not.toBe(template.board);
+		expect(state.navigate).toHaveBeenCalledWith({
+			to: "/editor/$projectId/templates/$templateUid/form/$sectionId",
+			params: {
+				projectId: "project",
+				templateUid: copy.uid,
+				sectionId: "general",
+			},
+		});
+	});
+
 	it("routes the actual E shortcut to the currently displayed board form", async () => {
 		await act(async () =>
 			root.render(

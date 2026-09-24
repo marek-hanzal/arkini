@@ -11,7 +11,12 @@ import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 
 describe("Generated Space transport", () => {
-	it("creates a room through transport without navigating and shares it with subsequent navigation", () => {
+	it("drops near the occupied center of a new template room and shares it with subsequent navigation", () => {
+		const config = generatedSpaceTestConfigFn();
+		config.templates![0]!.width = 5;
+		config.templates![0]!.height = 3;
+		config.templates![0]!.board[0]!.x = 2;
+		config.templates![0]!.board[0]!.y = 1;
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* mergeGeneratedSpaceItemsFx("cargo", "first");
@@ -23,7 +28,7 @@ describe("Generated Space transport", () => {
 				};
 			}).pipe(
 				useGameFx({
-					config: generatedSpaceTestConfigFn(),
+					config,
 					state: generatedSpaceStateFn(),
 				}),
 			),
@@ -36,7 +41,7 @@ describe("Generated Space transport", () => {
 			scope: "board",
 			space: room,
 			position: {
-				x: 1,
+				x: 2,
 				y: 0,
 			},
 		});

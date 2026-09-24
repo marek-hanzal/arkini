@@ -139,6 +139,10 @@ describe("receiver-owned Space merge", () => {
 			space,
 			effect: "keep",
 		});
+		config.meta.board = {
+			width: 8,
+			height: 4,
+		};
 		config.items.source.units = {
 			amount: 10,
 		};
@@ -177,8 +181,8 @@ describe("receiver-owned Space merge", () => {
 				scope: "board",
 				space: 7,
 				position: {
-					x: 3,
-					y: 0,
+					x: 4,
+					y: 2,
 				},
 			},
 		});

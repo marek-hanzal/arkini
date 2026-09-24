@@ -1,3 +1,5 @@
+import { GameConfigFx } from "~/game-config/context/GameConfigFx";
+import { readBoardSizeFn } from "~/game-runtime/fn/readBoardSizeFn";
 import { resolveGeneratedSpaceFx } from "~/space/fx/resolveGeneratedSpaceFx";
 import { PreviousSpaceUnavailableError } from "~/item-merge/error/PreviousSpaceUnavailableError";
 import { relocateBoardItemFx } from "~/item-placement/fx/relocateBoardItemFx";
@@ -329,13 +331,23 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 							? runtime.previousSpace
 							: rule.space;
 				if (space === undefined) return yield* new PreviousSpaceUnavailableError();
+				const destinationRuntime = generated?.runtime ?? runtime;
+				const size = readBoardSizeFn({
+					config: yield* GameConfigFx,
+					runtime: destinationRuntime,
+					space,
+				});
 				const moved = yield* relocateBoardItemFx({
 					itemId: source.id,
 					originItemId: owner.id,
-					runtime: generated?.runtime ?? runtime,
+					runtime: destinationRuntime,
 					origin: {
-						...owner.location,
+						scope: "board",
 						space,
+						position: {
+							x: Math.floor(size.width / 2),
+							y: Math.floor(size.height / 2),
+						},
 					},
 				});
 				return {

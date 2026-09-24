@@ -17,29 +17,72 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { GameEventBatchSchema } from "~/game-event/schema/GameEventBatchSchema";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
+import type { CommittedTransitionSchema } from "~/game-runtime/schema/CommittedTransitionSchema";
 import type { createGameAudioRuntimeFx } from "~/game-audio/fx/createGameAudioRuntimeFx";
 import type { GameAudioControl } from "~/game-audio/context/GameAudioContext";
 import { PresentationSfxEventEnumSchema } from "~/sfx-event/schema/PresentationSfxEventEnumSchema";
 
-const eventState = vi.hoisted(() => ({
-	game: {
-		id: "game:first",
-		config: {
-			items: {},
+const eventState = vi.hoisted(() => {
+	const state = {
+		listener: null as ((batch: GameEventBatchSchema.Type) => void | PromiseLike<void>) | null,
+		game: {
+			id: "game:first",
+			config: {
+				items: {},
+			},
+			subscribeTransitionsFn:
+				(
+					_listenerFn: (
+						transition: CommittedTransitionSchema.Type,
+					) => void | PromiseLike<void>,
+				): (() => void) =>
+				() =>
+					undefined,
 		},
-	},
-	listener: null as ((batch: GameEventBatchSchema.Type) => void | PromiseLike<void>) | null,
-}));
+	};
+	state.game.subscribeTransitionsFn = (listenerFn) => {
+		const runtime = {
+			currentSpace: 0,
+			items: [
+				{
+					id: "runtime:producer",
+					location: {
+						scope: "board",
+						space: 0,
+					},
+				},
+			],
+		} as unknown as CommittedTransitionSchema.Type["runtime"];
+		listenerFn({
+			sequence: 0,
+			previousRuntime: null,
+			runtime,
+			events: [
+				{
+					type: "job:started",
+					itemUid: "producer",
+					jobId: "job:replayed",
+					ownerItemId: "runtime:producer",
+					lineUid: "line:1",
+				},
+			],
+		});
+		state.listener = (batch) =>
+			listenerFn({
+				sequence: 1,
+				previousRuntime: runtime,
+				runtime,
+				events: batch.events,
+			});
+		return () => {
+			state.listener = null;
+		};
+	};
+	return state;
+});
 
 vi.mock("~/game-presentation/ui/useGameEngine", () => ({
 	useGameEngine: () => eventState.game,
-}));
-
-vi.mock("~/game-presentation/ui/useGameEvents", async (importOriginal) => ({
-	...(await importOriginal()),
-	useGameEvents: (listener: (batch: GameEventBatchSchema.Type) => void | PromiseLike<void>) => {
-		eventState.listener = listener;
-	},
 }));
 
 const createGameAudioRuntimeFxMock = vi.hoisted(() => vi.fn());
@@ -186,6 +229,7 @@ afterEach(async () => {
 	});
 	for (const registry of registries.splice(0)) registry.dispose();
 	eventState.game = {
+		...eventState.game,
 		id: "game:first",
 		config: {
 			items: {},
@@ -205,6 +249,7 @@ describe("GameAudio", () => {
 		expect(createGameAudioRuntimeFxMock).toHaveBeenCalledOnce();
 		await vi.waitFor(() => expect(harness.prepare).toHaveBeenCalledOnce());
 		await vi.waitFor(() => expect(harness.unlock).toHaveBeenCalledOnce());
+		expect(harness.play).not.toHaveBeenCalled();
 
 		window.dispatchEvent(new Event("pointerdown"));
 		await vi.waitFor(() => expect(harness.unlock).toHaveBeenCalledTimes(2));
@@ -313,6 +358,7 @@ describe("GameAudio", () => {
 		const { render } = await renderAudio();
 
 		eventState.game = {
+			...eventState.game,
 			id: "game:second",
 			config: {
 				items: {},
@@ -346,6 +392,7 @@ describe("GameAudio", () => {
 		if (staleListener === null) throw new Error("Missing first game audio event listener.");
 
 		eventState.game = {
+			...eventState.game,
 			id: "game:second",
 			config: {
 				items: {},
@@ -410,6 +457,7 @@ describe("GameAudio", () => {
 		if (committedListener === null) throw new Error("Missing committed audio event listener.");
 
 		eventState.game = {
+			...eventState.game,
 			id: "game:abandoned",
 			config: {
 				items: {},
@@ -568,6 +616,7 @@ describe("GameAudio", () => {
 		await vi.waitFor(() => expect(pendingCommands).toBe(1));
 
 		eventState.game = {
+			...eventState.game,
 			id: "game:second",
 			config: {
 				items: {},

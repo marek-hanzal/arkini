@@ -14,11 +14,10 @@ import type { SoundSettings } from "~electron/contract/sound/SoundSettings";
 import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
 import { SoundSettingsAtom } from "~/application-settings/atom/SoundSettingsAtom";
 import { createGameAudioRuntimeFx } from "~/game-audio/fx/createGameAudioRuntimeFx";
-import { readGameAudioCuesFn } from "~/game-audio/fn/readGameAudioCuesFn";
+import { readVisibleGameAudioCuesFn } from "~/game-audio/fn/readGameAudioCuesFn";
 import { GameAudioContext } from "~/game-audio/context/GameAudioContext";
-import type { GameEventBatchSchema } from "~/game-event/schema/GameEventBatchSchema";
 import { useGameEngine } from "~/game-presentation/ui/useGameEngine";
-import { useGameEvents } from "~/game-presentation/ui/useGameEvents";
+import type { CommittedTransitionSchema } from "~/game-runtime/schema/CommittedTransitionSchema";
 import type { GameEngine } from "~/playable-game/type/GameEngine";
 import type { PresentationSfxEventEnumSchema } from "~/sfx-event/schema/PresentationSfxEventEnumSchema";
 
@@ -90,12 +89,13 @@ const useGameAudioAtoms = (game: GameEngine, initialSound: SoundSettings) =>
 			},
 		).pipe(Atom.setIdleTTL(0));
 		const playBatchAtom = Atom.fn(
-			(batch: GameEventBatchSchema.Type, get) =>
+			(transition: CommittedTransitionSchema.Type, get) =>
 				Effect.yieldNow.pipe(
 					Effect.andThen(get.result(audioAtom)),
-					Effect.flatMap((audio) =>
-						audio.playFx(readGameAudioCuesFn(batch, game.config.items)),
-					),
+					Effect.flatMap((audio) => {
+						const cues = readVisibleGameAudioCuesFn(transition, game.config.items);
+						return cues.length === 0 ? Effect.void : audio.playFx(cues);
+					}),
 					Effect.catchCause((cause) =>
 						Cause.hasInterruptsOnly(cause)
 							? Effect.void
@@ -224,9 +224,22 @@ export const GameAudio = ({ children }: PropsWithChildren) => {
 		unlockFn,
 	]);
 
-	useGameEvents((batch) => {
-		if (activeAudioAtomsRef.current === audioAtoms) playBatchFn(batch);
-	});
+	useEffect(() => {
+		let replay = true;
+		return game.subscribeTransitionsFn((transition) => {
+			// Transition subscriptions replay the current snapshot; its events are not live audio.
+			if (replay) {
+				replay = false;
+				return;
+			}
+			if (transition.events.length > 0 && activeAudioAtomsRef.current === audioAtoms)
+				playBatchFn(transition);
+		});
+	}, [
+		game,
+		audioAtoms,
+		playBatchFn,
+	]);
 
 	const playSfxEventFn = useCallback(
 		(event: PresentationSfxEventEnumSchema.Type) => {

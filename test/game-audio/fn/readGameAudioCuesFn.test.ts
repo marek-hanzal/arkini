@@ -3,7 +3,11 @@ import { describe, expect, it } from "vitest";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventBatchSchema } from "~/game-event/schema/GameEventBatchSchema";
-import { readGameAudioCuesFn } from "~/game-audio/fn/readGameAudioCuesFn";
+import {
+	readGameAudioCuesFn,
+	readVisibleGameAudioCuesFn,
+} from "~/game-audio/fn/readGameAudioCuesFn";
+import type { CommittedTransitionSchema } from "~/game-runtime/schema/CommittedTransitionSchema";
 
 const boardLocation = {
 	scope: "board" as const,
@@ -44,6 +48,92 @@ const items = {
 };
 
 describe("readGameAudioCuesFn", () => {
+	it("plays only the presented Space, resolving removed job owners from the previous commit", () => {
+		const visibleLocation = {
+			...boardLocation,
+			space: 1,
+		};
+		const previousRuntime = {
+			currentSpace: 0,
+			items: [
+				{
+					id: "runtime:hidden",
+					location: boardLocation,
+				},
+				{
+					id: "runtime:visible",
+					location: visibleLocation,
+				},
+			],
+		} as unknown as CommittedTransitionSchema.Type["runtime"];
+		const runtime = {
+			currentSpace: 1,
+			items: [],
+		} as unknown as CommittedTransitionSchema.Type["runtime"];
+		const transition = {
+			sequence: 1,
+			previousRuntime,
+			runtime,
+			events: [
+				{
+					type: GameEventEnumSchema.enum.CurrentSpaceChanged,
+					previousSpace: 0,
+					currentSpace: 1,
+				},
+				{
+					type: "job:completed",
+					jobId: "job:hidden",
+					ownerItemId: "runtime:hidden",
+					itemUid: "producer",
+					lineUid: "line:1",
+				},
+				{
+					type: "job:completed",
+					jobId: "job:visible",
+					ownerItemId: "runtime:visible",
+					itemUid: "producer",
+					lineUid: "line:1",
+				},
+				{
+					type: "item:spawned",
+					itemId: "runtime:hidden-output",
+					itemUid: "producer",
+					originItemId: "runtime:hidden",
+					location: boardLocation,
+				},
+				{
+					type: "item:spawned",
+					itemId: "runtime:visible-output",
+					itemUid: "producer",
+					originItemId: "runtime:visible",
+					location: visibleLocation,
+				},
+				{
+					type: "item:discarded",
+					ownerItemId: "runtime:hidden",
+					itemUid: "producer",
+					quantity: 1,
+					source: "expiry-outcome",
+					reason: "board:full",
+				},
+			],
+		} satisfies CommittedTransitionSchema.Type;
+
+		expect(readVisibleGameAudioCuesFn(transition, items)).toEqual([
+			{
+				event: GameEventEnumSchema.enum.CurrentSpaceChanged,
+				strength: 1,
+			},
+			{
+				event: GameEventEnumSchema.enum.JobCompleted,
+				strength: 2,
+			},
+			{
+				event: GameEventEnumSchema.enum.ItemSpawned,
+				strength: 1,
+			},
+		]);
+	});
 	it("projects accepted queue work and explicit queue clearing", () => {
 		expect(
 			readGameAudioCuesFn(

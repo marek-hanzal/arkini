@@ -143,7 +143,7 @@ export const List = ({
 						value={query}
 						containerClassName="min-w-64 flex-1"
 						className="h-10 min-h-10 w-full rounded-lg border border-control-border bg-[var(--ak-editor-background)] px-3 text-sm text-foreground outline-none placeholder:text-muted"
-						placeholder={`${translator.textFn("Search item title or ID…")} (${filteredItems.length})`}
+						placeholder={`${translator.textFn("Search items…")} (${filteredItems.length})`}
 						onValueChangeFn={onQueryChangeFn}
 					/>
 					{empty ? null : newItemMenu}

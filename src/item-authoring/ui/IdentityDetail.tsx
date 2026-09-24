@@ -1,3 +1,4 @@
+import { EditorTextAreaControl } from "~/editor-control/ui/EditorValueControls";
 import { EditorMusicSelection } from "~/music-authoring/ui/EditorMusicSelection";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { useTranslator } from "~/translation/ui/useTranslator";
@@ -82,6 +83,15 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 									value={item.description}
 								/>
 							</FactList>
+						)}
+						{item.keywords === undefined ? null : (
+							<EditorTextAreaControl
+								label={translator.textFn("Keywords")}
+								required={false}
+								readOnly
+								value={item.keywords}
+								rows={3}
+							/>
 						)}
 					</div>
 				</EditorRootCard>

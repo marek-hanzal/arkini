@@ -303,6 +303,32 @@ const completeFirstProductionLine = async (container: HTMLElement) => {
 };
 
 describe("item section form session", () => {
+	it("saves multiline keyword edits and clears them without changing Description", async () => {
+		state.saveItem.mockImplementation(async ({ item: saved }) => {
+			state.persisted = saved;
+			return saved;
+		});
+		const { container, renderSection } = await render(<IdentitySection />);
+		const keywords = container.querySelector<HTMLTextAreaElement>('textarea[name="keywords"]');
+		if (keywords === null) throw new Error("Missing Keywords field");
+		const saveButton = [
+			...container.querySelectorAll("button"),
+		].find((button) => button.textContent === "Save");
+		if (saveButton === undefined) throw new Error("Missing Save action");
+		await changeTextArea(keywords, "  currency\ncoins money  ");
+		await act(async () => saveButton.click());
+		expect(state.saveItem.mock.lastCall?.[0].item).toMatchObject({
+			keywords: "currency\ncoins money",
+			description: item.description,
+		});
+		await renderSection(<IdentitySection />);
+		expect(keywords.value).toBe("currency\ncoins money");
+		await changeTextArea(keywords, "   ");
+		await act(async () => saveButton.click());
+		expect(state.saveItem.mock.lastCall?.[0].item).not.toHaveProperty("keywords");
+		expect(state.saveItem.mock.lastCall?.[0].item.description).toBe(item.description);
+	});
+
 	it("renders artwork on direct Clock entry and follows unsaved overlay changes", async () => {
 		state.project = {
 			...(state.project as Project),

@@ -1,3 +1,4 @@
+import { readItemSearchTermsFn } from "~/item-definition/fn/readItemSearchTermsFn";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { createFuzzySearchFn } from "~/fuzzy-search/fn/createFuzzySearchFn";
 
@@ -8,11 +9,7 @@ export const searchFn = (
 ): ReadonlyArray<ItemSchema.Type> => {
 	const fuzzyFn = createFuzzySearchFn({
 		candidates: items.map((item) => ({
-			terms: [
-				item.uid,
-				item.title,
-				item.description ?? "",
-			],
+			terms: readItemSearchTermsFn(item),
 			value: item,
 		})),
 	});

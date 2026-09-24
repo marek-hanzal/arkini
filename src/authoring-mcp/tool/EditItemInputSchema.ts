@@ -11,6 +11,7 @@ const itemPatch = z
 	.extend({
 		units: ItemSchema.shape.units.nullable(),
 		description: ItemSchema.shape.description.nullable(),
+		keywords: ItemSchema.shape.keywords.nullable(),
 		merge: ItemSchema.shape.merge.nullable(),
 		clock: ItemSchema.shape.clock.nullable(),
 		ui: ItemSchema.shape.ui.removeDefault().optional(),

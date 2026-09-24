@@ -21,6 +21,7 @@ describe("editor MCP item editing", () => {
 		);
 		const water = {
 			...editorTestPayload.config.items.water,
+			keywords: "drink\nfresh liquid",
 			ui: "simple" as const,
 		};
 		const producer = {
@@ -90,6 +91,7 @@ describe("editor MCP item editing", () => {
 				revision: waterConfig.revision,
 				patch: {
 					description: null,
+					keywords: null,
 					title: "Fresh Water",
 				},
 			}),
@@ -103,7 +105,7 @@ describe("editor MCP item editing", () => {
 						"Edited item.",
 						"UID: water",
 						`Revision: ${project.revision}`,
-						"Replaced: description, title",
+						"Replaced: description, keywords, title",
 					].join("\n"),
 				},
 			],
@@ -111,6 +113,7 @@ describe("editor MCP item editing", () => {
 		expect(project.config.items.water).toEqual({
 			...water,
 			description: undefined,
+			keywords: undefined,
 			title: "Fresh Water",
 		});
 		expect(notifyProjectChanged).toHaveBeenCalledExactlyOnceWith("edit-simple-project");

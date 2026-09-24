@@ -9,7 +9,7 @@ import type { InputSchema as LineInputSchema } from "~/production-input/schema/I
 /** Local presentation values owned only by one mounted item form. */
 export type FormValues = Omit<
 	ItemSchema.Type,
-	"artwork" | "description" | "merge" | "lines" | "maxQueueSize"
+	"artwork" | "description" | "keywords" | "merge" | "lines" | "maxQueueSize"
 > & {
 	readonly artwork: {
 		readonly scale: number;
@@ -19,6 +19,7 @@ export type FormValues = Omit<
 		];
 	};
 	readonly description: string;
+	readonly keywords: string;
 	readonly clock?: ItemScheduleSchema.Type;
 	readonly lines?: LineSchema.Type[];
 	readonly maxQueueSize?: number;
@@ -84,9 +85,14 @@ const bindSelfPaidUnitsInputsToOwnerFn = (candidate: FormValues): FormValues => 
  */
 export const FormSchema = z.custom<FormValues>().transform((candidate, context) => {
 	const normalized = bindSelfPaidUnitsInputsToOwnerFn(candidate);
-	const { description, ...item } = normalized;
+	const { description, keywords, ...item } = normalized;
 	const result = ItemSchema.safeParse({
 		...item,
+		...((keywords?.trim() ?? "") === ""
+			? {}
+			: {
+					keywords,
+				}),
 		...(description.trim() === ""
 			? {}
 			: {

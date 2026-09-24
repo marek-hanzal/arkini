@@ -965,6 +965,8 @@ Keep at most one item.:
 Keep at most {maximum} items.:
   value: Keep at most {maximum} items.
   dynamic: true
+Keywords:
+  value: Keywords
 Kill switch:
   value: Stop immediately
 Left click to bring this here.:
@@ -1744,10 +1746,10 @@ Search artwork…:
   value: Search artwork…
 Search images...:
   value: Search images...
-Search item title or ID…:
-  value: Search item title or ID…
 Search item title, ID or type…:
   value: Search item title, ID or type…
+Search items…:
+  value: Search items…
 Search music…:
   value: Search music…
 Search templates...:

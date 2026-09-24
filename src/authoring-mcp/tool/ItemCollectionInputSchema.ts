@@ -13,7 +13,7 @@ export const ItemCollectionInputSchema = z
 		query: z
 			.string()
 			.optional()
-			.describe("Optional fuzzy search across item title, ID, and description."),
+			.describe("Optional fuzzy search across item title, ID, description, and keywords."),
 	})
 	.strict()
 	.meta({

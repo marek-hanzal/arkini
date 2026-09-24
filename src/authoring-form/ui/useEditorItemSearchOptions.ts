@@ -1,3 +1,4 @@
+import { readItemSearchTermsFn } from "~/item-definition/fn/readItemSearchTermsFn";
 import { useCallback, useMemo } from "react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
@@ -22,11 +23,7 @@ export const useEditorItemSearchOptions = (
 						({
 							id: item.uid,
 							label: item.title,
-							terms: [
-								item.uid,
-								item.title,
-								item.description ?? "",
-							],
+							terms: readItemSearchTermsFn(item),
 						}) satisfies EditorSearchOption,
 				),
 		[

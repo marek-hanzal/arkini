@@ -153,10 +153,12 @@ export const EditorTextAreaControl = ({
 	placeholder,
 	required = true,
 	rows = 4,
+	readOnly,
 	value,
 }: {
 	readonly fill?: boolean;
-	readonly onChangeFn: (value: string) => void;
+	readonly readOnly?: boolean;
+	readonly onChangeFn?: (value: string) => void;
 	readonly placeholder?: string;
 	readonly rows?: number;
 	readonly value: string;
@@ -169,13 +171,14 @@ export const EditorTextAreaControl = ({
 		required={required}
 	>
 		<textarea
+			readOnly={readOnly}
 			name={name}
 			value={value}
 			className={`${editorInputClassName} ${fill ? "h-full resize-none" : "resize-y"} leading-6`}
 			placeholder={placeholder}
 			rows={rows}
 			onBlur={onBlurFn}
-			onChange={(event) => onChangeFn(event.currentTarget.value)}
+			onChange={(event) => onChangeFn?.(event.currentTarget.value)}
 			{...readDataUiFn({
 				dataUi: "EditorTextAreaControlInput",
 				state: {

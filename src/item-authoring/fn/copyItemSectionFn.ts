@@ -21,6 +21,7 @@ export const copyItemSectionFn = (
 			...current,
 			title: source.title,
 			description: source.description ?? "",
+			keywords: source.keywords ?? "",
 			ui: source.ui,
 			music: source.music,
 		}))

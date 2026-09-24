@@ -67,6 +67,7 @@ export namespace useFormController {
 const readFormValuesFn = (item: ItemSchema.Type): FormValues => ({
 	...item,
 	description: item.description ?? "",
+	keywords: item.keywords ?? "",
 	artwork: {
 		scale: item.artwork.scale,
 		default: [
@@ -191,6 +192,7 @@ export const useFormController = ({
 			if (current.title !== next.title) form.setFieldValue("title", next.title);
 			if (current.description !== next.description)
 				form.setFieldValue("description", next.description);
+			if (current.keywords !== next.keywords) form.setFieldValue("keywords", next.keywords);
 			if (current.ui !== next.ui) form.setFieldValue("ui", next.ui);
 			if (current.artwork !== next.artwork) form.setFieldValue("artwork", next.artwork);
 			if (current.lines !== next.lines) form.setFieldValue("lines", next.lines);

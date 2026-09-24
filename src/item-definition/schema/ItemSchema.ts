@@ -28,6 +28,12 @@ export const ItemSchema = z
 		description: DescriptionSchema.optional().describe(
 			"The optional human-readable explanation of this item's purpose.",
 		),
+		keywords: z
+			.string()
+			.trim()
+			.min(1)
+			.optional()
+			.describe("Optional free-text search keywords and aliases for this item."),
 		ui: z
 			.enum([
 				"simple",

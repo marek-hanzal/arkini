@@ -23,6 +23,71 @@ beforeEach(async () => {
 afterEach(async () => harness.close());
 
 describe("filesystem Editor project writes", () => {
+	it("persists item search keywords through config edits and reopen, then clears only that field", async () => {
+		const repository = await harness.openRepository();
+		const created = await harness.createProject(repository);
+		const water = created.config.items.water;
+		const keywords = "river spring\ndrinking water";
+		const saved = await Effect.runPromise(
+			repository.upsertItemFx({
+				projectId: created.projectId,
+				expectedRevision: created.revision,
+				item: {
+					...water,
+					keywords,
+				},
+			}),
+		);
+		expect(saved.config.items.water).toEqual({
+			...water,
+			keywords,
+		});
+		const changed = await Effect.runPromise(
+			repository.replaceConfigFx({
+				projectId: created.projectId,
+				expectedRevision: saved.revision,
+				config: {
+					...saved.config,
+					meta: {
+						...saved.config.meta,
+						title: "Updated project",
+					},
+				},
+			}),
+		);
+		await harness.closeRepository(repository);
+		const reopenedRepository = await harness.openRepository();
+		const reopened = await Effect.runPromise(
+			reopenedRepository.readProjectFx(created.projectId),
+		);
+		if (reopened === null) throw new Error("Reopened project missing.");
+		expect(reopened.config).toEqual(changed.config);
+		expect(reopened.config.items.water.keywords).toBe(keywords);
+
+		const { keywords: _keywords, ...withoutKeywords } = reopened.config.items.water;
+		const cleared = await Effect.runPromise(
+			reopenedRepository.upsertItemFx({
+				projectId: created.projectId,
+				expectedRevision: reopened.revision,
+				item: withoutKeywords,
+			}),
+		);
+		expect(cleared.config).toEqual({
+			...changed.config,
+			items: {
+				...changed.config.items,
+				water,
+			},
+		});
+		await harness.closeRepository(reopenedRepository);
+		const clearedRepository = await harness.openRepository();
+		const persisted = await Effect.runPromise(
+			clearedRepository.readProjectFx(created.projectId),
+		);
+		expect(persisted?.config).toEqual(cleared.config);
+		expect(persisted?.resources).toEqual(created.resources);
+	});
+
 	it("rekeys a renamed package while preserving its version and Notes", async () => {
 		const repository = await harness.openRepository();
 		const created = await harness.createProject(repository);

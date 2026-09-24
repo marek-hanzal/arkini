@@ -1,3 +1,4 @@
+import { readItemSearchTermsFn } from "~/item-definition/fn/readItemSearchTermsFn";
 import { useMemo, useState } from "react";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
@@ -120,10 +121,7 @@ export const ConnectionsSection = ({
 			options.set(`item:${item.uid}`, {
 				id: `item:${item.uid}`,
 				label: item.title,
-				terms: [
-					item.uid,
-					item.title,
-				],
+				terms: readItemSearchTermsFn(item),
 			});
 		for (const template of project.config.templates ?? [])
 			options.set(`template:${template.uid}`, {

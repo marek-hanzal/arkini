@@ -66,6 +66,7 @@ const destination: FormValues = {
 	uid: "destination",
 	title: "Destination",
 	description: "Keep this unsaved description",
+	keywords: "Keep unsaved aliases",
 	artwork: {
 		scale: 1,
 		default: [

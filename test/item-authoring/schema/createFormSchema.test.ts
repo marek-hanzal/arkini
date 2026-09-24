@@ -28,6 +28,7 @@ const createTargetPaidInput = (itemUid: string) => ({
 const readFormValues = (item: ItemSchema.Type): FormValues => ({
 	...item,
 	description: item.description ?? "",
+	keywords: item.keywords ?? "",
 	artwork: {
 		scale: item.artwork.scale,
 		default: [

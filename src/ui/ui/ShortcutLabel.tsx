@@ -1,10 +1,8 @@
 /** Highlights the actual mnemonic; the owning control supplies its selected visual state. */
 export const ShortcutLabel = ({
-	highlightClassName = "text-accent",
 	label,
 	shortcut,
 }: {
-	readonly highlightClassName?: string;
 	readonly label: string;
 	readonly shortcut?: string;
 }) => {
@@ -19,9 +17,7 @@ export const ShortcutLabel = ({
 			) : (
 				<>
 					{label.slice(0, index)}
-					<span
-						className={`${highlightClassName} group-data-[ui-selected=true]/shortcut:text-inherit`}
-					>
+					<span className="text-accent group-data-[ui-selected=true]/shortcut:text-inherit">
 						{label[index]}
 					</span>
 					{label.slice(index + 1)}

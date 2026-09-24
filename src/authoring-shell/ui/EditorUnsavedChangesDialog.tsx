@@ -8,7 +8,6 @@ import { useSyncExternalStore, type KeyboardEvent } from "react";
 import { useEditorUnsavedChangesOwner } from "~/authoring-session/ui/useEditorUnsavedChangesRegistration";
 import { Button, PrimaryButton } from "~/ui/ui/Button";
 import { LinkButton } from "~/ui/ui/LinkButton";
-import { ShortcutLabel } from "~/ui/ui/ShortcutLabel";
 import { useOverlayFocus } from "~/ui/ui/useOverlayFocus";
 import type { EditorUnsavedChangesSnapshot } from "~/authoring-session/service/EditorUnsavedChanges";
 
@@ -77,11 +76,7 @@ const EditorUnsavedChangesPrompt = ({
 						onClick={() => void owner.decideFn("discard")}
 					>
 						<Trash2 className="size-4" />
-						<ShortcutLabel
-							highlightClassName="text-shortcut-highlight"
-							label={translator.textFn("Discard")}
-							shortcut="d"
-						/>
+						{translator.textFn("Discard")}
 					</LinkButton>
 					<div className="flex items-center gap-2">
 						<Button
@@ -90,11 +85,7 @@ const EditorUnsavedChangesPrompt = ({
 							onClick={() => void owner.decideFn("cancel")}
 						>
 							<X className="size-4" />
-							<ShortcutLabel
-								highlightClassName="text-shortcut-highlight"
-								label={translator.textFn("Cancel")}
-								shortcut="c"
-							/>
+							{translator.textFn("Cancel")}
 						</Button>
 						<PrimaryButton
 							className="gap-1.5"
@@ -108,11 +99,7 @@ const EditorUnsavedChangesPrompt = ({
 							onClick={() => void owner.decideFn("save")}
 						>
 							<Save className="size-4" />
-							<ShortcutLabel
-								highlightClassName="text-shortcut-highlight-on-accent"
-								label={translator.textFn("Save")}
-								shortcut="s"
-							/>
+							{translator.textFn("Save")}
 						</PrimaryButton>
 					</div>
 				</div>

@@ -43,12 +43,20 @@ export const MergeField = ({
 	const validationIssues = useFormValidationIssues(merge);
 	const sourceError = readEditorFormValidationErrorFn(validationIssues, "action");
 	const targetError = readEditorFormValidationErrorFn(validationIssues, "effect");
+	const selectedSpaceKind =
+		merge.action !== "space"
+			? undefined
+			: typeof merge.space === "number"
+				? "exact"
+				: merge.space === "previous"
+					? "previous"
+					: "generated";
 	const spaceActionLabel =
-		merge.action !== "space" || typeof merge.space === "number"
-			? translator.textFn("Space")
-			: merge.space === "previous"
-				? translator.textFn("Previous Space")
-				: translator.textFn("Generated Space");
+		selectedSpaceKind === "previous"
+			? translator.textFn("Previous Space")
+			: selectedSpaceKind === "generated"
+				? translator.textFn("Generated Space")
+				: translator.textFn("Space");
 	const selectSpaceFn = (space: SpaceDestinationSchema.Type) => {
 		if (merge.action === "space" && merge.space === space) return;
 		const effect =
@@ -109,6 +117,7 @@ export const MergeField = ({
 								menuOptions: [
 									{
 										id: "exact",
+										selected: selectedSpaceKind === "exact",
 										label: translator.textFn("Space"),
 										description: translator.textFn(
 											"Move the dropped item to an exact space number.",
@@ -124,6 +133,7 @@ export const MergeField = ({
 									},
 									{
 										id: "previous",
+										selected: selectedSpaceKind === "previous",
 										label: translator.textFn("Previous Space"),
 										description: translator.textFn(
 											"Move the dropped item to the last space left. Without history, the merge is rejected.",
@@ -133,6 +143,7 @@ export const MergeField = ({
 									},
 									{
 										id: "generated",
+										selected: selectedSpaceKind === "generated",
 										label: translator.textFn("Generated Space"),
 										description: translator.textFn(
 											"Move the dropped item into the receiver's private room.",

@@ -10,6 +10,7 @@ import {
 	useFloating,
 	useInteractions,
 } from "@floating-ui/react";
+import { Check } from "lucide-react";
 import { useState, type ButtonHTMLAttributes, type ReactNode, type Ref } from "react";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
@@ -19,6 +20,7 @@ export interface ActionMenuOption {
 	readonly description: string;
 	readonly icon: ReactNode;
 	readonly disabled?: boolean;
+	readonly selected?: boolean;
 	readonly onSelectFn: () => void;
 }
 
@@ -80,7 +82,7 @@ export const ActionMenu = ({
 								key={option.id}
 								type="button"
 								disabled={option.disabled}
-								className="flex cursor-pointer items-start gap-3 rounded-lg px-3 py-2.5 text-left text-foreground enabled:hover:bg-surface-raised disabled:cursor-not-allowed disabled:opacity-50"
+								className="ak-action-menu-option flex cursor-pointer items-start gap-3 rounded-lg px-3 py-2.5 text-left text-foreground disabled:cursor-not-allowed disabled:opacity-50"
 								onClick={() => {
 									setOpenFn(false);
 									option.onSelectFn();
@@ -89,6 +91,7 @@ export const ActionMenu = ({
 									dataUi: "ActionMenuOption",
 									state: {
 										id: option.id,
+										selected: option.selected,
 									},
 								})}
 							>
@@ -101,6 +104,9 @@ export const ActionMenu = ({
 										{option.description}
 									</span>
 								</span>
+								{option.selected ? (
+									<Check className="ml-auto mt-0.5 size-4 shrink-0 text-accent" />
+								) : null}
 							</button>
 						))}
 					</div>

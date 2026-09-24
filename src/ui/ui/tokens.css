@@ -14,8 +14,6 @@
 	--color-accent: var(--ak-accent);
 	--color-accent-hover: var(--ak-accent-hover);
 	--color-accent-contrast: var(--ak-accent-contrast);
-	--color-shortcut-highlight: var(--ak-shortcut-highlight);
-	--color-shortcut-highlight-on-accent: var(--ak-shortcut-highlight-on-accent);
 	--color-info: var(--ak-info);
 	--color-info-contrast: var(--ak-info-contrast);
 	--color-secondary-subtle: var(--ak-secondary-subtle);
@@ -62,8 +60,6 @@
 	--ak-accent: light-dark(#b9247d, #f05bb8);
 	--ak-accent-hover: light-dark(#9e1969, #ff7ccc);
 	--ak-accent-contrast: light-dark(#fff9fc, #2a0a1d);
-	--ak-shortcut-highlight: light-dark(#9e1969, #f5c4e3);
-	--ak-shortcut-highlight-on-accent: light-dark(#2a0a1d, #f5c4e3);
 	--ak-info: light-dark(#4b4da8, #8e90f8);
 	--ak-info-contrast: light-dark(#fff, #0c1030);
 	--ak-success: light-dark(#75508c, #caa9df);

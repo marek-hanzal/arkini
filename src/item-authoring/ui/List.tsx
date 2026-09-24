@@ -22,7 +22,6 @@ import { Status } from "~/ui/ui/Status";
 import { SearchInput } from "~/ui/ui/SearchInput";
 import { useDebouncedSearchQuery } from "~/ui/ui/useDebouncedSearchQuery";
 import { useTranslator } from "~/translation/ui/useTranslator";
-import { ShortcutLabel } from "~/ui/ui/ShortcutLabel";
 import { Tooltip } from "~/ui/ui/Tooltip";
 
 const readItemKeyFn = (item: ItemSchema.Type) => item.uid;
@@ -140,11 +139,7 @@ export const List = ({
 				variant="primary"
 			>
 				<Plus className="size-4" />
-				<ShortcutLabel
-					highlightClassName="text-shortcut-highlight-on-accent"
-					label={translator.textFn("New item")}
-					shortcut="n"
-				/>
+				{translator.textFn("New item")}
 			</CreateItemLink>
 		</Tooltip>
 	);

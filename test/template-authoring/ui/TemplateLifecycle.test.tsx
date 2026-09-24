@@ -70,6 +70,14 @@ vi.mock("~/authoring-shell/ui/EditorHistoryBackButton", () => ({
 }));
 vi.mock("~/ui/ui/Button", () => ({
 	Button: (props: ButtonHTMLAttributes<HTMLButtonElement>) => createElement("button", props),
+	ButtonLink: ({ children, ...destination }: { children: ReactNode }) =>
+		createElement(
+			"a",
+			{
+				onClick: () => state.navigate(destination),
+			},
+			children,
+		),
 	DangerButton: (props: ButtonHTMLAttributes<HTMLButtonElement>) =>
 		createElement("button", props),
 	PrimaryButtonLink: ({
@@ -490,10 +498,36 @@ it("blocks template deletion while an authored outcome references its UID", asyn
 			},
 		},
 	};
-	await beginDeleteFn();
+	await act(async () =>
+		root.render(
+			<TemplateDetail
+				templateUid="template"
+				section="delete"
+			/>,
+		),
+	);
 	expect(state.save).not.toHaveBeenCalled();
-	expect(
-		container.querySelectorAll("button").item(container.querySelectorAll("button").length - 1)
-			.disabled,
-	).toBe(true);
+	const blockerLink = container.querySelector<HTMLAnchorElement>(
+		"[data-ui='TemplateDeleteBlockers'] a",
+	);
+	expect(blockerLink).not.toBeNull();
+	expect(container.querySelector("button")).toBeNull();
+	await act(async () => blockerLink!.click());
+	expect(state.navigate).toHaveBeenCalledWith(
+		expect.objectContaining({
+			to: "/editor/$projectId/editor/items/$itemUid/form/$sectionId",
+			params: {
+				projectId: "project",
+				itemUid: "portal",
+				sectionId: "production",
+			},
+			search: {
+				lineUid: expect.any(String),
+				merge: undefined,
+				outcomeSet: 0,
+				outcomeRoll: 0,
+				outcomeIndex: 0,
+			},
+		}),
+	);
 });

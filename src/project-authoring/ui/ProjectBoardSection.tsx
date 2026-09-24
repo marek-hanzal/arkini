@@ -9,12 +9,12 @@ import { EditorNumberControl } from "~/editor-control/ui/EditorValueControls";
 import { Status } from "~/ui/ui/Status";
 import { PanelsTopLeft } from "lucide-react";
 
-export const ProjectBoardSection = () => {
+export const ProjectBoardSection = ({ initialSpace }: { readonly initialSpace?: number }) => {
 	const translator = useTranslator();
 	const { form, validationIssues } = useProjectFormSession();
 	const start = useStore(form.store, (state) => state.values.start);
 	const templates = useStore(form.store, (state) => state.values.templates);
-	const [selectedSpace, setSelectedSpaceFn] = useState(start.currentSpace);
+	const [selectedSpace, setSelectedSpaceFn] = useState(initialSpace ?? start.currentSpace);
 	const templateUid = start.spaces.find((entry) => entry.space === selectedSpace)?.templateUid;
 	const template = templates.find((entry) => entry.uid === templateUid);
 	const firstIssue = validationIssues.find(

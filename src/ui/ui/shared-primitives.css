@@ -11,6 +11,17 @@
 	display: none;
 }
 
+.ak-action-menu-option[data-ui-selected="true"] {
+	color: var(--ak-secondary-foreground);
+	background-color: var(--ak-secondary-selected);
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.ak-action-menu-option:not(:disabled):not([data-ui-selected="true"]):hover {
+		background-color: var(--ak-surface-raised);
+	}
+}
+
 .ak-list {
 	isolation: isolate;
 	row-gap: 0;

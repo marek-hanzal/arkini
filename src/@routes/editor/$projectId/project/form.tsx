@@ -5,16 +5,25 @@ import type { ProjectSectionId } from "~/project-authoring/type/ProjectSections"
 
 interface EditorProjectFormSearch {
 	readonly avatar?: number;
+	readonly space?: number;
 }
 
 export const Route = createFileRoute("/editor/$projectId/project/form")({
 	validateSearch: (search): EditorProjectFormSearch => {
 		const avatar = typeof search.avatar === "number" ? search.avatar : Number.NaN;
-		return Number.isInteger(avatar) && avatar >= 0
-			? {
-					avatar,
-				}
-			: {};
+		const space = typeof search.space === "number" ? search.space : Number.NaN;
+		return {
+			...(Number.isInteger(avatar) && avatar >= 0
+				? {
+						avatar,
+					}
+				: {}),
+			...(Number.isSafeInteger(space) && space >= 0
+				? {
+						space,
+					}
+				: {}),
+		};
 	},
 	component: () => {
 		const params = useParams({

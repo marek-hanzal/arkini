@@ -2,7 +2,6 @@ import type { LucideIcon } from "lucide-react";
 import { Power } from "lucide-react";
 
 import { PrimaryButton } from "~/ui/ui/Button";
-import { ShortcutLabel } from "~/ui/ui/ShortcutLabel";
 import { Status } from "~/ui/ui/Status";
 import { useSectionShortcuts } from "~/ui/ui/useSectionShortcuts";
 
@@ -45,11 +44,7 @@ export const EditorCapabilityStatus = ({
 					onClick={onEnableFn}
 				>
 					<Power className="size-4" />
-					<ShortcutLabel
-						highlightClassName="text-shortcut-highlight-on-accent"
-						label={actionLabel}
-						shortcut="e"
-					/>
+					{actionLabel}
 				</PrimaryButton>
 			}
 			dataUi={dataUi}

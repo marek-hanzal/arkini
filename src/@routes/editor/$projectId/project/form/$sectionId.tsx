@@ -22,7 +22,7 @@ export const Route = createFileRoute("/editor/$projectId/project/form/$sectionId
 	},
 	component: () => {
 		const { sectionId } = Route.useParams();
-		const { avatar } = Route.useSearch();
+		const { avatar, space } = Route.useSearch();
 		return match(sectionId as ProjectSectionId)
 			.with("introduction", () => {
 				return <ProjectIntroductionSection />;
@@ -34,7 +34,12 @@ export const Route = createFileRoute("/editor/$projectId/project/form/$sectionId
 				return <ProjectImagesSection initialAvatarIndex={avatar} />;
 			})
 			.with("board", () => {
-				return <ProjectBoardSection />;
+				return (
+					<ProjectBoardSection
+						key={space}
+						initialSpace={space}
+					/>
+				);
 			})
 			.exhaustive();
 	},

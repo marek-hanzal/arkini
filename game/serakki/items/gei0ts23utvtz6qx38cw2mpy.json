@@ -402,6 +402,40 @@
 				},
 				"effect": "replace",
 				"result": "sai5thegm85dr4fptu7689bz"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemUid": "h408uew16iniwj9h93gz1h1o"
+				},
+				"action": "consume",
+				"outcome": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"outcome": [
+										{
+											"type": "item",
+											"itemUid": "w3x58j053qf9fgq90wqqtylq",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"effect": "replace",
+				"result": "cmx82bxkksin9kijenmoint2"
 			}
 		],
 		"maxQueueSize": 1,

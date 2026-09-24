@@ -121,6 +121,15 @@
 				"action": "spend",
 				"effect": "replace",
 				"result": "sai5thegm85dr4fptu7689bz"
+			},
+			{
+				"target": {
+					"type": "item",
+					"itemUid": "h408uew16iniwj9h93gz1h1o"
+				},
+				"action": "spend",
+				"effect": "replace",
+				"result": "cmx82bxkksin9kijenmoint2"
 			}
 		],
 		"maxQueueSize": 1,

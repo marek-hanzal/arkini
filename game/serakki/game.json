@@ -311,6 +311,74 @@
 					"itemUid": "ilbwt5g7ougy6iu73pgiw7py"
 				}
 			]
+		},
+		{
+			"uid": "f0444ea2-cb2e-448b-be55-13bb7f1e785d",
+			"title": "Kaboom",
+			"width": 7,
+			"height": 7,
+			"board": [
+				{
+					"x": 3,
+					"y": 3,
+					"itemUid": "rok1ie5bkngxk1qbyre9mssz"
+				},
+				{
+					"x": 2,
+					"y": 3,
+					"itemUid": "rp06r6pjrhyhxxkujos2r1md"
+				},
+				{
+					"x": 4,
+					"y": 4,
+					"itemUid": "rp06r6pjrhyhxxkujos2r1md"
+				},
+				{
+					"x": 4,
+					"y": 1,
+					"itemUid": "ubo4ux37gz2ya3qfsj78a9oq"
+				},
+				{
+					"x": 0,
+					"y": 2,
+					"itemUid": "isr1iw451e8km1lo7pejzjht"
+				},
+				{
+					"x": 5,
+					"y": 3,
+					"itemUid": "isr1iw451e8km1lo7pejzjht"
+				},
+				{
+					"x": 1,
+					"y": 5,
+					"itemUid": "rok1ie5bkngxk1qbyre9mssz"
+				},
+				{
+					"x": 2,
+					"y": 1,
+					"itemUid": "adwkzsf6f7sy2mtg0rpi09wr"
+				},
+				{
+					"x": 3,
+					"y": 6,
+					"itemUid": "rp06r6pjrhyhxxkujos2r1md"
+				},
+				{
+					"x": 1,
+					"y": 2,
+					"itemUid": "rp06r6pjrhyhxxkujos2r1md"
+				},
+				{
+					"x": 0,
+					"y": 0,
+					"itemUid": "rok1ie5bkngxk1qbyre9mssz"
+				},
+				{
+					"x": 5,
+					"y": 6,
+					"itemUid": "rok1ie5bkngxk1qbyre9mssz"
+				}
+			]
 		}
 	],
 	"start": {

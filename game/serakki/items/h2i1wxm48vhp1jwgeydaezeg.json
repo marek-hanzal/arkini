@@ -1,0 +1,53 @@
+{
+	"$schema": "../schema.json",
+	"item": {
+		"uid": "h2i1wxm48vhp1jwgeydaezeg",
+		"title": "Atomic Rocket",
+		"ui": "simple",
+		"artwork": {
+			"scale": 1,
+			"default": [
+				"ciyc7r15homie9v5mn97njn7"
+			]
+		},
+		"maxQueueSize": 1,
+		"lines": [
+			{
+				"uid": "pc7aopcgelvphxsatis54kak",
+				"title": "Boom",
+				"description": "Boom",
+				"clockWeight": 1,
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "simple"
+					}
+				],
+				"outcome": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"outcome": [
+										{
+											"type": "template",
+											"templateUid": "f0444ea2-cb2e-448b-be55-13bb7f1e785d",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
+	}
+}

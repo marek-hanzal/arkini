@@ -24,7 +24,8 @@
 		},
 		"types": [
 			"node",
-			"electron"
+			"electron",
+			"vite/client"
 		],
 		"resolveJsonModule": true
 	},

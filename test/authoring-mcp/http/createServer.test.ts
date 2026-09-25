@@ -28,6 +28,7 @@ describe("editor MCP server", () => {
 		});
 		const tools = await client.listTools();
 		expect(tools.tools.map(({ name }) => name)).toEqual([
+			"knowledge",
 			"schema_json",
 			"create_item",
 			"edit_item",

@@ -85,6 +85,7 @@ Every MCP tool publishes explicit behavior annotations: reads are non-destructiv
 
 | Purpose | Tools |
 | --- | --- |
+| Gameplay and authoring handbook | `knowledge` |
 | Text discovery and inspection | `project`, `item_collection`, `item_detail`, `item_lines`, `template_collection`, `template_detail`, `note_collection`, `note_detail`, `artwork_collection` |
 | Text relationship discovery | `graph_search`, `graph_connections`, `graph_operations`, `graph_path`, `graph_flow`, `graph_traverse`, `graph_audit`, `graph_batch` |
 | Structured documents | `project_json`, `item_json`, `items_json`, `item_line_json`, `item_lines_json`, `template_json`, `graph_operations_json` |

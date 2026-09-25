@@ -6,6 +6,7 @@ import { Effect } from "effect";
 import { z } from "zod";
 
 import { SerakkiAppVersion } from "~shared/SerakkiAppMetadata";
+import KnowledgeMarkdown from "../knowledge.md?raw";
 import type { Project } from "~/project-authoring/type/Project";
 import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
 import { IdSchema } from "~/game-value/schema/IdSchema";
@@ -41,6 +42,12 @@ const ProjectInputSchema = z.object({}).strict().meta({
 	$id: "urn:serakki:schema:mcp:project-input",
 	title: "Project tool input",
 	description: "The project summary tool accepts no arguments.",
+});
+
+const KnowledgeInputSchema = z.object({}).strict().meta({
+	$id: "urn:serakki:schema:mcp:knowledge-input",
+	title: "Knowledge handbook tool input",
+	description: "The knowledge handbook tool accepts no arguments.",
 });
 
 const ItemDetailInputSchema = z
@@ -410,10 +417,20 @@ const createServerFn = (
 		},
 		{
 			instructions:
-				"Every project tool targets only the project currently open in the Serakki editor. Tools without a format suffix return concise formatted text. Tools ending in _json return one valid JSON document; plural names hold multiple results with shared metadata. No JSONL tools are exposed. Structurally large create and edit inputs are serialized JSON strings: retrieve the exact schema named by their tool description through schema_json with optional resolveDepth (0–2) to inline registered references. Remaining $refs can be read through schema_json again. Create and edit tools persist canonical saved editor state. For board templates, start with template_collection, then template_detail (text) or template_json (canonical JSON); use focused template mutations instead of replacing the project templates array.",
+				"Every project tool targets only the project currently open in the Serakki editor. Read knowledge before non-trivial content authoring or reasoning about combined game systems; use schema_json for exact data shapes. Tools without a format suffix return concise formatted text. Tools ending in _json return one valid JSON document; plural names hold multiple results with shared metadata. No JSONL tools are exposed. Structurally large create and edit inputs are serialized JSON strings: retrieve the exact schema named by their tool description through schema_json with optional resolveDepth (0–2) to inline registered references. Remaining $refs can be read through schema_json again. Create and edit tools persist canonical saved editor state. For board templates, start with template_collection, then template_detail (text) or template_json (canonical JSON); use focused template mutations instead of replacing the project templates array.",
 		},
 	);
 	const readProjectFx = () => readCurrentProjectFx(repository, readProjectContextFn);
+	server.registerTool(
+		"knowledge",
+		{
+			annotations: EditorToolAnnotations.readOnly,
+			description:
+				"Returns the Serakki gameplay/authoring knowledge handbook. Read it before performing non-trivial content authoring or reasoning about how multiple game systems should be combined. Schemas remain authoritative for exact data shapes; this document describes semantics, conventions, compound patterns, invariants and common authoring pitfalls.",
+			inputSchema: KnowledgeInputSchema,
+		},
+		async () => runToolFn(Effect.succeed(KnowledgeMarkdown)),
+	);
 	server.registerTool(
 		"schema_json",
 		{

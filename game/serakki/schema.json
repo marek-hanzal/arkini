@@ -1432,7 +1432,7 @@
 					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
 				},
 				"description": {
-					"description": "The human-readable explanation of this product line's purpose.",
+					"description": "Optional human-readable explanation of this product line's purpose.",
 					"$ref": "urn:serakki:schema:project#/$defs/DescriptionSchema"
 				},
 				"clock": {
@@ -1491,7 +1491,6 @@
 			"required": [
 				"uid",
 				"title",
-				"description",
 				"clockWeight",
 				"default",
 				"show",

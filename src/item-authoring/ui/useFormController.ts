@@ -1,7 +1,6 @@
 import { match } from "ts-pattern";
 import { createId } from "@paralleldrive/cuid2";
 import { ProjectWriteAdmission } from "~/project-authoring/service/ProjectWriteAdmission";
-import { copyItemSectionFn } from "~/item-authoring/fn/copyItemSectionFn";
 import { createLineFn } from "~/production-authoring/fn/createLineFn";
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
@@ -66,6 +65,10 @@ export namespace useFormController {
 
 const readFormValuesFn = (item: ItemSchema.Type): FormValues => ({
 	...item,
+	lines: item.lines.map((line) => ({
+		...line,
+		description: line.description ?? "",
+	})),
 	description: item.description ?? "",
 	keywords: item.keywords ?? "",
 	artwork: {
@@ -174,39 +177,6 @@ export const useFormController = ({
 			if (notifyOnSaved.current) await onSavedFn?.(saved);
 		},
 	});
-	const copySectionFn = useCallback(
-		(source: ItemSchema.Type, section: copyItemSectionFn.Section) => {
-			if (form.state.isSubmitting || source.uid === initialItem.uid) return;
-			const current = form.state.values;
-			const next = copyItemSectionFn(
-				current,
-				source,
-				section,
-				section === "production"
-					? source.lines.map((line) => ({
-							...line,
-							uid: createId(),
-						}))
-					: [],
-			);
-			if (current.title !== next.title) form.setFieldValue("title", next.title);
-			if (current.description !== next.description)
-				form.setFieldValue("description", next.description);
-			if (current.keywords !== next.keywords) form.setFieldValue("keywords", next.keywords);
-			if (current.ui !== next.ui) form.setFieldValue("ui", next.ui);
-			if (current.artwork !== next.artwork) form.setFieldValue("artwork", next.artwork);
-			if (current.lines !== next.lines) form.setFieldValue("lines", next.lines);
-			if (current.maxQueueSize !== next.maxQueueSize)
-				form.setFieldValue("maxQueueSize", next.maxQueueSize);
-			if (current.merge !== next.merge) form.setFieldValue("merge", next.merge);
-			if (current.units !== next.units) form.setFieldValue("units", next.units);
-			if (current.clock !== next.clock) form.setFieldValue("clock", next.clock);
-		},
-		[
-			form,
-			initialItem.uid,
-		],
-	);
 	const enableClockFn = useCallback(() => {
 		if (form.state.values.clock !== undefined) return;
 		form.setFieldValue("clock", {
@@ -218,9 +188,14 @@ export const useFormController = ({
 		form,
 	]);
 	const enableProductionFn = useCallback(() => {
-		if ((form.state.values.lines ?? []).length > 0) return;
+		const lines = form.state.values.lines ?? [];
+		if (lines.some((line) => line.clock === undefined)) return;
 		form.setFieldValue("lines", [
-			createLineFn([], "", "", createId()),
+			...lines,
+			{
+				...createLineFn(lines, "", "", createId()),
+				default: !lines.some((line) => line.default),
+			},
 		]);
 	}, [
 		form,
@@ -295,7 +270,10 @@ export const useFormController = ({
 			const issue = result.error.issues[0];
 			if (issue === undefined) return false;
 
-			await onInvalidSectionFn(readSectionForPathFn(issue.path), issue.path);
+			await onInvalidSectionFn(
+				readSectionForPathFn(issue.path, form.state.values.lines),
+				issue.path,
+			);
 			const focusInvalidFieldFn = () =>
 				document
 					.querySelector<HTMLElement>(
@@ -352,7 +330,6 @@ export const useFormController = ({
 	return useMemo(
 		() => ({
 			canonicalItem: initialItem,
-			copySectionFn,
 			discardFn,
 			enableClockFn,
 			enableProductionFn,
@@ -367,7 +344,6 @@ export const useFormController = ({
 			validationIssues,
 		}),
 		[
-			copySectionFn,
 			discardFn,
 			enableClockFn,
 			enableProductionFn,

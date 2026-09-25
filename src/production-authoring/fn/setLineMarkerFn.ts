@@ -16,22 +16,3 @@ export const setLineMarkerFn = (
 					? false
 					: line.default,
 	}));
-
-/** Switching to an expiry trigger only removes manual Default selection. */
-export const setLineClockFn = (
-	lines: ReadonlyArray<LineSchema.Type>,
-	index: number,
-	clock: LineSchema.Type["clock"],
-): LineSchema.Type[] =>
-	lines.map((line, lineIndex) => {
-		if (lineIndex !== index) return line;
-		return {
-			...line,
-			clock,
-			...(clock === LineClockModeEnumSchema.enum["clock-lifetime"]
-				? {
-						default: false,
-					}
-				: {}),
-		};
-	});

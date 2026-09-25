@@ -12,6 +12,7 @@ import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Mx } from "~/translation/ui/Mx";
+import { ProductionLinesSection } from "~/item-authoring/ui/ProductionLinesSection";
 /** Composes shared time, rule, and outcome controls for the authored schedule. */
 const ClockFields = () => {
 	const translator = useTranslator();
@@ -128,6 +129,7 @@ const ClockFields = () => {
 					</form.Subscribe>
 				</EditorFormCard>
 			</EditorFormSection>
+			<ProductionLinesSection kind="clock" />
 		</div>
 	);
 };
@@ -136,18 +138,28 @@ const ClockFields = () => {
 export const ClockSection = () => {
 	const { form, enableClockFn } = useFormSession();
 	const translator = useTranslator();
+	const hasClockLines = useStore(
+		form.store,
+		(state) => state.values.lines?.some((line) => line.clock !== undefined) ?? false,
+	);
 	return (
 		<form.Subscribe selector={(state) => state.values.clock}>
 			{(clock) =>
 				clock === undefined ? (
-					<EditorCapabilityStatus
-						icon={Clock}
-						title={translator.textFn("No Clock configured")}
-						summary={translator.textFn("Item clock empty title")}
-						size="large"
-						actionLabel={translator.textFn("Enable")}
-						onEnableFn={enableClockFn}
-					/>
+					<div
+						className="grid gap-[var(--ak-viewport-gap)]"
+						data-ui="EditorClockSection"
+					>
+						<EditorCapabilityStatus
+							icon={Clock}
+							title={translator.textFn("No Clock configured")}
+							summary={translator.textFn("Item clock empty title")}
+							size="large"
+							actionLabel={translator.textFn("Enable")}
+							onEnableFn={enableClockFn}
+						/>
+						{hasClockLines ? <ProductionLinesSection kind="clock" /> : null}
+					</div>
 				) : (
 					<div
 						className="grid gap-[var(--ak-viewport-gap)]"

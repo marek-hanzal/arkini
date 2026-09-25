@@ -12,9 +12,10 @@ import { Mx } from "~/translation/ui/Mx";
 /** Keeps the item overview to two authored lines, with full outcome semantics. */
 export const ProductionSummaryDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 	const translator = useTranslator();
+	const lines = item.lines.filter((line) => line.clock === undefined);
 	return (
 		<div className="grid">
-			{item.lines.length === 0 ? (
+			{lines.length === 0 ? (
 				<EditorRootCard dataUi="EditorItemProductionDisabledCard">
 					<DisabledCapabilityDetail
 						capability="production"
@@ -29,7 +30,7 @@ export const ProductionSummaryDetail = ({ item }: { readonly item: ItemSchema.Ty
 					className="grid content-start gap-3"
 					data-ui="EditorItemProductionSummaryContent"
 				>
-					{item.lines.slice(0, 2).map((line) => (
+					{lines.slice(0, 2).map((line) => (
 						<EditorRootCard
 							key={line.uid}
 							dataUi="EditorItemProductionOutputCard"
@@ -41,6 +42,7 @@ export const ProductionSummaryDetail = ({ item }: { readonly item: ItemSchema.Ty
 										<LineEditLink
 											itemUid={item.uid}
 											lineUid={line.uid}
+											clock={line.clock !== undefined}
 										>
 											{line.title}
 											<ArrowUpRight className="size-4 shrink-0 text-muted transition-colors group-hover:text-accent" />

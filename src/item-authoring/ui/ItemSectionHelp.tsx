@@ -11,18 +11,12 @@ export const ItemSectionHelp: Record<SectionId, EditorPageHelpContent> = {
 			<>
 				<Mx label="Item identity help" />
 				<Mx label="Item detail music help" />
-				<Mx label="Item section copy help" />
 			</>
 		),
 	},
 	production: {
 		title: <Tx label="Production" />,
-		content: (
-			<>
-				<Mx label="Item production help" />
-				<Mx label="Item section copy help" />
-			</>
-		),
+		content: <Mx label="Item production help" />,
 	},
 	notes: {
 		title: <Tx label="Notes" />,
@@ -34,39 +28,19 @@ export const ItemSectionHelp: Record<SectionId, EditorPageHelpContent> = {
 	},
 	merges: {
 		title: <Tx label="Merges" />,
-		content: (
-			<>
-				<Mx label="Item merges help" />
-				<Mx label="Item section copy help" />
-			</>
-		),
+		content: <Mx label="Item merges help" />,
 	},
 	units: {
 		title: <Tx label="Units" />,
-		content: (
-			<>
-				<Mx label="Item units help" />
-				<Mx label="Item section copy help" />
-			</>
-		),
+		content: <Mx label="Item units help" />,
 	},
 	clock: {
 		title: <Tx label="Clock" />,
-		content: (
-			<>
-				<Mx label="Item clock help" />
-				<Mx label="Item section copy help" />
-			</>
-		),
+		content: <Mx label="Item clock help" />,
 	},
 	artwork: {
 		title: <Tx label="Artwork" />,
-		content: (
-			<>
-				<Mx label="Item artwork help" />
-				<Mx label="Item section copy help" />
-			</>
-		),
+		content: <Mx label="Item artwork help" />,
 	},
 	chain: {
 		title: <Tx label="Chain" />,

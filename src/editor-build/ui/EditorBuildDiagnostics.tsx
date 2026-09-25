@@ -140,13 +140,20 @@ const readEditorGameDiagnosticTargetsFn = (
 		...new Set(readDiagnosticItemUidsFn(diagnostic)),
 	].flatMap((itemUid) => {
 		const item = project.config.items[itemUid];
+		const pathSection =
+			item === undefined
+				? undefined
+				: readSectionForPathFn(diagnostic.path.slice(2), item.lines);
 		return item === undefined
 			? []
 			: [
 					{
 						kind: "item",
 						itemUid: item.uid,
-						sectionId: itemSection ?? readSectionForPathFn(diagnostic.path.slice(2)),
+						sectionId:
+							pathSection === "clock"
+								? "clock"
+								: (itemSection ?? pathSection ?? "identity"),
 						label: item.title,
 					} satisfies EditorDiagnosticTarget,
 				];

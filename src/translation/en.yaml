@@ -79,8 +79,8 @@ Artwork usage help:
   value: Shows every saved Item that references this Artwork.
 Assigned:
   value: Assigned
-At lifetime expiry, selects this line by weight. On a Board it runs as a Job; inside another item or Job, its output settles immediately without inputs or runtime. Select again to remove its Clock role.:
-  value: At lifetime expiry, selects this line by weight. On a Board it runs as a Job; inside another item or Job, its output settles immediately without inputs or runtime. Select again to remove its Clock role.
+At lifetime expiry, selects this line by weight. On a Board it runs as a Job; inside another item or Job, its output settles immediately without inputs or runtime.:
+  value: At lifetime expiry, selects this line by weight. On a Board it runs as a Job; inside another item or Job, its output settles immediately without inputs or runtime.
 Audio not found:
   value: Audio not found
 Authored Clock interval summary help:
@@ -344,6 +344,11 @@ Clock loose-kill help:
     **Wait for output** lets started jobs finish before the expired item disappears.
 
     If the output has nowhere to go, the item waits too.
+Clock production lines help:
+  value: |
+    Each Clock line is an ordinary production job selected by weight when its timer fires. Choose Interval or Expiry when adding a line. Its inputs, rules, runtime and outcomes use the same controls as other production lines.
+
+    Interval lines run at Clock pulses; Expiry lines are selected when the lifetime ends.
 Clock rules help:
   value: |
     These rules pause or resume the Clock.
@@ -390,30 +395,10 @@ Copied:
   value: Copied
 Copy:
   value: Copy
-Copy Clock section help:
-  value: |
-    Copying a Clock removes the destination Action.
 Copy URL:
   value: Copy URL
-Copy from:
-  value: Copy from
-Copy from…:
-  value: Copy from…
-Copy identity section help:
-  value: |
-    **Item ID** and **UID** stay unchanged.
 Copy password:
   value: Copy password
-Copy production section help:
-  value: |
-    Copies every line and the shared queue size. Nonempty Production removes the destination Action.
-Copy section replacement help:
-  value: |
-    Replaces this whole section, including unsaved changes.
-
-    - Empty source sections clear the destination.
-    - Lists are replaced, never combined.
-    - **Save** keeps the copy; **Discard** restores the saved item.
 Cost:
   value: Cost
 Could not load notes.:
@@ -494,7 +479,7 @@ Disable:
   value: Disable
 Disable Clock help:
   value: |
-    Removes Interval, Lifetime, starting state, rules and expiry output.
+    Removes the Clock settings and its Interval and Expiry production lines. Manual production lines remain.
 
     **Save** keeps the removal. **Discard** restores the saved Clock.
 Disable Units help:
@@ -509,7 +494,7 @@ Disable merges help:
     **Save** keeps the removal. **Discard** restores the saved merges.
 Disable production help:
   value: |
-    Removes every production line with its requirements, rules and output.
+    Removes manual production lines with their requirements, rules and output. Clock lines remain.
 
     The queue size stays ready for future lines. **Discard** restores the saved Production.
 Disable removes all merge interactions from this item.:
@@ -873,17 +858,6 @@ Item production help:
     Adding Production removes Action when you save. Clock may also exist without any line when you only need a Lifetime.
 Item search shortcuts:
   value: ↑↓ Select · Enter Open · Esc Close
-Item section copy help:
-  value: |
-    **Copy from** replaces the whole open section with values from another saved item. Unsaved changes in this section are replaced too; the source item never changes.
-
-    - **Item** keeps Item ID and UID.
-    - **Production** copies every line and queue size; nonempty Production removes Action.
-    - **Clock** removes Action.
-    - **Action** removes Production and Clock.
-    - Artwork, Merges and Units replace their complete section.
-
-    Lists are replaced, never combined. **Save** keeps the copy; **Discard** restores the destination item.
 Item sent through portal:
   value: Item sent through portal
   dynamic: true
@@ -1222,8 +1196,6 @@ No music yet:
 No other authored item outputs this item through production, expiry, units, or merges.:
   value: No saved item creates this one through Production, Clock, Units or Merges.
   dynamic: true
-No other item matches this search.:
-  value: No other item matches this search.
 No outcome:
   value: No outcome
 No outcome configured.:
@@ -1388,11 +1360,6 @@ Production inputs help:
     At least one input is required. Use **Simple** when the line intentionally needs nothing; Materials and Units add real costs.
 Production line:
   value: Production line
-Production line Clock help:
-  value: |
-    Includes this line in the weighted pool tried on every Clock interval.
-
-    Line rules are evaluated before selection; only enabled lines enter the pool. Visibility does not affect selection. Changing the pool does not restart the Clock.
 Production line default help:
   value: |
     The initial line selected for manual production.
@@ -1667,8 +1634,8 @@ Selected target must have Units enabled before choosing Spend.:
   value: Selected target must have Units enabled before choosing Spend.
 Selected target must have Units enabled.:
   value: Selected target must have Units enabled.
-Selects this line by weight at each Clock interval. Select again to remove its Clock role.:
-  value: Selects this line by weight at each Clock interval. Select again to remove its Clock role.
+Selects this line by weight at each Clock interval.:
+  value: Selects this line by weight at each Clock interval.
 Self:
   value: Self
   dynamic: true
@@ -1981,6 +1948,8 @@ blocking errors:
   value: errors
 chance:
   value: chance
+clock:
+  value: clock
 clock-lifetime:
   value: clock-lifetime
 conditions:

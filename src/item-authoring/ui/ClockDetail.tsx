@@ -7,8 +7,10 @@ import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { DisabledCapabilityDetail } from "~/item-authoring/ui/DisabledCapabilityDetail";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Mx } from "~/translation/ui/Mx";
+import { ProductionDetail } from "~/item-authoring/ui/ProductionDetail";
+import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 
-/** Presents the authored schedule independently of production lines. */
+/** Presents the authored schedule and its Clock-owned production lines. */
 export const ClockDetail = ({
 	item,
 	preview = false,
@@ -18,6 +20,16 @@ export const ClockDetail = ({
 }) => {
 	const translator = useTranslator();
 	const clock = item.clock;
+	const production =
+		!preview && item.lines.some((line) => line.clock !== undefined) ? (
+			<div className="grid gap-3">
+				<EditorFormSectionDivider title={translator.textFn("Production")} />
+				<ProductionDetail
+					item={item}
+					kind="clock"
+				/>
+			</div>
+		) : null;
 	if (clock === undefined) {
 		const empty = (
 			<DisabledCapabilityDetail
@@ -35,7 +47,10 @@ export const ClockDetail = ({
 		return preview ? (
 			<EditorRootCard dataUi="EditorClockDisabledCard">{empty}</EditorRootCard>
 		) : (
-			empty
+			<div className="grid gap-3">
+				{empty}
+				{production}
+			</div>
 		);
 	}
 
@@ -86,6 +101,7 @@ export const ClockDetail = ({
 				</DetailFacts>
 				<RulesDetail rules={clock.rules} />
 			</EditorRootCard>
+			{production}
 		</div>
 	);
 };

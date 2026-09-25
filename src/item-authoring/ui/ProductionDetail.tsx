@@ -10,32 +10,40 @@ import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { useTranslator } from "~/translation/ui/useTranslator";
 
 /** Presents the authored production lines and their input/outcome flows. */
-export const ProductionDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
+export const ProductionDetail = ({
+	item,
+	kind = "manual",
+}: {
+	readonly item: ItemSchema.Type;
+	readonly kind?: "manual" | "clock";
+}) => {
 	const translator = useTranslator();
 	const project = useEditorProject();
+	const lines = item.lines.filter((line) => (line.clock !== undefined) === (kind === "clock"));
+	if (kind === "clock" && lines.length === 0) return null;
 	return (
 		<div
 			className="grid gap-[var(--ak-viewport-gap)]"
 			data-ui="EditorItemProductionDetail"
 		>
-			{item.lines.length > 0 ? (
+			{lines.length > 0 ? (
 				<EditorCollectionSelector
 					key={item.uid}
-					count={item.lines.length}
-					itemLabelFn={(index) => item.lines[index].title}
+					count={lines.length}
+					itemLabelFn={(index) => lines[index].title}
 					renderItemContentFn={(index, label) => (
 						<ProductionLineOption
 							items={project.config.items}
-							line={item.lines[index]}
+							line={lines[index]}
 							label={label}
 						/>
 					)}
 					itemSearchTermsFn={(index) => [
-						item.lines[index].uid,
-						item.lines[index].description,
+						lines[index].uid,
+						lines[index].description ?? "",
 					]}
 					itemRelatedSearchTermsFn={(index) =>
-						readCapabilityRelatedTermsFn(item.lines[index], project.config.items)
+						readCapabilityRelatedTermsFn(lines[index], project.config.items)
 					}
 					label={translator.textFn("Product lines")}
 					navigationCard
@@ -43,7 +51,7 @@ export const ProductionDetail = ({ item }: { readonly item: ItemSchema.Type }) =
 					{(index) => (
 						<ProductionLineDetail
 							itemUid={item.uid}
-							line={item.lines[index]}
+							line={lines[index]}
 						/>
 					)}
 				</EditorCollectionSelector>

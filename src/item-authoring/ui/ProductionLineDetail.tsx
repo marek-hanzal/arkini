@@ -83,6 +83,7 @@ export const ProductionLineDetail = ({
 								dataUi="EditorProductionLineDetailEditLink"
 								itemUid={itemUid}
 								lineUid={line.uid}
+								clock={line.clock !== undefined}
 							>
 								{line.title}
 								<ArrowUpRight className="size-4 shrink-0 text-muted transition-colors group-hover:text-accent" />
@@ -121,9 +122,11 @@ export const ProductionLineDetail = ({
 							description={<Mx label="Authored production Enabled marker help" />}
 						/>
 					</div>
-					<p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted">
-						{line.description}
-					</p>
+					{line.description === undefined ? null : (
+						<p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted">
+							{line.description}
+						</p>
+					)}
 				</div>
 				<LineRuntime runtimeMs={line.runtimeMs} />
 			</div>

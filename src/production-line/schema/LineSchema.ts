@@ -32,8 +32,8 @@ export const LineSchema = z
 		/**
 		 * Human-readable explanation of this product line's purpose.
 		 */
-		description: DescriptionSchema.describe(
-			"The human-readable explanation of this product line's purpose.",
+		description: DescriptionSchema.optional().describe(
+			"Optional human-readable explanation of this product line's purpose.",
 		),
 		clock: LineClockModeEnumSchema.optional().describe(
 			"Optional weighted Clock role: interval admits a Job at each pulse; lifetime expiry runs this line as a Board Job or immediately settles its outcome when the owner is held internally.",

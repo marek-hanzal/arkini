@@ -1,6 +1,5 @@
 import { useItemSectionShortcuts } from "~/item-authoring/ui/useItemSectionShortcuts";
 import { ItemSectionDisableControl } from "~/item-authoring/ui/ItemSectionDisableControl";
-import { ItemSectionCopyControl } from "~/item-authoring/ui/ItemSectionCopyControl";
 import { ItemHeaderTitle } from "~/item-authoring/ui/ItemHeaderTitle";
 import { readCanonicalItemArtworkFn } from "~/item-authoring/schema/FormSchema";
 import { useTranslator } from "~/translation/ui/useTranslator";
@@ -256,15 +255,7 @@ export const FormSession = ({
 					}
 					secondaryNavigation={
 						<EditorSectionBar
-							actions={
-								<>
-									<ItemSectionCopyControl
-										key={sectionId}
-										sectionId={sectionId}
-									/>
-									<ItemSectionDisableControl sectionId={sectionId} />
-								</>
-							}
+							actions={<ItemSectionDisableControl sectionId={sectionId} />}
 							help={help === undefined ? undefined : <EditorPageHelp {...help} />}
 						>
 							{sections.map((candidate) => (

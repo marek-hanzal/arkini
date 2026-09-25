@@ -88,6 +88,20 @@ export const FormSchema = z.custom<FormValues>().transform((candidate, context) 
 	const { description, keywords, ...item } = normalized;
 	const result = ItemSchema.safeParse({
 		...item,
+		...(item.lines === undefined
+			? {}
+			: {
+					lines: item.lines.map((line) => ({
+						...line,
+						...(line.description?.trim()
+							? {
+									description: line.description,
+								}
+							: {
+									description: undefined,
+								}),
+					})),
+				}),
 		...((keywords?.trim() ?? "") === ""
 			? {}
 			: {

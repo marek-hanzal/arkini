@@ -1142,103 +1142,131 @@ describe("item section form session", () => {
 		]);
 	});
 
-	it("keeps Default exclusive and independent Clock lines through the saved form", async () => {
+	it("separates manual and Clock line editing without changing their shared form order", async () => {
 		state.saveItem.mockImplementation(async ({ item }: { item: ItemSchema.Type }) => {
 			state.persisted = item;
 			(state.project as Project).config.items[item.uid] = item;
 			return item;
 		});
-		const common = {
+		const common = ItemSchema.parse({
 			...createProducerItem({
 				id: item.uid,
 			}),
 			uid: item.uid,
+			clock: {
+				intervalMs: 5000,
+				durationMs: 10000,
+			},
 			lines: [
 				createLine({
 					uid: "line:first",
-					default: false,
+					default: true,
 				}),
 				createLine({
 					uid: "line:second",
-					default: true,
+					default: false,
 					clock: "clock-interval",
 				}),
 			],
-		};
+		});
 		state.persisted = common;
 		(state.project as Project).config.items[item.uid] = common;
 		const { container, renderSection } = await render(<ProductionSection />);
-		const toggle = async (label: string) => {
-			const button = [
-				...container.querySelectorAll<HTMLButtonElement>(
-					'[data-ui="EditorBooleanToggleGroupOption"]',
-				),
-			].find((candidate) => candidate.textContent === label);
-			if (button === undefined) throw new Error(`Missing ${label} toggle.`);
-			await act(async () => button.click());
-			if (label === "Clock") {
-				const option = document.querySelector<HTMLButtonElement>(
-					'[data-ui="ActionMenuOption"][data-ui-id="clock-interval"]',
-				);
-				if (option === null) throw new Error("Missing Clock interval option.");
-				await act(async () => option.click());
-			}
-			await act(async () => {
-				await state.unsavedSession?.saveFn();
-			});
-			// The repository hook mock needs an explicit render to publish the saved canonical item.
-			await renderSection(<ProductionSection />);
-			return state.saveItem.mock.lastCall?.[0].item.lines;
-		};
-		expect(await toggle("Default")).toMatchObject([
-			{
-				default: true,
-			},
-			{
-				default: false,
-				clock: "clock-interval",
-			},
-		]);
-		expect(await toggle("Clock")).toMatchObject([
-			{
-				default: true,
-				clock: "clock-interval",
-			},
-			{
-				default: false,
-				clock: "clock-interval",
-			},
-		]);
+		expect(container.querySelector('input[name="lines[0].title"]')).not.toBeNull();
+		expect(container.querySelector('input[name="lines[1].title"]')).toBeNull();
+		expect(container.querySelector('input[name="lines[0].clockWeight"]')).toBeNull();
+		await renderSection(<ClockSection />, "clock");
+		expect(container.querySelector('input[name="lines[0].title"]')).toBeNull();
+		expect(container.querySelector('input[name="lines[1].title"]')).not.toBeNull();
+		const clockTitle = container.querySelector<HTMLInputElement>(
+			'input[name="lines[1].title"]',
+		);
+		if (clockTitle === null) throw new Error("Missing Clock line title field.");
+		await changeInput(clockTitle, "");
+		await act(async () => {
+			await state.unsavedSession?.saveFn();
+		});
+		expect(state.navigate).toHaveBeenLastCalledWith(
+			expect.objectContaining({
+				params: expect.objectContaining({
+					sectionId: "clock",
+				}),
+			}),
+		);
+		await changeInput(clockTitle, common.lines[1].title);
 		const weight = container.querySelector<HTMLInputElement>(
-			'input[name="lines[0].clockWeight"]',
+			'input[name="lines[1].clockWeight"]',
 		);
 		if (weight === null) throw new Error("Missing Clock weight field.");
 		await changeInput(weight, "7");
 		await act(async () => {
 			await state.unsavedSession?.saveFn();
 		});
-		expect(state.saveItem.mock.lastCall?.[0].item.lines[0].clockWeight).toBe(7);
-		await renderSection(<ProductionSection />);
-
-		expect(await toggle("Default")).toMatchObject([
-			{
-				default: false,
-				clock: "clock-interval",
-			},
-			{
-				default: false,
-				clock: "clock-interval",
-			},
+		expect(state.saveItem.mock.lastCall?.[0].item.lines[0].clock).toBeUndefined();
+		expect(state.saveItem.mock.lastCall?.[0].item.lines[1].clockWeight).toBe(7);
+		await renderSection(<ClockSection />, "clock");
+		const remove = container.querySelector<HTMLButtonElement>(
+			'[data-ui="EditorClockLinesCollection"] [data-ui="EditorCollectionRemove"]',
+		);
+		if (remove === null) throw new Error("Missing Clock line remove control.");
+		await act(async () => remove.click());
+		await act(async () => {
+			await state.unsavedSession?.saveFn();
+		});
+		expect(
+			state.saveItem.mock.lastCall?.[0].item.lines.map(
+				(line: ItemSchema.Type["lines"][number]) => line.uid,
+			),
+		).toEqual([
+			"line:first",
 		]);
-		expect(await toggle("Clock")).toMatchObject([
-			{
-				default: false,
-				clock: undefined,
+	});
+
+	it("creates Clock lines with the selected role and no manual Default", async () => {
+		let session: ReturnType<typeof useFormSession> | undefined;
+		const Probe = () => {
+			session = useFormSession();
+			return <ClockSection />;
+		};
+		const scheduled = ItemSchema.parse({
+			...item,
+			clock: {
+				intervalMs: 5000,
+				durationMs: 10000,
 			},
-			{
-				default: false,
-				clock: "clock-interval",
-			},
+		});
+		state.persisted = scheduled;
+		(state.project as Project).config.items[item.uid] = scheduled;
+		const { container } = await render(<Probe />);
+		for (const clock of [
+			"clock-interval",
+			"clock-lifetime",
+		] as const) {
+			const add = container.querySelector<HTMLButtonElement>(
+				'[data-ui="EditorClockLinesCollection"] [data-ui="EditorCollectionAdd"]',
+			);
+			if (add === null) throw new Error("Missing Clock line add control.");
+			await act(async () => add.click());
+			const option = document.querySelector<HTMLButtonElement>(
+				`[data-ui="ActionMenuOption"][data-ui-id="${clock}"]`,
+			);
+			if (option === null) throw new Error(`Missing ${clock} option.`);
+			await act(async () => option.click());
+		}
+		expect(
+			session?.form.state.values.lines?.map((line) => [
+				line.clock,
+				line.default,
+			]),
+		).toEqual([
+			[
+				"clock-interval",
+				false,
+			],
+			[
+				"clock-lifetime",
+				false,
+			],
 		]);
 	});
 
@@ -1533,72 +1561,12 @@ vi.mock("~/translation/ui/useTranslator", () => {
 	};
 });
 
-it("keeps copied sections in the draft until Save and lets Discard restore the destination", async () => {
-	let session: ReturnType<typeof useFormSession> | undefined;
-	const CopyProbe = () => {
-		session = useFormSession();
-		return null;
-	};
-	await render(<CopyProbe />);
-	const source = ItemSchema.parse({
-		...item,
-		uid: "source",
-		title: "Source",
-		ui: "simple",
-		clock: {
-			durationMs: 300000,
-			enable: true,
-			rules: [],
-		},
-	});
-	await act(async () => {
-		session?.form.setFieldValue("description", "Keep my other edit");
-		session?.copySectionFn(source, "clock");
-	});
-	expect(session?.isDirty).toBe(true);
-	expect(session?.form.state.values.clock).toEqual(source.clock);
-	expect(session?.form.state.values.ui).toBe("default");
-	expect(session?.form.state.values.description).toBe("Keep my other edit");
-	expect(state.saveItem).not.toHaveBeenCalled();
-	await act(async () => session?.discardFn());
-	expect(session?.form.state.values.clock).toBeUndefined();
-	expect(session?.form.state.values.description).toBe(item.description);
-	expect(session?.isDirty).toBe(false);
-	await act(async () => {
-		session?.copySectionFn(source, "identity");
-		session?.copySectionFn(source, "clock");
-	});
-	state.saveItem.mockImplementation(async ({ item: saved }: { item: ItemSchema.Type }) => saved);
-	await act(async () => {
-		expect(await session?.saveFn()).toBe(true);
-	});
-	expect(state.saveItem).toHaveBeenCalledExactlyOnceWith(
-		expect.objectContaining({
-			item: expect.objectContaining({
-				uid: item.uid,
-				title: source.title,
-				ui: "simple",
-				clock: source.clock,
-			}),
-		}),
-	);
-	expect(session?.isDirty).toBe(false);
-});
-
-it("generates fresh UIDs for every duplicate and Production copy while retaining source identities", async () => {
+it("generates a fresh UID when duplicating a production line", async () => {
 	let session: ReturnType<typeof useFormSession> | undefined;
 	const Probe = () => {
 		session = useFormSession();
 		return <ProductionSection />;
 	};
-	const source = createProducerItem({
-		id: "source",
-		lines: [
-			createLine({
-				uid: "line:source",
-			}),
-		],
-	});
 	const configured = createProducerItem({
 		id: item.uid,
 		lines: [
@@ -1609,7 +1577,6 @@ it("generates fresh UIDs for every duplicate and Production copy while retaining
 	});
 	state.persisted = configured;
 	(state.project as Project).config.items[item.uid] = configured;
-	(state.project as Project).config.items[source.uid] = source;
 	const { container } = await render(<Probe />);
 	const duplicate = container.querySelector<HTMLButtonElement>(
 		'[data-ui="EditorProductionLinesCollection"] [data-ui="EditorCollectionDuplicate"]',
@@ -1620,17 +1587,9 @@ it("generates fresh UIDs for every duplicate and Production copy while retaining
 	expect(duplicateUid).toBeTruthy();
 	expect(duplicateUid).not.toBe("line:original");
 	expect(session?.form.state.values.lines?.[0].uid).toBe("line:original");
-	await act(async () => session?.copySectionFn(source, "production"));
-	const copiedUid = session?.form.state.values.lines?.[0].uid;
-	expect(copiedUid).toBeTruthy();
-	expect(copiedUid).not.toBe("line:source");
-	expect(copiedUid).not.toBe(duplicateUid);
-	await act(async () => session?.copySectionFn(source, "production"));
-	expect(session?.form.state.values.lines?.[0].uid).not.toBe(copiedUid);
-	expect(source.lines[0].uid).toBe("line:source");
-	const savedUid = session?.form.state.values.lines?.[0].uid;
+	const savedUid = session?.form.state.values.lines?.[1].uid;
 	await act(async () => {
 		expect(await session?.saveFn()).toBe(true);
 	});
-	expect(state.saveItem.mock.lastCall?.[0].item.lines[0].uid).toBe(savedUid);
+	expect(state.saveItem.mock.lastCall?.[0].item.lines[1].uid).toBe(savedUid);
 });

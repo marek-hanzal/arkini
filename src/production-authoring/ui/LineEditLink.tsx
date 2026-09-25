@@ -3,18 +3,20 @@ import type { PropsWithChildren } from "react";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { ButtonLink } from "~/ui/ui/Button";
 
-/** Opens the production form with one authored line selected. */
+/** Opens the form section that owns the selected authored line. */
 export const LineEditLink = ({
 	children,
 	dataUi = "EditorProductionLineEditLink",
 	disabled = false,
 	itemUid,
 	lineUid,
+	clock,
 }: PropsWithChildren<{
 	readonly dataUi?: string;
 	readonly disabled?: boolean;
 	readonly itemUid: string;
 	readonly lineUid: string;
+	readonly clock?: boolean;
 }>) => {
 	const project = useEditorProject();
 	return (
@@ -24,7 +26,7 @@ export const LineEditLink = ({
 			params={{
 				projectId: project.projectId,
 				itemUid,
-				sectionId: "production",
+				sectionId: clock ? "clock" : "production",
 			}}
 			search={{
 				lineUid,

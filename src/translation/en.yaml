@@ -469,8 +469,6 @@ Deleting this audio also removes the assignments listed below.:
   value: Deleting this audio also removes the assignments listed below.
 Deleting this template removes its saved board layout from the project.:
   value: Deleting this template removes its saved board layout from the project.
-Depleted:
-  value: Depleted
 Depletion outcome:
   value: Depletion outcome
 Depletion outcome help:
@@ -1824,8 +1822,6 @@ This item can be deleted:
   value: This item can be deleted
 This item cannot be deleted yet:
   value: This item cannot be deleted yet
-This item doesn't use units.:
-  value: This item doesn't use units.
 This item has no inputs:
   value: This item has no inputs
   dynamic: true
@@ -1879,8 +1875,6 @@ Units input:
 Units per item:
   value: Units per item
   dynamic: true
-Units remaining:
-  value: Units remaining
 Unlimited:
   value: Unlimited
 Unsaved changes:

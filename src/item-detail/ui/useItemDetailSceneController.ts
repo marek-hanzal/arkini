@@ -10,8 +10,10 @@ import { useRuntimeSelector } from "~/game-presentation/ui/useRuntimeSelector";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import { readItemRemainingUnitsFn } from "~/production-action/fn/readItemRemainingUnitsFn";
+import { readItemScheduleFn } from "~/item-schedule/fn/readItemScheduleFn";
 import { canControlItemProductionFn } from "~/production-line/fn/canControlItemProductionFn";
 import { resolveJobQueueFx } from "~/production-job/fx/resolveJobQueueFx";
+import { readLineInputAutofillCoverageFx } from "~/production-input/fx/readLineInputAutofillCoverageFx";
 import { lineRulesFx } from "~/production-line/fx/lineRulesFx";
 import { resolveLineShowFn } from "~/production-line/fn/resolveLineShowFn";
 import { resolveLineEnableFn } from "~/production-line/fn/resolveLineEnableFn";
@@ -25,12 +27,17 @@ export namespace useItemDetailSceneController {
 		readonly canMake: boolean;
 		readonly disabledLineUids: readonly string[];
 		readonly lineBlockingHints: Readonly<Record<string, string | undefined>>;
+		readonly materialReadyLineUids: readonly string[];
 		readonly title: string;
 		readonly sourceUrl: string;
 		readonly compositeUrl?: string;
 		readonly units?: {
 			readonly remaining: number;
 			readonly total: number;
+		};
+		readonly lifetime?: {
+			readonly remainingMs: number;
+			readonly totalMs: number;
 		};
 	}
 	export interface Output {
@@ -81,36 +88,56 @@ export const useItemDetailSceneController = ({
 					: undefined;
 			const item = itemUid === undefined ? runtimeItem?.item : game.config.items[itemUid];
 			if (item === undefined) return undefined;
+			const boardLocation =
+				runtimeItem?.location.scope === "board" && finalSnapshot === undefined
+					? runtimeItem.location
+					: undefined;
+			const boardOwnerItemId = boardLocation === undefined ? undefined : runtimeItem?.id;
 			const lineStates = game.readFn(
 				Effect.forEach(item.lines, (line) => {
 					// Only a live Board owner supplies a physical origin for visibility rules.
-					if (runtimeItem?.location.scope !== "board" || finalSnapshot !== undefined)
+					if (boardLocation === undefined || boardOwnerItemId === undefined)
 						return Effect.succeed({
 							line,
 							visible: line.show,
 							enabled: line.enable,
 							blockingHint: undefined,
+							materialsAvailable: false,
 						});
-					return lineRulesFx({
-						origin: runtimeItem.location,
-						rules: line.rules,
-					}).pipe(
-						Effect.map((rules) => ({
+					return Effect.gen(function* () {
+						const rules = yield* lineRulesFx({
+							origin: boardLocation,
+							rules: line.rules,
+						});
+						const visible = resolveLineShowFn({
+							line,
+							rules,
+						});
+						const enabled = resolveLineEnableFn({
+							line,
+							rules,
+						});
+						const materialsAvailable =
+							visible &&
+							enabled &&
+							line.input.some((input) => input.type === "materials")
+								? (yield* readLineInputAutofillCoverageFx({
+										ownerItemId: boardOwnerItemId,
+										lineUid: line.uid,
+										runtime,
+									})).type === "complete"
+								: false;
+						return {
 							line,
 							blockingHint: readLineBlockingHintFn({
 								line,
 								rules,
 							}),
-							visible: resolveLineShowFn({
-								line,
-								rules,
-							}),
-							enabled: resolveLineEnableFn({
-								line,
-								rules,
-							}),
-						})),
-					);
+							visible,
+							enabled,
+							materialsAvailable,
+						};
+					});
 				}).pipe(
 					Effect.provideService(RuntimeFx, {
 						read: Effect.succeed(runtime),
@@ -137,6 +164,7 @@ export const useItemDetailSceneController = ({
 				if (Exit.isFailure(queue)) throw queue.cause;
 				canMake = queue.value.available;
 			}
+			const lifetimeDurationMs = readItemScheduleFn(item)?.durationMs;
 			return {
 				lines: visibleLines.map((state) => state.line),
 				lineBlockingHints: Object.fromEntries(
@@ -145,6 +173,9 @@ export const useItemDetailSceneController = ({
 						state.blockingHint,
 					]),
 				),
+				materialReadyLineUids: visibleLines
+					.filter((state) => state.materialsAvailable)
+					.map((state) => state.line.uid),
 				disabledLineUids: visibleLines
 					.filter((state) => !state.enabled)
 					.map((state) => state.line.uid),
@@ -167,6 +198,15 @@ export const useItemDetailSceneController = ({
 										: (readItemRemainingUnitsFn(runtimeItem) ??
 											item.units.amount),
 								total: item.units.amount,
+							},
+				lifetime:
+					lifetimeDurationMs === undefined
+						? undefined
+						: {
+								remainingMs:
+									runtimeItem?.schedule?.remainingDurationMs ??
+									lifetimeDurationMs,
+								totalMs: lifetimeDurationMs,
 							},
 			};
 		},

@@ -35,6 +35,7 @@ export const ItemDetailScene = ({ disabled, target }: ItemDetailSceneProps) => {
 						lines={controller.detail.lines}
 						disabledLineUids={controller.detail.disabledLineUids}
 						lineBlockingHints={controller.detail.lineBlockingHints}
+						materialReadyLineUids={controller.detail.materialReadyLineUids}
 						ownerItemId={target.kind === "runtime" ? target.itemId : undefined}
 						disabled={disabled || controller.stale}
 						makeDisabled={!controller.detail.canMake}

@@ -44,6 +44,7 @@ const linePresenceMotion = {
 interface ItemLineProps extends useItemLineMakeController.Props {
 	readonly line: LineSchema.Type;
 	readonly makeDisabled: boolean;
+	readonly materialsAvailable: boolean;
 	readonly ruleDisabled: boolean;
 	readonly blockingHint?: string;
 	readonly status?: readItemLineStatusesFn.Status;
@@ -54,10 +55,14 @@ const ItemLineProgressBackdrop = ({
 	ownerItemId,
 	lineUid,
 	artworkId,
+	materialsAvailable,
+	ruleDisabled,
 }: {
 	readonly ownerItemId?: IdSchema.Type;
 	readonly lineUid: IdSchema.Type;
 	readonly artworkId: IdSchema.Type;
+	readonly materialsAvailable: boolean;
+	readonly ruleDisabled: boolean;
 }) => {
 	const game = useGameEngine();
 	const selectorFn = useCallback(
@@ -81,6 +86,8 @@ const ItemLineProgressBackdrop = ({
 		<ItemLineBackdrop
 			sourceUrl={game.getResourceUrlFn(artworkId)}
 			progress={progress}
+			materialsAvailable={materialsAvailable}
+			ruleDisabled={ruleDisabled}
 		/>
 	);
 };
@@ -88,6 +95,7 @@ const ItemLineProgressBackdrop = ({
 const ItemLine = ({
 	line,
 	makeDisabled,
+	materialsAvailable,
 	ruleDisabled,
 	blockingHint,
 	status,
@@ -133,6 +141,8 @@ const ItemLine = ({
 							ownerItemId={props.ownerItemId}
 							lineUid={line.uid}
 							artworkId={line.artwork}
+							materialsAvailable={materialsAvailable}
+							ruleDisabled={ruleDisabled}
 						/>
 					)
 				}
@@ -223,6 +233,7 @@ export const ItemLines = ({
 	lines,
 	disabledLineUids,
 	lineBlockingHints,
+	materialReadyLineUids,
 	ownerItemId,
 	disabled,
 	makeDisabled,
@@ -230,6 +241,7 @@ export const ItemLines = ({
 	readonly lines: readonly LineSchema.Type[];
 	readonly disabledLineUids: readonly string[];
 	readonly lineBlockingHints: Readonly<Record<string, string | undefined>>;
+	readonly materialReadyLineUids: readonly string[];
 	readonly ownerItemId?: IdSchema.Type;
 	readonly disabled: boolean;
 	readonly makeDisabled: boolean;
@@ -244,6 +256,7 @@ export const ItemLines = ({
 						key={`line:${line.uid}`}
 						line={line}
 						ruleDisabled={disabledLineUids.includes(line.uid)}
+						materialsAvailable={materialReadyLineUids.includes(line.uid)}
 						blockingHint={lineBlockingHints[line.uid]}
 						lineUid={line.uid}
 						ownerItemId={ownerItemId}

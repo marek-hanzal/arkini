@@ -144,6 +144,9 @@ export const createVisual = (
 		item,
 		readyListeners: new Set(),
 		releaseTexturesFn: () => {},
+		unitsFadeFilter: {
+			destroy: () => {},
+		},
 		size: 80,
 		textureGeneration: 1,
 		textureState,

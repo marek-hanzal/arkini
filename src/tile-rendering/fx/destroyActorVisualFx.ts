@@ -13,6 +13,7 @@ export const destroyActorVisualFx = Effect.fn("destroyActorVisualFx")(function* 
 		visual,
 	});
 	visual.releaseTexturesFn();
+	visual.unitsFadeFilter.destroy();
 	visual.container.destroy({
 		children: true,
 	});

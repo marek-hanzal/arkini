@@ -1,4 +1,4 @@
-import { Container, Graphics, Sprite, Text, Texture } from "pixi.js";
+import { Container, Graphics, Sprite, Text, Texture, UniformGroup } from "pixi.js";
 
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
@@ -61,6 +61,15 @@ export const createDragActor = (actorItem: TileActorItem): PixiTileActor => {
 		size: 80,
 		textureGeneration: 0,
 		textureState: "ready",
+		unitsFadeFilter: {
+			destroy: () => {},
+		} as ActorVisual["unitsFadeFilter"],
+		unitsFadeUniforms: new UniformGroup({
+			uColorFraction: {
+				value: 1,
+				type: "f32",
+			},
+		}),
 	} satisfies ActorVisual;
 	return {
 		container,

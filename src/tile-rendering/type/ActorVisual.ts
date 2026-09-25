@@ -1,4 +1,4 @@
-import type { Container, Graphics, Sprite, Text } from "pixi.js";
+import type { Container, Filter, Graphics, Sprite, Text, UniformGroup } from "pixi.js";
 
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 
@@ -17,6 +17,13 @@ export interface ActorVisual {
 	readonly container: Container;
 	readonly primary: Sprite;
 	readonly composite: Sprite;
+	readonly unitsFadeFilter: Filter;
+	readonly unitsFadeUniforms: UniformGroup<{
+		uColorFraction: {
+			value: number;
+			type: "f32";
+		};
+	}>;
 	readonly badge: Text;
 	readonly badgeBackground: Graphics;
 	readonly readyListeners: Set<VisualReadyListener>;

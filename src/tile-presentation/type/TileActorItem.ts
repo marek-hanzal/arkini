@@ -5,7 +5,7 @@ import type { TileActorVisual } from "~/tile-presentation/type/TileActorVisual";
 /** One exact live grid identity projected for the shared Canvas tile actor layer. */
 export interface TileActorItem extends TileActorVisual {
 	readonly badgeCount?: number;
-	readonly badgeKind?: "units" | "queue";
+	readonly colorFraction?: number;
 	readonly id: string;
 	readonly revision: string;
 	readonly location: BoardLocationSchema.Type;

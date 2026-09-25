@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { Container, Graphics, Sprite, Text, Texture } from "pixi.js";
+import { Container, Filter, Graphics, Sprite, Text, Texture, UniformGroup } from "pixi.js";
 
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
@@ -26,6 +26,41 @@ interface LoadVisualTexturesProps {
 	readonly primaryTextureFx: Effect.Effect<Texture, unknown, never>;
 	readonly visual: ActorVisual;
 }
+
+const unitsFadeVertex = `
+in vec2 aPosition;
+out vec2 vTextureCoord;
+out vec2 vFaceCoord;
+uniform vec4 uInputSize;
+uniform vec4 uOutputFrame;
+uniform vec4 uOutputTexture;
+
+void main() {
+  vec2 position = aPosition * uOutputFrame.zw + uOutputFrame.xy;
+  position.x = position.x * (2.0 / uOutputTexture.x) - 1.0;
+  position.y = position.y * (2.0 * uOutputTexture.z / uOutputTexture.y) - uOutputTexture.z;
+  gl_Position = vec4(position, 0.0, 1.0);
+  vTextureCoord = aPosition * (uOutputFrame.zw * uInputSize.zw);
+  vFaceCoord = aPosition;
+}
+`;
+
+const unitsFadeFragment = `
+in vec2 vTextureCoord;
+in vec2 vFaceCoord;
+out vec4 finalColor;
+uniform sampler2D uTexture;
+uniform float uColorFraction;
+
+void main() {
+  vec4 color = texture(uTexture, vTextureCoord);
+  float depleted = 1.0 - clamp(uColorFraction, 0.0, 1.0);
+  float boundary = depleted <= 0.0 ? -0.08 : depleted >= 1.0 ? 1.08 : depleted;
+  float grayAmount = 1.0 - smoothstep(boundary - 0.08, boundary + 0.08, vFaceCoord.y);
+  float gray = dot(color.rgb, vec3(0.2126, 0.7152, 0.0722));
+  finalColor = vec4(mix(color.rgb, vec3(gray), grayAmount), color.a);
+}
+`;
 
 /** Loads one complete visual revision before publishing any texture slot. */
 const loadVisualTexturesFx = Effect.fn("loadVisualTexturesFx")(
@@ -101,8 +136,32 @@ export const createActorVisualFx = Effect.fn("createActorVisualFx")(function* ({
 		eventMode: "none",
 		label: `TileActorVisual:${item.id}:${item.revision}`,
 	});
+	const artworkLayer = new Container({
+		eventMode: "none",
+		label: `TileActorArtwork:${item.id}:${item.revision}`,
+	});
 	const primary = new Sprite(Texture.EMPTY);
 	const composite = new Sprite(Texture.EMPTY);
+	const unitsFadeUniforms = new UniformGroup({
+		uColorFraction: {
+			value: 1,
+			type: "f32",
+		},
+	});
+	const unitsFadeFilter = Filter.from({
+		gl: {
+			vertex: unitsFadeVertex,
+			fragment: unitsFadeFragment,
+		},
+		resources: {
+			unitsFadeUniforms,
+		},
+		resolution: "inherit",
+	});
+	unitsFadeFilter.enabled = false;
+	artworkLayer.filters = [
+		unitsFadeFilter,
+	];
 	const badgeBackground = new Graphics();
 	const badge = new Text({
 		style: {
@@ -113,11 +172,14 @@ export const createActorVisualFx = Effect.fn("createActorVisualFx")(function* ({
 		},
 		text: "",
 	});
-	container.addChild(primary, composite, badgeBackground, badge);
+	artworkLayer.addChild(primary, composite);
+	container.addChild(artworkLayer, badgeBackground, badge);
 	const visual = {
 		container,
 		primary,
 		composite,
+		unitsFadeFilter,
+		unitsFadeUniforms,
 		badge,
 		badgeBackground,
 		readyListeners: new Set(),

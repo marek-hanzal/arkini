@@ -25,6 +25,9 @@ const createVisual = () => {
 			releaseTexturesFn: () => {},
 			textureGeneration: 4,
 			textureState: "loading",
+			unitsFadeFilter: {
+				destroy: vi.fn(),
+			},
 		} as unknown as ActorVisual,
 	};
 };

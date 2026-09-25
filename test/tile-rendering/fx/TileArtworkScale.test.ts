@@ -111,3 +111,25 @@ it("keeps full-slot hit geometry and pose independent of artwork scale through r
 	expect(actor.container.scale.x).toBe(1);
 	Effect.runSync(destroyTileActorFx(actor));
 });
+
+it("updates unit depletion on the retained artwork without touching its badge", async () => {
+	const item = createItemFn(0.8);
+	const { actor, updateFn } = createHarnessFn(item);
+	await vi.waitFor(() => expect(actor.currentVisual.textureState).toBe("ready"));
+	updateFn(item, 256);
+	const visual = actor.currentVisual;
+	updateFn(
+		{
+			...item,
+			colorFraction: 0.4,
+		},
+		256,
+	);
+	expect(actor.currentVisual).toBe(visual);
+	expect(visual.unitsFadeFilter.enabled).toBe(true);
+	expect(visual.unitsFadeUniforms.uniforms.uColorFraction).toBe(0.4);
+	expect(visual.badge.visible).toBe(false);
+	updateFn(item, 256);
+	expect(visual.unitsFadeFilter.enabled).toBe(false);
+	Effect.runSync(destroyTileActorFx(actor));
+});

@@ -14,8 +14,7 @@ export namespace updateActorVisualFx {
 }
 
 const layeredArtworkToFaceRatio = 0.75;
-const formatTileBadgeLabelFn = (count: number, kind?: "units" | "queue") =>
-	`${kind === "units" ? "" : "x"}${count > 99 ? "99+" : String(count)}`;
+const formatTileBadgeLabelFn = (count: number) => `x${count > 99 ? "99+" : String(count)}`;
 
 /** Applies one complete logical face revision to one private visual slot. */
 export const updateActorVisualFx = Effect.fn("updateActorVisualFx")(function* ({
@@ -30,6 +29,8 @@ export const updateActorVisualFx = Effect.fn("updateActorVisualFx")(function* ({
 
 	visual.item = item;
 	visual.size = size;
+	visual.unitsFadeFilter.enabled = item.colorFraction !== undefined && item.colorFraction < 1;
+	visual.unitsFadeUniforms.uniforms.uColorFraction = item.colorFraction ?? 1;
 	const artworkSize =
 		item.compositeUrl === undefined ? faceSize : faceSize * layeredArtworkToFaceRatio;
 	const artwork = {
@@ -53,17 +54,13 @@ export const updateActorVisualFx = Effect.fn("updateActorVisualFx")(function* ({
 	visual.composite.width = artwork.secondary.size;
 	visual.composite.height = artwork.secondary.size;
 
-	const badgeCount =
-		item.badgeKind === "units" && (item.badgeCount ?? 0) <= 1 ? undefined : item.badgeCount;
 	const badge = {
 		text: visual.badge,
 		background: visual.badgeBackground,
-		count: badgeCount,
-		kind: item.badgeKind,
+		count: item.badgeCount,
 	};
 	badge.text.style.fontSize = badgeFontSize;
-	badge.text.text =
-		badge.count === undefined ? "" : formatTileBadgeLabelFn(badge.count, badge.kind);
+	badge.text.text = badge.count === undefined ? "" : formatTileBadgeLabelFn(badge.count);
 	badge.text.visible = badge.count !== undefined;
 	badge.background.visible = badge.count !== undefined;
 	if (badge.count === undefined) return;
@@ -71,10 +68,7 @@ export const updateActorVisualFx = Effect.fn("updateActorVisualFx")(function* ({
 	const badgePaddingY = Math.max(2, faceSize * 0.02);
 	const badgeWidth = badge.text.width + badgePaddingX * 2;
 	const badgeHeight = badge.text.height + badgePaddingY * 2;
-	const badgeX =
-		badge.kind === undefined
-			? inset + faceSize * 0.05
-			: inset + faceSize - faceSize * 0.05 - badgeWidth;
+	const badgeX = inset + faceSize - faceSize * 0.05 - badgeWidth;
 	const badgeY = inset + faceSize * 0.05;
 	badge.text.x = badgeX + badgePaddingX;
 	badge.text.y = badgeY + badgePaddingY;

@@ -45,12 +45,12 @@ describe("readTileActorsFx", () => {
 			),
 		).toMatchObject({
 			badgeCount: 3,
-			badgeKind: "queue",
+			colorFraction: 1,
 			progressRatio: 0.5,
 		});
 	});
 
-	it("hides instant-job indicators without hiding units or a timed job at completion", () => {
+	it("hides instant-job indicators while retaining unit color and timed work", () => {
 		const runtime = createTileActorRuntime({
 			active: true,
 		});
@@ -64,8 +64,8 @@ describe("readTileActorsFx", () => {
 		});
 		expect(instant?.progressRatio).toBeUndefined();
 		expect(instant?.running).toBe(false);
-		expect(instant?.badgeKind).toBe("units");
-		expect(instant?.badgeCount).toBe(1);
+		expect(instant?.badgeCount).toBeUndefined();
+		expect(instant?.colorFraction).toBe(1);
 		const completed = readMainActor({
 			...runtime,
 			jobs: runtime.jobs.map((job) => ({
@@ -74,20 +74,36 @@ describe("readTileActorsFx", () => {
 			})),
 		});
 		expect(completed?.progressRatio).toBe(1);
-		expect(completed?.badgeKind).toBe("queue");
+		expect(completed?.badgeCount).toBe(1);
 	});
 
-	it("projects remaining units for an idle finite item", () => {
-		expect(readMainActor(createTileActorRuntime())).toMatchObject({
-			badgeCount: 1,
-			badgeKind: "units",
-		});
+	it("projects depletion from canonical units without a unit badge", () => {
+		const runtime = createTileActorRuntime();
+		const actor = readMainActor(
+			RuntimeSchema.parse({
+				...runtime,
+				items: runtime.items.map((item) => ({
+					...item,
+					remainingUnits: 4,
+					item: {
+						...item.item,
+						units: {
+							amount: 10,
+						},
+					},
+				})),
+			}),
+		);
+		expect(actor?.colorFraction).toBe(0.4);
+		expect(actor?.badgeCount).toBeUndefined();
 	});
 
 	it("projects temporary lifetime without an activity effect", () => {
-		expect(readMainActor(createTemporaryTileActorRuntime())).toMatchObject({
+		const actor = readMainActor(createTemporaryTileActorRuntime());
+		expect(actor).toMatchObject({
 			progressRatio: 0.6,
 		});
+		expect(actor?.colorFraction).toBeUndefined();
 	});
 
 	it("keeps lifetime visible across an instant Clock job", () => {

@@ -208,6 +208,15 @@ describe("PixiBoardSurface", () => {
 		expect(boardState.navigate).not.toHaveBeenCalled();
 
 		boardState.openItemDetail.mockClear();
+		await createProps.onActivateFn(owner, "fill-default-line-queue", canvas);
+
+		expect(boardState.openItemDetail).toHaveBeenCalledWith({
+			itemId: owner.id,
+			origin: canvas,
+		});
+		expect(boardState.enqueueLine).not.toHaveBeenCalled();
+
+		boardState.openItemDetail.mockClear();
 		await createProps.onActivateFn(owner, "detail", canvas);
 
 		expect(boardState.openItemDetail).toHaveBeenCalledWith({
@@ -235,7 +244,7 @@ describe("PixiBoardSurface", () => {
 		expect(boardState.openItemDetail).not.toHaveBeenCalled();
 	});
 
-	it("admits the default line before opening Detail and keeps right click detail-only", async () => {
+	it("admits the default line without opening Detail and keeps right click detail-only", async () => {
 		await renderSurface();
 		const createProps = boardState.createProps;
 		if (createProps === null) throw new Error("Board scene did not create its runtime.");
@@ -274,13 +283,7 @@ describe("PixiBoardSurface", () => {
 			kind: "enqueue",
 			ownerItemId: producer.id,
 		});
-		expect(boardState.openItemDetail).toHaveBeenCalledWith({
-			itemId: producer.id,
-			origin: canvas,
-		});
-		expect(boardState.enqueueLine.mock.invocationCallOrder[0]).toBeLessThan(
-			boardState.openItemDetail.mock.invocationCallOrder[0],
-		);
+		expect(boardState.openItemDetail).not.toHaveBeenCalled();
 		await createProps.onActivateFn(producer, "fill-default-line-queue", canvas);
 
 		expect(boardState.enqueueLine).toHaveBeenLastCalledWith({
@@ -288,12 +291,13 @@ describe("PixiBoardSurface", () => {
 			ownerItemId: producer.id,
 		});
 		expect(boardState.enqueueLine).toHaveBeenCalledTimes(2);
-		expect(boardState.openItemDetail).toHaveBeenCalledTimes(2);
-		expect(boardState.enqueueLine.mock.invocationCallOrder[1]).toBeLessThan(
-			boardState.openItemDetail.mock.invocationCallOrder[1],
-		);
+		expect(boardState.openItemDetail).not.toHaveBeenCalled();
 		await createProps.onActivateFn(producer, "detail", canvas);
 		expect(boardState.enqueueLine).toHaveBeenCalledTimes(2);
-		expect(boardState.openItemDetail).toHaveBeenCalledTimes(3);
+		expect(boardState.openItemDetail).toHaveBeenCalledWith({
+			itemId: producer.id,
+			origin: canvas,
+		});
+		expect(boardState.openItemDetail).toHaveBeenCalledTimes(1);
 	});
 });

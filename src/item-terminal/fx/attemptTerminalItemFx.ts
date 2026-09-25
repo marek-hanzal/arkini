@@ -3,6 +3,7 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { EngineFact } from "~/game-event/type/EngineFact";
+import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import { readItemPhysicalContextFx } from "~/item-location/fx/readItemPhysicalContextFx";
 import { readItemTerminalStateFn } from "~/item-terminal/fn/readItemTerminalStateFn";
 import { selectTriggeredLineFx } from "~/line-trigger/fx/selectTriggeredLineFx";
@@ -13,6 +14,8 @@ import { enqueueLineRuntimeFx } from "~/production-job/fx/enqueueLineRuntimeFx";
 import { abortJobRuntimeFx } from "~/production-job/fx/abortJobRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
+import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
+import { reconcileOutboundDeliveriesRuntimeFx } from "~/production-delivery/fx/reconcileOutboundDeliveriesRuntimeFx";
 
 interface AttemptTerminalItemProps {
 	itemId: IdSchema.Type;
@@ -40,6 +43,48 @@ interface CompleteTerminalItemTransitionResult {
 	readonly claimedSourceItemIds?: readonly IdSchema.Type[];
 }
 
+/** Admission is the visibility boundary; a selected but rejected line does not retain its owner. */
+const enqueueSelectedTerminalLineFx = Effect.fn("enqueueSelectedTerminalLineFx")(function* ({
+	itemId,
+	lineUid,
+	runtime,
+	excludedSourceItemIds,
+	allowOccupiedTerminalSlot = false,
+}: {
+	readonly itemId: IdSchema.Type;
+	readonly lineUid: IdSchema.Type;
+	readonly runtime: RuntimeSchema.Type;
+	readonly excludedSourceItemIds?: ReadonlySet<IdSchema.Type>;
+	readonly allowOccupiedTerminalSlot?: boolean;
+}) {
+	return yield* Effect.gen(function* () {
+		const coverage = yield* readLineInputAutofillCoverageFx({
+			ownerItemId: itemId,
+			lineUid,
+			runtime,
+			excludedSourceItemIds,
+		});
+		if (coverage.type === "incomplete") return undefined;
+		const request = yield* enqueueLineRuntimeFx({
+			ownerItemId: itemId,
+			lineUid,
+			runtime,
+			trigger: LineTriggerEnumSchema.enum["item-termination"],
+			allowOccupiedTerminalSlot,
+		});
+		return {
+			request,
+			claimedSourceItemIds: coverage.plan.entry.map((entry) => entry.sourceItemId),
+		};
+	}).pipe(
+		Effect.catchTags({
+			JobQueueFullError: () => Effect.succeed(undefined),
+			LineRunUnavailableError: () => Effect.succeed(undefined),
+			ItemNotOnBoardError: () => Effect.succeed(undefined),
+		}),
+	);
+});
+
 /** Schedules one terminal line as ordinary work, or removes an owner with no eligible work. */
 const completeTerminalItemTransitionFx = Effect.fn("completeTerminalItemTransitionFx")(function* ({
 	itemId,
@@ -65,6 +110,7 @@ const completeTerminalItemTransitionFx = Effect.fn("completeTerminalItemTransiti
 		randomSeed: `serakki:terminal-line:v1:${item.id}:${item.item.uid}`,
 	});
 	const force = terminal.mode === "kill-switch";
+	const activeJob = runtime.jobs.some((job) => job.ownerItemId === item.id);
 	// Material owned by another job cannot run its own Board job. Its expiry must
 	// settle immediately so the parent job can abort before advancing again.
 	if (item.location.scope !== "board") {
@@ -101,6 +147,69 @@ const completeTerminalItemTransitionFx = Effect.fn("completeTerminalItemTransiti
 			runtime: release.runtime,
 		} satisfies CompleteTerminalItemTransitionResult;
 	}
+	if (activeJob && !force) {
+		if (selectedLine !== undefined) {
+			const queued = yield* enqueueSelectedTerminalLineFx({
+				itemId: item.id,
+				lineUid: selectedLine.uid,
+				runtime,
+				excludedSourceItemIds,
+				allowOccupiedTerminalSlot: true,
+			});
+			if (queued !== undefined)
+				return {
+					type: "queued",
+					facts: queued.request.events,
+					runtime: queued.request.runtime,
+					claimedSourceItemIds: queued.claimedSourceItemIds,
+				} satisfies CompleteTerminalItemTransitionResult;
+		}
+		const departed = yield* reviseRuntimeItemFx({
+			item: {
+				...item,
+				location: {
+					scope: "terminal",
+					origin: item.location,
+				},
+			},
+		});
+		const detached = {
+			...runtime,
+			items: runtime.items.map((candidate) =>
+				candidate.id === item.id ? departed : candidate,
+			),
+			jobQueue: runtime.jobQueue.filter((request) => request.ownerItemId !== item.id),
+		} satisfies RuntimeSchema.Type;
+		return {
+			type: "settled",
+			facts: [
+				{
+					type:
+						terminal.cause === "depleted"
+							? GameEventEnumSchema.enum.ItemDepleted
+							: GameEventEnumSchema.enum.ItemExpired,
+					itemId: item.id,
+					itemUid: item.item.uid,
+					location: item.location,
+				},
+				{
+					type: GameEventEnumSchema.enum.ItemDisappeared,
+					itemId: item.id,
+					itemUid: item.item.uid,
+					location: item.location,
+				},
+			],
+			runtime: yield* reconcileOutboundDeliveriesRuntimeFx({
+				returnFromByOwnerItemId: new Map([
+					[
+						item.id,
+						item.location,
+					],
+				]),
+				runtime: detached,
+			}),
+		} satisfies CompleteTerminalItemTransitionResult;
+	}
 	let draft: RuntimeSchema.Type = {
 		...runtime,
 		jobQueue: runtime.jobQueue.filter((request) => request.ownerItemId !== item.id),
@@ -127,31 +236,12 @@ const completeTerminalItemTransitionFx = Effect.fn("completeTerminalItemTransiti
 			runtime: draft,
 		} satisfies CompleteTerminalItemTransitionResult;
 	if (selectedLine !== undefined) {
-		const queued = yield* Effect.gen(function* () {
-			const coverage = yield* readLineInputAutofillCoverageFx({
-				ownerItemId: item.id,
-				lineUid: selectedLine.uid,
-				runtime: draft,
-				excludedSourceItemIds,
-			});
-			if (coverage.type === "incomplete") return undefined;
-			const request = yield* enqueueLineRuntimeFx({
-				ownerItemId: item.id,
-				lineUid: selectedLine.uid,
-				runtime: draft,
-				trigger: LineTriggerEnumSchema.enum["item-termination"],
-			});
-			return {
-				request,
-				claimedSourceItemIds: coverage.plan.entry.map((entry) => entry.sourceItemId),
-			};
-		}).pipe(
-			Effect.catchTags({
-				JobQueueFullError: () => Effect.succeed(undefined),
-				LineRunUnavailableError: () => Effect.succeed(undefined),
-				ItemNotOnBoardError: () => Effect.succeed(undefined),
-			}),
-		);
+		const queued = yield* enqueueSelectedTerminalLineFx({
+			itemId: item.id,
+			lineUid: selectedLine.uid,
+			runtime: draft,
+			excludedSourceItemIds,
+		});
 		if (queued !== undefined)
 			return {
 				type: "queued",

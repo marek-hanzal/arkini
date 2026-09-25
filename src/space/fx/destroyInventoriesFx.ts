@@ -53,11 +53,13 @@ export const destroyInventoriesFx = Effect.fn("destroyInventoriesFx")(function* 
 			const destroyed =
 				location.scope === "board"
 					? spaces.has(location.space)
-					: location.scope === "delivery"
+					: location.scope === "terminal"
 						? spaces.has(location.origin.space)
-						: location.scope === "input"
-							? discardedIds.has(location.ownerItemId)
-							: discardedJobs.has(location.jobId);
+						: location.scope === "delivery"
+							? spaces.has(location.origin.space)
+							: location.scope === "input"
+								? discardedIds.has(location.ownerItemId)
+								: discardedJobs.has(location.jobId);
 			if (!destroyed || discardedIds.has(item.id)) continue;
 			discardedIds.add(item.id);
 			for (const space of Object.values(item.inventories ?? {})) spaces.add(space);

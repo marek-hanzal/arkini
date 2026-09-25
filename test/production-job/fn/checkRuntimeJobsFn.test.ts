@@ -34,6 +34,69 @@ const job = (id: string, overrides: Partial<RuntimeSchema.Type["jobs"][number]> 
 });
 
 describe("checkRuntimeJobsFn", () => {
+	it("rejects a detached terminal owner without its one ordinary active job", () => {
+		const detachedConfig = {
+			...config,
+			items: {
+				...config.items,
+				forge: {
+					...config.items.forge!,
+					units: {
+						amount: 1,
+					},
+				},
+			},
+		};
+		const detachedOwner = {
+			...owner,
+			item: detachedConfig.items.forge,
+			remainingUnits: 0,
+			location: {
+				scope: "terminal",
+				origin: owner.location,
+			},
+		} satisfies RuntimeItemSchema.Type;
+		const runtime = {
+			cheats: {
+				enabled: false,
+				everEnabled: false,
+				speedUpGameplay: false,
+			},
+			currentSpace: 0,
+			templateUidBySpace: {},
+			items: [
+				detachedOwner,
+			],
+			jobs: [],
+			jobQueue: [],
+			defaultLineByOwnerItemId: {},
+		} satisfies RuntimeSchema.Type;
+		const check = (candidate: RuntimeSchema.Type) =>
+			Effect.runSync(
+				checkRuntimeFx({
+					runtime: candidate,
+				}).pipe(
+					useGameFx({
+						config: detachedConfig,
+					}),
+				),
+			);
+		expect(check(runtime).issues).toContainEqual({
+			itemId: owner.id,
+			jobIds: [],
+			requestIds: [],
+			type: RuntimeCheckIssueEnumSchema.enum.JobDetachedOwnerInvalid,
+		});
+		expect(
+			check({
+				...runtime,
+				jobs: [
+					job("job:active"),
+				],
+			}).issues,
+		).toEqual([]);
+	});
+
 	it("reports invalid jobs and job-owned material locations", () => {
 		const invalidOwner = {
 			...owner,

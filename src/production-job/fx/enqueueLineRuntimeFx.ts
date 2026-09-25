@@ -20,6 +20,7 @@ export namespace enqueueLineRuntimeFx {
 		readonly ownerItemId: IdSchema.Type;
 		readonly runtime: RuntimeSchema.Type;
 		readonly trigger?: LineTriggerEnumSchema.Type;
+		readonly allowOccupiedTerminalSlot?: boolean;
 	}
 
 	export interface Result {
@@ -40,6 +41,7 @@ export const enqueueLineRuntimeFx = Effect.fn("enqueueLineRuntimeFx")(function* 
 	ownerItemId,
 	runtime,
 	trigger = LineTriggerEnumSchema.enum.manual,
+	allowOccupiedTerminalSlot = false,
 }: enqueueLineRuntimeFx.Props) {
 	const owner = yield* readRuntimeItemByIdFx({
 		itemId: ownerItemId,
@@ -64,7 +66,15 @@ export const enqueueLineRuntimeFx = Effect.fn("enqueueLineRuntimeFx")(function* 
 		lineUid,
 		runtime,
 	});
-	if (!resolution.queue.available) {
+	if (
+		!resolution.queue.available &&
+		!(
+			allowOccupiedTerminalSlot &&
+			trigger === LineTriggerEnumSchema.enum["item-termination"] &&
+			runtime.jobs.some((job) => job.ownerItemId === ownerItemId) &&
+			resolution.queue.used === resolution.queue.capacity
+		)
+	) {
 		return yield* Effect.fail(
 			new JobQueueFullError({
 				ownerItemId,

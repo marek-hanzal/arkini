@@ -14,7 +14,7 @@ import {
 } from "./itemUnits.test/fixture";
 
 describe("item units / owner lifecycle", () => {
-	it("subtracts a self-targeted Producer unit and removes the owner after its final job", () => {
+	it("removes a self-targeted Producer from the Board at its final spend", () => {
 		const result = run(
 			Effect.gen(function* () {
 				const well = yield* spawnItemFx({
@@ -38,6 +38,7 @@ describe("item units / owner lifecycle", () => {
 					ownerItemId: well.id,
 					lineUid: "line:self-well:water",
 				});
+				const finalStart = yield* (yield* CommittedTransitionsFx).read;
 				expect(
 					(yield* readRuntimeFx()).items.find((item) => item.id === well.id)
 						?.remainingUnits,
@@ -47,6 +48,7 @@ describe("item units / owner lifecycle", () => {
 				});
 				return {
 					finalCompletion: yield* (yield* CommittedTransitionsFx).read,
+					finalStart,
 					firstStart,
 					runtime: yield* readRuntimeFx(),
 					well,
@@ -62,7 +64,7 @@ describe("item units / owner lifecycle", () => {
 			previousUnits: 2,
 			resultingUnits: 1,
 		});
-		expect(result.finalCompletion.events).toContainEqual(
+		expect(result.finalStart.events).toContainEqual(
 			expect.objectContaining({
 				type: GameEventEnumSchema.enum.ItemDepleted,
 				itemId: result.well.id,
@@ -70,7 +72,7 @@ describe("item units / owner lifecycle", () => {
 				location: board(0),
 			}),
 		);
-		expect(result.finalCompletion.events).toContainEqual({
+		expect(result.finalStart.events).toContainEqual({
 			type: GameEventEnumSchema.enum.ItemDisappeared,
 			itemId: result.well.id,
 			itemUid: "units:self-well",

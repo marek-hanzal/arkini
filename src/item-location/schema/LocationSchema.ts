@@ -5,6 +5,7 @@ import { DeliveryLocationSchema } from "./DeliveryLocationSchema";
 import { InputLocationSchema } from "./InputLocationSchema";
 import { JobLocationSchema } from "./JobLocationSchema";
 import { ReservedLocationSchema } from "./ReservedLocationSchema";
+import { TerminalLocationSchema } from "./TerminalLocationSchema";
 
 /**
  * The concrete runtime or persisted location owned by one live item.
@@ -15,6 +16,7 @@ import { ReservedLocationSchema } from "./ReservedLocationSchema";
 export const LocationSchema = z
 	.discriminatedUnion("scope", [
 		BoardLocationSchema,
+		TerminalLocationSchema,
 		DeliveryLocationSchema,
 		InputLocationSchema,
 		JobLocationSchema,
@@ -23,7 +25,7 @@ export const LocationSchema = z
 	.meta({
 		id: "LocationSchema",
 		description:
-			"The concrete grid, delivery, line-input, reserved, or consumed-job location owned by one live item.",
+			"The concrete grid, terminal-origin, delivery, line-input, reserved, or consumed-job location owned by one live item.",
 	});
 
 export type LocationSchema = typeof LocationSchema;

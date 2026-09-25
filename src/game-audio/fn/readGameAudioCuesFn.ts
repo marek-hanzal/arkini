@@ -266,6 +266,7 @@ export const readVisibleGameAudioCuesFn = (
 			if (item === undefined) continue;
 			const location = item.location;
 			if (location.scope === "board") return location.space;
+			if (location.scope === "terminal") return location.origin.space;
 			if (location.scope === "delivery") return location.origin.space;
 			if (location.scope === "input") return ownerSpaceFn(location.ownerItemId, visited);
 			const job = snapshots
@@ -278,6 +279,7 @@ export const readVisibleGameAudioCuesFn = (
 	const spaceOfFn = (itemId: string) => ownerSpaceFn(itemId, new Set());
 	const locationSpaceFn = (location: LocationSchema.Type): number | undefined => {
 		if (location.scope === "board") return location.space;
+		if (location.scope === "terminal") return location.origin.space;
 		if (location.scope === "delivery") return location.origin.space;
 		if (location.scope === "input") return spaceOfFn(location.ownerItemId);
 		const job = snapshots

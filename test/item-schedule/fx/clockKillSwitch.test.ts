@@ -207,6 +207,11 @@ describe("Clock kill switch", () => {
 					ownerItemId: "runtime:clock",
 					lineUid: "a",
 				}),
+				expect.objectContaining({
+					type: "job:queued",
+					ownerItemId: "runtime:clock",
+					lineUid: "line:expiry",
+				}),
 			]);
 		} else {
 			expect(result.step.runtime.jobs).toMatchObject([

@@ -257,6 +257,9 @@ describe("Clock expiry settlement", () => {
 				{
 					lineUid: "a",
 				},
+				{
+					lineUid: "line:expiry",
+				},
 			]);
 			expect(result.nextJob.jobs).toMatchObject([
 				{
@@ -264,7 +267,11 @@ describe("Clock expiry settlement", () => {
 					remainingMs: 100,
 				},
 			]);
-			expect(result.nextJob.jobQueue).toHaveLength(0);
+			expect(result.nextJob.jobQueue).toMatchObject([
+				{
+					lineUid: "line:expiry",
+				},
+			]);
 			expect(result.settled.items.filter((item) => item.item.uid === "clock")).toHaveLength(
 				0,
 			);
@@ -277,7 +284,7 @@ describe("Clock expiry settlement", () => {
 		},
 	);
 
-	it("gives no extra capacity to the final pulse when an active job already fills the queue limit", () => {
+	it("gives no extra capacity to the final pulse while reserving one terminal request", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnClockItemFx();
@@ -305,7 +312,11 @@ describe("Clock expiry settlement", () => {
 			),
 		);
 		expect(result.expired.jobs).toHaveLength(1);
-		expect(result.expired.jobQueue).toHaveLength(0);
+		expect(result.expired.jobQueue).toMatchObject([
+			{
+				lineUid: "line:expiry",
+			},
+		]);
 		expect(result.settled.items.filter((item) => item.item.uid === "result")).toHaveLength(1);
 		expect(result.settled.jobs).toMatchObject([
 			{

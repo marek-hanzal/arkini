@@ -4,6 +4,7 @@ import { z } from "zod";
 export const LocationScopeEnumSchema = z
 	.enum({
 		Board: "board",
+		Terminal: "terminal",
 		Input: "input",
 		Job: "job",
 		Reserved: "reserved",

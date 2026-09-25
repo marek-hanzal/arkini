@@ -983,7 +983,9 @@ describe("item section form session", () => {
 				'[data-ui="EditorSectionBar"] [data-ui="ItemSectionDisableControl"]',
 			);
 			if (disable === null) throw new Error("Missing disable capability control.");
-			expect(container.querySelectorAll('[data-ui="ItemSectionDisableControl"]')).toHaveLength(1);
+			expect(
+				container.querySelectorAll('[data-ui="ItemSectionDisableControl"]'),
+			).toHaveLength(1);
 			await act(async () => disable.click());
 			expect(state.saveItem).not.toHaveBeenCalled();
 			expect(state.persisted).toBe(configured);

@@ -203,6 +203,9 @@ export const createMainSurfaceFx = Effect.fn("createMainSurfaceFx")(
 				readActorPoseFx: Effect.fn("MainSurface.readActorPoseFx")((item) =>
 					Effect.sync(() => readLocationPoseFn(item.location)),
 				),
+				readBoardPoseFx: Effect.fn("MainSurface.readBoardPoseFx")((location) =>
+					Effect.sync(() => readLocationPoseFn(location)),
+				),
 				readTargetFactsFx: Effect.fn("MainSurface.readTargetFactsFx")((x, y) =>
 					readTargetFactsFromTargetFx(readDropTargetFn(x, y)),
 				),

@@ -7,6 +7,8 @@ import type { EngineFact } from "~/game-event/type/EngineFact";
 import { releaseOwnerInputsFx } from "~/production-input/fx/releaseOwnerInputsFx";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
 import type { BoardRuntimeItemSchema } from "~/game-runtime/schema/BoardRuntimeItemSchema";
+import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
+import type { TerminalLocationSchema } from "~/item-location/schema/TerminalLocationSchema";
 import type { ReservedRuntimeItemSchema } from "~/game-runtime/schema/ReservedRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
@@ -24,7 +26,11 @@ const emptyOutcome = {
 export namespace settleJobRuntimeFx {
 	export interface Props {
 		readonly job: JobSchema.Type;
-		readonly owner: BoardRuntimeItemSchema.Type;
+		readonly owner:
+			| BoardRuntimeItemSchema.Type
+			| (RuntimeItemSchema.Type & {
+					readonly location: TerminalLocationSchema.Type;
+			  });
 		readonly lineOutcome?: OutcomeTableSchema.Type;
 		readonly ownerExit?: {
 			readonly cause: "expired" | "depleted";
@@ -53,7 +59,12 @@ export const settleJobRuntimeFx = Effect.fn("settleJobRuntimeFx")(function* (
 			runtime: context.runtime,
 			facts: [],
 		} satisfies settleJobRuntimeFx.Result;
-	const removeOwner = context.ownerExit !== undefined;
+	const removeOwner =
+		context.ownerExit !== undefined || context.owner.location.scope === "terminal";
+	const origin =
+		context.owner.location.scope === "terminal"
+			? context.owner.location.origin
+			: context.owner.location;
 	const overflow = context.ownerExit?.overflow ?? context.overflow;
 	let draft = context.runtime;
 	let removalEvents: readonly GameEventSchema.Type[] = [];
@@ -79,7 +90,7 @@ export const settleJobRuntimeFx = Effect.fn("settleJobRuntimeFx")(function* (
 			? emptyOutcome
 			: yield* resolveOutcomeTableFx({
 					ownerItemId: context.owner.id,
-					origin: context.owner.location,
+					origin,
 					outcome: context.lineOutcome,
 				});
 	if (lineOutcome.roll.length > 0) {
@@ -97,7 +108,7 @@ export const settleJobRuntimeFx = Effect.fn("settleJobRuntimeFx")(function* (
 	if (removeOwner) {
 		const releasedInputs = yield* releaseOwnerInputsFx({
 			owner: context.owner,
-			origin: context.owner.location,
+			origin,
 			overflow,
 			runtime: draft,
 		});
@@ -106,7 +117,7 @@ export const settleJobRuntimeFx = Effect.fn("settleJobRuntimeFx")(function* (
 	}
 
 	const releasedReservations = yield* releaseJobReservationsFx({
-		origin: context.owner.location,
+		origin,
 		originItemId: context.owner.id,
 		reservations: context.reservations,
 		overflow,
@@ -118,14 +129,14 @@ export const settleJobRuntimeFx = Effect.fn("settleJobRuntimeFx")(function* (
 	);
 	const facts: EngineFact[] = [
 		...removalEvents,
-		...(removeOwner
+		...(context.ownerExit !== undefined
 			? [
 					{
 						type: "lifecycle:settled",
 						cause: context.ownerExit?.cause ?? "expired",
 						itemId: context.owner.id,
 						itemUid: context.owner.item.uid,
-						location: context.owner.location,
+						location: origin,
 						visible: true,
 						replacementItemIds,
 					} satisfies EngineFact,

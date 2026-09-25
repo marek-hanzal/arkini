@@ -11,6 +11,7 @@ import { spawnItemFx } from "~test/support/spawnItemFx";
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
+import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 
 const outcome = {
 	set: [
@@ -179,6 +180,88 @@ const lifecycleConfig = GameConfigSchema.parse({
 				},
 			],
 		},
+		"producer:terminal": {
+			...base("producer:terminal"),
+			units: {
+				amount: 1,
+			},
+			maxQueueSize: 1,
+			lines: [
+				{
+					uid: "line:terminal:work",
+					title: "Work",
+					description: "Produce before death.",
+					runtimeMs: 200,
+					input: [
+						{
+							type: "simple",
+							units: {
+								from: "self",
+								cost: 1,
+							},
+						},
+					],
+					outcome,
+					rules: [],
+				},
+				{
+					uid: "line:terminal:end",
+					title: "End",
+					description: "Wait before removal.",
+					trigger: "item-termination",
+					runtimeMs: 300,
+					input: [
+						{
+							type: "simple",
+						},
+					],
+					rules: [],
+				},
+			],
+		},
+		"producer:terminal-rejected": {
+			...base("producer:terminal-rejected"),
+			units: {
+				amount: 1,
+			},
+			maxQueueSize: 1,
+			lines: [
+				{
+					uid: "line:terminal-rejected:work",
+					title: "Work",
+					description: "Produce before death.",
+					runtimeMs: 200,
+					input: [
+						{
+							type: "simple",
+							units: {
+								from: "self",
+								cost: 1,
+							},
+						},
+					],
+					outcome,
+					rules: [],
+				},
+				{
+					uid: "line:terminal-rejected:end",
+					title: "End",
+					description: "Cannot pay for termination.",
+					trigger: "item-termination",
+					runtimeMs: 300,
+					input: [
+						{
+							type: "simple",
+							units: {
+								from: "self",
+								cost: 1,
+							},
+						},
+					],
+					rules: [],
+				},
+			],
+		},
 		"producer:finite-queue": {
 			...base("producer:finite-queue"),
 
@@ -338,8 +421,8 @@ describe("job completion unit lifecycle", () => {
 		]);
 	});
 
-	it("removes a depleted producer after placing outcome", () => {
-		const runtime = run(
+	it("detaches a depleted producer at job start and drops into its freed cell", () => {
+		const result = run(
 			Effect.gen(function* () {
 				const owner = yield* spawnItemFx({
 					id: "runtime:trader",
@@ -389,12 +472,35 @@ describe("job completion unit lifecycle", () => {
 					ownerItemId: owner.id,
 					lineUid: "line:trader:trade",
 				});
+				const started = yield* readRuntimeFx();
+				const startEvents = (yield* (yield* CommittedTransitionsFx).read).events;
 				yield* runTickRuntimeByFx({
 					elapsedMs: 200,
 				});
-				return yield* readRuntimeFx();
+				return {
+					started,
+					startEvents,
+					completed: yield* readRuntimeFx(),
+				};
 			}),
 		);
+		const runtime = result.completed;
+		expect(result.started.items.find((item) => item.id === "runtime:trader")?.location).toEqual(
+			{
+				scope: "terminal",
+				origin: {
+					scope: "board",
+					space: 0,
+					position: {
+						x: 0,
+						y: 0,
+					},
+				},
+			},
+		);
+		expect(result.started.jobs).toHaveLength(1);
+		expect(result.startEvents.map((event) => event.type)).toContain("item:disappeared");
+		expect(result.startEvents.map((event) => event.type)).toContain("item:depleted");
 
 		expect(runtime.items.some((item) => item.item.uid === "producer:trader")).toBe(false);
 		expect(runtime.items).toEqual(
@@ -407,7 +513,7 @@ describe("job completion unit lifecycle", () => {
 						scope: "board",
 						space: 0,
 						position: {
-							x: 2,
+							x: 0,
 							y: 0,
 						},
 					},
@@ -419,6 +525,122 @@ describe("job completion unit lifecycle", () => {
 				}),
 			]),
 		);
+	});
+
+	it("keeps a depleted owner on the Board until its accepted termination job completes", () => {
+		const result = run(
+			Effect.gen(function* () {
+				const owner = yield* spawnItemFx({
+					id: "runtime:terminal",
+					itemUid: "producer:terminal",
+					location: {
+						scope: "board",
+						space: 0,
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+				});
+				yield* startLineFx({
+					ownerItemId: owner.id,
+					lineUid: "line:terminal:work",
+				});
+				const started = yield* readRuntimeFx();
+				const startEvents = (yield* (yield* CommittedTransitionsFx).read).events;
+				yield* runTickRuntimeByFx({
+					elapsedMs: 200,
+				});
+				const afterWork = yield* readRuntimeFx();
+				yield* runTickRuntimeByFx({
+					elapsedMs: 100,
+				});
+				const duringTermination = yield* readRuntimeFx();
+				yield* runTickRuntimeByFx({
+					elapsedMs: 300,
+				});
+				return {
+					started,
+					startEvents,
+					afterWork,
+					duringTermination,
+					finished: yield* readRuntimeFx(),
+					finishEvents: (yield* (yield* CommittedTransitionsFx).read).events,
+				};
+			}),
+		);
+		expect(
+			result.started.items.find((item) => item.id === "runtime:terminal")?.location.scope,
+		).toBe("board");
+		expect(result.started.jobs).toHaveLength(1);
+		expect(result.started.jobQueue).toMatchObject([
+			{
+				lineUid: "line:terminal:end",
+			},
+		]);
+		expect(result.startEvents.map((event) => event.type)).not.toContain("item:disappeared");
+		expect(
+			result.afterWork.items.find((item) => item.item.uid === "item:gift")?.location,
+		).toMatchObject({
+			scope: "board",
+			position: {
+				x: 1,
+				y: 0,
+			},
+		});
+		expect(result.duringTermination.items.some((item) => item.id === "runtime:terminal")).toBe(
+			true,
+		);
+		expect(result.finished.items.some((item) => item.id === "runtime:terminal")).toBe(false);
+		expect(result.finishEvents.map((event) => event.type)).toContain("item:disappeared");
+	});
+
+	it("frees the cell when a selected termination line cannot be admitted", () => {
+		const result = run(
+			Effect.gen(function* () {
+				const owner = yield* spawnItemFx({
+					id: "runtime:terminal-rejected",
+					itemUid: "producer:terminal-rejected",
+					location: {
+						scope: "board",
+						space: 0,
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+				});
+				yield* startLineFx({
+					ownerItemId: owner.id,
+					lineUid: "line:terminal-rejected:work",
+				});
+				const started = yield* readRuntimeFx();
+				const startEvents = (yield* (yield* CommittedTransitionsFx).read).events;
+				yield* runTickRuntimeByFx({
+					elapsedMs: 200,
+				});
+				return {
+					started,
+					startEvents,
+					completed: yield* readRuntimeFx(),
+				};
+			}),
+		);
+		expect(
+			result.started.items.find((item) => item.id === "runtime:terminal-rejected")?.location
+				.scope,
+		).toBe("terminal");
+		expect(result.started.jobQueue).toEqual([]);
+		expect(result.startEvents.map((event) => event.type)).toContain("item:disappeared");
+		expect(
+			result.completed.items.find((item) => item.item.uid === "item:gift")?.location,
+		).toMatchObject({
+			scope: "board",
+			position: {
+				x: 0,
+				y: 0,
+			},
+		});
 	});
 
 	it("preserves one impure stored input after depleted-owner outputs claim priority", () => {
@@ -435,11 +657,14 @@ describe("job completion unit lifecycle", () => {
 					id: "runtime:trader",
 					itemUid: "producer:trader",
 					location: {
-						scope: "board",
-						space: 0,
-						position: {
-							x: 0,
-							y: 0,
+						scope: "terminal",
+						origin: {
+							scope: "board",
+							space: 0,
+							position: {
+								x: 0,
+								y: 0,
+							},
 						},
 					},
 					remainingUnits: 0,
@@ -496,7 +721,7 @@ describe("job completion unit lifecycle", () => {
 				scope: "board",
 				space: 0,
 				position: {
-					x: 1,
+					x: 0,
 					y: 0,
 				},
 			},
@@ -508,7 +733,7 @@ describe("job completion unit lifecycle", () => {
 					scope: "board",
 					space: 0,
 					position: {
-						x: 0,
+						x: 1,
 						y: 0,
 					},
 				},

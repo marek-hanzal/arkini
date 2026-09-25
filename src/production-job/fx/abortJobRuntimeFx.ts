@@ -47,8 +47,16 @@ export const abortJobRuntimeFx = Effect.fn("abortJobRuntimeFx")(function* ({
 		runtime,
 	});
 	const owner = Option.getOrUndefined(narrowBoardRuntimeItemFn(runtimeOwner));
-	if (owner === undefined)
+	const detachedOwner =
+		runtimeOwner.location.scope === LocationScopeEnumSchema.enum.Terminal
+			? {
+					...runtimeOwner,
+					location: runtimeOwner.location,
+				}
+			: undefined;
+	if (owner === undefined && detachedOwner === undefined)
 		return yield* Effect.die(new Error(`Job ${jobId} owner has no grid origin.`));
+	const jobOwner = owner ?? detachedOwner!;
 
 	const consumedItems = runtime.items.filter(
 		(item): item is JobRuntimeItemSchema.Type =>
@@ -68,8 +76,8 @@ export const abortJobRuntimeFx = Effect.fn("abortJobRuntimeFx")(function* ({
 		{
 			type: GameEventEnumSchema.enum.JobAborted,
 			jobId: job.id,
-			ownerItemId: owner.id,
-			itemUid: owner.item.uid,
+			ownerItemId: jobOwner.id,
+			itemUid: jobOwner.item.uid,
 			lineUid: job.lineUid,
 			reason,
 		},
@@ -79,7 +87,7 @@ export const abortJobRuntimeFx = Effect.fn("abortJobRuntimeFx")(function* ({
 		const discarded = yield* discardRuntimeItemTreeFx({
 			ownershipRuntime: runtime,
 			item: consumedItem,
-			ownerItemId: owner.id,
+			ownerItemId: jobOwner.id,
 			source: "consumed-input",
 			reason: "job-aborted",
 			runtime: draft,
@@ -91,7 +99,7 @@ export const abortJobRuntimeFx = Effect.fn("abortJobRuntimeFx")(function* ({
 		job,
 		program: settleJobRuntimeFx({
 			job,
-			owner,
+			owner: jobOwner,
 			reservations,
 			overflow,
 			runtime: draft,

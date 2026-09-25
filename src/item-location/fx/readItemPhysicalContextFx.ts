@@ -35,6 +35,12 @@ export const readItemPhysicalContextFx = Effect.fn("readItemPhysicalContextFx")(
 			)
 			.with(
 				{
+					scope: "terminal",
+				},
+				(location) => Effect.succeed(location.origin),
+			)
+			.with(
+				{
 					scope: "delivery",
 				},
 				(location) => Effect.succeed(location.origin),

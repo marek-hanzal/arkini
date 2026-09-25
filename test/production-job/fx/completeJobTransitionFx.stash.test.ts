@@ -327,6 +327,18 @@ describe("stash line completion transition", () => {
 						},
 					},
 				});
+				yield* spawnItemFx({
+					id: "runtime:blocker:second",
+					itemUid: "item:blocker",
+					location: {
+						scope: "board",
+						space: 0,
+						position: {
+							x: 2,
+							y: 0,
+						},
+					},
+				});
 				yield* runTickRuntimeByFx({
 					elapsedMs: 200,
 				});

@@ -8,6 +8,7 @@ import { JobLineMissingIssueSchema } from "~/production-job/schema/JobLineMissin
 import { JobOwnerMissingIssueSchema } from "~/production-job/schema/JobOwnerMissingIssueSchema";
 import { JobOwnerMultipleActiveIssueSchema } from "~/production-job/schema/JobOwnerMultipleActiveIssueSchema";
 import { JobOwnerNotOnGridIssueSchema } from "~/production-job/schema/JobOwnerNotOnGridIssueSchema";
+import { JobDetachedOwnerInvalidIssueSchema } from "~/production-job/schema/JobDetachedOwnerInvalidIssueSchema";
 import { JobQueueExceededIssueSchema } from "~/production-job/schema/JobQueueExceededIssueSchema";
 import { JobConsumedMaterialStateIssueSchema } from "~/production-job/schema/JobConsumedMaterialStateIssueSchema";
 import { JobMaterialInputIssueSchema } from "~/production-job/schema/JobMaterialInputIssueSchema";
@@ -34,6 +35,7 @@ export const RuntimeCheckIssueSchema = z
 		JobOwnerMissingIssueSchema,
 		JobOwnerMultipleActiveIssueSchema,
 		JobOwnerNotOnGridIssueSchema,
+		JobDetachedOwnerInvalidIssueSchema,
 		JobLineMissingIssueSchema,
 		JobQueueExceededIssueSchema,
 		JobTimeInvalidIssueSchema,

@@ -7,6 +7,7 @@ import type { JobLineMissingIssueSchema } from "~/production-job/schema/JobLineM
 import type { JobOwnerMissingIssueSchema } from "~/production-job/schema/JobOwnerMissingIssueSchema";
 import type { JobOwnerMultipleActiveIssueSchema } from "~/production-job/schema/JobOwnerMultipleActiveIssueSchema";
 import type { JobOwnerNotOnGridIssueSchema } from "~/production-job/schema/JobOwnerNotOnGridIssueSchema";
+import type { JobDetachedOwnerInvalidIssueSchema } from "~/production-job/schema/JobDetachedOwnerInvalidIssueSchema";
 import type { JobQueueExceededIssueSchema } from "~/production-job/schema/JobQueueExceededIssueSchema";
 import type { JobConsumedMaterialStateIssueSchema } from "~/production-job/schema/JobConsumedMaterialStateIssueSchema";
 import type { JobMaterialInputIssueSchema } from "~/production-job/schema/JobMaterialInputIssueSchema";
@@ -20,6 +21,7 @@ import { readRuntimeItemOwnedStateFn } from "~/game-runtime/fn/readRuntimeItemOw
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { matchesItemSelectorFn } from "~/item-definition/fn/matchesItemSelectorFn";
+import { readItemTerminalStateFn } from "~/item-terminal/fn/readItemTerminalStateFn";
 import { TypeSchema as InputTypeSchema } from "~/production-input/schema/TypeSchema";
 
 export namespace checkRuntimeJobsFn {
@@ -35,6 +37,7 @@ export const checkRuntimeJobsFn = ({ runtime }: checkRuntimeJobsFn.Props) => {
 	const multipleActiveIssues: JobOwnerMultipleActiveIssueSchema.Type[] = [];
 	const lineIssues: JobLineMissingIssueSchema.Type[] = [];
 	const ownerGridIssues: JobOwnerNotOnGridIssueSchema.Type[] = [];
+	const detachedOwnerIssues: JobDetachedOwnerInvalidIssueSchema.Type[] = [];
 	const queueIssues: JobQueueExceededIssueSchema.Type[] = [];
 	const timeIssues: JobTimeInvalidIssueSchema.Type[] = [];
 	const materialOrphanIssues: JobMaterialOrphanIssueSchema.Type[] = [];
@@ -73,7 +76,10 @@ export const checkRuntimeJobsFn = ({ runtime }: checkRuntimeJobsFn.Props) => {
 			});
 			continue;
 		}
-		if (Option.isNone(narrowBoardRuntimeItemFn(owner)))
+		if (
+			Option.isNone(narrowBoardRuntimeItemFn(owner)) &&
+			!(owner.location.scope === LocationScopeEnumSchema.enum.Terminal && job !== undefined)
+		)
 			ownerGridIssues.push({
 				jobId: entry.id,
 				ownerItemId: owner.id,
@@ -105,6 +111,32 @@ export const checkRuntimeJobsFn = ({ runtime }: checkRuntimeJobsFn.Props) => {
 			});
 		}
 	}
+	for (const item of runtime.items) {
+		if (item.location.scope !== LocationScopeEnumSchema.enum.Terminal) continue;
+		const jobs = runtime.jobs.filter((job) => job.ownerItemId === item.id);
+		const requests = queue.filter((request) => request.ownerItemId === item.id);
+		const line =
+			jobs.length === 1
+				? readItemLineFn({
+						item: item.item,
+						lineUid: jobs[0]!.lineUid,
+					})
+				: undefined;
+		if (
+			jobs.length === 1 &&
+			requests.length === 0 &&
+			line !== undefined &&
+			line.trigger !== "item-termination" &&
+			readItemTerminalStateFn(item) !== undefined
+		)
+			continue;
+		detachedOwnerIssues.push({
+			itemId: item.id,
+			jobIds: jobs.map((job) => job.id),
+			requestIds: requests.map((request) => request.id),
+			type: RuntimeCheckIssueEnumSchema.enum.JobDetachedOwnerInvalid,
+		});
+	}
 
 	for (const ownerItemId of new Set(entries.map((entry) => entry.ownerItemId))) {
 		const owner = runtime.items.find((item) => item.id === ownerItemId);
@@ -116,7 +148,17 @@ export const checkRuntimeJobsFn = ({ runtime }: checkRuntimeJobsFn.Props) => {
 		const ids = entries
 			.filter((entry) => entry.ownerItemId === ownerItemId)
 			.map((entry) => entry.id);
-		if (ids.length > maxQueueSize)
+		const hasQueuedTerminalLine = queue.some((request) => {
+			if (request.ownerItemId !== ownerItemId) return false;
+			return owner.item.lines.some(
+				(line) => line.uid === request.lineUid && line.trigger === "item-termination",
+			);
+		});
+		const terminalSlot =
+			hasQueuedTerminalLine && runtime.jobs.some((job) => job.ownerItemId === ownerItemId)
+				? 1
+				: 0;
+		if (ids.length > maxQueueSize + terminalSlot)
 			queueIssues.push({
 				ownerItemId,
 				jobIds: ids,
@@ -212,6 +254,7 @@ export const checkRuntimeJobsFn = ({ runtime }: checkRuntimeJobsFn.Props) => {
 		...ownerIssues,
 		...multipleActiveIssues,
 		...ownerGridIssues,
+		...detachedOwnerIssues,
 		...lineIssues,
 		...queueIssues,
 		...timeIssues,

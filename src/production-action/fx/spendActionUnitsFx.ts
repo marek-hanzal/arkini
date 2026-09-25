@@ -77,11 +77,7 @@ export const spendActionUnitsFx = Effect.fn("spendActionUnitsFx")(function* ({
 		...runtime,
 		items: runtime.items.map((candidate) => (candidate.id === item.id ? spentItem : candidate)),
 	};
-	if (
-		nextRemainingUnits > 0 ||
-		(item.item.terminationMode !== "kill-switch" &&
-			spentRuntime.jobs.some((job) => job.ownerItemId === item.id))
-	)
+	if (nextRemainingUnits > 0)
 		return {
 			facts: spentFacts,
 			runtime: spentRuntime,

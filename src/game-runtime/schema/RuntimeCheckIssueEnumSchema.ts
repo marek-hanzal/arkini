@@ -8,6 +8,7 @@ export const RuntimeCheckIssueEnumSchema = z
 		JobOwnerMissing: "job:owner-missing",
 		JobOwnerMultipleActive: "job:owner:multiple-active",
 		JobOwnerNotOnGrid: "job:owner-not-on-grid",
+		JobDetachedOwnerInvalid: "job:detached-owner-invalid",
 		JobLineMissing: "job:line-missing",
 		JobQueueExceeded: "job:queue-exceeded",
 		JobTimeInvalid: "job:time-invalid",

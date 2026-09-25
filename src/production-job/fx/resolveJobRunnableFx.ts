@@ -25,6 +25,16 @@ export const resolveJobRunnableFx = Effect.fn("resolveJobRunnableFx")(function* 
 			item.location.jobId === job.id,
 	);
 	if (hasReadyMaterial) return false;
+	// An admitted job keeps running after its depleted owner leaves the Board.
+	// Its line was already validated at start; the detached owner has no live grid rules.
+	if (
+		runtime.items.some(
+			(item) =>
+				item.id === job.ownerItemId &&
+				item.location.scope === LocationScopeEnumSchema.enum.Terminal,
+		)
+	)
+		return true;
 
 	const { line, owner } = yield* readBoardItemLineFx({
 		lineUid: job.lineUid,

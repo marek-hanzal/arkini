@@ -173,7 +173,7 @@ it("counts earlier target costs and uses an alternate payer before depleting a q
 	);
 });
 
-it("lets a self-targeted final unit start while the same owner still has queued work", () => {
+it("lets a self-targeted final unit start and clears the departed owner's queue", () => {
 	Effect.runSync(
 		Effect.gen(function* () {
 			yield* spawnItemFx({
@@ -196,15 +196,16 @@ it("lets a self-targeted final unit start while the same owner still has queued 
 			expect(runtime.items[0]).toMatchObject({
 				id: "payer",
 				remainingUnits: 0,
+				location: {
+					scope: "terminal",
+					origin: board(0),
+				},
 			});
 			expect(runtime.jobs[0]).toMatchObject({
 				ownerItemId: "payer",
 				lineUid: "self",
 			});
-			expect(runtime.jobQueue[0]).toMatchObject({
-				ownerItemId: "payer",
-				lineUid: "wait",
-			});
+			expect(runtime.jobQueue).toEqual([]);
 		}).pipe(
 			useGameFx({
 				config: createConfig(),
@@ -213,7 +214,7 @@ it("lets a self-targeted final unit start while the same owner still has queued 
 	);
 });
 
-it("retains an active external payer at zero units until its job completes", () => {
+it("detaches an active external payer at zero units while its job continues", () => {
 	Effect.runSync(
 		Effect.gen(function* () {
 			yield* spawnItemFx({
@@ -247,15 +248,16 @@ it("retains an active external payer at zero units until its job completes", () 
 			const runtime = yield* readRuntimeFx();
 			expect(runtime.items.find((item) => item.id === "payer")).toMatchObject({
 				remainingUnits: 0,
+				location: {
+					scope: "terminal",
+					origin: board(1),
+				},
 			});
 			expect(runtime.jobs.map((job) => job.ownerItemId)).toEqual([
 				"payer",
 				"consumer",
 			]);
-			expect(runtime.jobQueue[0]).toMatchObject({
-				ownerItemId: "payer",
-				lineUid: "wait",
-			});
+			expect(runtime.jobQueue).toEqual([]);
 		}).pipe(
 			useGameFx({
 				config: createConfig(),

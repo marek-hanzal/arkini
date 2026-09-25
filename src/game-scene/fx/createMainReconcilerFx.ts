@@ -313,7 +313,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 		const spawnOriginByItem = new Map<
 			string,
 			{
-				readonly actor: PixiTileActor;
+				readonly actor?: PixiTileActor;
 				readonly pose: PresentationTarget;
 			}
 		>();
@@ -352,17 +352,24 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 					const origin = actorStore.actors.get(event.originItemId);
 					if (
 						item === undefined ||
-						origin === undefined ||
 						item.itemUid !== event.itemUid ||
 						!isSameTileActorLocationFn(item.location, event.location) ||
 						actorStore.actors.has(item.id)
 					)
 						continue;
+					const previousOrigin = previousById.get(event.originItemId);
+					const departedOrigin =
+						previousOrigin?.location.scope === "terminal"
+							? RendererRuntime.runSync(
+									surface.readBoardPoseFx(previousOrigin.location.origin),
+								)
+							: null;
+					if (origin === undefined && departedOrigin === null) continue;
 					spawnOriginByItem.set(item.id, {
 						actor: origin,
 						pose: readContactPoseFn({
 							moving: null,
-							target: origin,
+							target: origin ?? departedOrigin!,
 						}),
 					});
 				}

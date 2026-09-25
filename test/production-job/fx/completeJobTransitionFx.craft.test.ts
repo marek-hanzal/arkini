@@ -12,7 +12,7 @@ import {
 } from "~test/production-job/fx/completeJobTransitionFx.craft.test/fixture";
 
 describe("craft job completion transition", () => {
-	it("finishes craft output before removing the depleted owner and returning reservations", () => {
+	it("places craft output into the departed owner's cell before returning reservations", () => {
 		const runtime = runCraft(
 			Effect.gen(function* () {
 				const owner = yield* spawnCraftFx({
@@ -60,7 +60,7 @@ describe("craft job completion transition", () => {
 						scope: "board",
 						space: 0,
 						position: {
-							x: 1,
+							x: 0,
 							y: 0,
 						},
 					},
@@ -73,8 +73,8 @@ describe("craft job completion transition", () => {
 						scope: "board",
 						space: 0,
 						position: {
-							x: 0,
-							y: 1,
+							x: 1,
+							y: 0,
 						},
 					},
 				}),
@@ -87,7 +87,7 @@ describe("craft job completion transition", () => {
 		).toBe(false);
 	});
 
-	it("places ordered craft output before the depleted owner exits", () => {
+	it("places ordered craft output from the departed owner's origin", () => {
 		const runtime = runCraft(
 			Effect.gen(function* () {
 				const owner = yield* spawnCraftFx({
@@ -115,7 +115,7 @@ describe("craft job completion transition", () => {
 						scope: "board",
 						space: 0,
 						position: {
-							x: 1,
+							x: 0,
 							y: 0,
 						},
 					},

@@ -65,15 +65,23 @@ export const completeJobTransitionFx = Effect.fn("completeJobTransitionFx")(func
 	if (runtimeOwner === undefined)
 		return yield* Effect.die(new Error(`Job ${job.id} owner is missing.`));
 	const owner = Option.getOrUndefined(narrowBoardRuntimeItemFn(runtimeOwner));
-	if (owner === undefined)
+	const detachedOwner =
+		runtimeOwner.location.scope === LocationScopeEnumSchema.enum.Terminal
+			? {
+					...runtimeOwner,
+					location: runtimeOwner.location,
+				}
+			: undefined;
+	if (owner === undefined && detachedOwner === undefined)
 		return yield* Effect.fail(
 			new ItemNotOnBoardError({
 				itemId: runtimeOwner.id,
 				location: runtimeOwner.location,
 			}),
 		);
+	const completionOwner = owner ?? detachedOwner!;
 	const line = readItemLineFn({
-		item: owner.item,
+		item: completionOwner.item,
 		lineUid: job.lineUid,
 	});
 	if (line === undefined)
@@ -84,11 +92,13 @@ export const completeJobTransitionFx = Effect.fn("completeJobTransitionFx")(func
 	const reservations = Array.getSomes(runtime.items.map(isReservedRuntimeItemFn)).filter(
 		(item) => item.location.jobId === job.id,
 	);
-	const completionOwner = owner;
-	const ownerExit = readTerminalLineOwnerExitFn({
-		owner,
-		line,
-	});
+	const ownerExit =
+		owner === undefined
+			? undefined
+			: readTerminalLineOwnerExitFn({
+					owner,
+					line,
+				});
 	let completionRuntime = {
 		...runtime,
 		jobs: runtime.jobs.filter((candidate) => candidate.id !== job.id),

@@ -19,6 +19,7 @@ export const settleTerminalItemsFx = Effect.fn("settleTerminalItemsFx")(function
 	for (const itemId of ids) {
 		const item = draft.items.find((candidate) => candidate.id === itemId);
 		if (item === undefined) continue;
+		if (item.location.scope === "terminal") continue;
 		const terminal = readItemTerminalStateFn(item);
 		if (terminal === undefined) continue;
 		const terminalLineUids = new Set(
@@ -35,8 +36,6 @@ export const settleTerminalItemsFx = Effect.fn("settleTerminalItemsFx")(function
 					request.ownerItemId === itemId && terminalLineUids.has(request.lineUid),
 			)
 		)
-			continue;
-		if (terminal.mode !== "kill-switch" && draft.jobs.some((job) => job.ownerItemId === itemId))
 			continue;
 		const attempt = yield* attemptTerminalItemFx({
 			itemId,

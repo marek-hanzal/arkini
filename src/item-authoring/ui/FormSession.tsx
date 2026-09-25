@@ -256,7 +256,9 @@ export const FormSession = ({
 					secondaryNavigation={
 						<EditorSectionBar
 							actions={
-								sectionId === "production" || sectionId === "merges" ? (
+								sectionId === "production" ||
+								sectionId === "merges" ||
+								sectionId === "clock" ? (
 									<ItemSectionDisableControl capability={sectionId} />
 								) : undefined
 							}

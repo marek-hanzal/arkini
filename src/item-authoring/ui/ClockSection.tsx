@@ -11,7 +11,7 @@ import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Mx } from "~/translation/ui/Mx";
-import { ItemSectionDisableControl } from "~/item-authoring/ui/ItemSectionDisableControl";
+
 /** Composes time and rule controls for the authored schedule. */
 const ClockFields = () => {
 	const translator = useTranslator();
@@ -25,10 +25,7 @@ const ClockFields = () => {
 			data-ui="EditorClockFields"
 		>
 			<EditorFormCard>
-				<EditorFormSectionDivider
-					title={translator.textFn("Clock")}
-					action={<ItemSectionDisableControl capability="clock" />}
-				/>
+				<EditorFormSectionDivider title={translator.textFn("Clock")} />
 				<div className="grid grid-cols-2 items-start gap-4">
 					<form.AppField name="clock.durationMs">
 						{(field) => (

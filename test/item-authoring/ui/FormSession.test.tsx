@@ -929,6 +929,7 @@ describe("item section form session", () => {
 	it.each([
 		"merges",
 		"production",
+		"clock",
 	] as const)(
 		"disables all %s only in the draft until Save and preserves the other capabilities",
 		async (capability) => {
@@ -974,6 +975,7 @@ describe("item section form session", () => {
 			const section = {
 				merges: <MergesSection />,
 				production: <ProductionSection />,
+				clock: <ClockSection />,
 			}[capability];
 			const { container, renderSection } = await render(section);
 			await renderSection(section, capability);
@@ -981,6 +983,7 @@ describe("item section form session", () => {
 				'[data-ui="EditorSectionBar"] [data-ui="ItemSectionDisableControl"]',
 			);
 			if (disable === null) throw new Error("Missing disable capability control.");
+			expect(container.querySelectorAll('[data-ui="ItemSectionDisableControl"]')).toHaveLength(1);
 			await act(async () => disable.click());
 			expect(state.saveItem).not.toHaveBeenCalled();
 			expect(state.persisted).toBe(configured);
@@ -992,7 +995,7 @@ describe("item section form session", () => {
 					item: expect.objectContaining({
 						uid: configured.uid,
 						maxQueueSize: configured.maxQueueSize,
-						clock: configured.clock,
+						clock: capability === "clock" ? undefined : configured.clock,
 						units: configured.units,
 						lines: capability === "production" ? [] : configured.lines,
 						merge: capability === "merges" ? undefined : configured.merge,

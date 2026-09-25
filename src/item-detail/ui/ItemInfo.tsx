@@ -6,10 +6,11 @@ import { ItemArtwork } from "~/ui/ui/ItemArtwork";
 
 interface ItemInfoProps {
 	readonly detail: useItemDetailSceneController.Detail;
+	readonly stale: boolean;
 }
 
 /** The player's basic item facts, without authoring controls or resource identifiers. */
-export const ItemInfo = ({ detail }: ItemInfoProps) => {
+export const ItemInfo = ({ detail, stale }: ItemInfoProps) => {
 	const translator = useTranslator();
 	const depleted =
 		detail.units === undefined
@@ -33,6 +34,10 @@ export const ItemInfo = ({ detail }: ItemInfoProps) => {
 					/>
 				</div>
 				<div className="grid min-w-0 gap-8">
+					<h2 className="text-3xl font-semibold leading-tight">
+						{detail.title}
+						{stale ? ` · ${translator.textFn("Gone")}` : null}
+					</h2>
 					{detail.description ? (
 						<p className="whitespace-pre-wrap text-base leading-relaxed text-foreground">
 							{detail.description}

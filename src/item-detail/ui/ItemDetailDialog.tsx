@@ -1,4 +1,5 @@
 import { motion } from "motion/react";
+import { X } from "lucide-react";
 
 import { useCloseItemDetail } from "~/item-detail-frame/ui/useCloseItemDetail";
 import { ItemDetailScene } from "~/item-detail/ui/ItemDetailScene";
@@ -36,7 +37,7 @@ export const ItemDetailDialog = ({ state }: useItemDetailMotion.Props) => {
 		>
 			<motion.div
 				ref={focus.overlayRef}
-				className="flex h-[90%] max-h-full w-[90%] max-w-full cursor-default flex-col overflow-hidden rounded-2xl border border-line-strong bg-modal p-[var(--ak-panel-padding)] text-foreground shadow-[0_2rem_5rem_color-mix(in_srgb,var(--ak-overlay)_58%,transparent),0_0_0_1px_color-mix(in_srgb,var(--ak-line-strong)_45%,transparent)]"
+				className="relative flex h-[90%] max-h-full w-[90%] max-w-full cursor-default flex-col overflow-hidden rounded-2xl border border-line-strong bg-modal p-[var(--ak-panel-padding)] text-foreground shadow-[0_2rem_5rem_color-mix(in_srgb,var(--ak-overlay)_58%,transparent),0_0_0_1px_color-mix(in_srgb,var(--ak-line-strong)_45%,transparent)]"
 				data-ui="ItemDetailModal"
 				onContextMenu={(event) => {
 					event.preventDefault();
@@ -56,6 +57,15 @@ export const ItemDetailDialog = ({ state }: useItemDetailMotion.Props) => {
 				transition={itemDetailTransition}
 				onAnimationComplete={motionState.completeMotionPhaseFn}
 			>
+				<button
+					type="button"
+					className="absolute top-[var(--ak-panel-padding)] right-[var(--ak-panel-padding)] z-10 grid size-14 cursor-pointer place-items-center bg-modal text-foreground transition-[color,transform] hover:scale-110 hover:text-accent disabled:cursor-not-allowed"
+					data-ui="ItemDetailCloseButton"
+					disabled={disabled}
+					onClick={() => closeItemDetailFn()}
+				>
+					<X className="size-10" />
+				</button>
 				<ItemDetailScene
 					disabled={disabled}
 					target={state.target}

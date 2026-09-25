@@ -1,9 +1,6 @@
-import { ItemDetailHeader } from "~/item-detail-frame/ui/ItemDetailHeader";
-import { useCloseItemDetail } from "~/item-detail-frame/ui/useCloseItemDetail";
 import { ItemInfo } from "~/item-detail/ui/ItemInfo";
 import { ItemLines } from "~/item-detail/ui/ItemLines";
 import { useItemDetailSceneController } from "~/item-detail/ui/useItemDetailSceneController";
-import { useTranslator } from "~/translation/ui/useTranslator";
 import { Tx } from "~/translation/ui/Tx";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
@@ -16,43 +13,18 @@ export const ItemDetailScene = ({ disabled, target }: ItemDetailSceneProps) => {
 	const controller = useItemDetailSceneController({
 		target,
 	});
-	const closeItemDetailFn = useCloseItemDetail();
-	const translator = useTranslator();
-	const status = controller.stale ? translator.textFn("Gone") : undefined;
 	const fullInterface = controller.detail?.ui === "default";
 	return (
 		<div
 			className="flex min-h-0 flex-1 flex-col"
 			data-ui="ItemDetailScene"
 		>
-			{controller.detail !== undefined ? (
-				<ItemDetailHeader
-					disabled={disabled}
-					identity={controller.detail}
-					status={status}
-				/>
-			) : (
-				<header className="flex items-center justify-between border-b border-line pb-3">
-					<div>
-						<h2 className="text-lg font-semibold">
-							<Tx label="Item unavailable" />
-						</h2>
-					</div>
-					<button
-						type="button"
-						disabled={disabled}
-						className="grid size-14 cursor-pointer place-items-center text-foreground hover:text-accent"
-						onClick={() => closeItemDetailFn()}
-					>
-						×
-					</button>
-				</header>
-			)}
 			<div
-				className="min-h-0 flex-1 overflow-auto [container-type:size] transition-opacity duration-300 data-[ui-stale=true]:opacity-45"
+				className="min-h-0 flex-1 overflow-auto [container-type:size] transition-opacity duration-300 data-[ui-interface=default]:pt-14 data-[ui-stale=true]:opacity-45"
 				{...readDataUiFn({
 					dataUi: "ItemDetailPanel",
 					state: {
+						interface: controller.detail?.ui,
 						stale: controller.stale,
 					},
 				})}
@@ -69,10 +41,25 @@ export const ItemDetailScene = ({ disabled, target }: ItemDetailSceneProps) => {
 					/>
 				) : null}
 				{controller.detail !== undefined ? (
-					<div className="pb-[50cqh]">
-						<ItemInfo detail={controller.detail} />
+					<div
+						className="data-[ui-interface=simple]:grid data-[ui-interface=simple]:min-h-full data-[ui-interface=simple]:items-center"
+						{...readDataUiFn({
+							dataUi: "ItemInfoContainer",
+							state: {
+								interface: controller.detail.ui,
+							},
+						})}
+					>
+						<ItemInfo
+							detail={controller.detail}
+							stale={controller.stale}
+						/>
 					</div>
-				) : null}
+				) : (
+					<h2 className="p-6 text-2xl font-semibold">
+						<Tx label="Item unavailable" />
+					</h2>
+				)}
 			</div>
 		</div>
 	);

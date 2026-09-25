@@ -3,7 +3,7 @@ import type { JobQueueRequestSchema } from "~/production-job/schema/JobQueueRequ
 import type { JobSchema } from "~/production-job/schema/JobSchema";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
+import { readRuntimeOwnershipClosureFn } from "~/game-runtime/fn/readRuntimeOwnershipClosureFn";
 
 interface ReadRuntimeItemOwnedStateProps {
 	ownerItemId: IdSchema.Type;
@@ -23,49 +23,13 @@ export const readRuntimeItemOwnedStateFn = ({
 	ownerItemId,
 	runtime,
 }: ReadRuntimeItemOwnedStateProps) => {
-	const ownerItemIds = new Set<IdSchema.Type>([
-		ownerItemId,
-	]);
-	const inputItemIds = new Set<IdSchema.Type>();
-	const jobIds = new Set<IdSchema.Type>();
-	const jobItemIds = new Set<IdSchema.Type>();
-
-	let changed = true;
-	while (changed) {
-		changed = false;
-
-		for (const item of runtime.items) {
-			if (
-				item.location.scope === LocationScopeEnumSchema.enum.Input &&
-				ownerItemIds.has(item.location.ownerItemId) &&
-				!inputItemIds.has(item.id)
-			) {
-				inputItemIds.add(item.id);
-				ownerItemIds.add(item.id);
-				changed = true;
-			}
-		}
-
-		for (const job of runtime.jobs) {
-			if (ownerItemIds.has(job.ownerItemId) && !jobIds.has(job.id)) {
-				jobIds.add(job.id);
-				changed = true;
-			}
-		}
-
-		for (const item of runtime.items) {
-			if (
-				(item.location.scope === LocationScopeEnumSchema.enum.Job ||
-					item.location.scope === LocationScopeEnumSchema.enum.Reserved) &&
-				jobIds.has(item.location.jobId) &&
-				!jobItemIds.has(item.id)
-			) {
-				jobItemIds.add(item.id);
-				ownerItemIds.add(item.id);
-				changed = true;
-			}
-		}
-	}
+	const { ownerItemIds, inputItemIds, jobIds, jobItemIds } = readRuntimeOwnershipClosureFn({
+		rootItemIds: new Set([
+			ownerItemId,
+		]),
+		items: runtime.items,
+		jobs: runtime.jobs,
+	});
 
 	return {
 		ownerItemIds,

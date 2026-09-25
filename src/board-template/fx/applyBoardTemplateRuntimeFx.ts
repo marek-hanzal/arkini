@@ -5,9 +5,11 @@ import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import { createRuntimeItemFx } from "~/game-runtime/fx/createRuntimeItemFx";
 import { createRuntimeItemIdFx } from "~/game-runtime/fx/createRuntimeItemIdFx";
 import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
+import { readRuntimeOwnershipClosureFn } from "~/game-runtime/fn/readRuntimeOwnershipClosureFn";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
+import { readPhysicalRootOriginFn } from "~/item-location/fn/readPhysicalRootOriginFn";
 import { resolveItemFx } from "~/item-resolution/fx/resolveItemFx";
 import { readDeliveryTravelDurationMsFn } from "~/production-delivery/fn/readDeliveryTravelDurationMsFn";
 
@@ -27,50 +29,16 @@ export namespace applyBoardTemplateRuntimeFx {
 
 /** A board owns its physical roots and complete input/job trees. */
 const readDiscardedIdsFn = (runtime: RuntimeSchema.Type, space: number) => {
-	const itemIds = new Set(
+	const rootItemIds = new Set(
 		runtime.items
-			.filter(({ location }) => {
-				switch (location.scope) {
-					case "board":
-						return location.space === space;
-					case "delivery":
-					case "terminal":
-						return location.origin.space === space;
-					case "input":
-					case "job":
-					case "reserved":
-						return false;
-					default: {
-						const unhandled: never = location;
-						return unhandled;
-					}
-				}
-			})
+			.filter(({ location }) => readPhysicalRootOriginFn(location)?.space === space)
 			.map((item) => item.id),
 	);
-	const jobIds = new Set<string>();
-	let changed = true;
-	while (changed) {
-		changed = false;
-		for (const job of runtime.jobs) {
-			if (itemIds.has(job.ownerItemId) && !jobIds.has(job.id)) {
-				jobIds.add(job.id);
-				changed = true;
-			}
-		}
-		for (const item of runtime.items) {
-			const location = item.location;
-			const owned =
-				location.scope === "input"
-					? itemIds.has(location.ownerItemId)
-					: (location.scope === "job" || location.scope === "reserved") &&
-						jobIds.has(location.jobId);
-			if (owned && !itemIds.has(item.id)) {
-				itemIds.add(item.id);
-				changed = true;
-			}
-		}
-	}
+	const { ownerItemIds: itemIds, jobIds } = readRuntimeOwnershipClosureFn({
+		rootItemIds,
+		items: runtime.items,
+		jobs: runtime.jobs,
+	});
 	return {
 		itemIds,
 		jobIds,

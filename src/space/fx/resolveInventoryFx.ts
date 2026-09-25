@@ -6,6 +6,7 @@ import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { applyBoardTemplateRuntimeFx } from "~/board-template/fx/applyBoardTemplateRuntimeFx";
 import { reviseRuntimeItemFx } from "~/game-runtime/fx/reviseRuntimeItemFx";
 import { readAuthoredSpaceIdsFn } from "~/space/fn/readAuthoredSpaceIdsFn";
+import { readPhysicalRootOriginFn } from "~/item-location/fn/readPhysicalRootOriginFn";
 import type { AppliedOutcome } from "~/outcome/type/AppliedOutcome";
 
 export namespace resolveInventoryFx {
@@ -51,12 +52,10 @@ export const resolveInventoryFx = Effect.fn("resolveInventoryFx")(function* ({
 		for (const key of Object.keys(state.templateUidBySpace)) occupied.add(Number(key));
 		for (const item of state.items) {
 			for (const space of Object.values(item.inventories ?? {})) occupied.add(space);
-			if (item.location.scope === "board") occupied.add(item.location.space);
-			if (item.location.scope === "delivery") {
-				occupied.add(item.location.origin.space);
-				if (item.location.phase === "returning")
-					occupied.add(item.location.returnFrom.space);
-			}
+			const origin = readPhysicalRootOriginFn(item.location);
+			if (origin !== undefined) occupied.add(origin.space);
+			if (item.location.scope === "delivery" && item.location.phase === "returning")
+				occupied.add(item.location.returnFrom.space);
 		}
 	}
 	let space = 0;

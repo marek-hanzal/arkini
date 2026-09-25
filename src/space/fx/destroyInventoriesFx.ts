@@ -2,6 +2,8 @@ import { Effect } from "effect";
 import { GameConfigFx } from "~/game-config/context/GameConfigFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
+import { readRuntimeOwnershipClosureFn } from "~/game-runtime/fn/readRuntimeOwnershipClosureFn";
+import { readPhysicalRootOriginFn } from "~/item-location/fn/readPhysicalRootOriginFn";
 import { reconcileOutboundDeliveriesRuntimeFx } from "~/production-delivery/fx/reconcileOutboundDeliveriesRuntimeFx";
 
 export namespace destroyInventoriesFx {
@@ -43,34 +45,31 @@ export const destroyInventoriesFx = Effect.fn("destroyInventoriesFx")(function* 
 		...runtime.jobs,
 		...snapshot.jobs.filter(({ id }) => !liveJobIds.has(id)),
 	];
-	const discardedIds = new Set<string>();
-	const discardedJobs = new Set<string>();
-	let changed = true;
-	while (changed) {
-		changed = false;
-		for (const item of items) {
-			const location = item.location;
-			const destroyed =
-				location.scope === "board"
-					? spaces.has(location.space)
-					: location.scope === "terminal"
-						? spaces.has(location.origin.space)
-						: location.scope === "delivery"
-							? spaces.has(location.origin.space)
-							: location.scope === "input"
-								? discardedIds.has(location.ownerItemId)
-								: discardedJobs.has(location.jobId);
-			if (!destroyed || discardedIds.has(item.id)) continue;
-			discardedIds.add(item.id);
-			for (const space of Object.values(item.inventories ?? {})) spaces.add(space);
-			changed = true;
-		}
-		for (const job of jobs)
-			if (discardedIds.has(job.ownerItemId) && !discardedJobs.has(job.id)) {
-				discardedJobs.add(job.id);
-				changed = true;
-			}
-	}
+	let discardedIds: ReadonlySet<string> = new Set();
+	let discardedJobs: ReadonlySet<string> = new Set();
+	let addedSpace: boolean;
+	do {
+		const rootItemIds = new Set(
+			items
+				.filter((item) => {
+					const origin = readPhysicalRootOriginFn(item.location);
+					return origin !== undefined && spaces.has(origin.space);
+				})
+				.map((item) => item.id),
+		);
+		const closure = readRuntimeOwnershipClosureFn({
+			rootItemIds,
+			items,
+			jobs,
+		});
+		discardedIds = closure.ownerItemIds;
+		discardedJobs = closure.jobIds;
+		const previousSpaceCount = spaces.size;
+		for (const item of items)
+			if (discardedIds.has(item.id))
+				for (const space of Object.values(item.inventories ?? {})) spaces.add(space);
+		addedSpace = spaces.size > previousSpaceCount;
+	} while (addedSpace);
 	const removed = runtime.items.filter(({ id }) => discardedIds.has(id));
 	const previousSpace =
 		runtime.previousSpace !== undefined && !spaces.has(runtime.previousSpace)

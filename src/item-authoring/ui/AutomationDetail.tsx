@@ -4,17 +4,19 @@ import { ProductionDetail } from "~/item-authoring/ui/ProductionDetail";
 import { LineTriggerEnumSchema } from "~/production-line/schema/LineTriggerEnumSchema";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Status } from "~/ui/ui/Status";
-import { ClockDetail } from "~/item-authoring/ui/ClockDetail";
 
-/** Presents interval and item-ending jobs from their single authoring tab. */
+/** Presents automatic production lines independently of their triggers. */
 export const AutomationDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 	const translator = useTranslator();
 	const hasAutomaticLines = item.lines.some(
 		(line) => line.trigger !== LineTriggerEnumSchema.enum.manual,
 	);
+	const hasTrigger =
+		item.units !== undefined ||
+		item.clock?.durationMs !== undefined ||
+		item.clock?.intervalMs !== undefined;
 	return (
 		<div className="grid gap-[var(--ak-viewport-gap)]">
-			<ClockDetail item={item} />
 			{hasAutomaticLines ? (
 				<ProductionDetail
 					item={item}
@@ -25,7 +27,11 @@ export const AutomationDetail = ({ item }: { readonly item: ItemSchema.Type }) =
 					dataUi="EditorItemNoAutomationLines"
 					icon={Workflow}
 					size="large"
-					title={translator.textFn("No automation lines defined")}
+					title={translator.textFn(
+						hasTrigger
+							? "No automation lines defined"
+							: "Configure Clock or Units to add automation lines",
+					)}
 					variant="flat"
 				/>
 			)}

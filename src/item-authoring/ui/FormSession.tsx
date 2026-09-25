@@ -207,6 +207,7 @@ export const FormSession = ({
 					error={controller.error}
 					rootCard={
 						sectionId !== "automation" &&
+						sectionId !== "clock" &&
 						sectionId !== "artwork" &&
 						sectionId !== "merges" &&
 						sectionId !== "production"

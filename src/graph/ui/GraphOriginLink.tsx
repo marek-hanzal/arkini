@@ -45,7 +45,7 @@ export const GraphOriginLink = ({
 				{
 					kind: "clock",
 				},
-				() => "automation" as const,
+				() => "clock" as const,
 			)
 			.with(
 				{

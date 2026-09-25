@@ -8,7 +8,7 @@ import { DisabledCapabilityDetail } from "~/item-authoring/ui/DisabledCapability
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Mx } from "~/translation/ui/Mx";
 
-/** Presents authored Clock timing and rules in the Automation detail. */
+/** Presents authored Clock timing and rules. */
 export const ClockDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 	const translator = useTranslator();
 	const clock = item.clock;
@@ -22,7 +22,7 @@ export const ClockDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 					icon={Clock}
 					title={translator.textFn("No Clock configured")}
 					summary={translator.textFn("Item clock empty title")}
-					size="normal"
+					size="large"
 				/>
 			</EditorRootCard>
 		);

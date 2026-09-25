@@ -302,6 +302,8 @@ Clear interval:
   value: Clear interval
 Clear lifetime:
   value: Clear lifetime
+Clear units:
+  value: Clear units
 Clock:
   value: Clock
 Clock - Interval:
@@ -340,11 +342,11 @@ Clock status help:
 Close:
   value: Close
   dynamic: true
-Common:
-  value: Common
 Condition:
   value: Condition
   dynamic: true
+Configure Clock or Units to add automation lines:
+  value: Configure Clock or Units to add automation lines
 Configure the remote domain in the ngrok tab.:
   value: Configure the remote domain in the ngrok tab.
 Configured — paste to replace:
@@ -445,7 +447,7 @@ Disable:
   value: Disable
 Disable Clock help:
   value: |
-    Removes the Clock timer settings and its interval lines from Automation. Item ending lines remain; Units can still trigger them.
+    Removes the Clock timer settings and its interval lines. Item ending lines remain in Automation; Units can still trigger them.
 
     **Save** keeps the removal. **Discard** restores the saved Clock.
 Disable merges help:
@@ -692,14 +694,14 @@ Item artwork help:
     The preview updates immediately and matches Item detail.
 Item automation help:
   value: |
-    Automation owns the Clock settings and jobs started by its interval or by the item ending.
+    Automation owns jobs started by the Clock interval or by the item ending. Configure timers on Clock and Units on Item.
 
-    When Clock lifetime or Units run out, they use the same weighted **Item ending** lines and the **Common** termination policy. Configure Units on the Item page. Removing the item for another reason does not run those lines.
+    When Clock lifetime or Units run out, they use the same weighted **Item ending** lines and the termination mode configured on Item. Removing the item for another reason does not run those lines.
 Item clock empty title:
   value: Give this item a repeating interval or a limited lifetime.
 Item clock help:
   value: |
-    Clock sets an interval, a limited Lifetime, or both. Configure it alongside automatic production lines in Automation.
+    Clock sets an interval, a limited Lifetime, or both. Configure its automatic production lines in Automation.
 
     - **Interval** triggers one eligible weighted interval line while the item is on the Board. Leave empty for no repeating production.
     - **Lifetime** ends the item and selects from the same ending lines used by Units. Leave empty for no time limit.
@@ -1934,6 +1936,8 @@ from the game.:
   value: from the game.
 item-termination:
   value: item-termination
+kill-switch:
+  value: kill-switch
 managed:
   value: managed
 manual:

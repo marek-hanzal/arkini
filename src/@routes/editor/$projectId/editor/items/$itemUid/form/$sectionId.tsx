@@ -1,5 +1,6 @@
 import { match } from "ts-pattern";
 import { AutomationSection } from "~/item-authoring/ui/AutomationSection";
+import { ClockSection } from "~/item-authoring/ui/ClockSection";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 import { ArtworkSection } from "~/item-authoring/ui/ArtworkSection";
@@ -37,6 +38,9 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 			})
 			.with("automation", () => {
 				return <AutomationSection />;
+			})
+			.with("clock", () => {
+				return <ClockSection />;
 			})
 			.with("production", () => {
 				return <ProductionSection />;

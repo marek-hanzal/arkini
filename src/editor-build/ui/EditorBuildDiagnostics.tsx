@@ -151,7 +151,7 @@ const readEditorGameDiagnosticTargetsFn = (
 						kind: "item",
 						itemUid: item.uid,
 						sectionId:
-							pathSection === "automation"
+							pathSection === "automation" || pathSection === "clock"
 								? pathSection
 								: (itemSection ?? pathSection ?? "identity"),
 						label: item.title,

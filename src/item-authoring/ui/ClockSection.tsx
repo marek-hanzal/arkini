@@ -130,7 +130,7 @@ export const ClockSection = () => {
 							icon={Clock}
 							title={translator.textFn("No Clock configured")}
 							summary={translator.textFn("Item clock empty title")}
-							size="normal"
+							size="large"
 							actionLabel={translator.textFn("Enable")}
 							onEnableFn={enableClockFn}
 						/>

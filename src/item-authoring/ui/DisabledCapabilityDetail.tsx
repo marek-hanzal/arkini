@@ -35,7 +35,7 @@ export const DisabledCapabilityDetail = ({
 							capability === "units"
 								? "identity"
 								: capability === "clock"
-									? "automation"
+									? "clock"
 									: capability,
 					}}
 					search={{

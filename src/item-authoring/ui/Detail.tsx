@@ -26,6 +26,7 @@ const showSectionHeadingFn = (sectionId: SectionId) => {
 		.with(
 			"merges",
 			"production",
+			"clock",
 			"automation",
 			"chain",
 			"connections",

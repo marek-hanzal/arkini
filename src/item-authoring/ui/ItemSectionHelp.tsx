@@ -33,12 +33,11 @@ export const ItemSectionHelp: Record<SectionId, EditorPageHelpContent> = {
 	},
 	automation: {
 		title: <Tx label="Automation" />,
-		content: (
-			<>
-				<Mx label="Item clock help" />
-				<Mx label="Item automation help" />
-			</>
-		),
+		content: <Mx label="Item automation help" />,
+	},
+	clock: {
+		title: <Tx label="Clock" />,
+		content: <Mx label="Item clock help" />,
 	},
 	artwork: {
 		title: <Tx label="Artwork" />,

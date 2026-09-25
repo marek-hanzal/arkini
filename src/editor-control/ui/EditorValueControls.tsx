@@ -194,6 +194,7 @@ export const EditorNumberControl = ({
 	step = 1,
 	...props
 }: {
+	readonly clearLabel?: string;
 	readonly disabled?: boolean;
 	readonly trailing?: ReactNode;
 	readonly labelVisible?: boolean;

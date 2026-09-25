@@ -1,5 +1,9 @@
 import { ItemInterfaceField } from "~/item-authoring/ui/ItemInterfaceField";
-import { EditorNumberControl, EditorTextControl } from "~/editor-control/ui/EditorValueControls";
+import {
+	EditorChoiceControl,
+	EditorNumberControl,
+	EditorTextControl,
+} from "~/editor-control/ui/EditorValueControls";
 import { readEditorFieldErrorFn } from "~/editor-control/fn/readEditorFieldErrorFn";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
@@ -38,6 +42,7 @@ export const IdentitySection = () => {
 						{(field) => (
 							<EditorNumberControl
 								label={translator.textFn("Units")}
+								clearLabel={translator.textFn("Clear units")}
 								description={<Mx label="Initial units help" />}
 								name={field.name}
 								value={field.state.value ?? Number.NaN}
@@ -56,6 +61,27 @@ export const IdentitySection = () => {
 												},
 									)
 								}
+							/>
+						)}
+					</form.AppField>
+					<form.AppField name="terminationMode">
+						{(field) => (
+							<EditorChoiceControl
+								label={translator.textFn("Termination mode")}
+								value={field.state.value ?? "loose-kill"}
+								options={[
+									{
+										value: "loose-kill",
+										label: translator.textFn("Loose-kill"),
+										description: <Mx label="Termination loose-kill help" />,
+									},
+									{
+										value: "kill-switch",
+										label: translator.textFn("Kill switch"),
+										description: <Mx label="Termination kill-switch help" />,
+									},
+								]}
+								onChangeFn={field.handleChange}
 							/>
 						)}
 					</form.AppField>

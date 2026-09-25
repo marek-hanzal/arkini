@@ -471,7 +471,9 @@ describe("item section form session", () => {
 			},
 			title: configured.title,
 		});
-		await changeInput(units, "");
+		const clear = container.querySelector<HTMLButtonElement>('button[title="Clear units"]');
+		if (clear === null) throw new Error("Missing Units clear control.");
+		await act(async () => clear.click());
 		await act(async () => {
 			await state.unsavedSession?.saveFn();
 		});
@@ -1243,6 +1245,20 @@ describe("item section form session", () => {
 		).toEqual([
 			"line:first",
 		]);
+	});
+
+	it("shows an unavailable Automation state until Clock or Units supplies a trigger", async () => {
+		const { container, renderSection } = await render(<AutomationSection />);
+		expect(container.querySelector('[data-ui="EditorAutomationUnavailable"]')).not.toBeNull();
+		expect(container.querySelector('[data-ui="EditorAutomationLinesCollection"]')).toBeNull();
+		await renderSection(<IdentitySection />, "identity");
+		const units = container.querySelector<HTMLInputElement>('input[name="units.amount"]');
+		if (units === null) throw new Error("Missing Units field.");
+		await changeInput(units, "2");
+		await renderSection(<AutomationSection />, "automation");
+		expect(
+			container.querySelector('[data-ui="EditorAutomationLinesCollection"]'),
+		).not.toBeNull();
 	});
 
 	it("creates interval and ending lines in Automation without a manual Default", async () => {

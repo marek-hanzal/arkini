@@ -3,6 +3,7 @@ export const SectionIds = [
 	"artwork",
 	"merges",
 	"production",
+	"clock",
 	"automation",
 	"connections",
 	"chain",

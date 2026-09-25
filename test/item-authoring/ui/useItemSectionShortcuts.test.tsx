@@ -70,6 +70,10 @@ describe("Item Detail section shortcuts", () => {
 				"production",
 			],
 			[
+				"c",
+				"clock",
+			],
+			[
 				"t",
 				"automation",
 			],

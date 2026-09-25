@@ -18,8 +18,8 @@ export const readSectionForPathFn = (
 		.with("artwork", () => "artwork")
 		.with("units", () => "identity")
 		.with("merge", () => "merges")
-		.with("clock", () => "automation")
-		.with("terminationMode", () => "automation")
+		.with("clock", () => "clock")
+		.with("terminationMode", () => "identity")
 		.with("lines", "maxQueueSize", () => "production")
 		.otherwise(() => "identity");
 };

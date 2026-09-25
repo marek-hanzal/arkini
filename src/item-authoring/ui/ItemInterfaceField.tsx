@@ -2,7 +2,7 @@ import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Mx } from "~/translation/ui/Mx";
 
-/** Both Item and Clock edit the same canonical item interface field. */
+/** Authors the item interface on the Item page. */
 export const ItemInterfaceField = () => {
 	const { form } = useFormSession();
 	const translator = useTranslator();

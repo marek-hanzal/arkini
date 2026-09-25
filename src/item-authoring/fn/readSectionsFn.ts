@@ -22,6 +22,11 @@ const FormSections = [
 		shortcut: "p",
 	},
 	{
+		id: "clock",
+		label: "Clock",
+		shortcut: "c",
+	},
+	{
 		id: "automation",
 		label: "Automation",
 		shortcut: "t",

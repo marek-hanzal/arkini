@@ -63,6 +63,14 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 								description={<Mx label="Authored Units amount summary help" />}
 								value={item.units?.amount ?? translator.textFn("None")}
 							/>
+							<DetailFact
+								label={translator.textFn("Termination mode")}
+								value={translator.textFn(
+									item.terminationMode === "kill-switch"
+										? "Kill switch"
+										: "Loose-kill",
+								)}
+							/>
 						</FactList>
 						<div className="grid min-w-0 grid-cols-2 items-start gap-x-8">
 							<EditorMusicSelection resourceUid={item.music} />

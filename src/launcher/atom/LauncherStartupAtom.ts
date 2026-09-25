@@ -6,8 +6,8 @@ import { SerapackCatalogOwnerAtom } from "~/serapack-catalog/atom/SerapackCatalo
 import { WindowModeAtom } from "~/window-mode/atom/WindowModeAtom";
 import { WindowModeReadyAtom } from "~/window-mode/atom/WindowModeReadyAtom";
 import { readAppearanceAccentFx } from "~/application-settings/fx/readAppearanceAccentFx";
-import { readAppearanceThemeFx } from "~/application-settings/fx/readAppearanceThemeFx";
-import { AppearanceAtom } from "~/application-settings/atom/AppearanceAtom";
+import type { AppearanceAccentSchema } from "~electron/contract/appearance/AppearanceAccentSchema";
+import { AccentAtom } from "~/application-settings/atom/AccentAtom";
 import { applyCheatAvailabilityFx } from "~/application-settings/fx/applyCheatAvailabilityFx";
 import { readCheatAvailabilityFx } from "~/application-settings/fx/readCheatAvailabilityFx";
 import { RendererLifecycleOwnerAtom } from "~/application-runtime/atom/RendererLifecycleOwnerAtom";
@@ -15,8 +15,7 @@ import { RendererLifecycleUnavailableError } from "~/application-runtime/error/R
 import { readWindowModeFx } from "~/window-mode/fx/readWindowModeFx";
 import { RendererAtomRuntime } from "~/application-runtime/atom/RendererAtomRegistry";
 import { LauncherHeroAtom } from "~/launcher/atom/LauncherHeroAtom";
-import type { LauncherStartup } from "~/launcher/type/LauncherStartup";
-import { LauncherAppearanceReadyAtom } from "~/launcher/atom/LauncherAppearanceReadyAtom";
+import { LauncherAccentReadyAtom } from "~/launcher/atom/LauncherAccentReadyAtom";
 import { LauncherCheatAvailabilityReadyAtom } from "~/launcher/atom/LauncherCheatAvailabilityReadyAtom";
 import { LauncherStartupConfigAtom } from "~/launcher/atom/LauncherStartupConfigAtom";
 import { SoundSettingsAtom } from "~/application-settings/atom/SoundSettingsAtom";
@@ -25,14 +24,14 @@ import { writeApplicationLogFx } from "~/application-diagnostics/fx/writeApplica
 import { formatApplicationDiagnosticTextFn } from "~/application-diagnostics/fn/formatApplicationDiagnosticTextFn";
 import { readSoundSettingsFx } from "~/application-settings/fx/readSoundSettingsFx";
 
-/** Publishes persisted appearance once without overwriting later user changes on retry. */
-const applyLauncherAppearanceHydrationFx = Effect.fn("applyLauncherAppearanceHydrationFx")(
-	(appearance: LauncherStartup.Appearance) =>
+/** Publishes the persisted accent once without overwriting later user changes on retry. */
+const applyLauncherAccentHydrationFx = Effect.fn("applyLauncherAccentHydrationFx")(
+	(accent: AppearanceAccentSchema.Type) =>
 		Effect.uninterruptible(
 			Effect.gen(function* () {
-				if (yield* Atom.get(LauncherAppearanceReadyAtom)) return;
-				yield* Atom.set(AppearanceAtom, appearance);
-				yield* Atom.set(LauncherAppearanceReadyAtom, true);
+				if (yield* Atom.get(LauncherAccentReadyAtom)) return;
+				yield* Atom.set(AccentAtom, accent);
+				yield* Atom.set(LauncherAccentReadyAtom, true);
 			}),
 		),
 );
@@ -65,7 +64,7 @@ const applyLauncherWindowModeHydrationFx = Effect.fn("applyLauncherWindowModeHyd
 /**
  * The authoritative launcher bootstrap AsyncResult.
  *
- * Appearance and cheat preferences publish as soon as their reads complete;
+ * Accent and cheat preferences publish as soon as their reads complete;
  * the final success still waits for every required bootstrap branch.
  */
 export const LauncherStartupAtom = RendererAtomRuntime.atom((get) => {
@@ -78,15 +77,7 @@ export const LauncherStartupAtom = RendererAtomRuntime.atom((get) => {
 		return Effect.fail(new Error("Serapack catalog is not configured."));
 	}
 
-	const appearanceFx = Effect.all(
-		{
-			theme: readAppearanceThemeFx(),
-			accent: readAppearanceAccentFx(),
-		},
-		{
-			concurrency: "unbounded",
-		},
-	).pipe(Effect.tap(applyLauncherAppearanceHydrationFx));
+	const accentFx = readAppearanceAccentFx().pipe(Effect.tap(applyLauncherAccentHydrationFx));
 	const cheatAvailabilityFx = readCheatAvailabilityFx().pipe(
 		Effect.tap(applyLauncherCheatAvailabilityHydrationFx),
 	);
@@ -117,7 +108,7 @@ export const LauncherStartupAtom = RendererAtomRuntime.atom((get) => {
 			: Effect.void;
 	const defaultBootstrapFx = Effect.all(
 		{
-			appearance: appearanceFx,
+			accent: accentFx,
 			catalog: catalogFx,
 			cheatsAvailable: cheatAvailabilityFx,
 			hero: Atom.getResult(LauncherHeroAtom, {
@@ -131,8 +122,8 @@ export const LauncherStartupAtom = RendererAtomRuntime.atom((get) => {
 			concurrency: "unbounded",
 		},
 	).pipe(
-		Effect.map(({ appearance, cheatsAvailable, sound, windowMode }) => ({
-			appearance,
+		Effect.map(({ accent, cheatsAvailable, sound, windowMode }) => ({
+			accent,
 			defaultPackageId: SerakkiDefaultPackageId,
 			cheatsAvailable,
 			sound,
@@ -144,7 +135,7 @@ export const LauncherStartupAtom = RendererAtomRuntime.atom((get) => {
 		Effect.tap((result) =>
 			Effect.all(
 				[
-					applyLauncherAppearanceHydrationFx(result.appearance),
+					applyLauncherAccentHydrationFx(result.accent),
 					applyLauncherCheatAvailabilityHydrationFx(result.cheatsAvailable),
 					Atom.set(SoundSettingsAtom, result.sound),
 					applyLauncherWindowModeHydrationFx(result.windowMode),

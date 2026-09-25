@@ -8,30 +8,9 @@ import {
 afterEach(cleanupRegisteredIpcHarnesses);
 
 describe("registerSerakkiElectronIpcFx preferences", () => {
-	it("preserves appearance, cheat, and launcher preference capabilities", async () => {
+	it("preserves accent, cheat, and launcher preference capabilities", async () => {
 		const harness = await createRegisteredIpcHarness();
 		const event = harness.trustedEvent;
-
-		await expect(
-			harness.invoke(SerakkiElectronApi.channels.appearanceRead, event),
-		).resolves.toBe("dark");
-		await expect(
-			harness.invoke(SerakkiElectronApi.channels.appearanceWrite, event, "light"),
-		).resolves.toBeUndefined();
-		await expect(
-			harness.invoke(SerakkiElectronApi.channels.appearanceRead, event),
-		).resolves.toBe("light");
-		expect(harness.nativeTheme.themeSource).toBe("light");
-		await expect(
-			harness.invoke(SerakkiElectronApi.channels.appearanceWrite, event, "system"),
-		).resolves.toBeUndefined();
-		expect(harness.nativeTheme.themeSource).toBe("system");
-		harness.nativeTheme.shouldUseDarkColors = false;
-		harness.nativeThemeListeners.get("updated")?.();
-		expect(harness.setBackgroundColor).toHaveBeenLastCalledWith("#fbf8ff");
-		harness.nativeTheme.shouldUseDarkColors = true;
-		harness.nativeThemeListeners.get("updated")?.();
-		expect(harness.setBackgroundColor).toHaveBeenLastCalledWith("#090711");
 
 		await expect(
 			harness.invoke(SerakkiElectronApi.channels.appearanceAccentRead, event),

@@ -2,8 +2,6 @@ import { useAtom, useAtomSet, useAtomValue } from "@effect/atom-react";
 import type { Effect } from "effect";
 import { useCallback, useEffect } from "react";
 
-import { AppearanceAtom } from "~/application-settings/atom/AppearanceAtom";
-import type { AppearanceThemeSchema } from "~electron/contract/appearance/AppearanceThemeSchema";
 import type { WindowModeSchema } from "~electron/contract/window/WindowModeSchema";
 import { WindowModeAtom } from "~/window-mode/atom/WindowModeAtom";
 import { useCheatAvailability } from "~/application-settings/ui/useCheatAvailability";
@@ -21,10 +19,8 @@ export namespace useSettingsModel {
 		readonly cheatToolsAvailable: boolean;
 		readonly status: SettingsCommandState;
 		readonly sound: SoundSettings;
-		readonly theme: AppearanceThemeSchema.Type;
 		readonly windowMode: WindowModeSchema.Type;
 		readonly goBackFn: () => void;
-		readonly selectThemeFn: (theme: AppearanceThemeSchema.Type) => void;
 		readonly selectWindowModeFn: (mode: WindowModeSchema.Type) => void;
 		readonly setCheatToolsAvailableFn: (available: boolean) => void;
 		readonly setSoundVolumeFn: (channel: SoundChannel, volume: number) => void;
@@ -37,7 +33,6 @@ export const useSettingsModel = ({
 }: {
 	readonly onBackFx: Effect.Effect<void, unknown, never>;
 }): useSettingsModel.Output => {
-	const appearance = useAtomValue(AppearanceAtom);
 	const cheatAvailability = useCheatAvailability();
 	const windowMode = useAtomValue(WindowModeAtom);
 	const sound = useAtomValue(SoundSettingsAtom);
@@ -71,15 +66,8 @@ export const useSettingsModel = ({
 		cheatToolsAvailable: cheatAvailability.available,
 		status: commandState,
 		sound,
-		theme: appearance.theme,
 		windowMode,
 		goBackFn,
-		selectThemeFn: (theme: AppearanceThemeSchema.Type) => {
-			runCommandFn({
-				action: "theme",
-				theme,
-			});
-		},
 		selectWindowModeFn: (mode: WindowModeSchema.Type) => {
 			runCommandFn({
 				action: "window-mode",

@@ -157,7 +157,7 @@ The filesystem Project Repository and Electron IPC composition are mapped in [`e
 | `application-data` | Canonical system-user Serakki data root and complete path tree | [`src/application-data/fn/createSerakkiUserDataPathsFn.ts`](src/application-data/fn/createSerakkiUserDataPathsFn.ts) |
 | `application-diagnostics` | Shared failure extraction, bounded formatting and transport | [`src/application-diagnostics/fn/formatApplicationDiagnosticTextFn.ts`](src/application-diagnostics/fn/formatApplicationDiagnosticTextFn.ts) |
 | `application-runtime` | Renderer ManagedRuntime, Atom bridge and native lifecycle | [`src/application-runtime/service/RendererRuntime.ts`](src/application-runtime/service/RendererRuntime.ts) |
-| `application-settings` | Appearance, Cheat availability and Settings | [`src/application-settings/atom/SettingsCommandAtom.ts`](src/application-settings/atom/SettingsCommandAtom.ts) |
+| `application-settings` | Accent, Cheat availability and Settings | [`src/application-settings/atom/SettingsCommandAtom.ts`](src/application-settings/atom/SettingsCommandAtom.ts) |
 | `application-shell` | Root context, fatal surface and route transitions | [`src/application-shell/ui/renderRendererFx.tsx`](src/application-shell/ui/renderRendererFx.tsx) |
 | `renderer-bootstrap` | Ordered renderer startup and React root composition | [`src/renderer-bootstrap/ui/bootstrapRendererFx.tsx`](src/renderer-bootstrap/ui/bootstrapRendererFx.tsx) |
 | `launcher` | Session startup, Hero/About resources and shell surfaces | [`src/launcher/ui/LauncherScene.tsx`](src/launcher/ui/LauncherScene.tsx) |

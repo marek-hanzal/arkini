@@ -140,13 +140,6 @@ export const Route = createFileRoute("/_launcher/settings")({
 								.with(
 									{
 										kind: "pending",
-										action: "theme",
-									},
-									() => <p className="text-accent">Saving theme…</p>,
-								)
-								.with(
-									{
-										kind: "pending",
 										action: "exit",
 									},
 									() => null,

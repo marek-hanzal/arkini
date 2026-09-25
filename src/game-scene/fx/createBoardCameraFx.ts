@@ -16,7 +16,7 @@ interface Props {
 	readonly drag: {
 		readonly cancelInteractionFx: Effect.Effect<void>;
 		readonly refreshPointerFx?: (pointer: {
-			readonly pointerId: number;
+			readonly pointerId?: number;
 			readonly x: number;
 			readonly y: number;
 		}) => Effect.Effect<void>;
@@ -308,7 +308,6 @@ export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 		if (pan !== null) return;
 		const bounds = canvas.getBoundingClientRect();
 		if (bounds.width <= 0 || bounds.height <= 0) return;
-		RendererRuntime.runSync(drag.cancelInteractionFx);
 		const x = ((event.clientX - bounds.left) * width) / bounds.width;
 		const y = ((event.clientY - bounds.top) * height) / bounds.height;
 		const delta =
@@ -324,6 +323,14 @@ export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 		const ratio = nextScale / stage.scale.x;
 		stage.position.set(x - (x - stage.x) * ratio, y - (y - stage.y) * ratio);
 		stage.scale.set(nextScale);
+		if (drag.refreshPointerFx !== undefined) {
+			RendererRuntime.runSync(
+				drag.refreshPointerFx({
+					x,
+					y,
+				}),
+			);
+		}
 		invalidateFn();
 	};
 	const visibilityFn = () => {

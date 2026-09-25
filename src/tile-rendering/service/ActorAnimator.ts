@@ -8,6 +8,7 @@ export type AnimationChannel =
 	| "artwork-opacity"
 	| "drop-target"
 	| "grab-offset"
+	| "hover-scale"
 	| "lifecycle-opacity"
 	| "lifecycle-scale"
 	| "pose";
@@ -42,6 +43,10 @@ export type ActorAnimation =
 			readonly toFactor: number;
 	  })
 	| (AnimationBase & {
+			readonly channel: "hover-scale";
+			readonly toScale: number;
+	  })
+	| (AnimationBase & {
 			readonly channel: "pose";
 			readonly readPoseFn?: (progress: number) => PresentedPose;
 			readonly toScale?: number;
@@ -71,6 +76,11 @@ export type PresentationWrite =
 	| {
 			readonly actor: PixiTileActor;
 			readonly channel: "lifecycle-scale";
+			readonly scale: number;
+	  }
+	| {
+			readonly actor: PixiTileActor;
+			readonly channel: "hover-scale";
 			readonly scale: number;
 	  }
 	| {

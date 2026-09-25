@@ -158,6 +158,7 @@ describe("main reconciliation / snapshot ownership", () => {
 		actor.dragging = false;
 		Effect.runSync(harness.reconciler.hydrateFx(transition(2)));
 		expect(harness.travels).toHaveLength(1);
+		expect(harness.hoverClears).toContain(actor);
 		expect(actor.container.position).toMatchObject({
 			x: 240,
 			y: 130,

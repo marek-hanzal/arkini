@@ -204,16 +204,19 @@ it("rejects a fill click once its line has started, preserving committed materia
 	);
 });
 
-it("rejects simple UI ownership and invalid slots before moving any source", () => {
+it("allows a simple UI owner to deliver materials while rejecting an invalid slot", () => {
 	Effect.runSync(
 		Effect.gen(function* () {
 			yield* spawnOwnerFx();
 			yield* spawnWaterFx(7);
-			const before = yield* readRuntimeFx();
-			expect(yield* Effect.flip(autofillLineInputFx(target))).toMatchObject({
-				_tag: "ItemProductionControlUnavailableError",
+			expect(yield* autofillLineInputFx(target)).toBe(3);
+			expect(
+				(yield* readRuntimeFx()).items.find((item) => item.id === "runtime:water"),
+			).toMatchObject({
+				location: {
+					scope: "delivery",
+				},
 			});
-			expect(yield* readRuntimeFx()).toEqual(before);
 		}).pipe(
 			useGameFx({
 				config: GameConfigSchema.parse({

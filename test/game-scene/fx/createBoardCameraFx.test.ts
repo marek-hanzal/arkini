@@ -268,7 +268,11 @@ describe.each(cases)("$name camera", ({ surfaces }) => {
 		});
 		expect(after.x).toBeCloseTo(before.x);
 		expect(after.y).toBeCloseTo(before.y);
-		expect(mounted.cancelFn).toHaveBeenCalledOnce();
+		expect(mounted.cancelFn).not.toHaveBeenCalled();
+		expect(mounted.refreshPointerFn).toHaveBeenLastCalledWith({
+			x: 300,
+			y: 200,
+		});
 		const center = mounted.stage.toLocal({
 			x: 500,
 			y: 400,

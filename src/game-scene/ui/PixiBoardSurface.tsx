@@ -1,7 +1,6 @@
 import { useGameAudioControl } from "~/game-audio/ui/useGameAudioControl";
 import { PresentationSfxEventEnumSchema } from "~/sfx-event/schema/PresentationSfxEventEnumSchema";
 import { useAtom } from "@effect/atom-react";
-import { match } from "ts-pattern";
 import { useCallback, useEffect, useRef } from "react";
 
 import { useTileCommands } from "~/tile-interaction/ui/useTileCommands";
@@ -19,9 +18,9 @@ import { usePixiGameRuntime } from "~/game-scene/ui/PixiGameRuntime";
 /**
  * Mounts the one Pixi-native Board scene into the React-owned game shell.
  *
- * Right click performs the canonical primary action, Ctrl+right click fills its default-line queue,
- * Left click opens Item Detail. React forwards commands
- * and overlay cancellation only; the scene runtime owns pointer and display lifecycle.
+ * Left click admits the effective Default line before opening Item Detail. Ctrl+left click
+ * fills its queue before opening Detail. Right click opens Detail alone. Queue playback
+ * owns Autofill and start; the scene owns only pointer and display lifecycle.
  */
 export const PixiBoardSurface = () => {
 	const game = useGameEngine();
@@ -44,49 +43,24 @@ export const PixiBoardSurface = () => {
 	};
 
 	const activateFn = useCallback(
-		async (item: TileActorItem, intent: MainActivationIntent, origin: HTMLElement) => {
+		(item: TileActorItem, intent: MainActivationIntent, origin: HTMLElement) => {
 			const { itemDetail: currentItemDetail } = controlsRef.current;
-			if (intent === "detail") {
-				RendererRuntime.runSync(
-					currentItemDetail.openItemDetailFx({
-						itemId: item.id,
-						origin,
-					}),
-				);
-				return;
-			}
-			if (intent === "fill-default-line-queue") {
-				if (
-					item.location.scope !== "board" ||
-					item.primaryAction.kind !== "enqueue-default-line"
-				) {
-					return;
-				}
+			if (
+				intent !== "detail" &&
+				item.location.scope === "board" &&
+				item.primaryAction.kind === "enqueue-default-line"
+			) {
 				enqueueLineFn({
-					kind: "fill",
+					kind: intent === "fill-default-line-queue" ? "fill" : "enqueue",
 					ownerItemId: item.id,
 				});
-				return;
 			}
-			await match(item.primaryAction)
-				.with(
-					{
-						kind: "none",
-					},
-					() => Promise.resolve(),
-				)
-				.with(
-					{
-						kind: "enqueue-default-line",
-					},
-					() => {
-						enqueueLineFn({
-							kind: "enqueue",
-							ownerItemId: item.id,
-						});
-					},
-				)
-				.exhaustive();
+			RendererRuntime.runSync(
+				currentItemDetail.openItemDetailFx({
+					itemId: item.id,
+					origin,
+				}),
+			);
 		},
 		[
 			enqueueLineFn,

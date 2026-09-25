@@ -75,6 +75,83 @@ it("disables Make across all lines when the owner's queue fills and enables it w
 	}
 });
 
+it("projects the live Default line for Simple without treating the UI mode as an engine rule", async () => {
+	const base = lineRunRuntime({
+		permit: true,
+		water: 3,
+	});
+	const owner = base.items[0];
+	const line = {
+		...owner.item.lines[0],
+		default: true,
+		rules: owner.item.lines[0].rules.map((rule) =>
+			rule.type === "enable"
+				? {
+						...rule,
+						hint: "Find a permit.",
+					}
+				: rule,
+		),
+	};
+	const simpleOwner = {
+		...owner,
+		item: {
+			...owner.item,
+			ui: "simple" as const,
+			lines: [
+				line,
+			],
+		},
+	};
+	state.runtime = {
+		...base,
+		items: [
+			simpleOwner,
+			...base.items.slice(1),
+		],
+	};
+	state.game = {
+		readFn: Effect.runSyncExit,
+		getResourceUrlFn: (id: string) => id,
+		subscribeTransitionsFn: () => () => {},
+	};
+	let output: useItemDetailSceneController.Output | undefined;
+	const Probe = () => {
+		output = useItemDetailSceneController({
+			target: {
+				kind: "runtime",
+				itemId: owner.id,
+				origin: null,
+			},
+		});
+		return null;
+	};
+	const root = createRoot(document.createElement("div"));
+	try {
+		await act(async () => root.render(<Probe />));
+		expect(output?.detail?.defaultLine?.uid).toBe(line.uid);
+		expect(output?.detail?.defaultLineDisabled).toBe(false);
+		expect(output?.detail?.defaultLinePlayReady).toBe(true);
+		state.runtime = {
+			...state.runtime,
+			items: state.runtime.items.filter((item) => item.id !== "runtime:permit"),
+		};
+		await act(async () => root.render(<Probe />));
+		expect(output?.detail?.defaultLineDisabled).toBe(true);
+		expect(output?.detail?.defaultLineBlockingHint).toBe("Find a permit.");
+		state.runtime = {
+			...state.runtime,
+			defaultLineByOwnerItemId: {
+				[owner.id]: null,
+			},
+		};
+		await act(async () => root.render(<Probe />));
+		expect(output?.detail?.defaultLine).toBeUndefined();
+	} finally {
+		await act(async () => root.unmount());
+	}
+});
+
 it("retains the terminal commit across batched updates and detaches when the target changes", async () => {
 	const base = lineRunRuntime({});
 	const owner = {

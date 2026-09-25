@@ -1,4 +1,4 @@
-import { Effect, Equal, Exit } from "effect";
+import { Effect, Equal, Exit, Result } from "effect";
 import { useCallback, useLayoutEffect, useState } from "react";
 
 import { readItemDetailRemovalFn } from "~/item-detail-read/fn/readItemDetailRemovalFn";
@@ -11,13 +11,17 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import { readItemRemainingUnitsFn } from "~/production-action/fn/readItemRemainingUnitsFn";
 import { readItemScheduleFn } from "~/item-schedule/fn/readItemScheduleFn";
-import { canControlItemProductionFn } from "~/production-line/fn/canControlItemProductionFn";
 import { resolveJobQueueFx } from "~/production-job/fx/resolveJobQueueFx";
+import { resolveLineStartFx } from "~/production-job/fx/resolveLineStartFx";
+import { assertLineEnqueueConditionsFx } from "~/production-job/fx/assertLineEnqueueConditionsFx";
 import { readLineInputAutofillCoverageFx } from "~/production-input/fx/readLineInputAutofillCoverageFx";
 import { lineRulesFx } from "~/production-line/fx/lineRulesFx";
 import { resolveLineShowFn } from "~/production-line/fn/resolveLineShowFn";
 import { resolveLineEnableFn } from "~/production-line/fn/resolveLineEnableFn";
 import { readLineBlockingHintFn } from "~/item-detail-read/fn/readLineBlockingHintFn";
+import { isItemProductionAdmissionOpenFn } from "~/production-line/fn/isItemProductionAdmissionOpenFn";
+import { readEffectiveLineFn } from "~/production-line/fn/readEffectiveLineFn";
+import type { LineSchema } from "~/production-line/schema/LineSchema";
 
 export namespace useItemDetailSceneController {
 	export interface Props {
@@ -28,6 +32,11 @@ export namespace useItemDetailSceneController {
 		readonly disabledLineUids: readonly string[];
 		readonly lineBlockingHints: Readonly<Record<string, string | undefined>>;
 		readonly materialReadyLineUids: readonly string[];
+		readonly playReadyLineUids: readonly string[];
+		readonly defaultLine?: LineSchema.Type;
+		readonly defaultLineDisabled: boolean;
+		readonly defaultLineBlockingHint?: string;
+		readonly defaultLinePlayReady: boolean;
 		readonly title: string;
 		readonly sourceUrl: string;
 		readonly compositeUrl?: string;
@@ -103,6 +112,7 @@ export const useItemDetailSceneController = ({
 							enabled: line.enable,
 							blockingHint: undefined,
 							materialsAvailable: false,
+							playReady: false,
 						});
 					return Effect.gen(function* () {
 						const rules = yield* lineRulesFx({
@@ -127,6 +137,37 @@ export const useItemDetailSceneController = ({
 										runtime,
 									})).type === "complete"
 								: false;
+						let playReady = false;
+						if (
+							visible &&
+							enabled &&
+							runtimeItem !== undefined &&
+							isItemProductionAdmissionOpenFn(runtimeItem) &&
+							(!line.input.some((input) => input.type === "materials") ||
+								materialsAvailable)
+						) {
+							const start = yield* resolveLineStartFx({
+								ownerItemId: boardOwnerItemId,
+								lineUid: line.uid,
+								runtime,
+							});
+							if (
+								start.queue.available &&
+								start.run.input.every(
+									({ resolution }) =>
+										resolution.type === "materials" || resolution.ready,
+								)
+							) {
+								playReady = Result.isSuccess(
+									yield* Effect.result(
+										assertLineEnqueueConditionsFx({
+											resolution: start,
+											runtime,
+										}),
+									),
+								);
+							}
+						}
 						return {
 							line,
 							blockingHint: readLineBlockingHintFn({
@@ -136,6 +177,7 @@ export const useItemDetailSceneController = ({
 							visible,
 							enabled,
 							materialsAvailable,
+							playReady,
 						};
 					});
 				}).pipe(
@@ -148,12 +190,23 @@ export const useItemDetailSceneController = ({
 			const visibleLines = lineStates.value
 				.filter((state) => state.visible)
 				.sort((a, b) => Number(b.enabled) - Number(a.enabled));
+			const defaultLine =
+				runtimeItem === undefined
+					? item.lines.find((line) => line.default)
+					: readEffectiveLineFn({
+							ownerItemId: runtimeItem.id,
+							ownerItem: item,
+							runtime,
+						});
+			const defaultLineState = lineStates.value.find(
+				(state) => state.line.uid === defaultLine?.uid,
+			);
 			let canMake = false;
 			if (
 				runtimeItem?.location.scope === "board" &&
 				finalSnapshot === undefined &&
-				item.lines.length > 0 &&
-				canControlItemProductionFn(item)
+				item.ui === "default" &&
+				item.lines.length > 0
 			) {
 				const queue = game.readFn(
 					resolveJobQueueFx({
@@ -166,6 +219,13 @@ export const useItemDetailSceneController = ({
 			}
 			const lifetimeDurationMs = readItemScheduleFn(item)?.durationMs;
 			return {
+				defaultLine,
+				defaultLineDisabled:
+					defaultLineState === undefined ||
+					!defaultLineState.visible ||
+					!defaultLineState.enabled,
+				defaultLineBlockingHint: defaultLineState?.blockingHint,
+				defaultLinePlayReady: defaultLineState?.playReady ?? false,
 				lines: visibleLines.map((state) => state.line),
 				lineBlockingHints: Object.fromEntries(
 					visibleLines.map((state) => [
@@ -175,6 +235,9 @@ export const useItemDetailSceneController = ({
 				),
 				materialReadyLineUids: visibleLines
 					.filter((state) => state.materialsAvailable)
+					.map((state) => state.line.uid),
+				playReadyLineUids: visibleLines
+					.filter((state) => state.playReady)
 					.map((state) => state.line.uid),
 				disabledLineUids: visibleLines
 					.filter((state) => !state.enabled)

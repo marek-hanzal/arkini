@@ -11,7 +11,7 @@ import { bootstrapRendererControlledCloseFx } from "~/application-runtime/fx/boo
 import { installRendererNativeDragGuardFx } from "~/application-runtime/fx/installRendererNativeDragGuardFx";
 import { RendererAtomRegistry } from "~/application-runtime/atom/RendererAtomRegistry";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
-import { AppearanceDataset } from "~/application-settings/ui/AppearanceDataset";
+import { AccentDataset } from "~/application-settings/ui/AccentDataset";
 import { GraphicsUnavailablePage } from "~/application-shell/ui/GraphicsUnavailablePage";
 import { renderRendererFx } from "~/application-shell/ui/renderRendererFx";
 import { createSerakkiRouterFx } from "~/createSerakkiRouterFx";
@@ -86,7 +86,7 @@ export const bootstrapRendererFx = Effect.fn("bootstrapRendererFx")(() =>
 					<StrictMode>
 						<TranslationContext.Provider value={translation.translator}>
 							<RegistryContext.Provider value={RendererAtomRegistry}>
-								<AppearanceDataset />
+								<AccentDataset />
 								<LauncherStartupHydrator />
 								<RouterProvider router={router} />
 							</RegistryContext.Provider>

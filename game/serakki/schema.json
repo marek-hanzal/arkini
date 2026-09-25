@@ -1844,7 +1844,7 @@
 				},
 				"ui": {
 					"default": "simple",
-					"description": "Item interface and player production control: simple shows only information but allows Board clicks on the default line; default enables manual production and always shows all sections, even without production lines.",
+					"description": "Item Detail presentation: simple shows information and direct controls for the effective Default line; default shows every production line and item information. Engine production behavior is independent of this setting.",
 					"type": "string",
 					"enum": [
 						"simple",

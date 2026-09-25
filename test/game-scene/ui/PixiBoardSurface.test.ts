@@ -171,7 +171,7 @@ describe("PixiBoardSurface", () => {
 		});
 	});
 
-	it("keeps an unavailable primary intent inert and opens Item Detail for detail intent", async () => {
+	it("opens Item Detail even when a left click has no default line", async () => {
 		await renderSurface();
 		const createProps = boardState.createProps;
 		if (createProps === null) throw new Error("Board scene did not create its runtime.");
@@ -201,9 +201,13 @@ describe("PixiBoardSurface", () => {
 		await createProps.onActivateFn(owner, "primary", canvas);
 
 		expect(boardState.enqueueLine).not.toHaveBeenCalled();
-		expect(boardState.openItemDetail).not.toHaveBeenCalled();
+		expect(boardState.openItemDetail).toHaveBeenCalledWith({
+			itemId: owner.id,
+			origin: canvas,
+		});
 		expect(boardState.navigate).not.toHaveBeenCalled();
 
+		boardState.openItemDetail.mockClear();
 		await createProps.onActivateFn(owner, "detail", canvas);
 
 		expect(boardState.openItemDetail).toHaveBeenCalledWith({
@@ -231,7 +235,7 @@ describe("PixiBoardSurface", () => {
 		expect(boardState.openItemDetail).not.toHaveBeenCalled();
 	});
 
-	it("routes single and fill default-line intents without interpreting queue capacity", async () => {
+	it("admits the default line before opening Detail and keeps right click detail-only", async () => {
 		await renderSurface();
 		const createProps = boardState.createProps;
 		if (createProps === null) throw new Error("Board scene did not create its runtime.");
@@ -263,23 +267,33 @@ describe("PixiBoardSurface", () => {
 			sourceUrl: "resource:producer",
 		} satisfies TileActorItem;
 
-		await createProps.onActivateFn(producer, "primary", document.createElement("canvas"));
+		const canvas = document.createElement("canvas");
+		await createProps.onActivateFn(producer, "primary", canvas);
 
 		expect(boardState.enqueueLine).toHaveBeenCalledWith({
 			kind: "enqueue",
 			ownerItemId: producer.id,
 		});
-		await createProps.onActivateFn(
-			producer,
-			"fill-default-line-queue",
-			document.createElement("canvas"),
+		expect(boardState.openItemDetail).toHaveBeenCalledWith({
+			itemId: producer.id,
+			origin: canvas,
+		});
+		expect(boardState.enqueueLine.mock.invocationCallOrder[0]).toBeLessThan(
+			boardState.openItemDetail.mock.invocationCallOrder[0],
 		);
+		await createProps.onActivateFn(producer, "fill-default-line-queue", canvas);
 
 		expect(boardState.enqueueLine).toHaveBeenLastCalledWith({
 			kind: "fill",
 			ownerItemId: producer.id,
 		});
 		expect(boardState.enqueueLine).toHaveBeenCalledTimes(2);
-		expect(boardState.openItemDetail).not.toHaveBeenCalled();
+		expect(boardState.openItemDetail).toHaveBeenCalledTimes(2);
+		expect(boardState.enqueueLine.mock.invocationCallOrder[1]).toBeLessThan(
+			boardState.openItemDetail.mock.invocationCallOrder[1],
+		);
+		await createProps.onActivateFn(producer, "detail", canvas);
+		expect(boardState.enqueueLine).toHaveBeenCalledTimes(2);
+		expect(boardState.openItemDetail).toHaveBeenCalledTimes(3);
 	});
 });

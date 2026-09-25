@@ -8,7 +8,6 @@ import { createFilesystemAppearancePreferencesFx } from "~electron/main/appearan
 
 let root = "";
 const preferenceDirectory = () => join(root, "serakki", "game", "preferences");
-const themePath = () => join(preferenceDirectory(), "appearance.theme.json");
 const accentPath = () => join(preferenceDirectory(), "appearance.accent.json");
 
 const createPreferences = () =>
@@ -30,13 +29,10 @@ afterEach(async () => {
 });
 
 describe("createFilesystemAppearancePreferencesFx", () => {
-	it("round-trips both appearance files atomically", async () => {
+	it("round-trips the accent preference", async () => {
 		const preferences = await createPreferences();
-		await Effect.runPromise(preferences.writeThemeFx("light"));
 		await Effect.runPromise(preferences.writeAccentFx("blue"));
-		expect(await readFile(themePath(), "utf8")).toBe('"light"');
 		expect(await readFile(accentPath(), "utf8")).toBe('"blue"');
-		expect(await Effect.runPromise(preferences.readThemeFx)).toBe("light");
 		expect(await Effect.runPromise(preferences.readAccentFx)).toBe("blue");
 	});
 });

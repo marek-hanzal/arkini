@@ -7,6 +7,7 @@ import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 interface ItemProductionRowProps {
 	readonly activateFn?: () => void;
 	readonly line: LineSchema.Type;
+	readonly colorAvailable: boolean;
 	readonly actions: ReactNode;
 	readonly leadingControl?: ReactNode;
 	readonly inputs: ReactNode;
@@ -18,6 +19,7 @@ interface ItemProductionRowProps {
 /** Shared production presentation; callers retain exact job/request identity and controls. */
 export const ItemProductionRow = ({
 	line,
+	colorAvailable,
 	activateFn,
 	actions,
 	leadingControl,
@@ -33,6 +35,7 @@ export const ItemProductionRow = ({
 				dataUi: "ItemProductionRow",
 				state: {
 					clickable: activateFn !== undefined,
+					colorAvailable,
 					ruleDisabled,
 				},
 			})}
@@ -49,7 +52,7 @@ export const ItemProductionRow = ({
 				{backdrop}
 				<div className="flex items-center gap-3 self-start">
 					{leadingControl}
-					<h3 className="min-w-0 text-xl font-semibold transition-colors duration-300 ease-out group-hover/production-row:text-accent">
+					<h3 className="min-w-0 text-xl font-semibold transition-colors duration-300 ease-out group-hover/production-row:group-data-[ui-color-available=true]/production-row:text-accent">
 						{line.title}
 					</h3>
 					<span className="inline-flex shrink-0 items-center gap-2 text-xl text-muted">

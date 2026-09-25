@@ -5,7 +5,6 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { describe, expect, it, vi } from "vitest";
 
-import { AppearanceAtom } from "~/application-settings/atom/AppearanceAtom";
 import { CheatAvailabilityAtom } from "~/application-settings/atom/CheatAvailabilityAtom";
 import { SoundSettingsAtom } from "~/application-settings/atom/SoundSettingsAtom";
 import { WindowModeAtom } from "~/window-mode/atom/WindowModeAtom";
@@ -96,13 +95,23 @@ describe("Settings mutation authority", () => {
 	});
 
 	it("keeps one settings mutation authoritative while routed sections change", async () => {
-		const { container, deferred, write, writeCheatAvailability } = await renderSettings([
-			"/settings",
-		]);
-		const light = settingsOptionByValue(container, "SettingsThemeOptions", "light");
+		const { container, deferred, writeWindowMode, writeCheatAvailability } =
+			await renderSettings(
+				[
+					"/settings",
+				],
+				{
+					deferWindowMode: true,
+				},
+			);
+		const fullscreen = settingsOptionByValue(
+			container,
+			"SettingsWindowModeOptions",
+			"fullscreen",
+		);
 
-		await act(async () => light.click());
-		expect(write).toHaveBeenCalledOnce();
+		await act(async () => fullscreen.click());
+		expect(writeWindowMode).toHaveBeenCalledOnce();
 		await act(async () => linkByText(container, "Game").click());
 		const toggle = container.querySelector<HTMLInputElement>(
 			'[data-ui="SettingsCheatAvailability"] input[type="checkbox"]',
@@ -113,25 +122,34 @@ describe("Settings mutation authority", () => {
 		expect(writeCheatAvailability).not.toHaveBeenCalled();
 
 		await act(async () => deferred.resolve());
-		await vi.waitFor(() => expect(container.textContent).toContain("Theme saved."));
+		await vi.waitFor(() => expect(container.textContent).toContain("Window saved."));
 		await act(async () => toggle.click());
 		await vi.waitFor(() => expect(writeCheatAvailability).toHaveBeenCalledOnce());
 	});
 
 	it("blocks same-tick Back admission until the settings mutation settles", async () => {
-		const { container, deferred, router, write } = await renderSettings([
-			"/main-menu",
-			"/settings",
-		]);
-		const light = settingsOptionByValue(container, "SettingsThemeOptions", "light");
+		const { container, deferred, router, writeWindowMode } = await renderSettings(
+			[
+				"/main-menu",
+				"/settings",
+			],
+			{
+				deferWindowMode: true,
+			},
+		);
+		const fullscreen = settingsOptionByValue(
+			container,
+			"SettingsWindowModeOptions",
+			"fullscreen",
+		);
 		const back = buttonByText(container, "Back");
 
 		await act(async () => {
-			light.click();
+			fullscreen.click();
 			back.click();
 		});
 
-		expect(write).toHaveBeenCalledOnce();
+		expect(writeWindowMode).toHaveBeenCalledOnce();
 		expect(router.state.location.pathname).toBe("/settings/common");
 
 		await act(async () => deferred.resolve());
@@ -141,14 +159,23 @@ describe("Settings mutation authority", () => {
 	});
 
 	it("releases the command authority after a failed write", async () => {
-		const { container, deferred, writeCheatAvailability } = await renderSettings([
-			"/settings",
-		]);
-		const light = settingsOptionByValue(container, "SettingsThemeOptions", "light");
+		const { container, deferred, writeCheatAvailability } = await renderSettings(
+			[
+				"/settings",
+			],
+			{
+				deferWindowMode: true,
+			},
+		);
+		const fullscreen = settingsOptionByValue(
+			container,
+			"SettingsWindowModeOptions",
+			"fullscreen",
+		);
 
-		await act(async () => light.click());
-		await act(async () => deferred.reject(new Error("theme write rejected")));
-		await vi.waitFor(() => expect(container.textContent).toContain("Theme update failed:"));
+		await act(async () => fullscreen.click());
+		await act(async () => deferred.reject(new Error("window mode write rejected")));
+		await vi.waitFor(() => expect(container.textContent).toContain("Window update failed:"));
 
 		await act(async () => linkByText(container, "Game").click());
 		const toggle = container.querySelector<HTMLInputElement>(
@@ -161,15 +188,31 @@ describe("Settings mutation authority", () => {
 	});
 
 	it("keeps one pending command authoritative across a React remount", async () => {
-		const { container, deferred, registry, root, router, write, writeCheatAvailability } =
-			await renderSettings([
+		const {
+			container,
+			deferred,
+			registry,
+			root,
+			router,
+			writeWindowMode,
+			writeCheatAvailability,
+		} = await renderSettings(
+			[
 				"/main-menu",
 				"/settings",
-			]);
-		const light = settingsOptionByValue(container, "SettingsThemeOptions", "light");
+			],
+			{
+				deferWindowMode: true,
+			},
+		);
+		const fullscreen = settingsOptionByValue(
+			container,
+			"SettingsWindowModeOptions",
+			"fullscreen",
+		);
 
-		await act(async () => light.click());
-		expect(write).toHaveBeenCalledOnce();
+		await act(async () => fullscreen.click());
+		expect(writeWindowMode).toHaveBeenCalledOnce();
 
 		await act(async () => root.unmount());
 		roots.splice(roots.indexOf(root), 1);
@@ -191,7 +234,7 @@ describe("Settings mutation authority", () => {
 		if (toggle === null) throw new Error("Expected Cheat tools control.");
 		expect(toggle.matches(":disabled")).toBe(true);
 		expect(back.disabled).toBe(true);
-		expect(registry.get(AppearanceAtom).theme).toBe("light");
+		expect(registry.get(WindowModeAtom)).toBe("default");
 
 		await act(async () => {
 			toggle.click();
@@ -199,23 +242,33 @@ describe("Settings mutation authority", () => {
 		});
 		expect(writeCheatAvailability).not.toHaveBeenCalled();
 		expect(router.state.location.pathname).toBe("/settings/game");
-		expect(registry.get(AppearanceAtom).theme).toBe("light");
+		expect(registry.get(WindowModeAtom)).toBe("default");
 
 		await act(async () => deferred.resolve());
-		await vi.waitFor(() => expect(container.textContent).toContain("Theme saved."));
+		await vi.waitFor(() => expect(container.textContent).toContain("Window saved."));
+		expect(registry.get(WindowModeAtom)).toBe("fullscreen");
 		expect(back.disabled).toBe(false);
 		await act(async () => toggle.click());
 		await vi.waitFor(() => expect(writeCheatAvailability).toHaveBeenCalledOnce());
 	});
 
 	it("allows registry disposal before React cleans up a pending settings command", async () => {
-		const { container, registry, root, write } = await renderSettings([
-			"/settings",
-		]);
-		const light = settingsOptionByValue(container, "SettingsThemeOptions", "light");
+		const { container, registry, root, writeWindowMode } = await renderSettings(
+			[
+				"/settings",
+			],
+			{
+				deferWindowMode: true,
+			},
+		);
+		const fullscreen = settingsOptionByValue(
+			container,
+			"SettingsWindowModeOptions",
+			"fullscreen",
+		);
 
-		await act(async () => light.click());
-		expect(write).toHaveBeenCalledOnce();
+		await act(async () => fullscreen.click());
+		expect(writeWindowMode).toHaveBeenCalledOnce();
 
 		registry.dispose();
 		registries.splice(registries.indexOf(registry), 1);

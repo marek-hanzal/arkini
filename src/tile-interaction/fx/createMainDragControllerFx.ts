@@ -28,13 +28,14 @@ import type { DragOriginGhosts } from "~/tile-interaction/type/DragOriginGhosts"
 export interface MainDragController {
 	readonly attachActorFx: (actor: PixiTileActor) => Effect.Effect<void, never, never>;
 	readonly cancelInteractionFx: Effect.Effect<void, never, never>;
+	readonly clearHoverFx: (actor: PixiTileActor) => Effect.Effect<void, never, never>;
 	readonly detachActorFx: (actor: PixiTileActor) => Effect.Effect<void, never, never>;
 	readonly settleOriginGhostFx: (actor: PixiTileActor) => Effect.Effect<void, never, never>;
 	/** Coalesces canonical/layout invalidation onto the current drag frame slot. */
 	readonly requestRefreshFx: Effect.Effect<void, never, never>;
 	/** Reprojects a held pointer after a camera change without promoting a pressed gesture. */
 	readonly refreshPointerFx: (pointer: {
-		readonly pointerId: number;
+		readonly pointerId?: number;
 		readonly x: number;
 		readonly y: number;
 	}) => Effect.Effect<void, never, never>;
@@ -126,6 +127,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 	let closed = false;
 	let interactionBlocked = false;
 	let thresholdCrossed = false;
+	let hoveredActor: PixiTileActor | null = null;
 
 	const dragPreview = yield* createMainDragPreviewFx({
 		actorStore,
@@ -141,6 +143,42 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 	const isMovingFn = (actor: PixiTileActor) =>
 		RendererRuntime.runSync(isTravelingFx(actor)) ||
 		RendererRuntime.runSync(animator.isChannelActiveFx(actor, "pose"));
+
+	const animateHoverScaleFn = (actor: PixiTileActor, scale: number) => {
+		if (actor.container.destroyed) return;
+		RendererRuntime.runSync(
+			animator.animateFx({
+				actor,
+				channel: "hover-scale",
+				curve: {
+					kind: "spring",
+					bounce: 0,
+				},
+				toScale: scale,
+				durationMs: 220,
+			}),
+		);
+	};
+
+	const setHoveredActorFn = (actor: PixiTileActor | null) => {
+		if (hoveredActor === actor) return;
+		const previous = hoveredActor;
+		hoveredActor = actor;
+		if (previous !== null && !previous.container.destroyed) previous.infoButton.visible = false;
+		if (actor !== null && !actor.container.destroyed) actor.infoButton.visible = true;
+		for (const [target, scale] of [
+			[
+				previous,
+				1,
+			],
+			[
+				actor,
+				1.08,
+			],
+		] as const) {
+			if (target !== null) animateHoverScaleFn(target, scale);
+		}
+	};
 
 	const isTargetMovingFn = (facts: MainInteractionTargetFacts) => {
 		if (facts.occupant === null) return false;
@@ -179,15 +217,29 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 	};
 
 	const cancelInteractionFn = () => {
+		setHoveredActorFn(null);
 		if (activeDrag === null) return;
 		cancelDragFn(activeDrag);
 	};
 
 	const detachActorFn = (actor: PixiTileActor) => {
+		if (hoveredActor === actor) setHoveredActorFn(null);
+		else if (actor.hoverLayer.scale.x !== 1) animateHoverScaleFn(actor, 1);
+		actor.infoButton.visible = false;
+		actor.infoButton.removeAllListeners("pointerdown");
+		actor.infoButton.removeAllListeners("pointertap");
 		RendererRuntime.runSync(dragPreview.detachTargetFx(actor));
 		if (actor.onPointerDownFn !== null) {
 			actor.container.off("pointerdown", actor.onPointerDownFn);
 			actor.onPointerDownFn = null;
+		}
+		if (actor.onPointerEnterFn !== null) {
+			actor.container.off("pointerenter", actor.onPointerEnterFn);
+			actor.onPointerEnterFn = null;
+		}
+		if (actor.onPointerLeaveFn !== null) {
+			actor.container.off("pointerleave", actor.onPointerLeaveFn);
+			actor.onPointerLeaveFn = null;
 		}
 		if (activeDrag?.actor !== actor) {
 			RendererRuntime.runSync(dragOriginGhosts.settleFx(actor));
@@ -465,6 +517,14 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 				if (actor.onPointerDownFn !== null) {
 					actor.container.off("pointerdown", actor.onPointerDownFn);
 				}
+				if (actor.onPointerEnterFn !== null) {
+					actor.container.off("pointerenter", actor.onPointerEnterFn);
+				}
+				if (actor.onPointerLeaveFn !== null) {
+					actor.container.off("pointerleave", actor.onPointerLeaveFn);
+				}
+				actor.infoButton.removeAllListeners("pointerdown");
+				actor.infoButton.removeAllListeners("pointertap");
 				actor.container.eventMode = "static";
 				actor.container.cursor = readActorCursorFn({
 					phase: "idle",
@@ -484,6 +544,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 						return;
 					}
 					event.stopPropagation();
+					setHoveredActorFn(null);
 					try {
 						application.app.canvas.setPointerCapture(event.pointerId);
 					} catch {
@@ -495,12 +556,13 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 							.returnType<MainActivationIntent>()
 							.with(
 								{
-									button: 0,
+									button: 2,
 								},
 								() => "detail",
 							)
 							.with(
 								{
+									button: 0,
 									ctrlKey: true,
 									altKey: false,
 									metaKey: false,
@@ -531,9 +593,50 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 				};
 				actor.onPointerDownFn = onPointerDownFn;
 				actor.container.on("pointerdown", onPointerDownFn);
+				const onPointerEnterFn = () => {
+					if (
+						closed ||
+						interactionBlocked ||
+						activeDrag !== null ||
+						actor.dragging ||
+						isMovingFn(actor) ||
+						RendererRuntime.runSync(dropSubmission.isPendingActorFx(actor.item.id))
+					)
+						return;
+					setHoveredActorFn(actor);
+				};
+				const onPointerLeaveFn = () => {
+					if (hoveredActor === actor) setHoveredActorFn(null);
+				};
+				actor.onPointerEnterFn = onPointerEnterFn;
+				actor.onPointerLeaveFn = onPointerLeaveFn;
+				actor.container.on("pointerenter", onPointerEnterFn);
+				actor.container.on("pointerleave", onPointerLeaveFn);
+				actor.infoButton.on("pointerdown", (event: FederatedPointerEvent) => {
+					event.stopPropagation();
+				});
+				actor.infoButton.on("pointertap", (event: FederatedPointerEvent) => {
+					event.stopPropagation();
+					if (closed || interactionBlocked || actor.container.destroyed) return;
+					void Promise.resolve()
+						.then(() => {
+							if (closed) return;
+							const latestActor = actorStore.actors.get(actor.item.id);
+							if (latestActor !== actor || isMovingFn(actor)) return;
+							return onActivateFn(latestActor.item, "detail", application.app.canvas);
+						})
+						.catch((cause) => {
+							if (!closed) game.reportCriticalFailureFn("game-presentation", cause);
+						});
+				});
 			}),
 		),
 		cancelInteractionFx: Effect.sync(() => cancelInteractionFn()),
+		clearHoverFx: Effect.fn("MainDragController.clearHoverFx")((actor) =>
+			Effect.sync(() => {
+				if (hoveredActor === actor) setHoveredActorFn(null);
+			}),
+		),
 		detachActorFx: Effect.fn("MainDragController.detachActorFx")((actor) =>
 			Effect.sync(() => detachActorFn(actor)),
 		),
@@ -556,13 +659,13 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 					drag === null ||
 					drag.mode !== "drag" ||
 					drag.phase !== "dragging" ||
-					drag.pointerId !== pointer.pointerId
+					(pointer.pointerId !== undefined && drag.pointerId !== pointer.pointerId)
 				)
 					return;
 				const point = application.stage.toLocal(pointer);
 				// Replace queued world coordinates captured before the camera moved.
 				yield* pointerSampler.flushFx({
-					pointerId: pointer.pointerId,
+					pointerId: drag.pointerId,
 					x: point.x,
 					y: point.y,
 				});

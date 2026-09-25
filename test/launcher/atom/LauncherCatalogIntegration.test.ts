@@ -18,9 +18,6 @@ import { LauncherStartupConfigAtom } from "~/launcher/atom/LauncherStartupConfig
 vi.mock("~/application-settings/fx/readAppearanceAccentFx", () => ({
 	readAppearanceAccentFx: () => Effect.succeed("rose"),
 }));
-vi.mock("~/application-settings/fx/readAppearanceThemeFx", () => ({
-	readAppearanceThemeFx: () => Effect.succeed("dark"),
-}));
 vi.mock("~/application-settings/fx/readCheatAvailabilityFx", () => ({
 	readCheatAvailabilityFx: () => Effect.succeed(false),
 }));

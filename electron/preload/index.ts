@@ -79,8 +79,6 @@ const api: SerakkiElectronApi.Api = {
 		readPathFn: (file) => webUtils.getPathForFile(file),
 	},
 	appearance: {
-		readFn: () => ipcRenderer.invoke(SerakkiElectronApi.channels.appearanceRead),
-		writeFn: (theme) => ipcRenderer.invoke(SerakkiElectronApi.channels.appearanceWrite, theme),
 		readAccentFn: () => ipcRenderer.invoke(SerakkiElectronApi.channels.appearanceAccentRead),
 		writeAccentFn: (accent) =>
 			ipcRenderer.invoke(SerakkiElectronApi.channels.appearanceAccentWrite, accent),

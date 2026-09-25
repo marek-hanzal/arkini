@@ -16,7 +16,7 @@ const readResolvedCssColorFn = (
 	return ((red ?? 0) << 16) | ((green ?? 0) << 8) | (blue ?? 0);
 };
 
-/** Resolves the active React shell theme once for native Pixi drawing. */
+/** Resolves the active semantic colors for native Pixi drawing. */
 export const readScenePaletteFx = Effect.fn("readScenePaletteFx")((host: HTMLElement) =>
 	Effect.sync((): PixiScenePalette => {
 		const probe = document.createElement("span");

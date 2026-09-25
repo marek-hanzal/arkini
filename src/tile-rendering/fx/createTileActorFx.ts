@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { Container, Graphics } from "pixi.js";
+import { Container, Graphics, Rectangle } from "pixi.js";
 
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
@@ -38,6 +38,10 @@ export const createTileActorFx = Effect.fn("createTileActorFx")(
 				eventMode: "none",
 				label: `TileActorLifecycle:${item.id}:${instanceId}`,
 			});
+			const hoverLayer = new Container({
+				eventMode: "none",
+				label: `TileActorHover:${item.id}:${instanceId}`,
+			});
 			const visualLayer = new Container({
 				eventMode: "none",
 				label: `TileActorVisualLayer:${item.id}:${instanceId}`,
@@ -52,6 +56,28 @@ export const createTileActorFx = Effect.fn("createTileActorFx")(
 				label: `TileActorClock:${item.id}:${instanceId}`,
 			});
 			clockRing.visible = false;
+			const infoButton = new Graphics({
+				eventMode: "static",
+				label: `TileActorInfo:${item.id}:${instanceId}`,
+			});
+			infoButton
+				.circle(0, 0, 11)
+				.fill({
+					color: palette.overlay,
+					alpha: 0.88,
+				})
+				.stroke({
+					color: palette.foreground,
+					alpha: 0.5,
+					width: 1.4,
+				})
+				.circle(0, -5, 1.5)
+				.fill(palette.foreground)
+				.roundRect(-1.5, -1.5, 3, 8, 1.2)
+				.fill(palette.foreground);
+			infoButton.hitArea = new Rectangle(-17, -17, 34, 34);
+			infoButton.cursor = "pointer";
+			infoButton.visible = false;
 			const currentVisual = yield* createActorVisualFx({
 				frames,
 				item,
@@ -63,13 +89,16 @@ export const createTileActorFx = Effect.fn("createTileActorFx")(
 				currentVisual,
 			]);
 			visualLayer.addChild(currentVisual.container);
-			lifecycleLayer.addChild(visualLayer, progressBar, clockRing);
-			container.addChild(lifecycleLayer);
+			hoverLayer.addChild(visualLayer, progressBar, clockRing);
+			lifecycleLayer.addChild(hoverLayer);
+			container.addChild(lifecycleLayer, infoButton);
 
 			return {
 				instanceId,
 				container,
 				lifecycleLayer,
+				hoverLayer,
+				infoButton,
 				visualLayer,
 				progressBar,
 				clockRing,
@@ -83,6 +112,8 @@ export const createTileActorFx = Effect.fn("createTileActorFx")(
 				dragOffsetX: 0,
 				dragOffsetY: 0,
 				onPointerDownFn: null,
+				onPointerEnterFn: null,
+				onPointerLeaveFn: null,
 			} satisfies PixiTileActor;
 		}),
 );

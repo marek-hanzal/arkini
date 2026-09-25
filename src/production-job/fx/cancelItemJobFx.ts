@@ -2,7 +2,6 @@ import { Effect } from "effect";
 
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
-import { assertItemProductionPlayerControlFx } from "~/production-line/fx/assertItemProductionPlayerControlFx";
 import { abortJobRuntimeFx } from "~/production-job/fx/abortJobRuntimeFx";
 
 export namespace cancelItemJobFx {
@@ -27,10 +26,6 @@ export const cancelItemJobFx = Effect.fn("cancelItemJobFx")(function* ({
 					undefined,
 					runtime,
 				] as const;
-			yield* assertItemProductionPlayerControlFx({
-				ownerItemId,
-				runtime,
-			});
 			const aborted = yield* abortJobRuntimeFx({
 				jobId,
 				reason: "player-cancelled",

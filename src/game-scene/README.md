@@ -49,7 +49,13 @@ The Board uses fixed 512 px world cells. The camera supports wheel and pinch zoo
 pointer, right drag pan, edge pan while dragging,
 `0` to fit, and resize that preserves the viewed center. Engine preview owns drop validity;
 Pixi hit testing supplies coordinates and the exact canonical target. Hover feedback never changes
-hit geometry or admission.
+hit geometry or admission. Hover grows only the tile art, shows a small detail control with a
+larger hit area, and yields smoothly to drag, blocked interaction and canonical travel. Pointer-anchored
+zoom preserves both hover and an active item drag.
+
+A short left click admits the effective Default line, then opens Item Detail. Ctrl+left click
+fills its queue, then opens Detail. A short right click opens Detail without a production command;
+right drag remains camera pan. Queue playback owns Autofill and job start after admission.
 
 The scene owns one actor per visible runtime identity. A transported identity receives a fresh
 Pixi actor in its destination Space. Animation requests can be replaced or cancelled without

@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { useItemDetailSceneController } from "~/item-detail/ui/useItemDetailSceneController";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
@@ -6,6 +7,7 @@ import { ItemArtwork } from "~/ui/ui/ItemArtwork";
 interface ItemInfoProps {
 	readonly detail: useItemDetailSceneController.Detail;
 	readonly stale: boolean;
+	readonly children?: ReactNode;
 }
 
 const ItemInfoProgress = ({
@@ -46,7 +48,7 @@ const ItemInfoProgress = ({
 };
 
 /** The player's basic item facts, without authoring controls or resource identifiers. */
-export const ItemInfo = ({ detail, stale }: ItemInfoProps) => {
+export const ItemInfo = ({ detail, stale, children }: ItemInfoProps) => {
 	const translator = useTranslator();
 	const colorFraction =
 		detail.units === undefined
@@ -101,6 +103,7 @@ export const ItemInfo = ({ detail, stale }: ItemInfoProps) => {
 							)}
 						</div>
 					) : null}
+					{children}
 				</div>
 			</div>
 		</section>

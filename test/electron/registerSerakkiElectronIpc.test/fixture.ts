@@ -48,9 +48,6 @@ export const createRegisteredIpcHarness = async () => {
 	vi.clearAllMocks();
 	electronHarness.handlers.clear();
 	electronHarness.appListeners.clear();
-	electronHarness.nativeThemeListeners.clear();
-	electronHarness.nativeTheme.shouldUseDarkColors = true;
-	electronHarness.nativeTheme.themeSource = "dark";
 	electronHarness.writeClipboardText.mockReset();
 
 	const userDataPath = await mkdtemp(join(tmpdir(), "serakki-ipc-"));
@@ -158,14 +155,11 @@ export const createRegisteredIpcHarness = async () => {
 			if (handler === undefined) throw new Error(`Missing ${channel} handler.`);
 			return handler(event, ...args);
 		},
-		nativeTheme: electronHarness.nativeTheme,
-		nativeThemeListeners: electronHarness.nativeThemeListeners,
 		openDiagnosticDirectory,
 		openPath: electronHarness.openPath,
 		preferredSystemLanguages: electronHarness.preferredSystemLanguages,
 		requestWindowMode: electronHarness.requestWindowMode,
 		saveKey,
-		setBackgroundColor: electronHarness.setBackgroundColor,
 		trustedEvent: createInvokeEvent("serakki://app/game/serakki"),
 		untrustedEvent: createInvokeEvent("https://example.com/"),
 		userDataPaths,

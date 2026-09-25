@@ -67,9 +67,11 @@ const harness = () => {
 		const container = new Container();
 		container.position.set(0, 0);
 		const lifecycleLayer = new Container();
+		const hoverLayer = new Container();
 		const visualLayer = new Container();
 		container.addChild(lifecycleLayer);
-		lifecycleLayer.addChild(visualLayer);
+		lifecycleLayer.addChild(hoverLayer);
+		hoverLayer.addChild(visualLayer);
 		const currentVisual = {
 			container: new Container(),
 			readyListeners: new Set(),
@@ -84,6 +86,7 @@ const harness = () => {
 			]),
 			pendingVisual: null,
 			lifecycleLayer,
+			hoverLayer,
 			visualLayer,
 			instanceId: id,
 			item: {

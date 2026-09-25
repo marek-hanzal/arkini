@@ -1,5 +1,4 @@
 import type { AppearanceAccentSchema } from "./appearance/AppearanceAccentSchema";
-import type { AppearanceThemeSchema } from "./appearance/AppearanceThemeSchema";
 import type { CheatAvailabilitySchema } from "./cheat/CheatAvailabilitySchema";
 import type { InstallationStatus } from "./cli/InstallationStatus";
 import type { CompletionStatus } from "./cli/CompletionStatus";
@@ -31,8 +30,6 @@ export namespace SerakkiElectronApi {
 		saveClear: "serakki:save:clear",
 		saveList: "serakki:save:list",
 		saveRestore: "serakki:save:restore",
-		appearanceRead: "serakki:appearance:read",
-		appearanceWrite: "serakki:appearance:write",
 		appearanceAccentRead: "serakki:appearance:accent:read",
 		appearanceAccentWrite: "serakki:appearance:accent:write",
 		cheatAvailabilityRead: "serakki:cheats:available:read",
@@ -165,8 +162,6 @@ export namespace SerakkiElectronApi {
 			readonly openUserDirectoryFn: () => Promise<void>;
 		};
 		readonly appearance: {
-			readonly readFn: () => Promise<AppearanceThemeSchema.Type>;
-			readonly writeFn: (theme: AppearanceThemeSchema.Type) => Promise<void>;
 			readonly readAccentFn: () => Promise<AppearanceAccentSchema.Type>;
 			readonly writeAccentFn: (accent: AppearanceAccentSchema.Type) => Promise<void>;
 		};

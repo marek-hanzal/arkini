@@ -1,8 +1,8 @@
 import * as Atom from "effect/unstable/reactivity/Atom";
-import { LauncherAppearanceReadyAtom } from "~/launcher/atom/LauncherAppearanceReadyAtom";
+import { LauncherAccentReadyAtom } from "~/launcher/atom/LauncherAccentReadyAtom";
 import { LauncherHeroReadyAtom } from "~/launcher/atom/LauncherHeroReadyAtom";
 
-/** True once both DOM appearance input and Hero resource are ready to render. */
+/** True once both accent and Hero resource are ready to render. */
 export const LauncherVisualReadyAtom = Atom.make(
-	(get) => get(LauncherAppearanceReadyAtom) && get(LauncherHeroReadyAtom),
+	(get) => get(LauncherAccentReadyAtom) && get(LauncherHeroReadyAtom),
 );

@@ -9,7 +9,7 @@ import type { SerapackCatalog } from "~/serapack-catalog/service/SerapackCatalog
 import { SerapackCatalogOwnerAtom } from "~/serapack-catalog/atom/SerapackCatalogOwnerAtom";
 import { createRendererLifecycleFx } from "~/application-runtime/fx/createRendererLifecycleFx";
 import { RendererLifecycleOwnerAtom } from "~/application-runtime/atom/RendererLifecycleOwnerAtom";
-import { LauncherAppearanceReadyAtom } from "~/launcher/atom/LauncherAppearanceReadyAtom";
+import { LauncherAccentReadyAtom } from "~/launcher/atom/LauncherAccentReadyAtom";
 import { LauncherHeroReadyAtom } from "~/launcher/atom/LauncherHeroReadyAtom";
 import { LauncherHeroUrlAtom } from "~/launcher/atom/LauncherHeroUrlAtom";
 import { LauncherStartupAtom } from "~/launcher/atom/LauncherStartupAtom";
@@ -28,9 +28,6 @@ const harness = vi.hoisted(() => ({
 
 vi.mock("~/application-settings/fx/readAppearanceAccentFx", () => ({
 	readAppearanceAccentFx: () => Effect.succeed("rose"),
-}));
-vi.mock("~/application-settings/fx/readAppearanceThemeFx", () => ({
-	readAppearanceThemeFx: () => Effect.succeed("dark"),
 }));
 vi.mock("~/application-settings/fx/readCheatAvailabilityFx", () => ({
 	readCheatAvailabilityFx: () => Effect.succeed(false),
@@ -153,7 +150,7 @@ describe("LauncherHeroAtom", () => {
 		registry.mount(LauncherStartupAtom);
 
 		await vi.waitFor(() => {
-			expect(registry.get(LauncherAppearanceReadyAtom)).toBe(true);
+			expect(registry.get(LauncherAccentReadyAtom)).toBe(true);
 			expect(registry.get(LauncherHeroReadyAtom)).toBe(true);
 		});
 		expect(registry.get(LauncherStartupAtom).waiting).toBe(true);

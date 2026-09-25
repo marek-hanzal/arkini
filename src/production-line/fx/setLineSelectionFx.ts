@@ -1,6 +1,5 @@
 import { ItemProductionControlUnavailableError } from "~/production-line/error/ItemProductionControlUnavailableError";
 import { createRevisionFx } from "~/item-revision/fx/createRevisionFx";
-import { assertItemProductionPlayerControlFx } from "~/production-line/fx/assertItemProductionPlayerControlFx";
 import { Effect, Option } from "effect";
 import { match, P } from "ts-pattern";
 
@@ -40,10 +39,6 @@ export const setLineSelectionFx = Effect.fn("setLineSelectionFx")(function* (
 	const lineUid = props.selection === "default" ? props.lineUid : null;
 	return yield* modifyRuntimeFx((runtime) =>
 		Effect.gen(function* () {
-			yield* assertItemProductionPlayerControlFx({
-				ownerItemId,
-				runtime,
-			});
 			const owner = runtime.items.find((item) => item.id === ownerItemId);
 			if (owner === undefined) {
 				return yield* Effect.fail(

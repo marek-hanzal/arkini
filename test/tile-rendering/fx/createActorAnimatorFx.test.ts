@@ -93,6 +93,7 @@ const createActor = (id = "runtime:actor", instanceId = `instance:${id}`) =>
 			y: 20,
 		},
 		visualLayer: new Container(),
+		hoverLayer: new Container(),
 		lifecycleLayer: {
 			scale: {
 				set(value: number) {
@@ -123,6 +124,36 @@ const createAnimator = () => {
 };
 
 describe("actor animator", () => {
+	it("reverses hover scale from the visible frame without changing pose or drop feedback", () => {
+		const actor = createActor();
+		const { animator, tweens } = createAnimator();
+		Effect.runSync(
+			animator.animateFx({
+				actor,
+				channel: "hover-scale",
+				durationMs: 220,
+				toScale: 1.08,
+			}),
+		);
+		tweens[0]?.update(0.5);
+		expect(actor.hoverLayer.scale.x).toBeCloseTo(1.04);
+		Effect.runSync(
+			animator.animateFx({
+				actor,
+				channel: "hover-scale",
+				durationMs: 220,
+				toScale: 1,
+			}),
+		);
+		expect(tweens[0]?.stop).toHaveBeenCalledOnce();
+		tweens[1]?.update(0.5);
+		expect(actor.hoverLayer.scale.x).toBeCloseTo(1.02);
+		expect(actor.visualLayer.scale.x).toBe(1);
+		expect(actor.container.scale.x).toBe(0.75);
+		tweens[1]?.update(1);
+		expect(actor.hoverLayer.scale.x).toBe(1);
+	});
+
 	it("retargets unit color from its displayed value and settles a full-color filter", () => {
 		const actor = createActor();
 		const { animator, tweens } = createAnimator();

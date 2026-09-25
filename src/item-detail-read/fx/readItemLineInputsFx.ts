@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 import { readItemRemainingUnitsFn } from "~/production-action/fn/readItemRemainingUnitsFn";
 import { resolveLineRunFx } from "~/production-line/fx/resolveLineRunFx";
-import { canControlItemProductionFn } from "~/production-line/fn/canControlItemProductionFn";
 import { isItemProductionAdmissionOpenFn } from "~/production-line/fn/isItemProductionAdmissionOpenFn";
 import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";
 import { resolveItemScheduleEnabledFx } from "~/item-schedule/fx/resolveItemScheduleEnabledFx";
@@ -183,7 +182,6 @@ export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* 
 				filled === 0 &&
 				owner?.location.scope === "board" &&
 				liveLine !== undefined &&
-				canControlItemProductionFn(owner.item) &&
 				isItemProductionAdmissionOpenFn(owner) &&
 				!isLineInputClosedFn({
 					ownerItemId: owner.id,
@@ -192,11 +190,7 @@ export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* 
 				}) &&
 				incoming.length < input.quantity.max &&
 				sources.length > 0,
-			canWithdraw:
-				buffered > 0 &&
-				!committed &&
-				owner?.location.scope === "board" &&
-				canControlItemProductionFn(owner.item),
+			canWithdraw: buffered > 0 && !committed && owner?.location.scope === "board",
 			clock,
 			availableQuantity,
 			available:

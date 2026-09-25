@@ -15,16 +15,16 @@ describe("main drag controller: pointer", () => {
 			button: 0,
 			ctrlKey: false,
 			shiftKey: false,
-			intent: "detail",
+			intent: "primary",
 		},
 		{
 			button: 2,
 			ctrlKey: false,
 			shiftKey: false,
-			intent: "primary",
+			intent: "detail",
 		},
 		{
-			button: 2,
+			button: 0,
 			ctrlKey: true,
 			shiftKey: false,
 			intent: "fill-default-line-queue",
@@ -33,7 +33,13 @@ describe("main drag controller: pointer", () => {
 			button: 2,
 			ctrlKey: false,
 			shiftKey: true,
-			intent: "primary",
+			intent: "detail",
+		},
+		{
+			button: 2,
+			ctrlKey: true,
+			shiftKey: false,
+			intent: "detail",
 		},
 	])("maps ordinary item clicks to $intent", async ({ button, ctrlKey, shiftKey, intent }) => {
 		const mounted = mountController();

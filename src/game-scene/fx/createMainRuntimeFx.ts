@@ -271,7 +271,6 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 		appearanceObserver.observe(document.documentElement, {
 			attributeFilter: [
 				"data-accent",
-				"data-theme",
 			],
 			attributes: true,
 		});

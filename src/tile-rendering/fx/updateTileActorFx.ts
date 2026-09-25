@@ -65,6 +65,9 @@ export const updateTileActorFx = Effect.fn("updateTileActorFx")(function* ({
 	actor.size = size;
 	actor.lifecycleLayer.position.set(size / 2, size / 2);
 	actor.lifecycleLayer.pivot.set(size / 2, size / 2);
+	actor.hoverLayer.position.set(size / 2, size / 2);
+	actor.hoverLayer.pivot.set(size / 2, size / 2);
+	actor.infoButton.position.set(size - 26, 26);
 	actor.visualLayer.position.set(size / 2, size / 2);
 	actor.visualLayer.pivot.set(size / 2, size / 2);
 	actor.container.hitArea = {

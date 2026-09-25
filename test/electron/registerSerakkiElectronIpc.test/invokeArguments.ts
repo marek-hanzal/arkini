@@ -20,16 +20,6 @@ export const invokeArguments = new Map<string, ReadonlyArray<unknown>>([
 		],
 	],
 	[
-		SerakkiElectronApi.channels.appearanceRead,
-		[],
-	],
-	[
-		SerakkiElectronApi.channels.appearanceWrite,
-		[
-			"dark",
-		],
-	],
-	[
 		SerakkiElectronApi.channels.appearanceAccentRead,
 		[],
 	],

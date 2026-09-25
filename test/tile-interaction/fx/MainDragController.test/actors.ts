@@ -45,6 +45,10 @@ export const createDragActor = (actorItem: TileActorItem): PixiTileActor => {
 	container.cursor = "grab";
 	container.position.set(10, 20);
 	const lifecycleLayer = new Container();
+	const hoverLayer = new Container();
+	lifecycleLayer.addChild(hoverLayer);
+	const infoButton = new Graphics();
+	infoButton.visible = false;
 	container.addChild(lifecycleLayer);
 	const visual = {
 		composite: new Sprite(Texture.EMPTY),
@@ -80,7 +84,11 @@ export const createDragActor = (actorItem: TileActorItem): PixiTileActor => {
 		instanceId: `test:${actorItem.id}`,
 		item: actorItem,
 		lifecycleLayer,
+		hoverLayer,
+		infoButton,
 		onPointerDownFn: null,
+		onPointerEnterFn: null,
+		onPointerLeaveFn: null,
 		pendingVisual: null,
 		progressBar: new Graphics(),
 		clockRing: new Graphics(),

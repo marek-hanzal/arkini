@@ -27,6 +27,7 @@ it("activates the row without stealing nested controls or activating an unavaila
 		root.render(
 			<ItemProductionRow
 				line={line}
+				colorAvailable={enabled}
 				activateFn={enabled ? activateFn : undefined}
 				actions={
 					<button onClick={controlFn}>

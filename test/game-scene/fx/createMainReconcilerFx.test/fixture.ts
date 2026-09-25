@@ -159,16 +159,20 @@ export const createActor = (item: TileActorItem): PixiTileActor => {
 	container.alpha = 1;
 	container.position.set(40, 60);
 	const lifecycleLayer = new Container();
+	const hoverLayer = new Container();
 	const visualLayer = new Container();
 	const progressBar = new Graphics();
 	const currentVisual = createVisual(item);
 	visualLayer.addChild(currentVisual.container);
-	lifecycleLayer.addChild(visualLayer);
+	hoverLayer.addChild(visualLayer);
+	lifecycleLayer.addChild(hoverLayer);
 	container.addChild(lifecycleLayer);
 	return {
 		instanceId: `test:${item.id}`,
 		container,
 		lifecycleLayer,
+		hoverLayer,
+		infoButton: new Graphics(),
 		visualLayer,
 		progressBar,
 		clockRing: new Graphics(),
@@ -184,6 +188,8 @@ export const createActor = (item: TileActorItem): PixiTileActor => {
 		dragOffsetX: 0,
 		dragOffsetY: 0,
 		onPointerDownFn: null,
+		onPointerEnterFn: null,
+		onPointerLeaveFn: null,
 	} satisfies PixiTileActor;
 };
 
@@ -327,15 +333,21 @@ export const createAnimator = () => {
 
 export const createDrag = () => {
 	const detached: PixiTileActor[] = [];
+	const hoverClears: PixiTileActor[] = [];
 	const requestRefresh = vi.fn();
 	const settledOriginGhosts: PixiTileActor[] = [];
 	return {
 		detached,
+		hoverClears,
 		requestRefresh,
 		settledOriginGhosts,
 		drag: {
 			attachActorFx: () => Effect.void,
 			cancelInteractionFx: Effect.void,
+			clearHoverFx: (actor: PixiTileActor) =>
+				Effect.sync(() => {
+					hoverClears.push(actor);
+				}),
 			closeFx: Effect.void,
 			detachActorFx: (actor: PixiTileActor) =>
 				Effect.sync(() => {
@@ -480,6 +492,8 @@ export const createReconcilerHarness = ({
 			presentation: presentationHarness.presentation,
 			readPaletteFn: () =>
 				({
+					foreground: 0xf7f2fc,
+					overlay: 0x231c2d,
 					success: 0x57d7b2,
 				}) as never,
 			surface,

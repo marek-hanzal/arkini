@@ -42,26 +42,29 @@ describe("Settings", () => {
 		await vi.waitFor(() => expect(readCompletionStatus).toHaveBeenCalledOnce());
 	});
 
-	it("changes and persists the authoritative theme, then returns through history with Escape", async () => {
-		const { container, deferred, router, write } = await renderSettings([
-			"/main-menu",
-			"/settings",
-		]);
+	it("changes the window mode, then returns through history with Escape", async () => {
+		const { container, deferred, router, writeWindowMode } = await renderSettings(
+			[
+				"/main-menu",
+				"/settings",
+			],
+			{
+				deferWindowMode: true,
+			},
+		);
 
 		const options = Array.from(
 			container.querySelectorAll<HTMLButtonElement>(
-				'[data-ui="SettingsThemeOptions"] [data-ui="SettingsSegmentedChoiceOption"]',
+				'[data-ui="SettingsWindowModeOptions"] [data-ui="SettingsSegmentedChoiceOption"]',
 			),
 		);
 		expect(options).toHaveLength(3);
-		const light = options.find((option) => option.dataset.uiValue === "light");
-		if (light === undefined) throw new Error("Expected Light theme option.");
-		expect(document.documentElement.dataset.theme).toBe("dark");
-		await act(async () => light.click());
-		expect(document.documentElement.dataset.theme).toBe("light");
-		expect(write).toHaveBeenCalledOnce();
-		expect(write).toHaveBeenCalledWith("light");
-		const fieldset = light.closest("fieldset");
+		const fullscreen = options.find((option) => option.dataset.uiValue === "fullscreen");
+		if (fullscreen === undefined) throw new Error("Expected Fullscreen option.");
+		await act(async () => fullscreen.click());
+		expect(writeWindowMode).toHaveBeenCalledOnce();
+		expect(writeWindowMode).toHaveBeenCalledWith("fullscreen");
+		const fieldset = fullscreen.closest("fieldset");
 		expect(fieldset).toBeInstanceOf(HTMLFieldSetElement);
 		expect((fieldset as HTMLFieldSetElement).disabled).toBe(true);
 		await act(async () => deferred.resolve());

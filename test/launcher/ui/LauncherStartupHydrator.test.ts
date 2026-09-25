@@ -9,9 +9,9 @@ import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { SerapackCatalog } from "~/serapack-catalog/service/SerapackCatalog";
 import { SerapackCatalogOwnerAtom } from "~/serapack-catalog/atom/SerapackCatalogOwnerAtom";
-import { AppearanceAtom } from "~/application-settings/atom/AppearanceAtom";
+import { AccentAtom } from "~/application-settings/atom/AccentAtom";
 import { CheatAvailabilityAtom } from "~/application-settings/atom/CheatAvailabilityAtom";
-import { AppearanceDataset } from "~/application-settings/ui/AppearanceDataset";
+import { AccentDataset } from "~/application-settings/ui/AccentDataset";
 import { LauncherStartupAtom } from "~/launcher/atom/LauncherStartupAtom";
 import { LauncherStartupConfigAtom } from "~/launcher/atom/LauncherStartupConfigAtom";
 import { LauncherStartupHydrator } from "~/launcher/ui/LauncherStartupHydrator";
@@ -43,7 +43,6 @@ afterEach(async () => {
 	});
 	for (const registry of registries.splice(0)) registry.dispose();
 	document.body.replaceChildren();
-	delete document.documentElement.dataset.theme;
 	delete document.documentElement.dataset.accent;
 });
 
@@ -61,10 +60,7 @@ describe("LauncherStartupHydrator", () => {
 			bootstrapFx: Effect.sync(() => {
 				bootstrap();
 				return {
-					appearance: {
-						theme: "light" as const,
-						accent: "blue" as const,
-					},
+					accent: "blue" as const,
 					defaultPackageId: "built-in",
 					cheatsAvailable: true,
 					sound: {
@@ -78,13 +74,9 @@ describe("LauncherStartupHydrator", () => {
 		});
 		const Probe = () => {
 			const startup = useAtomValue(LauncherStartupAtom);
-			const appearance = useAtomValue(AppearanceAtom);
+			const accent = useAtomValue(AccentAtom);
 			const cheatsAvailable = useAtomValue(CheatAvailabilityAtom);
-			return createElement(
-				"output",
-				null,
-				`${startup._tag}:${appearance.theme}:${appearance.accent}:${cheatsAvailable}`,
-			);
+			return createElement("output", null, `${startup._tag}:${accent}:${cheatsAvailable}`);
 		};
 		const container = document.createElement("div");
 		document.body.append(container);
@@ -101,7 +93,7 @@ describe("LauncherStartupHydrator", () => {
 						{
 							value: registry,
 						},
-						createElement(AppearanceDataset),
+						createElement(AccentDataset),
 						createElement(LauncherStartupHydrator),
 						createElement(Probe),
 					),
@@ -111,8 +103,7 @@ describe("LauncherStartupHydrator", () => {
 
 		await vi.waitFor(() => {
 			expect(AsyncResult.isSuccess(registry.get(LauncherStartupAtom))).toBe(true);
-			expect(container.textContent).toBe("Success:light:blue:true");
-			expect(document.documentElement.dataset.theme).toBe("light");
+			expect(container.textContent).toBe("Success:blue:true");
 			expect(document.documentElement.dataset.accent).toBe("blue");
 		});
 		expect(bootstrap).toHaveBeenCalledOnce();

@@ -2,7 +2,6 @@ import { FileSystem } from "effect";
 import { Effect } from "effect";
 import { join } from "node:path";
 import { AppearanceAccentSchema } from "~electron/contract/appearance/AppearanceAccentSchema";
-import { AppearanceThemeSchema } from "~electron/contract/appearance/AppearanceThemeSchema";
 import type { ElectronMainError } from "../ElectronMainError";
 import { readElectronPreferenceFx } from "../preference/readElectronPreferenceFx";
 import { writeElectronPreferenceFx } from "../preference/writeElectronPreferenceFx";
@@ -10,10 +9,6 @@ import { createFilesystemWriteFx } from "~/filesystem-write/fx/createFilesystemW
 
 /** Effect-native main-process capability for application-wide appearance preferences. */
 export interface AppearancePreferences {
-	readonly readThemeFx: Effect.Effect<AppearanceThemeSchema.Type, ElectronMainError, never>;
-	readonly writeThemeFx: (
-		theme: AppearanceThemeSchema.Type,
-	) => Effect.Effect<void, ElectronMainError, never>;
 	readonly readAccentFx: Effect.Effect<AppearanceAccentSchema.Type, ElectronMainError, never>;
 	readonly writeAccentFx: (
 		accent: AppearanceAccentSchema.Type,
@@ -38,19 +33,7 @@ export const createFilesystemAppearancePreferencesFx = Effect.fn(
 	const filesystemWrite = yield* createFilesystemWriteFx().pipe(
 		Effect.provideService(FileSystem.FileSystem, fileSystem),
 	);
-	const themePath = join(root, "appearance.theme.json");
 	const accentPath = join(root, "appearance.accent.json");
-	const writeThemeFx = Effect.fn("FilesystemAppearancePreferences.writeThemeFx")(
-		(theme: AppearanceThemeSchema.Type) =>
-			writeElectronPreferenceFx({
-				filesystemWrite,
-				lock: join(root, ".appearance-theme.lock"),
-				target: themePath,
-				value: theme,
-				operation: "persist the appearance preference",
-				serializeFn: (value) => JSON.stringify(AppearanceThemeSchema.parse(value)),
-			}),
-	);
 	const writeAccentFx = Effect.fn("FilesystemAppearancePreferences.writeAccentFx")(
 		(accent: AppearanceAccentSchema.Type) =>
 			writeElectronPreferenceFx({
@@ -63,20 +46,6 @@ export const createFilesystemAppearancePreferencesFx = Effect.fn(
 			}),
 	);
 	return {
-		readThemeFx: readElectronPreferenceFx({
-			fileSystem,
-			path: themePath,
-			fallback: "dark" as const,
-			operation: "read the appearance preference",
-			parseFn: (stored) => {
-				try {
-					return AppearanceThemeSchema.safeParse(JSON.parse(stored)).data;
-				} catch {
-					return undefined;
-				}
-			},
-		}),
-		writeThemeFx,
 		readAccentFx: readElectronPreferenceFx({
 			fileSystem,
 			path: accentPath,

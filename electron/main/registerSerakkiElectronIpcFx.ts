@@ -5,7 +5,6 @@ import {
 	clipboard,
 	dialog,
 	ipcMain,
-	nativeTheme,
 	screen,
 	shell,
 	type IpcMainInvokeEvent,
@@ -84,12 +83,6 @@ export const registerSerakkiElectronIpcFx = Effect.fn("registerSerakkiElectronIp
 				root: userDataPaths.game.saves,
 			});
 			yield* Effect.sync(() => {
-				const synchronizeWindowBackgroundsFn = () => {
-					const color = nativeTheme.shouldUseDarkColors ? "#090711" : "#fbf8ff";
-					for (const window of BrowserWindow.getAllWindows()) {
-						window.setBackgroundColor(color);
-					}
-				};
 				const runAuthorizedFn = <Value, Error>(
 					event: IpcMainInvokeEvent,
 					operation: Effect.Effect<Value, Error, never>,
@@ -100,26 +93,6 @@ export const registerSerakkiElectronIpcFx = Effect.fn("registerSerakkiElectronIp
 							.pipe(Effect.andThen(operation)),
 					);
 
-				nativeTheme.on("updated", synchronizeWindowBackgroundsFn);
-				ipcMain.handle(SerakkiElectronApi.channels.appearanceRead, (event) =>
-					runAuthorizedFn(
-						event,
-						Effect.sync(() => nativeTheme.themeSource),
-					),
-				);
-				ipcMain.handle(SerakkiElectronApi.channels.appearanceWrite, (event, theme) =>
-					runAuthorizedFn(
-						event,
-						appearancePreferences.writeThemeFx(theme).pipe(
-							Effect.tap(() =>
-								Effect.sync(() => {
-									nativeTheme.themeSource = theme;
-									synchronizeWindowBackgroundsFn();
-								}),
-							),
-						),
-					),
-				);
 				ipcMain.handle(SerakkiElectronApi.channels.appearanceAccentRead, (event) =>
 					runAuthorizedFn(event, appearancePreferences.readAccentFx),
 				);
@@ -405,10 +378,7 @@ export const registerSerakkiElectronIpcFx = Effect.fn("registerSerakkiElectronIp
 						runAuthorizedFn(event, saves.restoreFx(key, bytes)),
 				);
 				const cleanupFn = () => {
-					nativeTheme.removeListener("updated", synchronizeWindowBackgroundsFn);
 					for (const channel of [
-						SerakkiElectronApi.channels.appearanceRead,
-						SerakkiElectronApi.channels.appearanceWrite,
 						SerakkiElectronApi.channels.appearanceAccentRead,
 						SerakkiElectronApi.channels.appearanceAccentWrite,
 						SerakkiElectronApi.channels.cheatAvailabilityRead,

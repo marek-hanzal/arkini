@@ -155,7 +155,7 @@ it("preserves active work and its materials when a reservation cannot be returne
 	);
 });
 
-it("enforces player control and does not refund units spent at start", () => {
+it("preserves spent units when cancelling work in either UI mode", () => {
 	const config = GameConfigSchema.parse({
 		...clearItemJobQueueConfig,
 		items: {
@@ -192,7 +192,7 @@ it("enforces player control and does not refund units spent at start", () => {
 			}),
 		),
 	);
-	const automatic = GameConfigSchema.parse({
+	const simple = GameConfigSchema.parse({
 		...config,
 		items: {
 			...config.items,
@@ -204,18 +204,18 @@ it("enforces player control and does not refund units spent at start", () => {
 	});
 	Effect.runSync(
 		Effect.gen(function* () {
-			const before = yield* readRuntimeFx();
-			const result = yield* Effect.exit(
-				cancelItemJobFx({
-					ownerItemId: "runtime:forge:primary",
-					jobId: "job:active",
-				}),
-			);
-			expect(Exit.isFailure(result)).toBe(true);
-			expect(yield* readRuntimeFx()).toEqual(before);
+			yield* cancelItemJobFx({
+				ownerItemId: "runtime:forge:primary",
+				jobId: "job:active",
+			});
+			const after = yield* readRuntimeFx();
+			expect(after.jobs).toHaveLength(0);
+			expect(
+				after.items.find((item) => item.id === "runtime:forge:primary")?.remainingUnits,
+			).toBe(1);
 		}).pipe(
 			useGameFx({
-				config: automatic,
+				config: simple,
 				state,
 			}),
 		),

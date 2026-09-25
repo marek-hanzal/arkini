@@ -10,7 +10,6 @@ import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { cancelItemJobFx } from "~/production-job/fx/cancelItemJobFx";
 import { clearItemJobQueueFx } from "~/production-job/fx/clearItemJobQueueFx";
-import { canControlItemProductionFn } from "~/production-line/fn/canControlItemProductionFn";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
 
 export namespace useItemLineWorkController {
@@ -49,10 +48,7 @@ export const useItemLineWorkController = ({
 						job.ownerItemId === ownerItemId &&
 						job.lineUid === lineUid,
 				),
-				controllable:
-					owner !== undefined &&
-					owner.location.scope === "board" &&
-					canControlItemProductionFn(owner.item),
+				controllable: owner !== undefined && owner.location.scope === "board",
 			};
 		},
 		[

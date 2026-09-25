@@ -1,0 +1,29 @@
+:root[data-accent="rose"] {
+	--ak-accent: #f05bb8;
+	--ak-accent-hover: #ff7ccc;
+	--ak-accent-contrast: #2a0a1d;
+}
+
+:root[data-accent="violet"] {
+	--ak-accent: #a987ff;
+	--ak-accent-hover: #bea6ff;
+	--ak-accent-contrast: #170d2b;
+}
+
+:root[data-accent="blue"] {
+	--ak-accent: #70a9ff;
+	--ak-accent-hover: #8dbaff;
+	--ak-accent-contrast: #07182f;
+}
+
+:root[data-accent="green"] {
+	--ak-accent: #55d0ad;
+	--ak-accent-hover: #75dfc1;
+	--ak-accent-contrast: #06231b;
+}
+
+:root[data-accent="amber"] {
+	--ak-accent: #f1b35b;
+	--ak-accent-hover: #ffc77d;
+	--ak-accent-contrast: #2a1704;
+}

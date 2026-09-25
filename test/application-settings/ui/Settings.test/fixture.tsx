@@ -15,7 +15,6 @@ import {
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, vi } from "vitest";
-import { AppearanceAtom } from "~/application-settings/atom/AppearanceAtom";
 import { WindowModeAtom } from "~/window-mode/atom/WindowModeAtom";
 import type { CompletionStatus } from "~electron/contract/cli/CompletionStatus";
 import type { InstallationStatus } from "~electron/contract/cli/InstallationStatus";
@@ -33,7 +32,7 @@ import {
 	adoptTestGameEngineResourceFx,
 	createTestRendererRuntime,
 } from "~test/support/createTestRendererRuntime";
-import { AppearanceDataset } from "~/application-settings/ui/AppearanceDataset";
+import { AccentDataset } from "~/application-settings/ui/AccentDataset";
 
 const SettingsRoute = SettingsRouteDefinition.options.component;
 const CommonSection = CommonSettingsRouteDefinition.options.component;
@@ -119,6 +118,7 @@ export const renderSettings = async (
 	initialEntries: ReadonlyArray<string>,
 	{
 		activeGame = false,
+		deferWindowMode = false,
 		cliStatus = {
 			type: "unavailable",
 			commandPath: "/tmp/serakki-cli",
@@ -130,12 +130,12 @@ export const renderSettings = async (
 		},
 	}: {
 		readonly activeGame?: boolean;
+		readonly deferWindowMode?: boolean;
 		readonly cliStatus?: InstallationStatus;
 		readonly completionStatus?: CompletionStatus;
 	} = {},
 ) => {
 	const deferred = createDeferred();
-	const write = vi.fn(() => deferred.promise);
 	const writeCheatAvailability = vi.fn(() => Promise.resolve());
 	const writeSound = vi.fn(() => Promise.resolve());
 	const openDiagnostics = vi.fn(() => Promise.resolve());
@@ -163,21 +163,15 @@ export const renderSettings = async (
 	const registry = AtomRegistry.make({
 		initialValues: [
 			[
-				AppearanceAtom,
-				{
-					theme: "dark",
-					accent: "rose",
-				},
-			],
-			[
 				WindowModeAtom,
 				"default",
 			],
 		],
 	});
 	const writeWindowMode = vi.fn((mode: "default" | "bordered" | "fullscreen") => {
-		registry.set(WindowModeAtom, mode);
-		return Promise.resolve();
+		return (deferWindowMode ? deferred.promise : Promise.resolve()).then(() => {
+			registry.set(WindowModeAtom, mode);
+		});
 	});
 	registries.push(registry);
 	Object.defineProperty(window, "scrollTo", {
@@ -198,9 +192,6 @@ export const renderSettings = async (
 					replaceFn: vi.fn(),
 					uninstallFn: uninstallCompletion,
 				},
-			},
-			appearance: {
-				writeFn: write,
 			},
 			cheats: {
 				writeAvailableFn: writeCheatAvailability,
@@ -273,7 +264,7 @@ export const renderSettings = async (
 				{
 					value: registry,
 				},
-				createElement(AppearanceDataset),
+				createElement(AccentDataset),
 				createElement(SettingsRoute),
 			),
 	});
@@ -353,7 +344,6 @@ export const renderSettings = async (
 		game,
 		root,
 		router,
-		write,
 		writeCheatAvailability,
 		writeSound,
 		writeWindowMode,

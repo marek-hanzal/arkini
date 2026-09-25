@@ -45,6 +45,7 @@ interface ItemLineProps extends useItemLineMakeController.Props {
 	readonly line: LineSchema.Type;
 	readonly makeDisabled: boolean;
 	readonly materialsAvailable: boolean;
+	readonly playReady: boolean;
 	readonly ruleDisabled: boolean;
 	readonly blockingHint?: string;
 	readonly status?: readItemLineStatusesFn.Status;
@@ -55,14 +56,16 @@ const ItemLineProgressBackdrop = ({
 	ownerItemId,
 	lineUid,
 	artworkId,
-	materialsAvailable,
+	colorAvailable,
 	ruleDisabled,
+	playCue,
 }: {
 	readonly ownerItemId?: IdSchema.Type;
 	readonly lineUid: IdSchema.Type;
 	readonly artworkId: IdSchema.Type;
-	readonly materialsAvailable: boolean;
+	readonly colorAvailable: boolean;
 	readonly ruleDisabled: boolean;
+	readonly playCue: boolean;
 }) => {
 	const game = useGameEngine();
 	const selectorFn = useCallback(
@@ -86,8 +89,9 @@ const ItemLineProgressBackdrop = ({
 		<ItemLineBackdrop
 			sourceUrl={game.getResourceUrlFn(artworkId)}
 			progress={progress}
-			materialsAvailable={materialsAvailable}
+			colorAvailable={colorAvailable}
 			ruleDisabled={ruleDisabled}
+			playCue={playCue}
 		/>
 	);
 };
@@ -96,6 +100,7 @@ const ItemLine = ({
 	line,
 	makeDisabled,
 	materialsAvailable,
+	playReady,
 	ruleDisabled,
 	blockingHint,
 	status,
@@ -116,6 +121,15 @@ const ItemLine = ({
 	});
 	const translator = useTranslator();
 	const state = status?.state ?? "idle";
+	const canActivate =
+		!disabled &&
+		!makeDisabled &&
+		!controller.pending &&
+		props.ownerItemId !== undefined &&
+		!ruleDisabled;
+	const colorAvailable =
+		!ruleDisabled &&
+		(!line.input.some((input) => input.type === "materials") || materialsAvailable);
 	return (
 		<motion.div
 			{...linePresenceMotion}
@@ -126,14 +140,8 @@ const ItemLine = ({
 		>
 			<ItemProductionRow
 				line={line}
-				activateFn={
-					disabled ||
-					makeDisabled ||
-					controller.pending ||
-					props.ownerItemId === undefined
-						? undefined
-						: controller.makeFn
-				}
+				activateFn={canActivate ? controller.makeFn : undefined}
+				colorAvailable={colorAvailable}
 				ruleDisabled={ruleDisabled}
 				backdrop={
 					line.artwork === undefined ? null : (
@@ -141,8 +149,9 @@ const ItemLine = ({
 							ownerItemId={props.ownerItemId}
 							lineUid={line.uid}
 							artworkId={line.artwork}
-							materialsAvailable={materialsAvailable}
+							colorAvailable={colorAvailable}
 							ruleDisabled={ruleDisabled}
+							playCue={canActivate && playReady && state === "idle"}
 						/>
 					)
 				}
@@ -234,6 +243,7 @@ export const ItemLines = ({
 	disabledLineUids,
 	lineBlockingHints,
 	materialReadyLineUids,
+	playReadyLineUids,
 	ownerItemId,
 	disabled,
 	makeDisabled,
@@ -242,6 +252,7 @@ export const ItemLines = ({
 	readonly disabledLineUids: readonly string[];
 	readonly lineBlockingHints: Readonly<Record<string, string | undefined>>;
 	readonly materialReadyLineUids: readonly string[];
+	readonly playReadyLineUids: readonly string[];
 	readonly ownerItemId?: IdSchema.Type;
 	readonly disabled: boolean;
 	readonly makeDisabled: boolean;
@@ -257,6 +268,7 @@ export const ItemLines = ({
 						line={line}
 						ruleDisabled={disabledLineUids.includes(line.uid)}
 						materialsAvailable={materialReadyLineUids.includes(line.uid)}
+						playReady={playReadyLineUids.includes(line.uid)}
 						blockingHint={lineBlockingHints[line.uid]}
 						lineUid={line.uid}
 						ownerItemId={ownerItemId}

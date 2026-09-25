@@ -115,6 +115,14 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 					)
 					.with(
 						{
+							channel: "hover-scale",
+						},
+						(write) => {
+							write.actor.hoverLayer.scale.set(write.scale);
+						},
+					)
+					.with(
+						{
 							channel: "grab-offset",
 						},
 						(write) => {
@@ -143,6 +151,7 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 					const fromScale = actor.container.scale.x;
 					const fromAlpha = actor.container.alpha;
 					const fromLifecycleScale = actor.lifecycleLayer.scale.x;
+					const fromHoverScale = actor.hoverLayer.scale.x;
 					const colorVisual = channel === "artwork-color" ? actor.currentVisual : null;
 					const fromColorFraction =
 						colorVisual?.unitsFadeUniforms.uniforms.uColorFraction ?? 1;
@@ -250,6 +259,18 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 															fromScale) *
 															progress;
 												actor.container.scale.set(scale);
+											},
+										)
+										.with(
+											{
+												channel: "hover-scale",
+											},
+											(animation) => {
+												actor.hoverLayer.scale.set(
+													fromHoverScale +
+														(animation.toScale - fromHoverScale) *
+															progress,
+												);
 											},
 										)
 										.with(

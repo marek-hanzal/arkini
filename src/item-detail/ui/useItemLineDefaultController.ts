@@ -8,7 +8,6 @@ import { useGameEngine } from "~/game-presentation/ui/useGameEngine";
 import { useRuntimeSelector } from "~/game-presentation/ui/useRuntimeSelector";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
-import { canControlItemProductionFn } from "~/production-line/fn/canControlItemProductionFn";
 import { readEffectiveLineFn } from "~/production-line/fn/readEffectiveLineFn";
 import { setLineSelectionFx } from "~/production-line/fx/setLineSelectionFx";
 import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErrorFx";
@@ -50,8 +49,7 @@ export const useItemLineDefaultController = ({
 						ownerItem: owner.item,
 						runtime,
 					})?.uid === lineUid,
-				controllable:
-					owner.location.scope === "board" && canControlItemProductionFn(owner.item),
+				controllable: owner.location.scope === "board",
 			};
 		},
 		[

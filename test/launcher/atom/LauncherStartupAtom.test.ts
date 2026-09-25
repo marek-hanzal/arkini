@@ -7,11 +7,11 @@ import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { SerapackCatalog } from "~/serapack-catalog/service/SerapackCatalog";
 import { SerapackCatalogOwnerAtom } from "~/serapack-catalog/atom/SerapackCatalogOwnerAtom";
-import { AppearanceAtom } from "~/application-settings/atom/AppearanceAtom";
+import { AccentAtom } from "~/application-settings/atom/AccentAtom";
 import { CheatAvailabilityAtom } from "~/application-settings/atom/CheatAvailabilityAtom";
 import { WindowModeAtom } from "~/window-mode/atom/WindowModeAtom";
 import { WindowModeReadyAtom } from "~/window-mode/atom/WindowModeReadyAtom";
-import { LauncherAppearanceReadyAtom } from "~/launcher/atom/LauncherAppearanceReadyAtom";
+import { LauncherAccentReadyAtom } from "~/launcher/atom/LauncherAccentReadyAtom";
 import { LauncherCheatAvailabilityReadyAtom } from "~/launcher/atom/LauncherCheatAvailabilityReadyAtom";
 import { LauncherSplashCompletedAtom } from "~/launcher/atom/LauncherSplashCompletedAtom";
 import { LauncherStartupAtom } from "~/launcher/atom/LauncherStartupAtom";
@@ -79,7 +79,6 @@ const prepareDefaultStartupFn = () => {
 	const readSoundFn = vi.fn(() => Promise.reject(new Error("Sound preference IPC failed")));
 	vi.stubGlobal("serakki", {
 		appearance: {
-			readFn: async () => "dark",
 			readAccentFn: async () => "rose",
 		},
 		cheats: {
@@ -151,10 +150,7 @@ describe("LauncherStartupAtom", () => {
 			bootstrapFx: Effect.sync(() => {
 				bootstrap();
 				return {
-					appearance: {
-						theme: "light" as const,
-						accent: "blue" as const,
-					},
+					accent: "blue" as const,
 					defaultPackageId: "built-in",
 					cheatsAvailable: true,
 					sound: {
@@ -175,12 +171,9 @@ describe("LauncherStartupAtom", () => {
 		});
 
 		expect(bootstrap).toHaveBeenCalledOnce();
-		expect(registry.get(AppearanceAtom)).toEqual({
-			theme: "light",
-			accent: "blue",
-		});
+		expect(registry.get(AccentAtom)).toBe("blue");
 		expect(registry.get(CheatAvailabilityAtom)).toBe(true);
-		expect(registry.get(LauncherAppearanceReadyAtom)).toBe(true);
+		expect(registry.get(LauncherAccentReadyAtom)).toBe(true);
 		expect(registry.get(LauncherCheatAvailabilityReadyAtom)).toBe(true);
 		expect(registry.get(WindowModeReadyAtom)).toBe(true);
 		expect(registry.get(WindowModeAtom)).toBe("bordered");
@@ -211,10 +204,7 @@ describe("LauncherStartupAtom", () => {
 				return attempt === 1
 					? Effect.fail(failure)
 					: Effect.succeed({
-							appearance: {
-								theme: "dark" as const,
-								accent: "rose" as const,
-							},
+							accent: "rose" as const,
 							defaultPackageId: "built-in",
 							cheatsAvailable: false,
 							sound: {
@@ -263,10 +253,7 @@ describe("LauncherStartupAtom", () => {
 				if (attempt === 1) return Effect.fail(new Error("first failed"));
 				return Effect.promise(() => retryGate).pipe(
 					Effect.as({
-						appearance: {
-							theme: "dark" as const,
-							accent: "rose" as const,
-						},
+						accent: "rose" as const,
 						defaultPackageId: "built-in",
 						cheatsAvailable: false,
 						sound: {
@@ -309,10 +296,7 @@ describe("LauncherStartupAtom", () => {
 		registry.set(LauncherStartupConfigAtom, {
 			heroUrl: "hero.png",
 			bootstrapFx: Effect.succeed({
-				appearance: {
-					theme: "light" as const,
-					accent: "blue" as const,
-				},
+				accent: "blue" as const,
 				defaultPackageId: "built-in",
 				cheatsAvailable: true,
 				sound: {
@@ -328,10 +312,7 @@ describe("LauncherStartupAtom", () => {
 		await vi.waitFor(() =>
 			expect(AsyncResult.isSuccess(registry.get(LauncherStartupAtom))).toBe(true),
 		);
-		registry.set(AppearanceAtom, {
-			theme: "dark",
-			accent: "rose",
-		});
+		registry.set(AccentAtom, "rose");
 		registry.set(CheatAvailabilityAtom, false);
 		registry.set(WindowModeAtom, "fullscreen");
 		registry.set(retryLauncherStartupAtom, undefined);
@@ -340,10 +321,7 @@ describe("LauncherStartupAtom", () => {
 			expect(AsyncResult.isSuccess(startup) && !startup.waiting).toBe(true);
 		});
 
-		expect(registry.get(AppearanceAtom)).toEqual({
-			theme: "dark",
-			accent: "rose",
-		});
+		expect(registry.get(AccentAtom)).toBe("rose");
 		expect(registry.get(CheatAvailabilityAtom)).toBe(false);
 		expect(registry.get(WindowModeAtom)).toBe("fullscreen");
 	});

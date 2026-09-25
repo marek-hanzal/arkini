@@ -7,6 +7,8 @@ export interface PixiTileActor {
 	readonly instanceId: string;
 	readonly container: Container;
 	readonly lifecycleLayer: Container;
+	readonly hoverLayer: Container;
+	readonly infoButton: Graphics;
 	readonly visualLayer: Container;
 	readonly progressBar: Graphics;
 	readonly clockRing: Graphics;
@@ -20,4 +22,6 @@ export interface PixiTileActor {
 	dragOffsetX: number;
 	dragOffsetY: number;
 	onPointerDownFn: ((event: FederatedPointerEvent) => void) | null;
+	onPointerEnterFn: ((event: FederatedPointerEvent) => void) | null;
+	onPointerLeaveFn: ((event: FederatedPointerEvent) => void) | null;
 }

@@ -24,10 +24,7 @@ const catalog: SerapackCatalog = {
 	removeFx: () => Effect.die("unused"),
 };
 const readyResult = {
-	appearance: {
-		theme: "dark" as const,
-		accent: "rose" as const,
-	},
+	accent: "rose" as const,
 	defaultPackageId: "canonical-built-in",
 	cheatsAvailable: false,
 	sound: {

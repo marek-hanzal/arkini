@@ -2,23 +2,17 @@ import { Cause, Effect, Exit, Option } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { match } from "ts-pattern";
 
-import type { AppearanceThemeSchema } from "~electron/contract/appearance/AppearanceThemeSchema";
-import { setAppearanceThemeAtom } from "~/application-settings/atom/setAppearanceThemeAtom";
 import { setCheatAvailabilityAtom } from "~/application-settings/atom/setCheatAvailabilityAtom";
 import { readExactCauseFailureFn } from "~/application-diagnostics/fn/readExactCauseFailureFn";
 import type { WindowModeSchema } from "~electron/contract/window/WindowModeSchema";
 import { setWindowModeAtom } from "~/window-mode/atom/setWindowModeAtom";
 
-type SettingsCommandAction = "cheat-tools" | "window-mode" | "theme" | "exit";
+type SettingsCommandAction = "cheat-tools" | "window-mode" | "exit";
 
 type SettingsCommand =
 	| {
 			readonly action: "cheat-tools";
 			readonly available: boolean;
-	  }
-	| {
-			readonly action: "theme";
-			readonly theme: AppearanceThemeSchema.Type;
 	  }
 	| {
 			readonly action: "window-mode";
@@ -43,12 +37,12 @@ export type SettingsCommandState =
 	  }
 	| {
 			readonly kind: "save-error";
-			readonly label: "Cheat tools" | "Theme" | "Window";
+			readonly label: "Cheat tools" | "Window";
 			readonly error: unknown;
 	  }
 	| {
 			readonly kind: "saved";
-			readonly label: "Cheat tools" | "Theme" | "Window";
+			readonly label: "Cheat tools" | "Window";
 	  };
 
 const SettingsCommandStateAtom = Atom.make<SettingsCommandState>({
@@ -77,12 +71,6 @@ const SettingsCommandRunnerAtom = Atom.fn(
 				)
 				.with(
 					{
-						action: "theme",
-					},
-					({ theme }) => get.setResult(setAppearanceThemeAtom, theme),
-				)
-				.with(
-					{
 						action: "exit",
 					},
 					({ runFx }) => runFx.pipe(Effect.andThen(Effect.yieldNow)),
@@ -107,7 +95,6 @@ const SettingsCommandRunnerAtom = Atom.fn(
 								label: match(command.action)
 									.with("cheat-tools", () => "Cheat tools" as const)
 									.with("window-mode", () => "Window" as const)
-									.with("theme", () => "Theme" as const)
 									.exhaustive(),
 								error,
 							},
@@ -125,7 +112,6 @@ const SettingsCommandRunnerAtom = Atom.fn(
 							label: match(command.action)
 								.with("cheat-tools", () => "Cheat tools" as const)
 								.with("window-mode", () => "Window" as const)
-								.with("theme", () => "Theme" as const)
 								.exhaustive(),
 						},
 			);

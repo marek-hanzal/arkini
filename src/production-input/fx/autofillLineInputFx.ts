@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
-import { assertItemProductionPlayerControlFx } from "~/production-line/fx/assertItemProductionPlayerControlFx";
 import { readBoardItemLineFx } from "~/production-line/fx/readBoardItemLineFx";
 import { isItemProductionAdmissionOpenFn } from "~/production-line/fn/isItemProductionAdmissionOpenFn";
 import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";
@@ -26,10 +25,6 @@ export const autofillLineInputFx = Effect.fn("autofillLineInputFx")(function* (
 ) {
 	return yield* modifyRuntimeFx((runtime) =>
 		Effect.gen(function* () {
-			yield* assertItemProductionPlayerControlFx({
-				ownerItemId: props.ownerItemId,
-				runtime,
-			});
 			const { owner } = yield* readBoardItemLineFx({
 				...props,
 				runtime,

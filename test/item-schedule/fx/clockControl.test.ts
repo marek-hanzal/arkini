@@ -12,7 +12,7 @@ import {
 import { useGameFx } from "~test/support/useGameFx";
 import { createClockConfig, spawnClockItemFx, tickClockFx } from "./clockSchedule.test/fixture";
 
-it("rejects player production commands atomically for simple UI owners while autonomous admission succeeds", () => {
+it("admits production commands independently of the owner's UI presentation", () => {
 	const config = createClockConfig({
 		ui: "simple",
 		lines: [
@@ -59,26 +59,22 @@ it("rejects player production commands atomically for simple UI owners while aut
 		),
 	);
 	expect(result.enqueue).toMatchObject({
-		_tag: "Failure",
-		failure: {
-			_tag: "ItemProductionControlUnavailableError",
-			reason: "simple",
-			ownerItemId: "runtime:clock",
-		},
+		_tag: "Success",
 	});
 	expect(result.setDefault).toMatchObject({
-		_tag: "Failure",
-		failure: {
-			_tag: "ItemProductionControlUnavailableError",
-			reason: "simple",
-			ownerItemId: "runtime:clock",
-		},
+		_tag: "Success",
 	});
-	expect(result.after).toEqual(result.before);
+	expect(result.after.jobQueue).toMatchObject([
+		{
+			ownerItemId: "runtime:clock",
+			lineUid: "a",
+		},
+	]);
+	expect(result.after.defaultLineByOwnerItemId["runtime:clock"]).toBe("a");
 	expect(result.automatic.jobs).toMatchObject([
 		{
 			lineUid: "a",
-			remainingMs: 400,
+			remainingMs: 100,
 		},
 	]);
 });

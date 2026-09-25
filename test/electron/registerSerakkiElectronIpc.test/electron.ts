@@ -5,8 +5,6 @@ const electronHarness = vi.hoisted(() => {
 	const exit = vi.fn();
 	const handlers = new Map<string, (event: unknown, ...args: unknown[]) => unknown>();
 	const appListeners = new Map<string, () => void>();
-	const nativeThemeListeners = new Map<string, () => void>();
-	const setBackgroundColor = vi.fn();
 	const requestWindowMode = vi.fn();
 	const openPath = vi.fn(() => Promise.resolve(""));
 	const writeClipboardText = vi.fn(() => Promise.resolve());
@@ -22,28 +20,15 @@ const electronHarness = vi.hoisted(() => {
 	const userDataPath = {
 		value: "",
 	};
-	const nativeTheme = {
-		on: (event: string, listener: () => void) => {
-			nativeThemeListeners.set(event, listener);
-		},
-		removeListener: (event: string) => {
-			nativeThemeListeners.delete(event);
-		},
-		shouldUseDarkColors: true,
-		themeSource: "dark",
-	};
 	return {
 		relaunch,
 		exit,
 		appListeners,
 		browserWindow,
 		handlers,
-		nativeTheme,
-		nativeThemeListeners,
 		openPath,
 		preferredSystemLanguages,
 		requestWindowMode,
-		setBackgroundColor,
 		userDataPath,
 		writeClipboardText,
 		module: {
@@ -58,11 +43,6 @@ const electronHarness = vi.hoisted(() => {
 			},
 			BrowserWindow: {
 				fromWebContents: () => browserWindow,
-				getAllWindows: () => [
-					{
-						setBackgroundColor,
-					},
-				],
 			},
 			clipboard: {
 				writeText: writeClipboardText,
@@ -74,7 +54,6 @@ const electronHarness = vi.hoisted(() => {
 				) => handlers.set(channel, listener),
 				removeHandler: (channel: string) => handlers.delete(channel),
 			},
-			nativeTheme,
 			shell: {
 				openPath,
 			},

@@ -216,9 +216,8 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	});
 	yield* Effect.sync(() => app.once("will-quit", editorMcpOwnership.closeSyncFn));
 	const windowModeControllerOwnership = yield* createWindowModeControllerOwnershipFx();
-	const appearanceTheme = yield* appearancePreferences.readThemeFx;
 	yield* Effect.sync(() => {
-		nativeTheme.themeSource = appearanceTheme;
+		nativeTheme.themeSource = "dark";
 	});
 
 	const rendererRoot = fileURLToPath(new URL("../renderer", import.meta.url));

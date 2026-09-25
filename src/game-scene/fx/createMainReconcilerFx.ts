@@ -226,6 +226,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 			: targetActor;
 		pendingTravel.delete(actor);
 		if (shouldTravel) {
+			yield* drag.clearHoverFx(actor);
 			if (previousSize !== pose.size) {
 				yield* animator.setFx({
 					actor,

@@ -138,10 +138,7 @@ describe("MainMenu", () => {
 		registry.set(LauncherStartupConfigAtom, {
 			heroUrl: "/hero.png",
 			bootstrapFx: Effect.succeed({
-				appearance: {
-					theme: "dark" as const,
-					accent: "rose" as const,
-				},
+				accent: "rose" as const,
 				defaultPackageId: "serakki",
 				cheatsAvailable: false,
 				sound: {

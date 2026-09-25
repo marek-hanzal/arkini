@@ -7,6 +7,7 @@ import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
+import { spawnItemFx } from "~test/support/spawnItemFx";
 import { useGameFx } from "~test/support/useGameFx";
 
 it("replaces one space and its full ownership tree while retaining another space's work", () => {
@@ -295,4 +296,103 @@ it("replaces one space and its full ownership tree while retaining another space
 	});
 	expect(result.after.templateUidBySpace[0]).toBe("replacement");
 	expect(result.after.templateUidBySpace[7]).toBe(result.before.templateUidBySpace[7]);
+});
+
+it("discards a departed owner and its active job when replacing its origin space", () => {
+	const base = createJobTestConfig();
+	const config = GameConfigSchema.parse({
+		...base,
+		templates: [
+			{
+				uid: "replacement",
+				title: "Replacement",
+				width: 2,
+				height: 1,
+				board: [
+					{
+						itemUid: "tool",
+						x: 1,
+						y: 0,
+					},
+				],
+			},
+		],
+		items: {
+			...base.items,
+			forge: {
+				...base.items.forge,
+				units: {
+					amount: 1,
+				},
+				lines: [
+					{
+						uid: "line:forge:run",
+						title: "Run",
+						description: "Spend the final unit.",
+						runtimeMs: 1000,
+						input: [
+							{
+								type: "simple",
+								units: {
+									from: "self",
+									cost: 1,
+								},
+							},
+						],
+						rules: [],
+					},
+				],
+			},
+		},
+	});
+	const result = Effect.runSync(
+		Effect.gen(function* () {
+			yield* spawnItemFx({
+				id: "runtime:forge",
+				itemUid: "forge",
+				location: {
+					scope: "board",
+					space: 0,
+					position: {
+						x: 0,
+						y: 0,
+					},
+				},
+			});
+			yield* startLineFx({
+				ownerItemId: "runtime:forge",
+				lineUid: "line:forge:run",
+			});
+			const before = yield* readRuntimeFx();
+			yield* assertRuntimeFx({
+				runtime: before,
+			});
+			const transition = yield* applyBoardTemplateRuntimeFx({
+				runtime: before,
+				space: 0,
+				templateUid: "replacement",
+			});
+			yield* assertRuntimeFx({
+				runtime: transition.runtime,
+			});
+			return {
+				before,
+				transition,
+			};
+		}).pipe(
+			useGameFx({
+				config,
+			}),
+		),
+	);
+
+	expect(result.before.items.find((item) => item.id === "runtime:forge")?.location.scope).toBe(
+		"terminal",
+	);
+	expect(result.before.jobs).toHaveLength(1);
+	expect(result.transition.removed.map((item) => item.id)).toContain("runtime:forge");
+	expect(result.transition.runtime.items.map((item) => item.item.uid)).toEqual([
+		"tool",
+	]);
+	expect(result.transition.runtime.jobs).toEqual([]);
 });

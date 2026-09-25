@@ -29,11 +29,23 @@ export namespace applyBoardTemplateRuntimeFx {
 const readDiscardedIdsFn = (runtime: RuntimeSchema.Type, space: number) => {
 	const itemIds = new Set(
 		runtime.items
-			.filter((item) =>
-				item.location.scope === "board"
-					? item.location.space === space
-					: item.location.scope === "delivery" && item.location.origin.space === space,
-			)
+			.filter(({ location }) => {
+				switch (location.scope) {
+					case "board":
+						return location.space === space;
+					case "delivery":
+					case "terminal":
+						return location.origin.space === space;
+					case "input":
+					case "job":
+					case "reserved":
+						return false;
+					default: {
+						const unhandled: never = location;
+						return unhandled;
+					}
+				}
+			})
 			.map((item) => item.id),
 	);
 	const jobIds = new Set<string>();

@@ -6,7 +6,6 @@ import { Effect } from "effect";
 import { z } from "zod";
 
 import { SerakkiAppVersion } from "~shared/SerakkiAppMetadata";
-import KnowledgeMarkdown from "../knowledge.md?raw";
 import type { Project } from "~/project-authoring/type/Project";
 import type { ProjectRepositoryService } from "~/project-authoring/service/ProjectRepository";
 import { IdSchema } from "~/game-value/schema/IdSchema";
@@ -429,7 +428,10 @@ const createServerFn = (
 				"Returns the Serakki gameplay/authoring knowledge handbook. Read it before performing non-trivial content authoring or reasoning about how multiple game systems should be combined. Schemas remain authoritative for exact data shapes; this document describes semantics, conventions, compound patterns, invariants and common authoring pitfalls.",
 			inputSchema: KnowledgeInputSchema,
 		},
-		async () => runToolFn(Effect.succeed(KnowledgeMarkdown)),
+		async () =>
+			runToolFn(
+				Effect.promise(async () => (await import("../knowledge.md?raw")).default),
+			),
 	);
 	server.registerTool(
 		"schema_json",

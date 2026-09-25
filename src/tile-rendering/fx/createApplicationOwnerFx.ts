@@ -61,7 +61,10 @@ export const createApplicationOwnerFx = Effect.fn("createApplicationOwnerFx")(
 						backgroundAlpha: 0,
 						height: Math.max(1, host.clientHeight),
 						powerPreference: "high-performance",
-						preference: "webgl",
+						preference: [
+							"webgl",
+							"webgpu",
+						],
 						resolution: Math.min(maximumResolution, window.devicePixelRatio || 1),
 						sharedTicker: false,
 						width: Math.max(1, host.clientWidth),

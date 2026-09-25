@@ -12,6 +12,7 @@ import { installRendererNativeDragGuardFx } from "~/application-runtime/fx/insta
 import { RendererAtomRegistry } from "~/application-runtime/atom/RendererAtomRegistry";
 import { RendererRuntime } from "~/application-runtime/service/RendererRuntime";
 import { AppearanceDataset } from "~/application-settings/ui/AppearanceDataset";
+import { GraphicsUnavailablePage } from "~/application-shell/ui/GraphicsUnavailablePage";
 import { renderRendererFx } from "~/application-shell/ui/renderRendererFx";
 import { createSerakkiRouterFx } from "~/createSerakkiRouterFx";
 import { bootstrapLauncherFx } from "~/launcher/fx/bootstrapLauncherFx";
@@ -20,6 +21,7 @@ import { refreshEditorServiceStatusFx } from "~/project-authoring/fx/refreshEdit
 import { bootstrapTranslationFx } from "~/translation/fx/bootstrapTranslationFx";
 import { TranslationContext } from "~/translation/ui/TranslationContext";
 import { bootstrapWindowModeSyncFx } from "~/window-mode/fx/bootstrapWindowModeSyncFx";
+import { readGraphicsAvailabilityFx } from "~/tile-rendering/fx/readGraphicsAvailabilityFx";
 
 const readRendererRootFx = Effect.sync(() => {
 	const rootElement = document.getElementById("root");
@@ -55,6 +57,12 @@ export const bootstrapRendererFx = Effect.fn("bootstrapRendererFx")(() =>
 				});
 				document.title = SerakkiWindowTitle;
 				document.documentElement.lang = translation.locale;
+				if (!(yield* readGraphicsAvailabilityFx()))
+					return (
+						<GraphicsUnavailablePage
+							onCloseFn={() => window.serakki.lifecycle.forceCloseFn()}
+						/>
+					);
 
 				yield* bootstrapSerapackCatalogFx();
 				yield* refreshEditorServiceStatusFx.pipe(Effect.forkDetach);

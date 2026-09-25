@@ -126,7 +126,7 @@ Runtime + committed events
 
 Tile Interaction owns pointer gestures and submits exact Item Interaction commands. Runtime commits immediately; animation and audio may lag, redirect, collapse or skip without gating gameplay, Tick, publication or save. See [`src/game-scene/README.md`](src/game-scene/README.md).
 
-The router uses history routing in development and packaged Electron. `/` owns renderer bootstrap; Launcher creates no Game; the Game parent owns the installed resource. Blocking load, leave, reset, recovery and exit operations are explicit action leaves.
+The router uses history routing in development and packaged Electron. Renderer bootstrap requires WebGL or WebGPU before mounting Launcher or the router; if neither is available, it renders a standalone graphics alert. Pixi admits only those two backends, preferring WebGL. `/` owns the Launcher startup splash; Launcher creates no Game; the Game parent owns the installed resource. Blocking load, leave, reset, recovery and exit operations are explicit action leaves.
 
 ## Electron and security
 

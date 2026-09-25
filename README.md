@@ -74,7 +74,7 @@ The repository also builds a local `serakki-cli`. To discover its current comman
 
 `argc platform-check` is the narrower hosted macOS/Windows portability gate. It runs the production build plus real filesystem, Electron, pack, source, and schema-writer suites. Use focused tests during implementation; this does not replace the complete closing gate.
 
-Serakki is Electron-only: there is no web target or browser-storage fallback. Development uses the Vite renderer; packaged builds serve the same history-routed application from `serakki://app/`. Disposable build output lives below `.out/`; the official project owns its ignored `game/serakki/build/` artifacts.
+Serakki is Electron-only and requires WebGL or WebGPU for its Board. If neither renderer is available, startup shows a standalone graphics alert instead of the game menu. There is no web target or browser-storage fallback. Development uses the Vite renderer; packaged builds serve the same history-routed application from `serakki://app/`. Disposable build output lives below `.out/`; the official project owns its ignored `game/serakki/build/` artifacts.
 
 Settings → Dev includes a two-click **Hard reset**. It permanently deletes the entire `~/.serakki` data root (including managed Editor projects, installed games, saves, preferences, and logs) and restarts the app. Projects stored outside that root are not deleted.
 

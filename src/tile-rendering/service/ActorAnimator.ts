@@ -4,6 +4,7 @@ import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 import type { AnimationCurve } from "~/tile-rendering/service/AnimationDriver";
 
 export type AnimationChannel =
+	| "artwork-color"
 	| "artwork-opacity"
 	| "drop-target"
 	| "grab-offset"
@@ -29,6 +30,10 @@ export interface PresentedPose {
 }
 
 export type ActorAnimation =
+	| (AnimationBase & {
+			readonly channel: "artwork-color";
+			readonly toFraction: number;
+	  })
 	| (AnimationBase & {
 			readonly channel: "artwork-opacity";
 	  })

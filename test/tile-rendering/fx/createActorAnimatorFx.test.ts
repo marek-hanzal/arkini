@@ -3,6 +3,7 @@ import { Container } from "pixi.js";
 import { describe, expect, it, vi } from "vitest";
 
 import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
+import type { ActorVisual } from "~/tile-rendering/type/ActorVisual";
 import type { AnimationDriver, AnimationSpring } from "~/tile-rendering/service/AnimationDriver";
 import { createActorAnimatorFx } from "~/tile-rendering/fx/createActorAnimatorFx";
 import type { DemandFrameLoop } from "~/tile-rendering/service/DemandFrameLoop";
@@ -122,6 +123,53 @@ const createAnimator = () => {
 };
 
 describe("actor animator", () => {
+	it("retargets unit color from its displayed value and settles a full-color filter", () => {
+		const actor = createActor();
+		const { animator, tweens } = createAnimator();
+		const visual = {
+			container: {
+				destroyed: false,
+			},
+			unitsFadeFilter: {
+				enabled: false,
+			},
+			unitsFadeUniforms: {
+				uniforms: {
+					uColorFraction: 1,
+				},
+			},
+		} as unknown as ActorVisual;
+		actor.currentVisual = visual;
+
+		Effect.runSync(
+			animator.animateFx({
+				actor,
+				channel: "artwork-color",
+				durationMs: 300,
+				toFraction: 0,
+			}),
+		);
+		expect(visual.unitsFadeFilter.enabled).toBe(true);
+		tweens[0]?.update(0.5);
+		expect(visual.unitsFadeUniforms.uniforms.uColorFraction).toBe(0.5);
+
+		Effect.runSync(
+			animator.animateFx({
+				actor,
+				channel: "artwork-color",
+				durationMs: 300,
+				toFraction: 1,
+			}),
+		);
+		expect(tweens[0]?.stop).toHaveBeenCalledOnce();
+		tweens[1]?.update(0.5);
+		expect(visual.unitsFadeUniforms.uniforms.uColorFraction).toBe(0.75);
+		expect(visual.unitsFadeFilter.enabled).toBe(true);
+		tweens[1]?.complete();
+		expect(visual.unitsFadeUniforms.uniforms.uColorFraction).toBe(1);
+		expect(visual.unitsFadeFilter.enabled).toBe(false);
+	});
+
 	it("keeps pose, lifecycle, and crowd channels physically isolated", () => {
 		const actor = createActor();
 		const { animator, tweens } = createAnimator();

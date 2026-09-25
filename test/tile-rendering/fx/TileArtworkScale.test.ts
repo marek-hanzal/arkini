@@ -5,6 +5,7 @@ import { Texture } from "pixi.js";
 import { expect, it, vi } from "vitest";
 
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
+import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
 import { createTileActorFx } from "~/tile-rendering/fx/createTileActorFx";
 import { destroyTileActorFx } from "~/tile-rendering/fx/destroyTileActorFx";
 import { updateTileActorFx } from "~/tile-rendering/fx/updateTileActorFx";
@@ -44,6 +45,11 @@ const createItemFn = (artworkScale: number): TileActorItem => ({
 	sourceUrl: "resource:tile",
 });
 const createHarnessFn = (item: TileActorItem) => {
+	const animateFx = vi.fn(() => Effect.void);
+	const animator = {
+		animateFx,
+		cancelChannelFx: () => Effect.void,
+	} as unknown as ActorAnimator;
 	const frames = {
 		addBeforeRenderListenerFx: () => Effect.succeed(() => {}),
 		closeFx: Effect.void,
@@ -70,6 +76,7 @@ const createHarnessFn = (item: TileActorItem) => {
 	const updateFn = (nextItem: TileActorItem, size: number) =>
 		Effect.runSync(
 			updateTileActorFx({
+				animator,
 				crossfadeArtworkFx: ({ onCompleteFn }) => Effect.sync(onCompleteFn),
 				actor,
 				frames,
@@ -81,6 +88,7 @@ const createHarnessFn = (item: TileActorItem) => {
 		);
 	return {
 		actor,
+		animateFx,
 		updateFn,
 	};
 };
@@ -112,9 +120,9 @@ it("keeps full-slot hit geometry and pose independent of artwork scale through r
 	Effect.runSync(destroyTileActorFx(actor));
 });
 
-it("updates unit depletion on the retained artwork without touching its badge", async () => {
+it("animates unit depletion on the retained artwork without touching its badge", async () => {
 	const item = createItemFn(0.8);
-	const { actor, updateFn } = createHarnessFn(item);
+	const { actor, animateFx, updateFn } = createHarnessFn(item);
 	await vi.waitFor(() => expect(actor.currentVisual.textureState).toBe("ready"));
 	updateFn(item, 256);
 	const visual = actor.currentVisual;
@@ -126,10 +134,20 @@ it("updates unit depletion on the retained artwork without touching its badge", 
 		256,
 	);
 	expect(actor.currentVisual).toBe(visual);
-	expect(visual.unitsFadeFilter.enabled).toBe(true);
-	expect(visual.unitsFadeUniforms.uniforms.uColorFraction).toBe(0.4);
+	expect(animateFx).toHaveBeenCalledWith({
+		actor,
+		channel: "artwork-color",
+		durationMs: 300,
+		toFraction: 0.4,
+	});
+	expect(visual.unitsFadeUniforms.uniforms.uColorFraction).toBe(1);
 	expect(visual.badge.visible).toBe(false);
 	updateFn(item, 256);
-	expect(visual.unitsFadeFilter.enabled).toBe(false);
+	expect(animateFx).toHaveBeenLastCalledWith({
+		actor,
+		channel: "artwork-color",
+		durationMs: 300,
+		toFraction: 1,
+	});
 	Effect.runSync(destroyTileActorFx(actor));
 });

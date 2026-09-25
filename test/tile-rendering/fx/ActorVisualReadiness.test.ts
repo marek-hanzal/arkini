@@ -5,6 +5,7 @@ import { Texture } from "pixi.js";
 import { describe, expect, it, vi } from "vitest";
 
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
+import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
 import { createTileActorFx } from "~/tile-rendering/fx/createTileActorFx";
 import { destroyActorVisualFx } from "~/tile-rendering/fx/destroyActorVisualFx";
 import { updateTileActorFx } from "~/tile-rendering/fx/updateTileActorFx";
@@ -45,6 +46,11 @@ const palette = {
 	success: 0x57d7b2,
 	surface: 0,
 } satisfies PixiScenePalette;
+
+const animator = {
+	animateFx: () => Effect.void,
+	cancelChannelFx: () => Effect.void,
+} as unknown as ActorAnimator;
 
 const createItem = ({
 	compositeUrl,
@@ -192,6 +198,7 @@ describe("texture readiness", () => {
 
 		Effect.runSync(
 			updateTileActorFx({
+				animator,
 				crossfadeArtworkFx,
 				actor,
 				frames,
@@ -228,6 +235,7 @@ describe("texture readiness", () => {
 
 		Effect.runSync(
 			updateTileActorFx({
+				animator,
 				crossfadeArtworkFx,
 				actor,
 				frames,
@@ -284,6 +292,7 @@ describe("texture readiness", () => {
 		const updateFn = (item: TileActorItem) =>
 			Effect.runSync(
 				updateTileActorFx({
+					animator,
 					crossfadeArtworkFx: ({ onCompleteFn }) => Effect.sync(onCompleteFn),
 					actor,
 					frames,

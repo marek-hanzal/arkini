@@ -143,6 +143,9 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 					const fromScale = actor.container.scale.x;
 					const fromAlpha = actor.container.alpha;
 					const fromLifecycleScale = actor.lifecycleLayer.scale.x;
+					const colorVisual = channel === "artwork-color" ? actor.currentVisual : null;
+					const fromColorFraction =
+						colorVisual?.unitsFadeUniforms.uniforms.uColorFraction ?? 1;
 					const artworkAlphas =
 						animation.channel === "artwork-opacity"
 							? [
@@ -167,6 +170,7 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 					activeAnimations.add(active);
 					animationsByOwner.set(ownerKey, active);
 					readActorChannelsFn(actor).set(channel, active);
+					if (colorVisual !== null) colorVisual.unitsFadeFilter.enabled = true;
 
 					try {
 						active.control = RendererRuntime.runSync(
@@ -178,6 +182,22 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 								onUpdateFn: (progress) => {
 									if (closed || actor.container.destroyed) return;
 									match(animation)
+										.with(
+											{
+												channel: "artwork-color",
+											},
+											(animation) => {
+												if (
+													colorVisual === null ||
+													colorVisual.container.destroyed
+												)
+													return;
+												colorVisual.unitsFadeUniforms.uniforms.uColorFraction =
+													fromColorFraction +
+													(animation.toFraction - fromColorFraction) *
+														progress;
+											},
+										)
 										.with(
 											{
 												channel: "artwork-opacity",
@@ -264,6 +284,16 @@ export const createActorAnimatorFx = Effect.fn("createActorAnimatorFx")(
 										return;
 									}
 									releaseFn(active);
+									if (
+										animation.channel === "artwork-color" &&
+										colorVisual !== null &&
+										!colorVisual.container.destroyed
+									) {
+										colorVisual.unitsFadeUniforms.uniforms.uColorFraction =
+											animation.toFraction;
+										colorVisual.unitsFadeFilter.enabled =
+											animation.toFraction < 1;
+									}
 									animation.onCompleteFn?.();
 								},
 								repeat: animation.repeat,

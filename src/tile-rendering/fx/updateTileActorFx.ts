@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
+import type { ActorAnimator } from "~/tile-rendering/service/ActorAnimator";
 import type { PixiScenePalette } from "~/tile-rendering/type/PixiScenePalette";
 import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
 import { readActorCursorFn } from "~/tile-rendering/fn/readActorCursorFn";
@@ -13,6 +14,7 @@ import type { TextureStore } from "~/tile-rendering/fx/createTextureStoreFx";
 export namespace updateTileActorFx {
 	export interface Props {
 		readonly actor: PixiTileActor;
+		readonly animator: ActorAnimator;
 		readonly crossfadeArtworkFx: (props: {
 			readonly actor: PixiTileActor;
 			readonly onCompleteFn: () => void;
@@ -37,6 +39,7 @@ const sameVisualRevisionFn = (left: TileActorItem, right: TileActorItem) =>
 /** Reconciles metadata and geometry while texture-bearing revisions publish only when ready. */
 export const updateTileActorFx = Effect.fn("updateTileActorFx")(function* ({
 	actor,
+	animator,
 	crossfadeArtworkFx,
 	frames,
 	item,
@@ -50,6 +53,7 @@ export const updateTileActorFx = Effect.fn("updateTileActorFx")(function* ({
 	const texturesChanged =
 		actor.currentVisual.item.sourceUrl !== item.sourceUrl ||
 		actor.currentVisual.item.compositeUrl !== item.compositeUrl;
+	const colorChanged = actor.currentVisual.item.colorFraction !== item.colorFraction;
 
 	actor.item = item;
 	if (!actor.dragging) {
@@ -75,6 +79,7 @@ export const updateTileActorFx = Effect.fn("updateTileActorFx")(function* ({
 			visual,
 		});
 	}
+	if (texturesChanged) yield* animator.cancelChannelFx(actor, "artwork-color");
 
 	if (!pendingMatches) {
 		if (texturesChanged || actor.pendingVisual !== null) {
@@ -97,6 +102,15 @@ export const updateTileActorFx = Effect.fn("updateTileActorFx")(function* ({
 		} else {
 			actor.currentVisual.item = item;
 		}
+	}
+	if (!texturesChanged && colorChanged) {
+		yield* animator.animateFx({
+			actor,
+			channel: "artwork-color",
+			durationMs: 300,
+			toFraction: item.colorFraction ?? 1,
+		});
+		yield* frames.invalidateFx;
 	}
 	// Progress and Clock belong to the actor, so they follow canonical state even while artwork loads.
 	yield* updateActorProgressFx({

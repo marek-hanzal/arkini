@@ -109,6 +109,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 	}) {
 		yield* updateTileActorFx({
 			actor,
+			animator,
 			crossfadeArtworkFx: presentation.crossfadeArtworkFx,
 			frames: application.frames,
 			item,
@@ -608,6 +609,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 			if (pose === null) continue;
 			yield* updateTileActorFx({
 				actor,
+				animator,
 				crossfadeArtworkFx: presentation.crossfadeArtworkFx,
 				frames: application.frames,
 				item: actor.item,

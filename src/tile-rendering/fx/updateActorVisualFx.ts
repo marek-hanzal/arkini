@@ -29,8 +29,6 @@ export const updateActorVisualFx = Effect.fn("updateActorVisualFx")(function* ({
 
 	visual.item = item;
 	visual.size = size;
-	visual.unitsFadeFilter.enabled = item.colorFraction !== undefined && item.colorFraction < 1;
-	visual.unitsFadeUniforms.uniforms.uColorFraction = item.colorFraction ?? 1;
 	const artworkSize =
 		item.compositeUrl === undefined ? faceSize : faceSize * layeredArtworkToFaceRatio;
 	const artwork = {

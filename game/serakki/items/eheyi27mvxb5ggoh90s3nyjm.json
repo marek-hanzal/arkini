@@ -22,7 +22,7 @@
 				"title": "Townhall I",
 				"artwork": "c7uw765u5c2hqnjvv3zmwkgn",
 				"description": "Turn the Base Camp into the first proper Townhall and unpack a small supply chest from the next stage of civilization.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": false,

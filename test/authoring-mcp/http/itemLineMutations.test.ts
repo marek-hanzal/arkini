@@ -266,25 +266,23 @@ it("rejects all line writes when another save wins after the MCP snapshot was re
 	expect(notifyFn).not.toHaveBeenCalled();
 });
 
-it("admits omitted non-Clock weights but rejects missing Clock weights before either line write", async () => {
-	const { client, readFn, notifyFn } = await setupFn();
+it("defaults omitted line weights through create and replace", async () => {
+	const { client, readFn } = await setupFn();
 	for (const name of [
 		"create_item_line",
 		"replace_item_line",
-	]) {
-		for (const clock of [
-			undefined,
-			"clock-interval",
-		]) {
-			const before = await readFn();
-			const first = before.config.items.forge.lines[0]!;
-			const line = {
-				...readLineAuthoringFn(first),
-				title: `Clock ${name} ${String(clock)}`,
-				clock,
-				clockWeight: undefined,
-			};
-			const input = {
+	] as const) {
+		const before = await readFn();
+		const first = before.config.items.forge.lines[0]!;
+		const line = {
+			...readLineAuthoringFn(first),
+			title: `Weighted ${name}`,
+			trigger: "item-termination",
+			weight: undefined,
+		};
+		const result = await client.callTool({
+			name,
+			arguments: jsonToolInputFn({
 				itemUid: "forge",
 				revision: before.revision,
 				...(name === "replace_item_line"
@@ -293,33 +291,15 @@ it("admits omitted non-Clock weights but rejects missing Clock weights before ei
 						}
 					: {}),
 				line,
-			};
-			const notifications = notifyFn.mock.calls.length;
-			const result = await client.callTool({
-				name,
-				arguments: jsonToolInputFn(input),
-			});
-			if (clock === "clock-interval") {
-				expect(result.isError).toBe(true);
-				expect((await readFn()).revision).toBe(before.revision);
-				expect(notifyFn).toHaveBeenCalledTimes(notifications);
-				const explicit = await client.callTool({
-					name,
-					arguments: jsonToolInputFn({
-						...input,
-						line: {
-							...line,
-							clockWeight: 1,
-						},
-					}),
-				});
-				expect(explicit.isError).not.toBe(true);
-			} else expect(result.isError).not.toBe(true);
-			const saved = (await readFn()).config.items.forge.lines.find(
-				(candidate) => candidate.title === line.title,
-			);
-			expect(saved?.clockWeight).toBe(1);
-			expect(saved?.clock).toBe(clock);
-		}
+			}),
+		});
+		expect(result.isError).not.toBe(true);
+		const saved = (await readFn()).config.items.forge.lines.find(
+			(candidate) => candidate.title === line.title,
+		);
+		expect(saved).toMatchObject({
+			trigger: "item-termination",
+			weight: 1,
+		});
 	}
 });

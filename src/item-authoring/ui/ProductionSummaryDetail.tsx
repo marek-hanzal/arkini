@@ -12,7 +12,7 @@ import { Mx } from "~/translation/ui/Mx";
 /** Keeps the item overview to two authored lines, with full outcome semantics. */
 export const ProductionSummaryDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 	const translator = useTranslator();
-	const lines = item.lines.filter((line) => line.clock === undefined);
+	const lines = item.lines.filter((line) => line.trigger === "manual");
 	return (
 		<div className="grid">
 			{lines.length === 0 ? (
@@ -42,7 +42,6 @@ export const ProductionSummaryDetail = ({ item }: { readonly item: ItemSchema.Ty
 										<LineEditLink
 											itemUid={item.uid}
 											lineUid={line.uid}
-											clock={line.clock !== undefined}
 										>
 											{line.title}
 											<ArrowUpRight className="size-4 shrink-0 text-muted transition-colors group-hover:text-accent" />

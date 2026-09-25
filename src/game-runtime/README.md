@@ -48,7 +48,7 @@ Important invariants:
 | `simulation-time` | Fixed simulation quantum | [`../simulation-time/constant/SimulationStepMs.ts`](../simulation-time/constant/SimulationStepMs.ts) |
 | `game-tick` | Elapsed budget, fixed-step replay, lifecycle order and loop | [`../game-tick/fx/advanceRuntimeStepFx.ts`](../game-tick/fx/advanceRuntimeStepFx.ts) |
 | `item-schedule` | Optional periodic admission, lifetime across storage, enable evaluation and atomic owner/material expiry | [`../item-schedule/fx/advanceItemSchedulesFx.ts`](../item-schedule/fx/advanceItemSchedulesFx.ts) |
-| `item-expiry` | Shared atomic identity removal and expiry Output | [`../item-expiry/fx/expireItemRuntimeFx.ts`](../item-expiry/fx/expireItemRuntimeFx.ts) |
+| `item-expiry` | Shared atomic identity removal and expiry Output | [`../item-expiry/fx/settleTerminalItemRuntimeFx.ts`](../item-expiry/fx/settleTerminalItemRuntimeFx.ts) |
 | `game-persistence` | Serializable State, hydration, save codec and autosave | [`../game-persistence/schema/StateSchema.ts`](../game-persistence/schema/StateSchema.ts) |
 | `game-session` | One Runtime/Tick/save scope, command admission, subscriptions and fail-stop | [`../game-session/fx/createGameSessionFx.ts`](../game-session/fx/createGameSessionFx.ts) |
 | `playable-game` | Package-independent Game capability, semantic Resource catalog and URLs | [`../playable-game/type/PlayableGame.ts`](../playable-game/type/PlayableGame.ts) |

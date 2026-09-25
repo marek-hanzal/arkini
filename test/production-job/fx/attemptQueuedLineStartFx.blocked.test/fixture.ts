@@ -8,8 +8,7 @@ export type Blocker =
 	| "rule"
 	| "self-unit"
 	| "aggregate-self-unit"
-	| "target-unit"
-	| "placement";
+	| "target-unit";
 
 export const createBlockedQueueFixture = (blocker: Blocker) => {
 	const base = createJobTestConfig(2);
@@ -28,7 +27,7 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 			max: 2,
 		},
 		mode: "consume",
-		...(blocker === "self-unit" || blocker === "aggregate-self-unit" || blocker === "placement"
+		...(blocker === "self-unit" || blocker === "aggregate-self-unit"
 			? {
 					units: {
 						from: "self",
@@ -38,30 +37,6 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 				}
 			: {}),
 	};
-	const outcome = (itemId: string, quantity: number, placement = "drop") => ({
-		set: [
-			{
-				rules: [],
-				roll: [
-					{
-						type: "guaranteed",
-						outcome: [
-							{
-								type: "item" as const,
-								itemUid: itemId,
-								quantity: {
-									min: quantity,
-									max: quantity,
-								},
-								placement,
-								rules: [],
-							},
-						],
-					},
-				],
-			},
-		],
-	});
 	const config = GameConfigSchema.parse({
 		...base,
 		meta: {
@@ -81,18 +56,6 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 				...base.items.tool,
 				uid: "result",
 			},
-			debris: {
-				...base.items.tool,
-				uid: "debris",
-			},
-			payer: {
-				...base.items.tool,
-				uid: "payer",
-				units: {
-					amount: 1,
-					outcome: outcome("debris", 2, "random"),
-				},
-			},
 			forge: {
 				...forge,
 				units: {
@@ -106,7 +69,7 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 						runtimeMs: 1_000,
 						input: [
 							material,
-							...(blocker === "placement" || blocker === "aggregate-self-unit"
+							...(blocker === "aggregate-self-unit"
 								? [
 										{
 											type: "materials",
@@ -133,7 +96,7 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 										},
 									]
 								: []),
-							...(blocker === "placement" || blocker === "target-unit"
+							...(blocker === "target-unit"
 								? [
 										{
 											type: "units",
@@ -240,13 +203,7 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 			},
 		],
 	};
-	if (blocker === "placement")
-		runtime.items.push({
-			...runtime.items[2]!,
-			id: "buffer:second",
-			revision: "revision:buffer:second",
-		});
-	if (blocker === "placement" || blocker === "aggregate-self-unit") {
+	if (blocker === "aggregate-self-unit") {
 		runtime.items.push({
 			id: "tool",
 			revision: "revision:tool",
@@ -260,15 +217,7 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 			},
 		});
 	}
-	if (blocker === "placement") {
-		runtime.items.push({
-			id: "payer",
-			revision: "revision:payer",
-			item: config.items.payer,
-
-			location: board(1),
-		});
-	} else if (blocker !== "missing-input") {
+	if (blocker !== "missing-input") {
 		runtime.items.push({
 			id: "supply",
 			revision: "revision:supply",

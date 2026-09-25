@@ -18,7 +18,7 @@
 				"title": "Stone Block",
 				"artwork": "bu70ua4etisvo6qz4lv1jz61",
 				"description": "You'll get better stone from simple good old stone boulder.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

@@ -22,7 +22,7 @@
 				"title": "Build Flax Farm",
 				"artwork": "hp4vey6cbxfktd47m1seu0k4",
 				"description": "Build Flax Farm.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

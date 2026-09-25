@@ -109,6 +109,12 @@ describe("item units / owner lifecycle", () => {
 				yield* runTickRuntimeByFx({
 					elapsedMs: 200,
 				});
+				yield* runTickRuntimeByFx({
+					elapsedMs: 50,
+				});
+				yield* runTickRuntimeByFx({
+					elapsedMs: 50,
+				});
 				return {
 					finalCompletion: yield* (yield* CommittedTransitionsFx).read,
 					finalStart,
@@ -132,7 +138,7 @@ describe("item units / owner lifecycle", () => {
 					event.type === GameEventEnumSchema.enum.ItemUnitSpent ||
 					event.type === GameEventEnumSchema.enum.ItemDepleted,
 			),
-		).toBe(false);
+		).toBe(true);
 		expect(
 			runtime.finalCompletion.events.filter(
 				(event) => event.type === GameEventEnumSchema.enum.ItemDepleted,

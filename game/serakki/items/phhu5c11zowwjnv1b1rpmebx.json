@@ -12,34 +12,47 @@
 			]
 		},
 		"units": {
-			"amount": 24,
-			"outcome": {
-				"set": [
-					{
-						"weight": 1,
-						"rules": [],
-						"roll": [
-							{
-								"type": "guaranteed",
-								"outcome": [
-									{
-										"type": "item",
-										"itemUid": "wmo7luagikin3s157v4xk8wx",
-										"quantity": {
-											"min": 1,
-											"max": 1
-										},
-										"placement": "drop",
-										"rules": []
-									}
-								]
-							}
-						]
-					}
-				]
-			}
+			"amount": 24
 		},
 		"maxQueueSize": 1,
-		"lines": []
+		"lines": [
+			{
+				"uid": "416308f985984ee4895cdccc",
+				"title": "Depletion",
+				"trigger": "item-termination",
+				"weight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [],
+				"outcome": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"outcome": [
+										{
+											"type": "item",
+											"itemUid": "wmo7luagikin3s157v4xk8wx",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
 	}
 }

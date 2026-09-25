@@ -9,6 +9,7 @@ import { useTranslator } from "~/translation/ui/useTranslator";
 import { Mx } from "~/translation/ui/Mx";
 import { ProductionDetail } from "~/item-authoring/ui/ProductionDetail";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
+import { LineTriggerEnumSchema } from "~/production-line/schema/LineTriggerEnumSchema";
 
 /** Presents the authored schedule and its Clock-owned production lines. */
 export const ClockDetail = ({
@@ -21,7 +22,8 @@ export const ClockDetail = ({
 	const translator = useTranslator();
 	const clock = item.clock;
 	const production =
-		!preview && item.lines.some((line) => line.clock !== undefined) ? (
+		!preview &&
+		item.lines.some((line) => line.trigger === LineTriggerEnumSchema.enum["clock-interval"]) ? (
 			<div className="grid gap-3">
 				<EditorFormSectionDivider title={translator.textFn("Production")} />
 				<ProductionDetail
@@ -76,23 +78,6 @@ export const ClockDetail = ({
 								: formatDurationFn(clock.intervalMs)
 						}
 					/>
-					{clock.durationMs === undefined ? null : (
-						<DetailFact
-							label={translator.textFn("Expiry mode")}
-							value={translator.textFn(
-								clock.expiryMode === "kill-switch" ? "Kill switch" : "Loose-kill",
-							)}
-							description={
-								<Mx
-									label={
-										clock.expiryMode === "kill-switch"
-											? "Authored Clock kill-switch summary help"
-											: "Authored Clock loose-kill summary help"
-									}
-								/>
-							}
-						/>
-					)}
 					<DetailFact
 						label={translator.textFn("Timer")}
 						description={<Mx label="Authored Clock status summary help" />}

@@ -1,9 +1,10 @@
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { isItemProductionAdmissionOpenFn } from "~/production-line/fn/isItemProductionAdmissionOpenFn";
-import { LineClockModeEnumSchema } from "~/production-line/schema/LineClockModeEnumSchema";
+import { LineTriggerEnumSchema } from "~/production-line/schema/LineTriggerEnumSchema";
+import { readItemTerminalStateFn } from "~/item-terminal/fn/readItemTerminalStateFn";
 
-/** A lifetime line admits intent only at expiry; ordinary lines use the owner's open schedule. */
+/** A termination line admits intent only once its owner has ended. */
 export const isLineAdmissionOpenFn = ({
 	owner,
 	lineUid,
@@ -14,7 +15,8 @@ export const isLineAdmissionOpenFn = ({
 	readonly allowTerminalLine?: boolean;
 }): boolean => {
 	const line = owner.item.lines.find((candidate) => candidate.uid === lineUid);
-	return line?.clock === LineClockModeEnumSchema.enum["clock-lifetime"]
-		? allowTerminalLine && owner.schedule?.remainingDurationMs === 0
-		: isItemProductionAdmissionOpenFn(owner);
+	if (line === undefined) return false;
+	if (line.trigger === LineTriggerEnumSchema.enum["item-termination"])
+		return allowTerminalLine && readItemTerminalStateFn(owner) !== undefined;
+	return isItemProductionAdmissionOpenFn(owner);
 };

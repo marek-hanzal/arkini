@@ -21,7 +21,7 @@
 				"title": "Open the Townhall Supplies",
 				"artwork": "drlvi3wmv3s1uexv16xuzkd9",
 				"description": "Unpack a few samples of what the settlement will soon learn to produce, understand, employ, and inevitably run out of.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

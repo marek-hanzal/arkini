@@ -22,7 +22,7 @@
 				"title": "Build Vegetable Farm",
 				"artwork": "fabzgtg8buny4mcp46jrvdli",
 				"description": "Build Vegetable Farm.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

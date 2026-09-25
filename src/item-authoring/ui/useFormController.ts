@@ -189,7 +189,7 @@ export const useFormController = ({
 	]);
 	const enableProductionFn = useCallback(() => {
 		const lines = form.state.values.lines ?? [];
-		if (lines.some((line) => line.clock === undefined)) return;
+		if (lines.some((line) => line.trigger === "manual")) return;
 		form.setFieldValue("lines", [
 			...lines,
 			{

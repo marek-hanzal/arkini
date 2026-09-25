@@ -21,7 +21,7 @@
 				"title": "Stock Sheep Pen",
 				"artwork": "gzmgh8zm5rqimmud53xfuiyh",
 				"description": "Provide starter feed and water so the enclosure can be stocked with animals.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

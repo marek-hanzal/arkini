@@ -20,7 +20,6 @@ it("admits production commands independently of the owner's UI presentation", ()
 				...createLine({
 					uid: "a",
 					default: true,
-					clock: "clock-interval",
 				}),
 				runtimeMs: 400,
 			},
@@ -86,7 +85,6 @@ it("does not age a Clock created by a job completion until the next simulation b
 				...createLine({
 					uid: "a",
 					default: true,
-					clock: "clock-interval",
 					outcome: createOutput([
 						{
 							itemUid: "clock",
@@ -129,8 +127,8 @@ it("runs a manually chosen line ahead of the next pulse without shifting cadence
 			{
 				...createLine({
 					uid: "automatic",
-					default: true,
-					clock: "clock-interval",
+					default: false,
+					trigger: "clock-interval",
 				}),
 				runtimeMs: 100,
 			},
@@ -156,11 +154,6 @@ it("runs a manually chosen line ahead of the next pulse without shifting cadence
 			});
 			const admitted = yield* readRuntimeFx();
 			const pulse = yield* tickClockFx(400);
-			yield* setLineSelectionFx({
-				selection: "clock",
-				lineUids: [],
-				ownerItemId: owner.id,
-			});
 			const drained = yield* tickClockFx(400);
 			yield* enqueueLineFx({
 				ownerItemId: owner.id,
@@ -200,7 +193,6 @@ it("runs a manually chosen line ahead of the next pulse without shifting cadence
 	expect(result.drained.jobs).toHaveLength(0);
 	expect(result.drained.jobQueue).toHaveLength(0);
 	expect(result.drained.items[0].schedule).toMatchObject({
-		lineUids: [],
 		remainingIntervalMs: 100,
 		remainingDurationMs: 1100,
 	});
@@ -211,7 +203,6 @@ it("runs a manually chosen line ahead of the next pulse without shifting cadence
 		},
 	]);
 	expect(result.manualWhilePaused.items[0].schedule).toMatchObject({
-		lineUids: [],
 		remainingIntervalMs: 500,
 		remainingDurationMs: 1000,
 	});

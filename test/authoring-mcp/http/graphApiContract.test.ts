@@ -32,8 +32,8 @@ const fixtureFn = async () => {
 				(_, index) =>
 					lineFn(`light-${index}`, {
 						runtimeMs: 30000,
-						clock: "clock-interval",
-						clockWeight: 30,
+						trigger: "clock-interval",
+						weight: 30,
 						outcome: outputFn("candle"),
 					}),
 			),
@@ -314,7 +314,7 @@ it("publishes the same focused input contract in tools/list and graph_schema_jso
 		"runtimeSeconds",
 		"durationSeconds",
 		"intervalSeconds",
-		"clockWeight",
+		"weight",
 	]) {
 		expect(Object.keys(filter.properties[key].properties).sort()).toEqual([
 			"gt",

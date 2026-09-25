@@ -13,7 +13,6 @@
 		"clock": {
 			"intervalMs": 10000,
 			"durationMs": 15000,
-			"expiryMode": "kill-switch",
 			"enable": true,
 			"rules": []
 		},
@@ -23,8 +22,8 @@
 				"uid": "ydhnnfx22jr78oxvb8sfd2ql",
 				"title": "Plague",
 				"description": "You want to stop this. Really",
-				"clock": "clock-interval",
-				"clockWeight": 1,
+				"trigger": "clock-interval",
+				"weight": 1,
 				"default": false,
 				"show": false,
 				"enable": true,
@@ -82,6 +81,7 @@
 				},
 				"rules": []
 			}
-		]
+		],
+		"terminationMode": "kill-switch"
 	}
 }

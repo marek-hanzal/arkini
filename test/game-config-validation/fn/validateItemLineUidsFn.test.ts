@@ -185,20 +185,25 @@ describe("validateItemLineUidsFn", () => {
 	it("accepts multiple weighted Clock lines", async () => {
 		const owner = createProducerItem({
 			id: "producer:sawmill",
+			clock: {
+				intervalMs: 1000,
+				enable: true,
+				rules: [],
+			},
 			lines: [
 				{
 					...createLine({
 						uid: "line:plank",
-						clock: "clock-interval",
+						trigger: "clock-interval",
 					}),
-					clockWeight: 1,
+					weight: 1,
 				},
 				{
 					...createLine({
 						uid: "line:beam",
-						clock: "clock-interval",
+						trigger: "clock-interval",
 					}),
-					clockWeight: 3,
+					weight: 3,
 				},
 			],
 		});

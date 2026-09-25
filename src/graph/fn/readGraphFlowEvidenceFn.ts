@@ -83,7 +83,7 @@ export const readGraphFlowEvidenceFn = (
 				kind: "line",
 			},
 			({ data }) => [
-				`Line ${textFn(data.title)}; uid=${data.uid}; runtimeSeconds=${data.runtimeMs / 1000}; enable=${data.enable}; show=${data.show}; default=${data.default}; clock=${data.clock ?? "none"}; clockWeight=${data.clockWeight}`,
+				`Line ${textFn(data.title)}; uid=${data.uid}; runtimeSeconds=${data.runtimeMs / 1000}; enable=${data.enable}; show=${data.show}; default=${data.default}; trigger=${data.trigger}; weight=${data.weight}`,
 				...data.input.map((input, index) => {
 					const requirement = match(input)
 						.with(
@@ -142,7 +142,7 @@ export const readGraphFlowEvidenceFn = (
 				kind: "clock",
 			},
 			({ data }) => [
-				`Clock expiry; enable=${data.enable}; intervalSeconds=${data.intervalMs === undefined ? "none" : data.intervalMs / 1000}; durationSeconds=${data.durationMs === undefined ? "none" : data.durationMs / 1000}; expiryMode=${data.expiryMode ?? "loose-kill (default)"}`,
+				`Clock timing; enable=${data.enable}; intervalSeconds=${data.intervalMs === undefined ? "none" : data.intervalMs / 1000}; durationSeconds=${data.durationMs === undefined ? "none" : data.durationMs / 1000}`,
 				...rulesFn("Operation", data.rules, nodes),
 			],
 		)
@@ -155,7 +155,10 @@ export const readGraphFlowEvidenceFn = (
 			],
 		)
 		.exhaustive();
-	const table = operation.kind === "clock" ? undefined : operation.data.outcome;
+	const table =
+		operation.kind === "line" || operation.kind === "merge"
+			? operation.data.outcome
+			: undefined;
 	const { setIndex, rollIndex, outcomeIndex, outcome } = output.annotations;
 	const set = setIndex === undefined ? undefined : table?.set[setIndex];
 	const roll = rollIndex === undefined ? undefined : set?.roll[rollIndex];

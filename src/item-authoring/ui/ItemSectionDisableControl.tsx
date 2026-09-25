@@ -33,7 +33,7 @@ export const ItemSectionDisableControl = ({ sectionId }: { readonly sectionId: S
 	const configured = useStore(form.store, ({ values }) => {
 		return match(sectionId)
 			.with("production", () => {
-				return values.lines?.some((line) => line.clock === undefined) ?? false;
+				return values.lines?.some((line) => line.trigger === "manual") ?? false;
 			})
 			.with("merges", () => {
 				return (values.merge?.length ?? 0) > 0;
@@ -41,7 +41,7 @@ export const ItemSectionDisableControl = ({ sectionId }: { readonly sectionId: S
 			.with("clock", () => {
 				return (
 					values.clock !== undefined ||
-					(values.lines?.some((line) => line.clock !== undefined) ?? false)
+					(values.lines?.some((line) => line.trigger === "clock-interval") ?? false)
 				);
 			})
 			.with("units", () => {
@@ -71,7 +71,7 @@ export const ItemSectionDisableControl = ({ sectionId }: { readonly sectionId: S
 							form.setFieldValue(
 								"lines",
 								(form.state.values.lines ?? []).filter(
-									(line) => line.clock !== undefined,
+									(line) => line.trigger !== "manual",
 								),
 							);
 						})
@@ -83,7 +83,7 @@ export const ItemSectionDisableControl = ({ sectionId }: { readonly sectionId: S
 							form.setFieldValue(
 								"lines",
 								(form.state.values.lines ?? []).filter(
-									(line) => line.clock === undefined,
+									(line) => line.trigger !== "clock-interval",
 								),
 							);
 						})

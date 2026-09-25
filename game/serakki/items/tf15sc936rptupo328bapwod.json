@@ -22,7 +22,7 @@
 				"title": "Build Fruit Farm",
 				"artwork": "pwz8m2ffgyrsrfopn2bmm8w1",
 				"description": "Build Fruit Farm.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

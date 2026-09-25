@@ -129,7 +129,9 @@ it("keeps blocked craft completion unchanged and replays one deterministic outco
 			} satisfies RuntimeSchema.Type;
 			const freeRuntime = {
 				...fullRuntime,
-				items: fullRuntime.items.filter((item) => item.id !== "runtime:blocker:0"),
+				items: fullRuntime.items.filter(
+					(item) => item.id !== "runtime:blocker:0" && item.id !== "runtime:blocker:1",
+				),
 			} satisfies RuntimeSchema.Type;
 			const blocked = yield* attemptJobCompletionFx({
 				jobId: job.id,

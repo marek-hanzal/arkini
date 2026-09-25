@@ -30,7 +30,7 @@
 				"uid": "c8nm869lok9ka8frxldx4dqq",
 				"title": "Split",
 				"description": "Split",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

@@ -4,7 +4,7 @@ import type { GraphEdge, GraphNode, GraphOperation } from "~/graph/type/GraphFac
 import type { GraphResult } from "~/graph/type/GraphResult";
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import type { QuerySchema } from "~/item-query/schema/QuerySchema";
-import type { ItemScheduleSchema } from "~/item-schedule/schema/ItemScheduleSchema";
+import type { LineTriggerEnumSchema } from "~/production-line/schema/LineTriggerEnumSchema";
 
 export interface GraphDiscoveryNode {
 	readonly id: string;
@@ -50,8 +50,8 @@ export type GraphDiscoveryOperation = {
 			readonly lineUid: string;
 			readonly runtimeSeconds: number;
 			readonly default: boolean;
-			readonly clock: boolean;
-			readonly clockWeight: number;
+			readonly trigger: LineTriggerEnumSchema.Type;
+			readonly weight: number;
 			readonly show: boolean;
 			readonly enable: boolean;
 	  }
@@ -68,7 +68,6 @@ export type GraphDiscoveryOperation = {
 			readonly kind: "clock";
 			readonly intervalSeconds?: number;
 			readonly durationSeconds?: number;
-			readonly expiryMode?: ItemScheduleSchema.Type["expiryMode"];
 			readonly enable: boolean;
 	  }
 	| {

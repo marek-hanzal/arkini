@@ -22,7 +22,7 @@
 				"title": "Build Sugar Beet Farm",
 				"artwork": "hckjdd3x6d7e8j879cgupn5l",
 				"description": "Build Sugar Beet Farm.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

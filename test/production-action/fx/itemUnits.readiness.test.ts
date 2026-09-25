@@ -85,7 +85,14 @@ describe("item units / readiness and selection", () => {
 			}),
 		);
 
-		expect(runtime.items.some((item) => item.item.uid === "units:sapling")).toBe(false);
-		expect(runtime.items.filter((item) => item.item.uid === "item:seed")).toHaveLength(2);
+		expect(runtime.items.filter((item) => item.item.uid === "units:sapling")).toHaveLength(2);
+		expect(
+			runtime.items
+				.filter((item) => item.item.uid === "units:sapling")
+				.every((item) => item.remainingUnits === 0),
+		).toBe(true);
+		expect(
+			runtime.jobQueue.filter((request) => request.lineUid === "line:sapling:depletion"),
+		).toHaveLength(2);
 	});
 });

@@ -17,7 +17,7 @@
 				"uid": "q5fapewdv1zek2easikfe031",
 				"title": "Flour",
 				"description": "Flour is the base",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

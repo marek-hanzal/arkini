@@ -47,7 +47,7 @@ const runRangePulseFx = (durationMs: number) =>
 					{
 						...createLine({
 							uid: "range",
-							clock: "clock-interval",
+							trigger: "clock-interval",
 							input: [
 								{
 									type: "materials",
@@ -83,7 +83,7 @@ describe("Clock expiry and optional Autofill", () => {
 			lines: [
 				createLine({
 					uid: "expiry",
-					clock: "clock-lifetime",
+					trigger: "item-termination",
 					input: [
 						{
 							type: "materials",
@@ -146,7 +146,7 @@ describe("Clock expiry and optional Autofill", () => {
 			lines: [
 				createLine({
 					uid: "expiry",
-					clock: "clock-lifetime",
+					trigger: "item-termination",
 					input: [
 						{
 							type: "materials",
@@ -210,7 +210,7 @@ describe("Clock expiry and optional Autofill", () => {
 			lines: [
 				createLine({
 					uid: "material",
-					clock: "clock-interval",
+					trigger: "clock-interval",
 					input: [
 						{
 							type: "materials",
@@ -276,7 +276,7 @@ describe("Clock expiry and optional Autofill", () => {
 			lines: [
 				createLine({
 					uid: "material",
-					clock: "clock-interval",
+					trigger: "clock-interval",
 					input: [
 						{
 							type: "materials",
@@ -331,7 +331,7 @@ describe("Clock expiry and optional Autofill", () => {
 			lines: [
 				createLine({
 					uid: "material",
-					clock: "clock-interval",
+					trigger: "clock-interval",
 					input: [
 						{
 							type: "materials",

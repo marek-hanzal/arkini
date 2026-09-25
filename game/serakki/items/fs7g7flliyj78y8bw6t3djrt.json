@@ -12,32 +12,7 @@
 			]
 		},
 		"units": {
-			"amount": 50,
-			"outcome": {
-				"set": [
-					{
-						"weight": 1,
-						"rules": [],
-						"roll": [
-							{
-								"type": "guaranteed",
-								"outcome": [
-									{
-										"type": "item",
-										"itemUid": "r171qefgjo6x0m7pnl3vgtfj",
-										"quantity": {
-											"min": 1,
-											"max": 1
-										},
-										"placement": "drop",
-										"rules": []
-									}
-								]
-							}
-						]
-					}
-				]
-			}
+			"amount": 50
 		},
 		"maxQueueSize": 8,
 		"lines": [
@@ -46,7 +21,7 @@
 				"title": "Water",
 				"description": "Get some water for you infrastructure. Fresh, from deepness of earth!",
 				"default": true,
-				"clockWeight": 1,
+				"weight": 1,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 6000,
@@ -93,6 +68,43 @@
 										{
 											"type": "item",
 											"itemUid": "s9j877qispz12d8ry9h1d4wb",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"uid": "77ac031523ce41b3ad4d3933",
+				"title": "Depletion",
+				"trigger": "item-termination",
+				"weight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [],
+				"outcome": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"outcome": [
+										{
+											"type": "item",
+											"itemUid": "r171qefgjo6x0m7pnl3vgtfj",
 											"quantity": {
 												"min": 1,
 												"max": 1

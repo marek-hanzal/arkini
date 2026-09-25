@@ -36,12 +36,17 @@ const setup = async () => {
 					...config.items,
 					forge: {
 						...config.items.forge!,
+						clock: {
+							intervalMs: 1_000,
+							enable: true,
+							rules: [],
+						},
 						lines: [
 							{
 								...line,
 								uid: "last",
-								clock: "clock-interval",
-								clockWeight: 7,
+								trigger: "clock-interval",
+								weight: 7,
 								show: false,
 								enable: false,
 							},

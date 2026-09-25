@@ -9,8 +9,9 @@ import { z } from "zod";
 import { ItemScheduleSchema } from "~/item-schedule/schema/ItemScheduleSchema";
 
 import { LineSchema } from "~/production-line/schema/LineSchema";
-import { LineClockModeEnumSchema } from "~/production-line/schema/LineClockModeEnumSchema";
+import { LineTriggerEnumSchema } from "~/production-line/schema/LineTriggerEnumSchema";
 import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
+import { TerminalModeSchema } from "~/item-terminal/schema/TerminalModeSchema";
 
 /**
  * An ordinary item with optional production, Clock scheduling, or one immediate action.
@@ -55,7 +56,7 @@ export const ItemSchema = z
 		 * Optional finite unit supply initialized separately for each fresh item instance.
 		 */
 		units: UnitsSchema.optional().describe(
-			"The optional supply of units, such as health, resource stock, or uses, and depletion outcome of each item instance.",
+			"The optional supply of units, such as health, resource stock, or uses, in each item instance.",
 		),
 		/**
 		 * Optional target-specific merges initiated when this item is dropped onto another item.
@@ -103,6 +104,9 @@ export const ItemSchema = z
 				"Optional directional merges and at most one receiver-owned Space interaction.",
 			),
 		clock: ItemScheduleSchema.optional(),
+		terminationMode: TerminalModeSchema.optional().describe(
+			"How existing work and blocked output are handled when lifetime or units end this item; omission uses loose-kill.",
+		),
 		/**
 		 * Maximum accepted work count: one active job plus pending requests.
 		 */
@@ -119,17 +123,19 @@ export const ItemSchema = z
 	})
 	.strict()
 	.superRefine((item, context) => {
-		if (item.clock?.durationMs !== undefined) return;
 		item.lines.forEach((line, index) => {
-			if (line.clock === LineClockModeEnumSchema.enum["clock-lifetime"])
+			if (
+				line.trigger === LineTriggerEnumSchema.enum["clock-interval"] &&
+				item.clock?.intervalMs === undefined
+			)
 				context.addIssue({
 					code: "custom",
 					path: [
 						"lines",
 						index,
-						"clock",
+						"trigger",
 					],
-					message: "An expiry line requires a finite Clock lifetime.",
+					message: "An interval line requires a Clock interval.",
 				});
 		});
 	})

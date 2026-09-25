@@ -16,7 +16,7 @@
 				"uid": "k7yi5d8jhfl1a4r5p1nrdcai",
 				"title": "destroy-the-world",
 				"description": "boom",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

@@ -22,7 +22,7 @@
 				"title": "House - Tier 1",
 				"artwork": "ucep41zyvgbrif6rlcqdabk1",
 				"description": "A beautiful simple house, but you'll like it!",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

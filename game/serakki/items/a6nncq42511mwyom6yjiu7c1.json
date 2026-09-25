@@ -22,7 +22,7 @@
 				"title": "Build Sheep Farm",
 				"artwork": "mrnd35l8q8ynnve32m7znypb",
 				"description": "Build Sheep Farm.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

@@ -6,7 +6,6 @@ export const ItemUnitsIssueReasonEnumSchema = z
 		MissingConfig: "missing-config",
 		ExceedsAmount: "exceeds-amount",
 		FullState: "full-state",
-		DepletedIdle: "depleted-idle",
 	})
 	.meta({
 		id: "ItemUnitsIssueReasonEnumSchema",

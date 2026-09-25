@@ -6,7 +6,7 @@ describe("duplicateLineFn", () => {
 	it("deeply copies with fresh identity, Default cleared and Clock retained", () => {
 		const source = {
 			...createLineFn([], "Copper Ore", "Mines copper ore.", "line:source"),
-			clock: "clock-interval" as const,
+			trigger: "clock-interval" as const,
 			default: true,
 		};
 		const duplicate = duplicateLineFn(source, "line:copy");

@@ -2,6 +2,7 @@ import type { PropsWithChildren } from "react";
 
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { ButtonLink } from "~/ui/ui/Button";
+import type { LineTriggerEnumSchema } from "~/production-line/schema/LineTriggerEnumSchema";
 
 /** Opens the form section that owns the selected authored line. */
 export const LineEditLink = ({
@@ -10,13 +11,13 @@ export const LineEditLink = ({
 	disabled = false,
 	itemUid,
 	lineUid,
-	clock,
+	trigger = "manual",
 }: PropsWithChildren<{
 	readonly dataUi?: string;
 	readonly disabled?: boolean;
 	readonly itemUid: string;
 	readonly lineUid: string;
-	readonly clock?: boolean;
+	readonly trigger?: LineTriggerEnumSchema.Type;
 }>) => {
 	const project = useEditorProject();
 	return (
@@ -26,7 +27,12 @@ export const LineEditLink = ({
 			params={{
 				projectId: project.projectId,
 				itemUid,
-				sectionId: clock ? "clock" : "production",
+				sectionId:
+					trigger === "item-termination"
+						? "identity"
+						: trigger === "manual"
+							? "production"
+							: "clock",
 			}}
 			search={{
 				lineUid,

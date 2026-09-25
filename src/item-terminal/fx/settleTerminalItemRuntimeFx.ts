@@ -15,9 +15,10 @@ import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema"
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 
-/** Common atomic identity expiry: detach, resolve against the input snapshot, then place outcome. */
-export const expireItemRuntimeFx = Effect.fn("expireItemRuntimeFx")(function* ({
+/** Common atomic terminal removal: detach, resolve against the input snapshot, then place outcome. */
+export const settleTerminalItemRuntimeFx = Effect.fn("settleTerminalItemRuntimeFx")(function* ({
 	item,
+	cause,
 	removalMode,
 	origin,
 	outcome,
@@ -25,6 +26,7 @@ export const expireItemRuntimeFx = Effect.fn("expireItemRuntimeFx")(function* ({
 	runtime,
 }: {
 	readonly item: RuntimeItemSchema.Type;
+	readonly cause: "expired" | "depleted";
 	readonly removalMode?: "kill-switch";
 	readonly origin: BoardLocationSchema.Type;
 	readonly outcome?: OutcomeTableSchema.Type;
@@ -55,7 +57,7 @@ export const expireItemRuntimeFx = Effect.fn("expireItemRuntimeFx")(function* ({
 		)
 	) {
 		const aborted = yield* abortJobRuntimeFx({
-			reason: "material-expired",
+			reason: cause === "expired" ? "material-expired" : "material-depleted",
 			jobId: item.location.jobId,
 			runtime: draft,
 		}).pipe(
@@ -95,7 +97,7 @@ export const expireItemRuntimeFx = Effect.fn("expireItemRuntimeFx")(function* ({
 						ownerItemId: item.id,
 						itemUid: loss.itemUid,
 						quantity: loss.quantity,
-						source: "expiry-outcome",
+						source: cause === "expired" ? "expiry-outcome" : "depletion-outcome",
 						reason: loss.reason,
 					}),
 				),
@@ -120,7 +122,7 @@ export const expireItemRuntimeFx = Effect.fn("expireItemRuntimeFx")(function* ({
 			...removalFacts,
 			{
 				type: "lifecycle:settled",
-				cause: "expired",
+				cause,
 				itemId: item.id,
 				itemUid: item.item.uid,
 				location: origin,

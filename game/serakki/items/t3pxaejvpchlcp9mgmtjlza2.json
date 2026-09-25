@@ -22,7 +22,7 @@
 				"title": "Build House - Tier 2",
 				"artwork": "f0vnkcqwb0i3r7l5dqs3852l",
 				"description": "Build a Tier 2 house using processed materials and several units of basic labor.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

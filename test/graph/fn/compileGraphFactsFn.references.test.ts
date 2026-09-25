@@ -165,7 +165,7 @@ it("retains unresolved authoring references and self output without importing ru
 					lines: [
 						expiryLineFn("A-expiry", outputFn("missing")),
 						lineFn("L", {
-							clock: "clock-interval",
+							trigger: "clock-interval",
 							enable: false,
 							outcome: outputFn("A"),
 							rules: [

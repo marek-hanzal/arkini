@@ -8,6 +8,7 @@ import { ProductionLineDetail } from "~/item-authoring/ui/ProductionLineDetail";
 import { DisabledCapabilityDetail } from "~/item-authoring/ui/DisabledCapabilityDetail";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { useTranslator } from "~/translation/ui/useTranslator";
+import { LineTriggerEnumSchema } from "~/production-line/schema/LineTriggerEnumSchema";
 
 /** Presents the authored production lines and their input/outcome flows. */
 export const ProductionDetail = ({
@@ -15,12 +16,18 @@ export const ProductionDetail = ({
 	kind = "manual",
 }: {
 	readonly item: ItemSchema.Type;
-	readonly kind?: "manual" | "clock";
+	readonly kind?: "manual" | "clock" | "termination";
 }) => {
 	const translator = useTranslator();
 	const project = useEditorProject();
-	const lines = item.lines.filter((line) => (line.clock !== undefined) === (kind === "clock"));
-	if (kind === "clock" && lines.length === 0) return null;
+	const lines = item.lines.filter((line) =>
+		kind === "manual"
+			? line.trigger === LineTriggerEnumSchema.enum.manual
+			: kind === "termination"
+				? line.trigger === LineTriggerEnumSchema.enum["item-termination"]
+				: line.trigger === LineTriggerEnumSchema.enum["clock-interval"],
+	);
+	if (kind !== "manual" && lines.length === 0) return null;
 	return (
 		<div
 			className="grid gap-[var(--ak-viewport-gap)]"

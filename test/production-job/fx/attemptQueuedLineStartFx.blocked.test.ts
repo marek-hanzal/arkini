@@ -17,7 +17,6 @@ describe("queued blocked probes", () => {
 		"self-unit",
 		"aggregate-self-unit",
 		"target-unit",
-		"placement",
 	])(
 		"preserves input, units, reservations, deliveries and randomness on %s rejection",
 		(blocker) => {
@@ -55,8 +54,6 @@ describe("queued blocked probes", () => {
 				),
 			);
 
-			const errorTag =
-				blocker === "placement" ? "PlacementUnavailableError" : "LineRunUnavailableError";
 			for (const attempt of [
 				result.first,
 				result.retry,
@@ -64,7 +61,7 @@ describe("queued blocked probes", () => {
 				expect(attempt).toMatchObject({
 					type: "blocked",
 					error: {
-						_tag: errorTag,
+						_tag: "LineRunUnavailableError",
 					},
 				});
 				expect(attempt.runtime).toBe(runtime);
@@ -114,49 +111,5 @@ describe("queued blocked probes", () => {
 				lineUid: "ready",
 			},
 		]);
-	});
-
-	it("starts the same previously placement-blocked request after space is freed", () => {
-		const { config, runtime, request } = createBlockedQueueFixture("placement");
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				const blocked = yield* attemptQueuedLineStartFx({
-					requestId: request.id,
-					runtime,
-				});
-				const started = yield* attemptQueuedLineStartFx({
-					requestId: request.id,
-					runtime: {
-						...blocked.runtime,
-						items: blocked.runtime.items.filter((item) => item.id !== "result"),
-					},
-				});
-				return {
-					blocked,
-					started,
-				};
-			}).pipe(
-				useGameFx({
-					config,
-				}),
-			),
-		);
-		expect(result.blocked.type).toBe("blocked");
-		expect(result.started.type).toBe("started");
-		expect(result.started.runtime.jobQueue.map(({ id }) => id)).toEqual([
-			"request:ready",
-		]);
-		expect(
-			result.started.runtime.items.filter((item) => item.item.uid === "debris"),
-		).toHaveLength(2);
-		expect(
-			result.started.runtime.items.find((item) => item.id === "owner")?.remainingUnits,
-		).toBe(2);
-		expect(
-			result.started.runtime.items.find((item) => item.id === "buffer")?.location.scope,
-		).toBe("job");
-		expect(
-			result.started.runtime.items.find((item) => item.id === "tool")?.location.scope,
-		).toBe("reserved");
 	});
 });

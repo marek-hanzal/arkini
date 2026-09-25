@@ -21,7 +21,7 @@
 				"title": "Stock Cow Pen",
 				"artwork": "kvwdw73ifpkni8gmwozgsf78",
 				"description": "Provide starter feed and water so the enclosure can be stocked with animals.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

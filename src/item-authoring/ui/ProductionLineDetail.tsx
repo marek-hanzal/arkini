@@ -14,7 +14,7 @@ import { OutcomeDetail } from "~/item-authoring/ui/OutcomeDetail";
 import { ProductionLineInputs } from "~/item-authoring/ui/ProductionLineInputs";
 import { Mx } from "~/translation/ui/Mx";
 import { EditorResourceThumbnail } from "~/authoring-form/ui/EditorResourceThumbnail";
-import { LineClockModeEnumSchema } from "~/production-line/schema/LineClockModeEnumSchema";
+import { LineTriggerEnumSchema } from "~/production-line/schema/LineTriggerEnumSchema";
 
 const LineFlag = ({
 	checked,
@@ -83,7 +83,7 @@ export const ProductionLineDetail = ({
 								dataUi="EditorProductionLineDetailEditLink"
 								itemUid={itemUid}
 								lineUid={line.uid}
-								clock={line.clock !== undefined}
+								trigger={line.trigger}
 							>
 								{line.title}
 								<ArrowUpRight className="size-4 shrink-0 text-muted transition-colors group-hover:text-accent" />
@@ -95,18 +95,18 @@ export const ProductionLineDetail = ({
 							description={<Mx label="Authored production Default marker help" />}
 						/>
 						<LineFlag
-							checked={line.clock !== undefined}
+							checked={line.trigger !== LineTriggerEnumSchema.enum.manual}
 							label={
 								<>
 									<Tx
 										label={
-											line.clock ===
-											LineClockModeEnumSchema.enum["clock-lifetime"]
-												? "Clock - Expiry"
+											line.trigger ===
+											LineTriggerEnumSchema.enum["item-termination"]
+												? "Item termination"
 												: "Clock - Interval"
 										}
 									/>{" "}
-									· {line.clockWeight}
+									· {line.weight}
 								</>
 							}
 							description={<Mx label="Authored production Clock marker help" />}

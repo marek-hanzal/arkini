@@ -1,7 +1,7 @@
 import { Effect, Random } from "effect";
 import { describe, expect, it } from "vitest";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
-import { attemptScheduledItemExpiryFx } from "~/item-schedule/fx/attemptScheduledItemExpiryFx";
+import { attemptTerminalItemFx } from "~/item-terminal/fx/attemptTerminalItemFx";
 import { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { useGameFx } from "~test/support/useGameFx";
 import { makeFixedRandomFx } from "~test/support/makeFixedRandomFx";
@@ -16,13 +16,14 @@ import {
 const outputLocationsFn = (runtime: RuntimeSchema.Type) =>
 	runtime.items.filter((item) => item.item.uid === "residue").map((item) => item.location);
 
-describe("aborted job depletion replay", () => {
-	it.each([
-		"loose-kill",
-		"kill-switch",
-	] as const)("replays random placement from the same snapshot under %s", (mode) => {
-		const config = lastUnitConfigFn(mode);
-		const roll = config.items.owner!.units!.outcome!.set[0]!.roll[0]!;
+describe("internal item termination replay", () => {
+	it("replays random placement from the same snapshot after a blocked loose-kill attempt", () => {
+		const config = lastUnitConfigFn("loose-kill");
+		const outcome = config.items.owner!.lines.find(
+			(line) => line.trigger === "item-termination",
+		)!.outcome!;
+		config.items.temporary!.lines[0]!.outcome = outcome;
+		const roll = outcome.set[0]!.roll[0]!;
 		if (roll.type !== "guaranteed") throw new Error("Expected guaranteed fixture outcome");
 		const drop = roll.outcome[0]!;
 		if (drop.type !== "item") throw new Error("Expected Item outcome fixture");
@@ -48,7 +49,7 @@ describe("aborted job depletion replay", () => {
 							: item,
 					),
 				};
-				const first = yield* attemptScheduledItemExpiryFx({
+				const first = yield* attemptTerminalItemFx({
 					itemId: "input",
 					runtime: ready,
 				}).pipe(
@@ -78,12 +79,12 @@ describe("aborted job depletion replay", () => {
 						),
 					],
 				};
-				const constrained = yield* attemptScheduledItemExpiryFx({
+				const constrained = yield* attemptTerminalItemFx({
 					itemId: "input",
 					runtime: full,
 				});
 				const restored = RuntimeSchema.parse(JSON.parse(JSON.stringify(ready)));
-				const replay = yield* attemptScheduledItemExpiryFx({
+				const replay = yield* attemptTerminalItemFx({
 					itemId: "input",
 					runtime: restored,
 				}).pipe(
@@ -106,29 +107,11 @@ describe("aborted job depletion replay", () => {
 				}),
 			),
 		);
-		expect(result.first.type).toBe("expired");
-		expect(result.replay.type).toBe("expired");
+		expect(result.first.type).toBe("settled");
+		expect(result.replay.type).toBe("settled");
 		expect(outputLocationsFn(result.first.runtime)).toHaveLength(2);
-		if (mode === "loose-kill") {
-			expect(result.constrained.type).toBe("blocked");
-			expect(result.constrained.runtime).toBe(result.full);
-		} else {
-			expect(result.constrained.type).toBe("expired");
-			if (result.constrained.type !== "expired") throw new Error("Expected forced expiry");
-			expect(outputLocationsFn(result.constrained.runtime)).toHaveLength(1);
-			expect(result.constrained.runtime.jobs).toEqual([]);
-			expect(result.constrained.runtime.items.some((item) => item.id === "owner")).toBe(
-				false,
-			);
-			expect(result.constrained.facts).toContainEqual(
-				expect.objectContaining({
-					type: "item:discarded",
-					source: "depletion-outcome",
-					quantity: 1,
-					reason: "board:full",
-				}),
-			);
-		}
+		expect(result.constrained.type).toBe("blocked");
+		expect(result.constrained.runtime).toBe(result.full);
 		expect(outputLocationsFn(result.replay.runtime)).toEqual(
 			outputLocationsFn(result.first.runtime),
 		);

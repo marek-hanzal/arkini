@@ -30,7 +30,7 @@ it("records pre-callback admission and stale tool errors without authored inputs
 			},
 			filter: {
 				clock: true,
-				clockWeight: {
+				weight: {
 					gt: 15,
 				},
 				runtimeSeconds: {
@@ -50,7 +50,7 @@ it("records pre-callback admission and stale tool errors without authored inputs
 	expect(start.body).toContain('"kinds":[]');
 	expect(start.body).toContain('"search":{"text":"Digest","scope":"title"}');
 	expect(start.body).toContain(
-		'"filter":{"clock":true,"clockWeight":{"gt":15},"runtimeSeconds":{"gte":30,"lte":120}}',
+		'"filter":{"clock":true,"weight":{"gt":15},"runtimeSeconds":{"gte":30,"lte":120}}',
 	);
 	expect(end.body).toContain("Outcome: tool error");
 	await expect(
@@ -134,7 +134,7 @@ it("records per-query batch errors while preserving successful siblings and omit
 						kind: "operations",
 						kinds: [],
 						filter: {
-							clockWeight: {
+							weight: {
 								gt: 15,
 							},
 						},
@@ -149,7 +149,7 @@ it("records per-query batch errors while preserving successful siblings and omit
 		.toBe(true);
 	const end = records.find((record) => record.message === "Editor MCP tool completed")!;
 	const start = records.find((record) => record.message === "Editor MCP tool started")!;
-	expect(start.body).toContain('"filter":{"clockWeight":{"gt":15}}');
+	expect(start.body).toContain('"filter":{"weight":{"gt":15}}');
 	expect(end.body).toContain("Query: valid");
 	expect(end.body).toContain("Status: yes");
 	expect(end.body).toContain("Query: invalid");

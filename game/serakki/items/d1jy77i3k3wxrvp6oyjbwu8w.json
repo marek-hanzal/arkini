@@ -22,7 +22,7 @@
 				"title": "Build Cacao Farm",
 				"artwork": "bi1znl2l2getwrkalhxji2ao",
 				"description": "Build Cacao Farm.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

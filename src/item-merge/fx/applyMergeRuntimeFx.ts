@@ -24,6 +24,7 @@ import { removeRuntimeItemFx } from "~/game-runtime/fx/removeRuntimeItemFx";
 import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItemIdentityFx";
 import type { BoardRuntimeItemSchema } from "~/game-runtime/schema/BoardRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
+import { cancelItemTerminationWorkFx } from "~/item-terminal/fx/cancelItemTerminationWorkFx";
 
 /** Merge reuse and replacement cannot discard identity-owned state. */
 const hasMergeIdentityStateFn = ({
@@ -69,9 +70,19 @@ const applyMergeSourceActionFx = Effect.fn("applyMergeSourceActionFx")(function*
 	readonly runtime: RuntimeSchema.Type;
 	readonly source: BoardRuntimeItemSchema.Type;
 }) {
+	const cancelled =
+		action === SourceActionSchema.enum.Consume
+			? yield* cancelItemTerminationWorkFx({
+					itemId: source.id,
+					runtime,
+				})
+			: {
+					facts: [],
+					runtime,
+				};
 	yield* assertOwnerIdleFx({
 		ownerItemId: source.id,
-		runtime,
+		runtime: cancelled.runtime,
 	});
 	if (action === SourceActionSchema.enum.Spend) {
 		const spent = yield* spendActionUnitsFx({
@@ -113,10 +124,10 @@ const applyMergeSourceActionFx = Effect.fn("applyMergeSourceActionFx")(function*
 		action === SourceActionSchema.enum.Consume
 			? yield* discardRuntimeItemOwnedStateFx({
 					ownerItemId: source.id,
-					runtime,
+					runtime: cancelled.runtime,
 				})
 			: {
-					runtime,
+					runtime: cancelled.runtime,
 					events: [],
 				};
 	const removed = yield* removeRuntimeItemIdentityFx({
@@ -125,6 +136,7 @@ const applyMergeSourceActionFx = Effect.fn("applyMergeSourceActionFx")(function*
 	});
 	const draft = removed.runtime;
 	const events = [
+		...cancelled.facts,
 		...withoutOwnedState.events,
 		...removed.events,
 	];
@@ -235,16 +247,23 @@ const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(function*
 			},
 			() =>
 				Effect.gen(function* () {
+					const cancelled = yield* cancelItemTerminationWorkFx({
+						itemId: target.id,
+						runtime,
+					});
 					yield* assertOwnerIdleFx({
 						ownerItemId: target.id,
-						runtime,
+						runtime: cancelled.runtime,
 					});
 					const removed = yield* removeRuntimeItemFx({
 						item: target,
-						runtime,
+						runtime: cancelled.runtime,
 					});
 					return {
-						facts: removed.events,
+						facts: [
+							...cancelled.facts,
+							...removed.events,
+						],
 						runtime: removed.runtime,
 					};
 				}),
@@ -255,16 +274,20 @@ const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(function*
 			},
 			({ result }) =>
 				Effect.gen(function* () {
+					const cancelled = yield* cancelItemTerminationWorkFx({
+						itemId: target.id,
+						runtime,
+					});
 					yield* assertOwnerIdleFx({
 						ownerItemId: target.id,
-						runtime,
+						runtime: cancelled.runtime,
 					});
 					const resultItem = yield* resolveItemFx({
 						itemUid: result,
 					});
 					const replacementUnits = yield* resolveMergeReplacementUnitsFx({
 						resultItem,
-						runtime,
+						runtime: cancelled.runtime,
 						target,
 					});
 					const replacement = yield* createRuntimeItemFx({
@@ -279,10 +302,10 @@ const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(function*
 						inventories: target.inventories,
 					};
 					return {
-						facts: [],
+						facts: cancelled.facts,
 						runtime: {
-							...runtime,
-							items: runtime.items.map((item) =>
+							...cancelled.runtime,
+							items: cancelled.runtime.items.map((item) =>
 								item.id === target.id ? replacementWithSequence : item,
 							),
 						},
@@ -384,12 +407,6 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 		target: currentTarget,
 	});
 	let draft = targetEffect.runtime;
-	const targetDepleted = targetEffect.facts.some(
-		(event) =>
-			event.type === "lifecycle:settled" &&
-			event.cause === "depleted" &&
-			event.itemId === target.id,
-	);
 	const facts: EngineFact[] = [
 		...sourceAction.facts,
 		...targetEffect.facts,
@@ -417,7 +434,7 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 			);
 		draft = withOutcome;
 	}
-	if (rule.effect === TargetEffectSchema.enum.Remove && !targetDepleted) {
+	if (rule.effect === TargetEffectSchema.enum.Remove) {
 		facts.push({
 			type: "lifecycle:settled",
 			cause: "removed",

@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { ItemScheduleExpiryModeSchema } from "~/item-schedule/schema/ItemScheduleExpiryModeSchema";
 import { TimeSchema } from "~/game-value/schema/TimeSchema";
 import { RuleSchema } from "~/production-action/schema/RuleSchema";
 
@@ -14,11 +13,8 @@ export const ItemScheduleSchema = z
 		durationMs: TimeSchema.min(100)
 			.optional()
 			.describe(
-				"Optional active lifetime; expiryMode determines whether accepted work may outlive it.",
+				"Optional active lifetime; item termination mode determines whether accepted work may outlive it.",
 			),
-		expiryMode: ItemScheduleExpiryModeSchema.optional().describe(
-			"Lifetime expiry policy; omission uses loose-kill. Has no effect without a finite duration.",
-		),
 		enable: z.boolean().default(true),
 		rules: z.array(RuleSchema).default([]),
 	})
@@ -51,8 +47,7 @@ export const ItemScheduleSchema = z
 				],
 			},
 		],
-		description:
-			"Clock-line admission, finite lifetime, or both, with availability rules; expiry selects a weighted expiry line.",
+		description: "Clock-line admission, finite lifetime, or both, with availability rules.",
 	});
 export type ItemScheduleSchema = typeof ItemScheduleSchema;
 export namespace ItemScheduleSchema {

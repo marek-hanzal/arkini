@@ -22,7 +22,7 @@
 				"title": "Build Stoneworks",
 				"artwork": "fz36qa41hs9xro6g0jp08592",
 				"description": "Build a Stoneworks.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

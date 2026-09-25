@@ -1,12 +1,12 @@
-import { expireItemRuntimeFx } from "~/item-expiry/fx/expireItemRuntimeFx";
+import { settleTerminalItemRuntimeFx } from "~/item-terminal/fx/settleTerminalItemRuntimeFx";
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { EngineFact } from "~/game-event/type/EngineFact";
 import { readItemPhysicalContextFx } from "~/item-location/fx/readItemPhysicalContextFx";
-import { readItemScheduleFn } from "~/item-schedule/fn/readItemScheduleFn";
-import { selectClockLineFx } from "~/item-schedule/fx/selectClockLineFx";
-import { LineClockModeEnumSchema } from "~/production-line/schema/LineClockModeEnumSchema";
+import { readItemTerminalStateFn } from "~/item-terminal/fn/readItemTerminalStateFn";
+import { selectTriggeredLineFx } from "~/line-trigger/fx/selectTriggeredLineFx";
+import { LineTriggerEnumSchema } from "~/production-line/schema/LineTriggerEnumSchema";
 import { releaseOwnerInputsFx } from "~/production-input/fx/releaseOwnerInputsFx";
 import { readLineInputAutofillCoverageFx } from "~/production-input/fx/readLineInputAutofillCoverageFx";
 import { enqueueLineRuntimeFx } from "~/production-job/fx/enqueueLineRuntimeFx";
@@ -14,65 +14,68 @@ import { abortJobRuntimeFx } from "~/production-job/fx/abortJobRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
 
-interface AttemptScheduledItemExpiryProps {
+interface AttemptTerminalItemProps {
 	itemId: IdSchema.Type;
 	runtime: RuntimeSchema.Type;
 	excludedSourceItemIds?: ReadonlySet<IdSchema.Type>;
 }
 
-type AttemptScheduledItemExpiryResult =
+type AttemptTerminalItemResult =
 	| {
 			type: "blocked";
 			error: PlacementUnavailableError;
 			runtime: RuntimeSchema.Type;
 	  }
 	| {
-			type: "expired" | "queued";
+			type: "settled" | "queued";
 			facts: readonly EngineFact[];
 			runtime: RuntimeSchema.Type;
 			claimedSourceItemIds: readonly IdSchema.Type[];
 	  };
 
-interface CompleteScheduledItemExpiryTransitionResult {
-	readonly type: "expired" | "queued";
+interface CompleteTerminalItemTransitionResult {
+	readonly type: "settled" | "queued";
 	readonly facts: readonly EngineFact[];
 	readonly runtime: RuntimeSchema.Type;
 	readonly claimedSourceItemIds?: readonly IdSchema.Type[];
 }
 
-/** Schedules one expiry line as ordinary work, or removes an owner with no eligible work. */
-const completeScheduledItemExpiryTransitionFx = Effect.fn(
-	"completeScheduledItemExpiryTransitionFx",
-)(function* ({ itemId, runtime, excludedSourceItemIds }: AttemptScheduledItemExpiryProps) {
+/** Schedules one terminal line as ordinary work, or removes an owner with no eligible work. */
+const completeTerminalItemTransitionFx = Effect.fn("completeTerminalItemTransitionFx")(function* ({
+	itemId,
+	runtime,
+	excludedSourceItemIds,
+}: AttemptTerminalItemProps) {
 	const item = runtime.items.find((candidate) => candidate.id === itemId);
 	if (item === undefined)
-		return yield* Effect.die(new Error(`Scheduled item ${itemId} is missing.`));
-	const schedule = readItemScheduleFn(item.item);
-	if (schedule === undefined || item.schedule?.remainingDurationMs !== 0) {
-		return yield* Effect.die(new Error(`Scheduled item ${item.id} is not ready to expire.`));
-	}
+		return yield* Effect.die(new Error(`Terminal item ${itemId} is missing.`));
+	const terminal = readItemTerminalStateFn(item);
+	if (terminal === undefined)
+		return yield* Effect.die(new Error(`Item ${item.id} is not ready to terminate.`));
 	const context = yield* readItemPhysicalContextFx({
 		item,
 		runtime,
 	});
 
-	const selectedLine = yield* selectClockLineFx({
+	const selectedLine = yield* selectTriggeredLineFx({
 		item,
 		runtime,
-		role: LineClockModeEnumSchema.enum["clock-lifetime"],
+		trigger: LineTriggerEnumSchema.enum["item-termination"],
 		origin: context.origin,
+		randomSeed: `serakki:terminal-line:v1:${item.id}:${item.item.uid}`,
 	});
-	const force = schedule.expiryMode === "kill-switch";
+	const force = terminal.mode === "kill-switch";
 	// Material owned by another job cannot run its own Board job. Its expiry must
 	// settle immediately so the parent job can abort before advancing again.
 	if (item.location.scope !== "board") {
-		const expiry = yield* expireItemRuntimeFx({
+		const expiry = yield* settleTerminalItemRuntimeFx({
+			cause: terminal.cause,
 			removalMode: force ? "kill-switch" : undefined,
 			item,
 			origin: context.origin,
 			outcome: selectedLine?.outcome,
 			randomSeed: [
-				"serakki:scheduled-expiry",
+				`serakki:terminal:${terminal.cause}`,
 				"v1",
 				item.id,
 				item.item.uid,
@@ -90,13 +93,13 @@ const completeScheduledItemExpiryTransitionFx = Effect.fn(
 					runtime: expiry.runtime,
 				});
 		return {
-			type: "expired",
+			type: "settled",
 			facts: [
 				...expiry.facts,
 				...release.events,
 			],
 			runtime: release.runtime,
-		} satisfies CompleteScheduledItemExpiryTransitionResult;
+		} satisfies CompleteTerminalItemTransitionResult;
 	}
 	let draft: RuntimeSchema.Type = {
 		...runtime,
@@ -119,10 +122,10 @@ const completeScheduledItemExpiryTransitionFx = Effect.fn(
 	const currentOwner = draft.items.find((candidate) => candidate.id === item.id);
 	if (currentOwner === undefined)
 		return {
-			type: "expired",
+			type: "settled",
 			facts: cancelledFacts,
 			runtime: draft,
-		} satisfies CompleteScheduledItemExpiryTransitionResult;
+		} satisfies CompleteTerminalItemTransitionResult;
 	if (selectedLine !== undefined) {
 		const queued = yield* Effect.gen(function* () {
 			const coverage = yield* readLineInputAutofillCoverageFx({
@@ -136,7 +139,7 @@ const completeScheduledItemExpiryTransitionFx = Effect.fn(
 				ownerItemId: item.id,
 				lineUid: selectedLine.uid,
 				runtime: draft,
-				allowTerminalLine: true,
+				trigger: LineTriggerEnumSchema.enum["item-termination"],
 			});
 			return {
 				request,
@@ -158,14 +161,15 @@ const completeScheduledItemExpiryTransitionFx = Effect.fn(
 				],
 				runtime: queued.request.runtime,
 				claimedSourceItemIds: queued.claimedSourceItemIds,
-			} satisfies CompleteScheduledItemExpiryTransitionResult;
+			} satisfies CompleteTerminalItemTransitionResult;
 	}
-	const expiry = yield* expireItemRuntimeFx({
+	const expiry = yield* settleTerminalItemRuntimeFx({
+		cause: terminal.cause,
 		removalMode: force ? "kill-switch" : undefined,
 		item: currentOwner,
 		origin: context.origin,
 		randomSeed: [
-			"serakki:scheduled-expiry",
+			`serakki:terminal:${terminal.cause}`,
 			"v1",
 			item.id,
 			item.item.uid,
@@ -184,23 +188,23 @@ const completeScheduledItemExpiryTransitionFx = Effect.fn(
 			});
 
 	return {
-		type: "expired",
+		type: "settled",
 		facts: [
 			...cancelledFacts,
 			...expiry.facts,
 			...release.events,
 		],
 		runtime: release.runtime,
-	} satisfies CompleteScheduledItemExpiryTransitionResult;
+	} satisfies CompleteTerminalItemTransitionResult;
 });
 
-/** Resolves one ready scheduled expiry and keeps only expected delivery failures local. */
-export const attemptScheduledItemExpiryFx = Effect.fn("attemptScheduledItemExpiryFx")(function* ({
+/** Resolves one ready terminal exit and keeps only expected placement failures local. */
+export const attemptTerminalItemFx = Effect.fn("attemptTerminalItemFx")(function* ({
 	itemId,
 	runtime,
 	excludedSourceItemIds,
-}: AttemptScheduledItemExpiryProps) {
-	return yield* completeScheduledItemExpiryTransitionFx({
+}: AttemptTerminalItemProps) {
+	return yield* completeTerminalItemTransitionFx({
 		itemId,
 		runtime,
 		excludedSourceItemIds,
@@ -212,14 +216,14 @@ export const attemptScheduledItemExpiryFx = Effect.fn("attemptScheduledItemExpir
 					facts: completion.facts,
 					runtime: completion.runtime,
 					claimedSourceItemIds: completion.claimedSourceItemIds ?? [],
-				}) satisfies AttemptScheduledItemExpiryResult,
+				}) satisfies AttemptTerminalItemResult,
 		),
 		Effect.catchTag("PlacementUnavailableError", (error) =>
 			Effect.succeed({
 				type: "blocked",
 				error,
 				runtime,
-			} satisfies AttemptScheduledItemExpiryResult),
+			} satisfies AttemptTerminalItemResult),
 		),
 	);
 });

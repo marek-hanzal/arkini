@@ -22,7 +22,7 @@
 				"title": "Build Corn Farm",
 				"artwork": "owlqcko1fyi8058syhln3d4h",
 				"description": "Build Corn Farm.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

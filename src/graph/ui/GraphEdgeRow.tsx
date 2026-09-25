@@ -51,13 +51,13 @@ const GraphOperationDetails = ({
 						value={formatDurationFn(operation.data.runtimeMs)}
 					/>
 					<DetailFact
-						label={translator.textFn("Clock")}
-						value={translator.textFn(operation.data.clock ? "Enabled" : "Disabled")}
+						label={translator.textFn("Trigger")}
+						value={operation.data.trigger}
 					/>
-					{operation.data.clock ? (
+					{operation.data.trigger !== "manual" ? (
 						<DetailFact
-							label={translator.textFn("Clock weight")}
-							value={operation.data.clockWeight}
+							label={translator.textFn("Weight")}
+							value={operation.data.weight}
 						/>
 					) : null}
 					<DetailFact
@@ -234,16 +234,6 @@ const GraphOperationDetails = ({
 						label={translator.textFn("Timer")}
 						value={translator.textFn(operation.data.enable ? "Enabled" : "Disabled")}
 					/>
-					{operation.data.durationMs === undefined ? null : (
-						<DetailFact
-							label={translator.textFn("Expiry mode")}
-							value={translator.textFn(
-								operation.data.expiryMode === "kill-switch"
-									? "Kill switch"
-									: "Loose-kill",
-							)}
-						/>
-					)}
 				</DetailFacts>
 			),
 		)
@@ -275,7 +265,10 @@ export const GraphEdgeRow = ({
 }) => {
 	const translator = useTranslator();
 	const annotations = edge.annotations;
-	const table = operation?.kind === "clock" ? undefined : operation?.data.outcome;
+	const table =
+		operation?.kind === "line" || operation?.kind === "merge"
+			? operation.data.outcome
+			: undefined;
 	const set = annotations.setIndex === undefined ? undefined : table?.set[annotations.setIndex];
 	const unitPayer =
 		annotations.input?.units === undefined || operation === undefined

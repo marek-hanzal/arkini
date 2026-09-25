@@ -8,7 +8,10 @@ export const readGraphOperationSummaryFn = (
 	operation: GraphOperation,
 	ownerTitle: string,
 ): GraphDiscoveryOperation => {
-	const outcomes = operation.kind === "clock" ? undefined : operation.data.outcome;
+	const outcomes =
+		operation.kind === "line" || operation.kind === "merge"
+			? operation.data.outcome
+			: undefined;
 	const base = {
 		id: operation.id,
 		owner: operation.owner,
@@ -28,8 +31,8 @@ export const readGraphOperationSummaryFn = (
 				lineUid: data.uid,
 				runtimeSeconds: data.runtimeMs / 1000,
 				default: data.default,
-				clock: data.clock !== undefined,
-				clockWeight: data.clockWeight,
+				trigger: data.trigger,
+				weight: data.weight,
 				show: data.show,
 				enable: data.enable,
 			}),
@@ -77,11 +80,6 @@ export const readGraphOperationSummaryFn = (
 					? {}
 					: {
 							durationSeconds: data.durationMs / 1000,
-						}),
-				...(data.expiryMode === undefined
-					? {}
-					: {
-							expiryMode: data.expiryMode,
 						}),
 			}),
 		)

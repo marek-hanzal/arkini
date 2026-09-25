@@ -22,7 +22,7 @@
 				"title": "Lumber Camp",
 				"artwork": "vmfdb9sa06isuopjs1kqn7n2",
 				"description": "Build a new lumber-camp",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

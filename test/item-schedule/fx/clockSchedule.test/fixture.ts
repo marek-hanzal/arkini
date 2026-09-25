@@ -8,7 +8,6 @@ import { spawnItemFx } from "~test/support/spawnItemFx";
 import {
 	createLine,
 	createOutput,
-	createProducerItem,
 	createSimpleItem,
 } from "~test/game-config-validation/support/gameValidationTestSource";
 
@@ -35,35 +34,34 @@ export const createClockConfig = (
 		},
 		items: {
 			clock: {
-				...createProducerItem({
-					id: "clock",
-					lines: [
-						{
-							...createLine({
-								uid: "a",
-								default: true,
-								clock: "clock-interval",
-								outcome: createOutput([
-									{
-										itemUid: "result",
-									},
-								]),
-							}),
-							runtimeMs: 400,
-						},
-						{
-							...createLine({
-								uid: "b",
-								outcome: createOutput([
-									{
-										itemUid: "result",
-									},
-								]),
-							}),
-							runtimeMs: 100,
-						},
-					],
-				}),
+				...createSimpleItem("clock"),
+				lines: [
+					{
+						...createLine({
+							uid: "a",
+							default: false,
+							trigger: "clock-interval",
+							outcome: createOutput([
+								{
+									itemUid: "result",
+								},
+							]),
+						}),
+						runtimeMs: 400,
+					},
+					{
+						...createLine({
+							uid: "b",
+							default: true,
+							outcome: createOutput([
+								{
+									itemUid: "result",
+								},
+							]),
+						}),
+						runtimeMs: 100,
+					},
+				],
 
 				maxQueueSize: 3,
 				ui: "default",

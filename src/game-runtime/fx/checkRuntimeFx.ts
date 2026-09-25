@@ -56,15 +56,6 @@ const checkRuntimeItemUnitsFn = (runtime: RuntimeSchema.Type) => {
 			});
 			continue;
 		}
-		if (item.remainingUnits === 0 && !runtime.jobs.some((job) => job.ownerItemId === item.id)) {
-			issues.push({
-				type: RuntimeCheckIssueEnumSchema.enum.ItemUnits,
-				itemId: item.id,
-				amount,
-				remainingUnits: item.remainingUnits,
-				reason: ItemUnitsIssueReasonEnumSchema.enum.DepletedIdle,
-			});
-		}
 	}
 
 	return issues;

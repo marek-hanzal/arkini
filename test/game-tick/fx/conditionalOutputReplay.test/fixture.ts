@@ -79,7 +79,7 @@ export const createConfig = (path: OutputPath, markerDuration = 500) => {
 						uid: "expiry:temporaryPlain",
 						title: "Expiry",
 						description: "Expiry",
-						clock: "clock-lifetime",
+						trigger: "item-termination",
 						runtimeMs: 0,
 						input: [],
 						outcome: outcome("blocker"),
@@ -97,7 +97,7 @@ export const createConfig = (path: OutputPath, markerDuration = 500) => {
 						uid: "expiry:temporaryOutput",
 						title: "Expiry",
 						description: "Expiry",
-						clock: "clock-lifetime",
+						trigger: "item-termination",
 						runtimeMs: 0,
 						input: [],
 						outcome: outcome("result", true),
@@ -111,9 +111,19 @@ export const createConfig = (path: OutputPath, markerDuration = 500) => {
 			payer: {
 				...base.items.blocker,
 				uid: "payer",
+				lines: [
+					{
+						uid: "payer:termination",
+						title: "Payer termination",
+						trigger: "item-termination",
+						runtimeMs: 0,
+						input: [],
+						outcome: outcome("result", true),
+						rules: [],
+					},
+				],
 				units: {
 					amount: 1,
-					outcome: outcome("result", true),
 				},
 			},
 			producer: {
@@ -123,10 +133,22 @@ export const createConfig = (path: OutputPath, markerDuration = 500) => {
 					path === "deferred-depletion"
 						? {
 								amount: 1,
-								outcome: outcome("result", true),
 							}
 						: undefined,
 				lines: [
+					...(path === "deferred-depletion"
+						? [
+								{
+									uid: "producer:termination",
+									title: "Producer termination",
+									trigger: "item-termination" as const,
+									runtimeMs: 0,
+									input: [],
+									outcome: outcome("result", true),
+									rules: [],
+								},
+							]
+						: []),
 					{
 						...line,
 						runtimeMs: 600,

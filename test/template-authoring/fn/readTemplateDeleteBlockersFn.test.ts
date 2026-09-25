@@ -45,13 +45,13 @@ it("blocks deleting a generated-room template referenced by every outcome owner 
 						outcome,
 					}),
 					createExpiryLine(outcome, "line:A-expiry"),
+					createExpiryLine(outcome, "line:A-depletion"),
 				],
 				clock: {
 					durationMs: 1000,
 				},
 				units: {
 					amount: 1,
-					outcome,
 				},
 				merge: [
 					{
@@ -109,7 +109,8 @@ it("blocks deleting a generated-room template referenced by every outcome owner 
 			[
 				"items",
 				"A",
-				"units",
+				"lines",
+				2,
 				"outcome",
 				...tail,
 			],

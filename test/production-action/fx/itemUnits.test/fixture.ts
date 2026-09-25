@@ -115,6 +115,16 @@ export const base = ({ id }: { id: string }) => ({
 	},
 });
 
+const terminationLineFn = (uid: string, result: ReturnType<typeof outcome>) => ({
+	uid,
+	title: "Depletion",
+	trigger: "item-termination" as const,
+	runtimeMs: 0,
+	input: [],
+	outcome: result,
+	rules: [],
+});
+
 export const unitsConfig = GameConfigSchema.parse({
 	resources: {
 		hero: "hero",
@@ -139,10 +149,10 @@ export const unitsConfig = GameConfigSchema.parse({
 
 			units: {
 				amount: 2,
-				outcome: outcome("item:dust"),
 			},
 			maxQueueSize: 2,
 			lines: [
+				terminationLineFn("line:shrine:depletion", outcome("item:dust")),
 				{
 					uid: "line:shrine:pray",
 					title: "Pray",
@@ -362,7 +372,9 @@ export const unitsConfig = GameConfigSchema.parse({
 		},
 		"units:sapling": {
 			maxQueueSize: 1,
-			lines: [],
+			lines: [
+				terminationLineFn("line:sapling:depletion", outcome("item:seed")),
+			],
 
 			...base({
 				id: "units:sapling",
@@ -370,7 +382,6 @@ export const unitsConfig = GameConfigSchema.parse({
 
 			units: {
 				amount: 1,
-				outcome: outcome("item:seed"),
 			},
 		},
 		"units:empty": {
@@ -387,7 +398,9 @@ export const unitsConfig = GameConfigSchema.parse({
 		},
 		"units:messy": {
 			maxQueueSize: 1,
-			lines: [],
+			lines: [
+				terminationLineFn("line:messy:depletion", outcome("item:seed", "item:trash")),
+			],
 
 			...base({
 				id: "units:messy",
@@ -395,7 +408,6 @@ export const unitsConfig = GameConfigSchema.parse({
 
 			units: {
 				amount: 1,
-				outcome: outcome("item:seed", "item:trash"),
 			},
 		},
 		"item:gift": {

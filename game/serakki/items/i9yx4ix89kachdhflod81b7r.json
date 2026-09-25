@@ -124,7 +124,7 @@
 				"title": "Complete Contract",
 				"artwork": "uy7kf2yffldzm1s74bjzt85n",
 				"description": "Deliver the requested goods. The contract is consumed when the trade is completed.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

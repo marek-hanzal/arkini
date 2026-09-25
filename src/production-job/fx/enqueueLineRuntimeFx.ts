@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { isLineAdmissionOpenFn } from "~/production-line/fn/isLineAdmissionOpenFn";
 import { LineRunUnavailableError } from "~/production-line/error/LineRunUnavailableError";
+import { LineTriggerEnumSchema } from "~/production-line/schema/LineTriggerEnumSchema";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
@@ -18,7 +19,7 @@ export namespace enqueueLineRuntimeFx {
 		readonly lineUid: IdSchema.Type;
 		readonly ownerItemId: IdSchema.Type;
 		readonly runtime: RuntimeSchema.Type;
-		readonly allowTerminalLine?: boolean;
+		readonly trigger?: LineTriggerEnumSchema.Type;
 	}
 
 	export interface Result {
@@ -38,17 +39,18 @@ export const enqueueLineRuntimeFx = Effect.fn("enqueueLineRuntimeFx")(function* 
 	lineUid,
 	ownerItemId,
 	runtime,
-	allowTerminalLine = false,
+	trigger = LineTriggerEnumSchema.enum.manual,
 }: enqueueLineRuntimeFx.Props) {
 	const owner = yield* readRuntimeItemByIdFx({
 		itemId: ownerItemId,
 		runtime,
 	});
 	if (
+		owner.item.lines.find((line) => line.uid === lineUid)?.trigger !== trigger ||
 		!isLineAdmissionOpenFn({
 			owner,
 			lineUid,
-			allowTerminalLine,
+			allowTerminalLine: trigger === LineTriggerEnumSchema.enum["item-termination"],
 		})
 	)
 		return yield* Effect.fail(

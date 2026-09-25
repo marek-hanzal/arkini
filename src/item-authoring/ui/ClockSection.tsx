@@ -76,26 +76,6 @@ const ClockFields = () => {
 						</form.AppField>
 						<ItemInterfaceField />
 					</div>
-					<EditorChoiceControl
-						disabled={clock.durationMs === undefined}
-						label={translator.textFn("Expiry mode")}
-						value={clock.expiryMode ?? "loose-kill"}
-						options={[
-							{
-								value: "loose-kill",
-								label: translator.textFn("Loose-kill"),
-								description: <Mx label="Clock loose-kill help" />,
-							},
-							{
-								value: "kill-switch",
-								label: translator.textFn("Kill switch"),
-								description: <Mx label="Clock kill-switch help" />,
-							},
-						]}
-						onChangeFn={(expiryMode) =>
-							form.setFieldValue("clock.expiryMode", expiryMode)
-						}
-					/>
 				</div>
 				<SectionEnd />
 			</EditorFormCard>
@@ -140,7 +120,7 @@ export const ClockSection = () => {
 	const translator = useTranslator();
 	const hasClockLines = useStore(
 		form.store,
-		(state) => state.values.lines?.some((line) => line.clock !== undefined) ?? false,
+		(state) => state.values.lines?.some((line) => line.trigger === "clock-interval") ?? false,
 	);
 	return (
 		<form.Subscribe selector={(state) => state.values.clock}>

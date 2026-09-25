@@ -2,7 +2,6 @@ import { readItemScheduleFn } from "~/item-schedule/fn/readItemScheduleFn";
 import type { ItemScheduleIssueSchema } from "~/item-schedule/schema/ItemScheduleIssueSchema";
 import { RuntimeCheckIssueEnumSchema } from "~/game-runtime/schema/RuntimeCheckIssueEnumSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { LineClockModeEnumSchema } from "~/production-line/schema/LineClockModeEnumSchema";
 
 /** Validates phase/lifetime against the immutable schedule, including exhausted saved owners. */
 export const checkRuntimeItemSchedulesFn = (
@@ -34,19 +33,6 @@ export const checkRuntimeItemSchedulesFn = (
 					state.remainingDurationMs > config.durationMs
 		)
 			reason = "invalid-lifetime";
-		else if (
-			state.lineUids !== undefined &&
-			(new Set(state.lineUids).size !== state.lineUids.length ||
-				state.lineUids.some(
-					(id) =>
-						!item.item.lines.some(
-							(line) =>
-								line.uid === id &&
-								line.clock !== LineClockModeEnumSchema.enum["clock-lifetime"],
-						),
-				))
-		)
-			reason = "invalid-line";
 		if (reason !== undefined)
 			issues.push({
 				type: RuntimeCheckIssueEnumSchema.enum.ItemSchedule,

@@ -3,12 +3,14 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { GameEventEnumSchema } from "~/game-event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/game-event/schema/GameEventSchema";
+import type { EngineFact } from "~/game-event/type/EngineFact";
 import { assertOwnerIdleFx } from "~/production-job/fx/assertOwnerIdleFx";
 import type { RevisionSchema } from "~/item-revision/schema/RevisionSchema";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { removeRuntimeItemFx } from "~/game-runtime/fx/removeRuntimeItemFx";
 import { readRuntimeCommandTargetFx } from "~/game-runtime/fx/readRuntimeCommandTargetFx";
+import { cancelItemTerminationWorkFx } from "~/item-terminal/fx/cancelItemTerminationWorkFx";
 
 export namespace removeItemRuntimeTransitionFx {
 	export interface Props {
@@ -18,7 +20,7 @@ export namespace removeItemRuntimeTransitionFx {
 	}
 
 	export interface Result {
-		readonly events: readonly GameEventSchema.Type[];
+		readonly events: readonly EngineFact[];
 		readonly item: RuntimeItemSchema.Type;
 		readonly runtime: RuntimeSchema.Type;
 	}
@@ -35,9 +37,13 @@ export const removeItemRuntimeTransitionFx = Effect.fn("removeItemRuntimeTransit
 		revision,
 		runtime,
 	});
+	const cancelled = yield* cancelItemTerminationWorkFx({
+		itemId: item.id,
+		runtime,
+	});
 	yield* assertOwnerIdleFx({
 		ownerItemId: item.id,
-		runtime,
+		runtime: cancelled.runtime,
 	});
 
 	const disappearedEvent = {
@@ -48,11 +54,12 @@ export const removeItemRuntimeTransitionFx = Effect.fn("removeItemRuntimeTransit
 	} satisfies GameEventSchema.Type;
 	const removal = yield* removeRuntimeItemFx({
 		item,
-		runtime,
+		runtime: cancelled.runtime,
 	});
 
 	return {
 		events: [
+			...cancelled.facts,
 			disappearedEvent,
 			...removal.events,
 		],

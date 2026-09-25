@@ -22,7 +22,7 @@
 				"title": "Build Architect - Tier 1",
 				"artwork": "aj95mj8sdw2q1ciy8ifjzsyq",
 				"description": "Build a small architect's office from processed wood and stone.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

@@ -83,7 +83,7 @@ const expiryLineFn = (
 	uid,
 	title: "Expiry",
 	description: "Expiry",
-	clock: "clock-lifetime",
+	trigger: "item-termination",
 	runtimeMs: 0,
 	input: [],
 	outcome,

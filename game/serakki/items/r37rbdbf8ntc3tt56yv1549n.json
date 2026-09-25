@@ -18,7 +18,7 @@
 				"title": "Labor - Tier 1",
 				"artwork": "sra85ynvaeomomrdk79d61lx",
 				"description": "Serve a cooked steak to the household and free up ordinary skilled hands for useful work. Someone still has to wash the pan.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": false,
 				"show": true,
 				"enable": true,

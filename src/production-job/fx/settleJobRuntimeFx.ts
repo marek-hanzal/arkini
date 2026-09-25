@@ -10,7 +10,6 @@ import type { BoardRuntimeItemSchema } from "~/game-runtime/schema/BoardRuntimeI
 import type { ReservedRuntimeItemSchema } from "~/game-runtime/schema/ReservedRuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import type { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
-import { makeUnitDepletionRandomFx } from "~/production-job/fx/makeUnitDepletionRandomFx";
 import { resolveOutcomeTableFx } from "~/outcome/fx/resolveOutcomeTableFx";
 import { applyOutcomeTableFx } from "~/outcome/fx/applyOutcomeTableFx";
 import type { AppliedOutcome } from "~/outcome/type/AppliedOutcome";
@@ -28,7 +27,7 @@ export namespace settleJobRuntimeFx {
 		readonly owner: BoardRuntimeItemSchema.Type;
 		readonly lineOutcome?: OutcomeTableSchema.Type;
 		readonly ownerExit?: {
-			readonly cause: "expired";
+			readonly cause: "expired" | "depleted";
 			readonly overflow?: "discard";
 		};
 		readonly reservations: readonly ReservedRuntimeItemSchema.Type[];
@@ -43,7 +42,7 @@ export namespace settleJobRuntimeFx {
 
 /**
  * Settles completion or material abort after the job and consumed roots are detached.
- * A depleted owner's cell is freed before outcome and returns; abort supplies no line outcome.
+ * A terminal line frees its owner's cell before outcome and returns; abort supplies no line outcome.
  * Outcome conditions read the caller-provided input snapshot, never this partial draft.
  */
 export const settleJobRuntimeFx = Effect.fn("settleJobRuntimeFx")(function* (
@@ -54,25 +53,22 @@ export const settleJobRuntimeFx = Effect.fn("settleJobRuntimeFx")(function* (
 			runtime: context.runtime,
 			facts: [],
 		} satisfies settleJobRuntimeFx.Result;
-	const depleted = context.owner.item.units !== undefined && context.owner.remainingUnits === 0;
-	const removeOwner = depleted || context.ownerExit !== undefined;
+	const removeOwner = context.ownerExit !== undefined;
 	const overflow = context.ownerExit?.overflow ?? context.overflow;
 	let draft = context.runtime;
 	let removalEvents: readonly GameEventSchema.Type[] = [];
 	let lineEffects: readonly AppliedOutcome[] = [];
 	let lineDiscarded: readonly planBestEffortDropPlacementFx.Discarded[] = [];
-	let depletionEffects: readonly AppliedOutcome[] = [];
-	let depletionDiscarded: readonly planBestEffortDropPlacementFx.Discarded[] = [];
 
 	if (removeOwner) {
-		const withoutDepletedOwnerQueue = {
+		const withoutOwnerQueue = {
 			...draft,
 			jobQueue: draft.jobQueue.filter((request) => request.ownerItemId !== context.owner.id),
 		};
 		const removed = yield* removeRuntimeItemIdentityFx({
 			ownershipRuntime: yield* (yield* RuntimeFx).read,
 			item: context.owner,
-			runtime: withoutDepletedOwnerQueue,
+			runtime: withoutOwnerQueue,
 		});
 		draft = removed.runtime;
 		removalEvents = removed.events;
@@ -97,27 +93,6 @@ export const settleJobRuntimeFx = Effect.fn("settleJobRuntimeFx")(function* (
 		draft = withLineOutcome;
 	}
 
-	if (depleted && context.owner.item.units?.outcome !== undefined) {
-		const depletionOutcome = yield* makeUnitDepletionRandomFx({
-			itemId: context.owner.id,
-			job: context.job,
-			program: resolveOutcomeTableFx({
-				ownerItemId: context.owner.id,
-				origin: context.owner.location,
-				outcome: context.owner.item.units.outcome,
-			}),
-		});
-		if (depletionOutcome.roll.length > 0) {
-			const [placement, withDepletionOutcome] = yield* applyOutcomeTableFx({
-				outcome: depletionOutcome,
-				overflow,
-				runtime: draft,
-			});
-			depletionEffects = placement.effects;
-			depletionDiscarded = placement.discarded;
-			draft = withDepletionOutcome;
-		}
-	}
 	let releasedInputEvents: readonly GameEventSchema.Type[] = [];
 	if (removeOwner) {
 		const releasedInputs = yield* releaseOwnerInputsFx({
@@ -138,9 +113,7 @@ export const settleJobRuntimeFx = Effect.fn("settleJobRuntimeFx")(function* (
 		runtime: draft,
 	});
 	const finalRuntime = releasedReservations.runtime;
-	const replacementItemIds = (
-		context.ownerExit !== undefined ? lineEffects : depletionEffects
-	).flatMap((effect) =>
+	const replacementItemIds = lineEffects.flatMap((effect) =>
 		effect.type === "item" ? effect.placement.spawn.map((spawned) => spawned.id) : [],
 	);
 	const facts: EngineFact[] = [
@@ -149,7 +122,7 @@ export const settleJobRuntimeFx = Effect.fn("settleJobRuntimeFx")(function* (
 			? [
 					{
 						type: "lifecycle:settled",
-						cause: context.ownerExit?.cause ?? "depleted",
+						cause: context.ownerExit?.cause ?? "expired",
 						itemId: context.owner.id,
 						itemUid: context.owner.item.uid,
 						location: context.owner.location,
@@ -173,26 +146,10 @@ export const settleJobRuntimeFx = Effect.fn("settleJobRuntimeFx")(function* (
 				ownerItemId: context.owner.id,
 				itemUid: loss.itemUid,
 				quantity: loss.quantity,
-				source: "expiry-outcome",
-				reason: loss.reason,
-			}),
-		),
-		...(depletionEffects.length > 0
-			? [
-					{
-						type: "outcome:applied",
-						originItemId: context.owner.id,
-						effects: depletionEffects,
-					} satisfies EngineFact,
-				]
-			: []),
-		...depletionDiscarded.map(
-			(loss): GameEventSchema.Type => ({
-				type: GameEventEnumSchema.enum.ItemDiscarded,
-				ownerItemId: context.owner.id,
-				itemUid: loss.itemUid,
-				quantity: loss.quantity,
-				source: "depletion-outcome",
+				source:
+					context.ownerExit?.cause === "depleted"
+						? "depletion-outcome"
+						: "expiry-outcome",
 				reason: loss.reason,
 			}),
 		),

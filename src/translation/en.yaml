@@ -79,8 +79,6 @@ Artwork usage help:
   value: Shows every saved Item that references this Artwork.
 Assigned:
   value: Assigned
-At lifetime expiry, selects this line by weight. On a Board it runs as a Job; inside another item or Job, its output settles immediately without inputs or runtime.:
-  value: At lifetime expiry, selects this line by weight. On a Board it runs as a Job; inside another item or Job, its output settles immediately without inputs or runtime.
 Audio not found:
   value: Audio not found
 Authored Clock interval summary help:
@@ -88,17 +86,11 @@ Authored Clock interval summary help:
     How often the Clock selects one eligible weighted production line.
 
     **None** means no repeating production. Lifetime can still expire.
-Authored Clock kill-switch summary help:
-  value: |
-    **Stop immediately** cancels earlier work when Lifetime ends. A selected expiry line still runs to completion on the Board; output that cannot fit is discarded.
 Authored Clock lifetime summary help:
   value: |
     How long the item may exist before it expires, including while held as input or inside a job.
 
     **Unlimited** means it never expires on its own.
-Authored Clock loose-kill summary help:
-  value: |
-    **Wait for output** lets started jobs finish before the expired item disappears. If output has nowhere to go, the item waits too.
 Authored Clock status summary help:
   value: |
     The Clock's starting state.
@@ -117,8 +109,6 @@ Authored Units amount summary help:
     Units stored inside each new item.
 
     Each item keeps its own supply.
-Authored Units depletion outcome summary help:
-  value: Authored Units depletion outcome summary help
 Authored Units summary help:
   value: |
     Units are a spendable supply inside each item.
@@ -312,8 +302,6 @@ Clear lifetime:
   value: Clear lifetime
 Clock:
   value: Clock
-Clock - Expiry:
-  value: Clock - Expiry
 Clock - Interval:
   value: Clock - Interval
 Clock expiry output:
@@ -326,11 +314,6 @@ Clock interval help:
     How often the Clock selects one eligible weighted production line while the item is on a Board.
 
     Failed rules or a full queue skip that attempt. Leave empty for Lifetime only.
-Clock kill-switch help:
-  value: |
-    **Stop immediately** cancels earlier work when Lifetime ends. A selected expiry line on the Board still runs for its authored time.
-
-    At completion, output and returned material that cannot fit are lost. An item held inside another job expires immediately.
 Clock lifetime help:
   value: |
     How long this item remains alive before expiring.
@@ -339,16 +322,9 @@ Clock lifetime help:
 Clock loop:
   value: Clock repeats
   dynamic: true
-Clock loose-kill help:
-  value: |
-    **Wait for output** lets started jobs finish before the expired item disappears.
-
-    If the output has nowhere to go, the item waits too.
 Clock production lines help:
   value: |
-    Each Clock line is an ordinary production job selected by weight when its timer fires. Choose Interval or Expiry when adding a line. Its inputs, rules, runtime and outcomes use the same controls as other production lines.
-
-    Interval lines run at Clock pulses; Expiry lines are selected when the lifetime ends.
+    Each interval line is an ordinary production job selected by weight when the Clock pulses. Its inputs, rules, runtime and outcomes use the same controls as manual production lines.
 Clock rules help:
   value: |
     These rules pause or resume the Clock.
@@ -362,13 +338,6 @@ Clock status help:
     - **Disabled:** it waits until an Enable rule turns it on.
 
     Rules are checked after this setting. Changing it keeps the timers and output.
-Clock weight:
-  value: Clock weight
-Clock weight help:
-  value: |
-    Relative chance of selecting this line among enabled Clock lines after their rules are evaluated.
-
-    Use a whole number from 1 to 999. A weight of 3 is three times as likely as a weight of 1. If no line is eligible, the interval does nothing; a failed queue attempt does not select another line.
 Close:
   value: Close
   dynamic: true
@@ -456,10 +425,6 @@ Deleting this audio also removes the assignments listed below.:
   value: Deleting this audio also removes the assignments listed below.
 Deleting this template removes its saved board layout from the project.:
   value: Deleting this template removes its saved board layout from the project.
-Depletion outcome:
-  value: Depletion outcome
-Depletion outcome help:
-  value: Depletion outcome help
 Depth:
   value: Depth
 Depth limit:
@@ -604,10 +569,6 @@ Exists:
   value: Exists
 Exit:
   value: Exit
-Expiry mode:
-  value: When time runs out
-Expiry outcome:
-  value: Expiry outcome
 Exploration limit:
   value: Exploration limit
   dynamic: true
@@ -864,6 +825,8 @@ Item sent through portal:
 Item spawned:
   value: Item spawned
   dynamic: true
+Item termination:
+  value: Item termination
 Item unavailable:
   value: Item unavailable
 Item units empty title:
@@ -1070,7 +1033,7 @@ Merge with help:
 
     This item is the dragged item. **Source action** decides whether it stays, disappears, or spends a Unit. **Target effect** decides what happens to the item receiving it.
 
-    Extra **Merge outcome** rules use the dragged item's Board position, and local results appear near it. If the target runs out of Units, its separate depletion outcome uses the target's own position.
+    Extra **Merge outcome** rules use the dragged item's Board position, and local results appear near it. If the target runs out of Units, its terminal line uses the target's own position.
 
     Dragging the chosen item back onto this one does not trigger the same rule. That direction needs its own merge rule on the other item.
 Merges:
@@ -1153,8 +1116,6 @@ No authored operation owned by this item outputs another item.:
   dynamic: true
 No configured Space matches this search.:
   value: No configured Space matches this search.
-No depletion outcome configured.:
-  value: No depletion outcome configured.
 No extra outcome configured.:
   value: No extra outcome configured.
 No image selected:
@@ -1482,8 +1443,6 @@ Remove project:
   value: Remove project
 Remove project?:
   value: Remove project?
-Remove the unit depletion outcome from:
-  value: Remove the unit depletion outcome from
 Rename:
   value: Rename
 Rename project:
@@ -1766,6 +1725,19 @@ Templates help:
     Each template has a stable **UID**. Changing its title or contents keeps that identity. Templates have their own dimensions; the project board size only supplies the initial dimensions when creating one.
 
     A template has no Space number. The same layout can be used for different spaces. Templates are included in the Serapack. A new game creates independent items for each assigned Space. Saved games keep their existing items. Board dimensions always come from the loaded Serapack’s assigned template, or the project defaults for unassigned spaces.
+Termination kill-switch help:
+  value: |
+    Cancels earlier jobs and queued work when the item runs out of lifetime or units. One eligible termination line can still run as a Job. Its completed output and the item removal settle together.
+Termination lines:
+  value: Termination lines
+Termination lines help:
+  value: |
+    When the item's lifetime or units run out, one eligible line is selected by weight. On the Board it runs as an ordinary Job. Removing the item for another reason does not run these lines.
+Termination loose-kill help:
+  value: |
+    Lets already accepted work finish before the item ends. Then one eligible termination line can run as a Job. If its output has nowhere to go, the completed Job waits for space.
+Termination mode:
+  value: Termination mode
 That's everything you can make for now!:
   value: That's everything you can make for now!
 The project changed. Refresh and try again.:
@@ -1810,6 +1782,8 @@ Title:
   value: Title
 Transport incoming item:
   value: Transport incoming item
+Trigger:
+  value: Trigger
 Try a different search or change the active filters.:
   value: Try another search or change the **active filters**.
 Try a different search.:
@@ -1872,6 +1846,11 @@ Volume:
   value: Volume
 Weight:
   value: Weight
+Weight help:
+  value: |
+    Relative chance of selecting this line among eligible lines with the same trigger after their rules are evaluated.
+
+    Use a whole number from 1 to 999. A weight of 3 is three times as likely as a weight of 1. If no line is eligible, the trigger has no output; a failed queue attempt does not select another line.
 When Autofill starts bringing materials to a production line.:
   value: When Autofill starts bringing materials to a production line.
   dynamic: true
@@ -1950,8 +1929,6 @@ chance:
   value: chance
 clock:
   value: clock
-clock-lifetime:
-  value: clock-lifetime
 conditions:
   value: conditions
 consume:
@@ -1966,10 +1943,14 @@ from:
   value: from
 from the game.:
   value: from the game.
+item-termination:
+  value: item-termination
 kill-switch:
   value: stop immediately
 managed:
   value: managed
+manual:
+  value: manual
 music:
   value: music
 ngrok tunnel:
@@ -1992,6 +1973,8 @@ simple:
   value: simple
 space:
   value: space
+termination:
+  value: termination
 unit from owner:
   value: unit from this item
 unit from target:

@@ -22,7 +22,7 @@
 				"title": "Build Charcoal Kiln",
 				"artwork": "f5k76d90k3ibro2tzlio4znd",
 				"description": "Build a compact kiln from processed wood and stone.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

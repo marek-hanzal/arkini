@@ -22,7 +22,7 @@
 				"artwork": "ksit8kkq7m33yr8qf8h9mwh0",
 				"description": "Wanna some crispy bread or something?",
 				"default": true,
-				"clockWeight": 1,
+				"weight": 1,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 30000,

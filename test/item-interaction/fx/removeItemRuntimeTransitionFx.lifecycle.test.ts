@@ -12,6 +12,7 @@ import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/support/jobTestConfig";
+import { removeItemRuntimeTransitionFx } from "~/item-interaction/fx/removeItemRuntimeTransitionFx";
 
 const startProps = {
 	ownerItemId: "runtime:forge",
@@ -76,6 +77,87 @@ const prepareIdleOwnerInputsFx = Effect.fn("prepareIdleOwnerInputsFx")(function*
 });
 
 describe("removeItemRuntimeTransitionFx owner lifecycle", () => {
+	it.each([
+		"queued",
+		"running",
+	] as const)(
+		"cancels %s termination work when an unrelated removal deletes its owner",
+		(work) => {
+			const config = createJobTestConfig();
+			const terminalConfig = {
+				...config,
+				items: {
+					...config.items,
+					forge: {
+						...config.items.forge,
+						lines: config.items.forge.lines.map((line) => ({
+							...line,
+							trigger: "item-termination" as const,
+							input: [],
+						})),
+					},
+				},
+			};
+			const result = Effect.runSync(
+				Effect.gen(function* () {
+					const owner = yield* spawnItemFx({
+						id: "runtime:forge",
+						itemUid: "forge",
+						location: {
+							scope: "board",
+							space: 0,
+							position: {
+								x: 0,
+								y: 0,
+							},
+						},
+					});
+					const runtime = yield* readRuntimeFx();
+					const withWork = {
+						...runtime,
+						jobQueue:
+							work === "queued"
+								? [
+										{
+											id: "request:termination",
+											ownerItemId: owner.id,
+											lineUid: "line:forge:run",
+										},
+									]
+								: [],
+						jobs:
+							work === "running"
+								? [
+										{
+											id: "job:termination",
+											ownerItemId: owner.id,
+											lineUid: "line:forge:run",
+											durationMs: 1000,
+											remainingMs: 500,
+										},
+									]
+								: [],
+					};
+					return yield* removeItemRuntimeTransitionFx({
+						itemId: owner.id,
+						revision: owner.revision,
+						runtime: withWork,
+					});
+				}).pipe(
+					useGameFx({
+						config: terminalConfig,
+					}),
+				),
+			);
+			expect(result.runtime.items.some((item) => item.id === "runtime:forge")).toBe(false);
+			expect(result.runtime.jobQueue).toEqual([]);
+			expect(result.runtime.jobs).toEqual([]);
+			expect(result.events.filter((event) => event.type === "job:aborted")).toHaveLength(
+				work === "running" ? 1 : 0,
+			);
+		},
+	);
+
 	it("rejects removing an owner with active and queued work", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {

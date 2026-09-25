@@ -12,6 +12,7 @@ import { ItemDetailSectionHeader } from "~/item-authoring/ui/ItemDetailSectionHe
 import { DetailFact } from "~/item-authoring/ui/DetailDefinition";
 import { ConnectionsSummaryDetail } from "~/item-authoring/ui/ConnectionsSummaryDetail";
 import { Mx } from "~/translation/ui/Mx";
+import { ProductionDetail } from "~/item-authoring/ui/ProductionDetail";
 
 /** Presents the authored identity and storage contract of one item. */
 export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
@@ -149,6 +150,28 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 				/>
 			</section>
 			<ConnectionsSummaryDetail item={item} />
+			<section
+				className="col-span-2 grid gap-3"
+				data-ui="EditorItemTerminationDetail"
+			>
+				<ItemDetailSectionHeader
+					itemUid={item.uid}
+					sectionId="identity"
+					title={translator.textFn("Item termination")}
+				/>
+				<EditorRootCard dataUi="EditorItemTerminationCard">
+					<DetailFact
+						label={translator.textFn("Termination mode")}
+						value={translator.textFn(
+							item.terminationMode === "kill-switch" ? "Kill switch" : "Loose-kill",
+						)}
+					/>
+				</EditorRootCard>
+				<ProductionDetail
+					item={item}
+					kind="termination"
+				/>
+			</section>
 		</div>
 	);
 };

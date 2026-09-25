@@ -22,7 +22,7 @@
 				"title": "Build Rapeseed Farm",
 				"artwork": "w9p7m4v0s8q3pjmbvpc7xda4",
 				"description": "Build Rapeseed Farm.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

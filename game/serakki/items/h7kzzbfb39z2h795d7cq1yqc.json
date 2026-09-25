@@ -22,7 +22,7 @@
 				"title": "Apiary",
 				"artwork": "wvvpfewnw4oxnti4ljsn4w9o",
 				"description": "Bees bees bees",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

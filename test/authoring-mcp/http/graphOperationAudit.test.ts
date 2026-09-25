@@ -23,6 +23,11 @@ it("admits operation search and scalar filters over MCP and roundtrips compact c
 			expectedRevision: initial.revision,
 			item: {
 				...puppy,
+				clock: {
+					intervalMs: 1_000,
+					enable: true,
+					rules: [],
+				},
 				lines: [
 					"Digest",
 					"Digest Meal",
@@ -31,10 +36,10 @@ it("admits operation search and scalar filters over MCP and roundtrips compact c
 					...puppy.lines[0]!,
 					uid: `audit-line-${index}`,
 					title,
-					clock: "clock-interval",
+					trigger: "clock-interval",
 					show: false,
 					enable: true,
-					clockWeight: 20,
+					weight: 20,
 				})),
 			},
 		}),
@@ -48,10 +53,10 @@ it("admits operation search and scalar filters over MCP and roundtrips compact c
 			scope: "title",
 		},
 		filter: {
-			clock: true,
+			trigger: "clock-interval",
 			show: false,
 			enable: true,
-			clockWeight: {
+			weight: {
 				gt: 15,
 			},
 		},
@@ -100,17 +105,17 @@ it("admits operation search and scalar filters over MCP and roundtrips compact c
 	expect(hydrated.operations.map((operation) => operation.data)).toMatchObject([
 		{
 			title: "Digest",
-			clock: "clock-interval",
+			trigger: "clock-interval",
 			show: false,
 			enable: true,
-			clockWeight: 20,
+			weight: 20,
 		},
 		{
 			title: "Digest Meal",
-			clock: "clock-interval",
+			trigger: "clock-interval",
 			show: false,
 			enable: true,
-			clockWeight: 20,
+			weight: 20,
 		},
 	]);
 	expect(

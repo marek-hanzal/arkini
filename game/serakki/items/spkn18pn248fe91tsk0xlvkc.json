@@ -22,7 +22,7 @@
 				"title": "Build Townhall II",
 				"artwork": "dtuzdkf4lo7h6azmdgpv059f",
 				"description": "Upgrade the settlement using processed materials, available labor, and enough knowledge to avoid calling it a bigger shed.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

@@ -107,7 +107,7 @@ export const readGraphSchemaTextFn = () =>
 			connections:
 				"graph_connections requires from, optionally to as an exact direct counterpart. direction defaults both; kinds restricts relationship occurrences. Results are relationship-oriented and may group occurrences belonging to the same authored operation without losing distinct facts. limit counts relationship occurrences, not visual groups. Pages may return Cursor for remaining relationships.",
 			operations:
-				"graph_operations has no root node. Combine operationKinds, owner, participant, role, search and filter. Search scopes title, owner, participant or all (default) reuse the Editor exact-first Fuse configuration; matching is fuzzy, not a strict substring predicate, and relevance order persists across pages. Scalar filters combine with AND: hasOutcomes; merge action/effect/ownership; line clock/default/show; line or Clock enable; runtimeSeconds, clockWeight, durationSeconds and intervalSeconds ranges (gte/lte inclusive, gt/lt exclusive). A missing property never matches, including false. Operations with no edges remain discoverable.",
+				"graph_operations has no root node. Combine operationKinds, owner, participant, role, search and filter. Search scopes title, owner, participant or all (default) reuse the Editor exact-first Fuse configuration; matching is fuzzy, not a strict substring predicate, and relevance order persists across pages. Scalar filters combine with AND: hasOutcomes; merge action/effect/ownership; line clock/default/show; line or Clock enable; runtimeSeconds, weight, durationSeconds and intervalSeconds ranges (gte/lte inclusive, gt/lt exclusive). A missing property never matches, including false. Operations with no edges remain discoverable.",
 			aggregation:
 				"graph_operations.aggregate selects {mode: count} or {mode: group, by: kind|owner|action|effect|ownership|lineTitle}. The same kind/owner/participant/role/Fuse/scalar filters apply before aggregation. Count returns no operation records. Grouping counts the whole filtered index before applying limit to groups, sorted by count descending then exact group key. Owner groups include title and exact node ID; absent properties form a Not applicable group. Complete counts remain exact even when group pages are truncated. Expansion/timeout interruption yields only explicit lower bounds, no definitive total or stable ranked continuation: retry the original query with larger bounds. Completed grouped scans return snapshot-bound cursors for remaining groups. Aggregation is available unchanged in graph_batch.",
 			participants:
@@ -244,7 +244,7 @@ export const readGraphSchemaTextFn = () =>
 						clock: true,
 						show: false,
 						enable: true,
-						clockWeight: {
+						weight: {
 							gt: 15,
 						},
 					},

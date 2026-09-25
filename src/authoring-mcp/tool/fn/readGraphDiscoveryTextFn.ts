@@ -59,10 +59,10 @@ const operationDetailsFn = (operation: GraphDiscoveryOperation): readonly string
 				`lineUid=${identityFn(line.lineUid)}`,
 				`runtimeSeconds=${line.runtimeSeconds}`,
 				`default=${line.default}`,
-				`clock=${line.clock}`,
-				...(line.clock
+				`trigger=${line.trigger}`,
+				...(line.trigger !== "manual"
 					? [
-							`clockWeight=${line.clockWeight}`,
+							`weight=${line.weight}`,
 						]
 					: []),
 				`show=${line.show}`,
@@ -96,13 +96,7 @@ const operationDetailsFn = (operation: GraphDiscoveryOperation): readonly string
 					: [
 							`durationSeconds=${clock.durationSeconds}`,
 						]),
-				...(clock.expiryMode === undefined
-					? []
-					: [
-							`expiryMode=${clock.expiryMode}`,
-						]),
 				`enable=${clock.enable}`,
-				`expiry outcomes=${clock.hasOutcomes}`,
 			],
 		)
 		.with(
@@ -111,7 +105,6 @@ const operationDetailsFn = (operation: GraphDiscoveryOperation): readonly string
 			},
 			(depletion) => [
 				`units=${depletion.amount}`,
-				`depletion outcomes=${depletion.hasOutcomes}`,
 			],
 		)
 		.exhaustive(),

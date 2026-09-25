@@ -156,7 +156,6 @@ describe("forceDeleteFx", () => {
 					],
 					units: {
 						amount: 1,
-						outcome: waterOutput,
 					},
 				},
 				producer: createProducerItem({
@@ -211,9 +210,6 @@ describe("forceDeleteFx", () => {
 				},
 			],
 			removedClockRules: [],
-			removedUnitOutcomeOwnerIds: [
-				"oil",
-			],
 			removedLines: [
 				{
 					ownerItemUid: "producer",

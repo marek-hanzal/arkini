@@ -40,7 +40,7 @@ const graphArgumentKeys = new Set([
 	"show",
 	"enable",
 	"runtimeSeconds",
-	"clockWeight",
+	"weight",
 	"durationSeconds",
 	"intervalSeconds",
 	"gte",

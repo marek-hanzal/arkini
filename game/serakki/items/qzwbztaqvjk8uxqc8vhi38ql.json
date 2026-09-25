@@ -18,7 +18,7 @@
 				"title": "Advanced Education",
 				"artwork": "iemadnvneo3fyth0vg8oszrt",
 				"description": "Build on established knowledge using Tier 2 labor and paper to produce more advanced understanding.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

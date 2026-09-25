@@ -13,6 +13,7 @@ import type { ItemNotOnGridError } from "~/item-location/error/ItemNotOnGridErro
 import type { PlacementPlanInvalidError } from "~/item-placement/error/PlacementPlanInvalidError";
 import type { PlacementUnavailableError } from "~/item-placement/error/PlacementUnavailableError";
 import type { ItemNotFoundError } from "~/item-resolution/error/ItemNotFoundError";
+import type { ItemUnitsUnavailableError } from "~/production-action/error/ItemUnitsUnavailableError";
 import type { InputRunPlanInvalidError } from "~/production-input/error/InputRunPlanInvalidError";
 import type { JobNotFoundError } from "~/production-job/error/JobNotFoundError";
 import type { JobNotReadyError } from "~/production-job/error/JobNotReadyError";
@@ -37,6 +38,7 @@ export type AdvanceRuntimeElapsedError =
 	| TemplateNotFoundError
 	| RuntimeInvalidError
 	| ItemNotFoundError
+	| ItemUnitsUnavailableError
 	| ItemNotOnBoardError
 	| ItemNotOnGridError
 	| ItemStatefulError

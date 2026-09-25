@@ -91,7 +91,7 @@ describe("editor MCP item line replacement", () => {
 			...firstLine,
 			title: "Replacement line",
 			description: "Completely replaced.",
-			clockWeight: 7,
+			weight: 7,
 			runtimeMs: 2_000,
 			default: true,
 			show: false,

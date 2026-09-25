@@ -317,14 +317,19 @@ it("does not invent a template destination from an earlier Space outcome", () =>
 	);
 });
 
-it("retains authored Clock flags and outcomes even when no executable schedule connects them", () => {
+it("retains authored interval and termination line outcomes when clocks are disabled", () => {
 	const facts = compileGraphFactsFn(
 		configFn({
 			A: itemFn("A", {
+				clock: {
+					intervalMs: 100,
+					enable: false,
+					rules: [],
+				},
 				lines: [
 					lineFn("L", {
-						clock: "clock-interval",
-						clockWeight: 3,
+						trigger: "clock-interval",
+						weight: 3,
 						outcome: outputFn("B"),
 					}),
 				],
@@ -347,8 +352,8 @@ it("retains authored Clock flags and outcomes even when no executable schedule c
 				kind: "line",
 				owner: "item:A",
 				data: expect.objectContaining({
-					clock: "clock-interval",
-					clockWeight: 3,
+					trigger: "clock-interval",
+					weight: 3,
 				}),
 			}),
 			expect.objectContaining({

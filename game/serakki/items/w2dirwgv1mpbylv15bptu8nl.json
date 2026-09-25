@@ -19,7 +19,7 @@
 				"uid": "sjk9ixohdaibu9sx7aphs4vp",
 				"title": "Split",
 				"description": "Tier 2 is good enough",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

@@ -22,7 +22,7 @@
 				"title": "Build Cotton Farm",
 				"artwork": "g68kq5f65zhx8bdaj9ln5dti",
 				"description": "Build Cotton Farm.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

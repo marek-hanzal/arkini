@@ -3,11 +3,8 @@ import { BatteryCharging } from "lucide-react";
 
 import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
-import { SectionEnd } from "~/ui/ui/SectionEnd";
-import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
-import { OutcomeControl } from "~/production-authoring/ui/OutcomeControl";
 import { Mx } from "~/translation/ui/Mx";
 
 export const UnitsSection = () => {
@@ -44,21 +41,7 @@ export const UnitsSection = () => {
 										/>
 									)}
 								</form.AppField>
-								<SectionEnd />
 							</EditorFormCard>
-							<EditorFormSection
-								description={<Mx label="Depletion outcome help" />}
-								title={translator.textFn("Depletion outcome")}
-							>
-								<EditorFormCard>
-									<OutcomeControl
-										value={units.outcome}
-										onChangeFn={(outcome) =>
-											form.setFieldValue("units.outcome", outcome)
-										}
-									/>
-								</EditorFormCard>
-							</EditorFormSection>
 						</>
 					)
 				}

@@ -14,7 +14,7 @@ import type { LineRun } from "~/production-line/type/LineRun";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { RuleTypeSchema as LineRuleTypeSchema } from "~/production-line/schema/RuleTypeSchema";
 import { LineRunUnavailableError } from "~/production-line/error/LineRunUnavailableError";
-import { LineClockModeEnumSchema } from "~/production-line/schema/LineClockModeEnumSchema";
+import { LineTriggerEnumSchema } from "~/production-line/schema/LineTriggerEnumSchema";
 import { isLineAdmissionOpenFn } from "~/production-line/fn/isLineAdmissionOpenFn";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
@@ -123,7 +123,7 @@ export const resolveLineRunFx = Effect.fn("resolveLineRunFx")(function* ({
 		);
 	}
 	if (
-		line.clock === LineClockModeEnumSchema.enum["clock-lifetime"] &&
+		line.trigger === LineTriggerEnumSchema.enum["item-termination"] &&
 		!isLineAdmissionOpenFn({
 			owner,
 			lineUid,

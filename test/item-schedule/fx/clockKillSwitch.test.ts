@@ -5,7 +5,7 @@ import { projectCommittedEngineFactsFx } from "~/game-event/fx/projectCommittedE
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
-import { expireItemRuntimeFx } from "~/item-expiry/fx/expireItemRuntimeFx";
+import { settleTerminalItemRuntimeFx } from "~/item-terminal/fx/settleTerminalItemRuntimeFx";
 import { startLineFx } from "~test/production-job/support/startLineTestFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
 import { useGameFx } from "~test/support/useGameFx";
@@ -22,8 +22,7 @@ const configFn = (mode: "kill-switch" | "loose-kill", runtimeMs = 100) => {
 			{
 				...createLine({
 					uid: "a",
-					clock: "clock-interval",
-					default: true,
+					trigger: "clock-interval",
 					outcome: createOutput([
 						{
 							itemUid: "result",
@@ -46,8 +45,8 @@ const configFn = (mode: "kill-switch" | "loose-kill", runtimeMs = 100) => {
 				]),
 			),
 		],
+		terminationMode: mode,
 		clock: {
-			expiryMode: mode,
 			durationMs: 100,
 			intervalMs: 100,
 		},
@@ -135,8 +134,8 @@ describe("Clock kill switch", () => {
 						clock: {
 							durationMs: 100,
 							intervalMs: undefined,
-							expiryMode: mode,
 						},
+						terminationMode: mode,
 					}),
 				}),
 			),
@@ -349,7 +348,8 @@ describe("Clock kill switch", () => {
 				const attempt = yield* Effect.result(
 					modifyRuntimeFx((runtime) =>
 						Effect.gen(function* () {
-							const removed = yield* expireItemRuntimeFx({
+							const removed = yield* settleTerminalItemRuntimeFx({
+								cause: "expired",
 								item: owner,
 								origin: {
 									scope: "board",

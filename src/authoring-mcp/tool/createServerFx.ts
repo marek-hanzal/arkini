@@ -272,7 +272,7 @@ const readItemLinesTextFx = Effect.fn("readItemLinesTextFx")((project: Project, 
 						...item.lines.map((line) =>
 							[
 								`- ${JSON.stringify(line.title)} [line:${JSON.stringify(line.uid)}]`,
-								`  Default: ${line.default}; Clock: ${line.clock ?? "none"}; Clock weight: ${line.clockWeight}; Show: ${line.show}; Enable: ${line.enable}`,
+								`  Default: ${line.default}; Trigger: ${line.trigger}; Weight: ${line.weight}; Show: ${line.show}; Enable: ${line.enable}`,
 							].join("\n"),
 						),
 					]),
@@ -735,7 +735,7 @@ const createServerFn = (
 		"item_lines",
 		{
 			description:
-				"Read a compact text list of an item's lines in authored order with the project revision. Includes UID, title, default, clock, clockWeight, show and enable; these are authored values, not evaluated gameplay availability. Use item_lines_json to fetch selected complete lines.",
+				"Read a compact text list of an item's lines in authored order with the project revision. Includes UID, title, default, clock, weight, show and enable; these are authored values, not evaluated gameplay availability. Use item_lines_json to fetch selected complete lines.",
 			inputSchema: ItemLinesInputSchema,
 			annotations: EditorToolAnnotations.readOnly,
 		},

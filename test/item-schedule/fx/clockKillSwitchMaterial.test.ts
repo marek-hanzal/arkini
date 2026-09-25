@@ -56,8 +56,8 @@ const configFn = () => {
 				clock: {
 					...temporary.clock!,
 					durationMs: 100,
-					expiryMode: "kill-switch" as const,
 				},
+				terminationMode: "kill-switch" as const,
 			},
 		},
 	});

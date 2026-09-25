@@ -22,7 +22,7 @@
 				"title": "Build Grass Farm",
 				"artwork": "wrmhxvug81bpye6nu2z29v92",
 				"description": "Build Grass Farm.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

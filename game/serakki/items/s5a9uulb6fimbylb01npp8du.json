@@ -22,7 +22,7 @@
 				"title": "Build Cow Farm",
 				"artwork": "idjjruev1o20fc0k5r90nppr",
 				"description": "Build Cow Farm.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

@@ -16,7 +16,7 @@ import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import { enqueueDefaultLineFx } from "~/production-job/fx/enqueueDefaultLineFx";
 import { resolveOutcomeTableFx } from "~/outcome/fx/resolveOutcomeTableFx";
-import { expireItemRuntimeFx } from "~/item-expiry/fx/expireItemRuntimeFx";
+import { settleTerminalItemRuntimeFx } from "~/item-terminal/fx/settleTerminalItemRuntimeFx";
 
 describe("Outcome settlement", () => {
 	it("retains the complete mixed roll and owner origin while only publishing the last Space", () => {
@@ -177,7 +177,8 @@ describe("Outcome settlement", () => {
 				const owner = yield* spawnOwnerFx();
 				yield* modifyRuntimeFx((runtime) =>
 					Effect.gen(function* () {
-						const expired = yield* expireItemRuntimeFx({
+						const expired = yield* settleTerminalItemRuntimeFx({
+							cause: "expired",
 							item: owner,
 							origin,
 							outcome,
@@ -232,7 +233,8 @@ describe("Outcome settlement", () => {
 				const owner = yield* spawnOwnerFx();
 				yield* modifyRuntimeFx((runtime) =>
 					Effect.gen(function* () {
-						const expired = yield* expireItemRuntimeFx({
+						const expired = yield* settleTerminalItemRuntimeFx({
+							cause: "expired",
 							item: owner,
 							origin,
 							outcome,

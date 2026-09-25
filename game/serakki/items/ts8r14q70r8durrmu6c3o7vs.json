@@ -18,7 +18,7 @@
 				"title": "Bubbles",
 				"description": "World will be nicer with some bubbles around",
 				"default": true,
-				"clockWeight": 1,
+				"weight": 1,
 				"show": true,
 				"enable": false,
 				"runtimeMs": 30000,

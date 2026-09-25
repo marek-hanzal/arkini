@@ -22,7 +22,7 @@
 				"title": "Build Sunflower Farm",
 				"artwork": "wxqantahcsz9emd1y1g3tmu6",
 				"description": "Build Sunflower Farm.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

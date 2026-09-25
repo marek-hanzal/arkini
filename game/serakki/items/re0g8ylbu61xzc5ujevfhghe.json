@@ -22,7 +22,7 @@
 				"title": "Build Growers Guild",
 				"artwork": "g12ykuh5vwadvkoy3cs9r6zd",
 				"description": "Build Growers Guild.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

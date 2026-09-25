@@ -432,17 +432,217 @@
 				"amount": {
 					"description": "The positive number of units owned by every fresh item instance.",
 					"$ref": "urn:serakki:schema:project#/$defs/PositiveIntegerSchema"
-				},
-				"outcome": {
-					"description": "The optional outcome emitted exactly once from the depleted item's real grid origin.",
-					"$ref": "urn:serakki:schema:project#/$defs/OutcomeTableSchema"
 				}
 			},
 			"required": [
 				"amount"
 			],
 			"additionalProperties": false,
-			"description": "A finite unit supply and optional outcome emitted on depletion."
+			"description": "A finite unit supply."
+		},
+		"MergeSchema": {
+			"oneOf": [
+				{
+					"oneOf": [
+						{
+							"$ref": "urn:serakki:schema:project#/$defs/merge.SpendSchema"
+						},
+						{
+							"$ref": "urn:serakki:schema:project#/$defs/merge.KeepSchema"
+						},
+						{
+							"$ref": "urn:serakki:schema:project#/$defs/merge.RemoveSchema"
+						},
+						{
+							"$ref": "urn:serakki:schema:project#/$defs/merge.ReplaceSchema"
+						}
+					]
+				},
+				{
+					"oneOf": [
+						{
+							"type": "object",
+							"properties": {
+								"action": {
+									"type": "string",
+									"enum": [
+										"space"
+									]
+								},
+								"space": {
+									"description": "The destination Board space for the incoming item.",
+									"$ref": "urn:serakki:schema:project#/$defs/SpaceDestinationSchema"
+								},
+								"outcome": {
+									"$ref": "urn:serakki:schema:project#/$defs/OutcomeTableSchema"
+								},
+								"effect": {
+									"type": "string",
+									"enum": [
+										"keep"
+									]
+								}
+							},
+							"required": [
+								"action",
+								"space",
+								"effect"
+							],
+							"additionalProperties": false
+						},
+						{
+							"type": "object",
+							"properties": {
+								"action": {
+									"type": "string",
+									"enum": [
+										"space"
+									]
+								},
+								"space": {
+									"description": "The destination Board space for the incoming item.",
+									"$ref": "urn:serakki:schema:project#/$defs/SpaceDestinationSchema"
+								},
+								"outcome": {
+									"$ref": "urn:serakki:schema:project#/$defs/OutcomeTableSchema"
+								},
+								"effect": {
+									"type": "string",
+									"enum": [
+										"remove"
+									]
+								}
+							},
+							"required": [
+								"action",
+								"space",
+								"effect"
+							],
+							"additionalProperties": false
+						},
+						{
+							"type": "object",
+							"properties": {
+								"action": {
+									"type": "string",
+									"enum": [
+										"space"
+									]
+								},
+								"space": {
+									"description": "The destination Board space for the incoming item.",
+									"$ref": "urn:serakki:schema:project#/$defs/SpaceDestinationSchema"
+								},
+								"outcome": {
+									"$ref": "urn:serakki:schema:project#/$defs/OutcomeTableSchema"
+								},
+								"effect": {
+									"type": "string",
+									"enum": [
+										"spend"
+									]
+								}
+							},
+							"required": [
+								"action",
+								"space",
+								"effect"
+							],
+							"additionalProperties": false
+						},
+						{
+							"type": "object",
+							"properties": {
+								"action": {
+									"type": "string",
+									"enum": [
+										"space"
+									]
+								},
+								"space": {
+									"description": "The destination Board space for the incoming item.",
+									"$ref": "urn:serakki:schema:project#/$defs/SpaceDestinationSchema"
+								},
+								"outcome": {
+									"$ref": "urn:serakki:schema:project#/$defs/OutcomeTableSchema"
+								},
+								"effect": {
+									"type": "string",
+									"enum": [
+										"replace"
+									]
+								},
+								"result": {
+									"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
+								}
+							},
+							"required": [
+								"action",
+								"space",
+								"effect",
+								"result"
+							],
+							"additionalProperties": false
+						}
+					]
+				}
+			],
+			"description": "A source-owned directional merge or receiver-owned Space transport."
+		},
+		"merge.SpendSchema": {
+			"type": "object",
+			"properties": {
+				"target": {
+					"description": "The selector that must match the receiving item for this merge to apply.",
+					"$ref": "urn:serakki:schema:project#/$defs/SelectorSchema"
+				},
+				"action": {
+					"type": "string",
+					"enum": [
+						"use",
+						"consume",
+						"spend"
+					],
+					"description": "The action applied to the source item after this merge resolves."
+				},
+				"outcome": {
+					"description": "The optional extra outcome evaluated after this merge resolves.",
+					"$ref": "urn:serakki:schema:project#/$defs/OutcomeTableSchema"
+				},
+				"effect": {
+					"type": "string",
+					"enum": [
+						"spend"
+					],
+					"description": "Identifies this merge as one that spends a unit from its selected target."
+				}
+			},
+			"required": [
+				"target",
+				"action",
+				"effect"
+			],
+			"additionalProperties": false,
+			"description": "A merge that spends one unit from its selected receiving item."
+		},
+		"SelectorSchema": {
+			"type": "object",
+			"properties": {
+				"type": {
+					"type": "string",
+					"const": "item"
+				},
+				"itemUid": {
+					"description": "The immutable UID of the selected canonical item.",
+					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
+				}
+			},
+			"required": [
+				"type",
+				"itemUid"
+			],
+			"additionalProperties": false,
+			"description": "A selector that resolves one canonical game item by immutable UID."
 		},
 		"OutcomeTableSchema": {
 			"type": "object",
@@ -590,25 +790,6 @@
 			],
 			"additionalProperties": false,
 			"description": "A condition that checks whether an item query returns any quantity."
-		},
-		"SelectorSchema": {
-			"type": "object",
-			"properties": {
-				"type": {
-					"type": "string",
-					"const": "item"
-				},
-				"itemUid": {
-					"description": "The immutable UID of the selected canonical item.",
-					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
-				}
-			},
-			"required": [
-				"type",
-				"itemUid"
-			],
-			"additionalProperties": false,
-			"description": "A selector that resolves one canonical game item by immutable UID."
 		},
 		"DistanceSchema": {
 			"type": "string",
@@ -981,191 +1162,6 @@
 			"maximum": 1,
 			"description": "A probability from zero to one inclusive."
 		},
-		"MergeSchema": {
-			"oneOf": [
-				{
-					"oneOf": [
-						{
-							"$ref": "urn:serakki:schema:project#/$defs/merge.SpendSchema"
-						},
-						{
-							"$ref": "urn:serakki:schema:project#/$defs/merge.KeepSchema"
-						},
-						{
-							"$ref": "urn:serakki:schema:project#/$defs/merge.RemoveSchema"
-						},
-						{
-							"$ref": "urn:serakki:schema:project#/$defs/merge.ReplaceSchema"
-						}
-					]
-				},
-				{
-					"oneOf": [
-						{
-							"type": "object",
-							"properties": {
-								"action": {
-									"type": "string",
-									"enum": [
-										"space"
-									]
-								},
-								"space": {
-									"description": "The destination Board space for the incoming item.",
-									"$ref": "urn:serakki:schema:project#/$defs/SpaceDestinationSchema"
-								},
-								"outcome": {
-									"$ref": "urn:serakki:schema:project#/$defs/OutcomeTableSchema"
-								},
-								"effect": {
-									"type": "string",
-									"enum": [
-										"keep"
-									]
-								}
-							},
-							"required": [
-								"action",
-								"space",
-								"effect"
-							],
-							"additionalProperties": false
-						},
-						{
-							"type": "object",
-							"properties": {
-								"action": {
-									"type": "string",
-									"enum": [
-										"space"
-									]
-								},
-								"space": {
-									"description": "The destination Board space for the incoming item.",
-									"$ref": "urn:serakki:schema:project#/$defs/SpaceDestinationSchema"
-								},
-								"outcome": {
-									"$ref": "urn:serakki:schema:project#/$defs/OutcomeTableSchema"
-								},
-								"effect": {
-									"type": "string",
-									"enum": [
-										"remove"
-									]
-								}
-							},
-							"required": [
-								"action",
-								"space",
-								"effect"
-							],
-							"additionalProperties": false
-						},
-						{
-							"type": "object",
-							"properties": {
-								"action": {
-									"type": "string",
-									"enum": [
-										"space"
-									]
-								},
-								"space": {
-									"description": "The destination Board space for the incoming item.",
-									"$ref": "urn:serakki:schema:project#/$defs/SpaceDestinationSchema"
-								},
-								"outcome": {
-									"$ref": "urn:serakki:schema:project#/$defs/OutcomeTableSchema"
-								},
-								"effect": {
-									"type": "string",
-									"enum": [
-										"spend"
-									]
-								}
-							},
-							"required": [
-								"action",
-								"space",
-								"effect"
-							],
-							"additionalProperties": false
-						},
-						{
-							"type": "object",
-							"properties": {
-								"action": {
-									"type": "string",
-									"enum": [
-										"space"
-									]
-								},
-								"space": {
-									"description": "The destination Board space for the incoming item.",
-									"$ref": "urn:serakki:schema:project#/$defs/SpaceDestinationSchema"
-								},
-								"outcome": {
-									"$ref": "urn:serakki:schema:project#/$defs/OutcomeTableSchema"
-								},
-								"effect": {
-									"type": "string",
-									"enum": [
-										"replace"
-									]
-								},
-								"result": {
-									"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
-								}
-							},
-							"required": [
-								"action",
-								"space",
-								"effect",
-								"result"
-							],
-							"additionalProperties": false
-						}
-					]
-				}
-			],
-			"description": "A source-owned directional merge or receiver-owned Space transport."
-		},
-		"merge.SpendSchema": {
-			"type": "object",
-			"properties": {
-				"target": {
-					"description": "The selector that must match the receiving item for this merge to apply.",
-					"$ref": "urn:serakki:schema:project#/$defs/SelectorSchema"
-				},
-				"action": {
-					"type": "string",
-					"enum": [
-						"use",
-						"consume",
-						"spend"
-					],
-					"description": "The action applied to the source item after this merge resolves."
-				},
-				"outcome": {
-					"description": "The optional extra outcome evaluated after this merge resolves.",
-					"$ref": "urn:serakki:schema:project#/$defs/OutcomeTableSchema"
-				},
-				"effect": {
-					"type": "string",
-					"enum": [
-						"spend"
-					],
-					"description": "Identifies this merge as one that spends a unit from its selected target."
-				}
-			},
-			"required": [
-				"target",
-				"action",
-				"effect"
-			],
-			"additionalProperties": false,
-			"description": "A merge that spends one unit from its selected receiving item."
-		},
 		"merge.KeepSchema": {
 			"type": "object",
 			"properties": {
@@ -1288,17 +1284,9 @@
 					"$ref": "urn:serakki:schema:project#/$defs/TimeSchema"
 				},
 				"durationMs": {
-					"description": "Optional active lifetime; expiryMode determines whether accepted work may outlive it.",
+					"description": "Optional active lifetime; item termination mode determines whether accepted work may outlive it.",
 					"minimum": 100,
 					"$ref": "urn:serakki:schema:project#/$defs/TimeSchema"
-				},
-				"expiryMode": {
-					"description": "Lifetime expiry policy; omission uses loose-kill. Has no effect without a finite duration.",
-					"type": "string",
-					"enum": [
-						"loose-kill",
-						"kill-switch"
-					]
 				},
 				"enable": {
 					"default": true,
@@ -1329,7 +1317,7 @@
 					]
 				}
 			],
-			"description": "Clock-line admission, finite lifetime, or both, with availability rules; expiry selects a weighted expiry line."
+			"description": "Clock-line admission, finite lifetime, or both, with availability rules."
 		},
 		"TimeSchema": {
 			"type": "integer",
@@ -1435,17 +1423,19 @@
 					"description": "Optional human-readable explanation of this product line's purpose.",
 					"$ref": "urn:serakki:schema:project#/$defs/DescriptionSchema"
 				},
-				"clock": {
-					"description": "Optional weighted Clock role: interval admits a Job at each pulse; lifetime expiry runs this line as a Board Job or immediately settles its outcome when the owner is held internally.",
+				"trigger": {
+					"default": "manual",
+					"description": "The event that admits this line: manual action, Clock interval, or item termination.",
 					"type": "string",
 					"enum": [
+						"manual",
 						"clock-interval",
-						"clock-lifetime"
+						"item-termination"
 					]
 				},
-				"clockWeight": {
+				"weight": {
 					"default": 1,
-					"description": "Relative Clock selection weight among lines allowed by their evaluated rules.",
+					"description": "Relative selection weight among triggered lines allowed by their evaluated rules.",
 					"type": "integer",
 					"minimum": 1,
 					"maximum": 999
@@ -1491,7 +1481,8 @@
 			"required": [
 				"uid",
 				"title",
-				"clockWeight",
+				"trigger",
+				"weight",
 				"default",
 				"show",
 				"enable",
@@ -1853,7 +1844,7 @@
 					"$ref": "urn:serakki:schema:project#/$defs/ArtworkSchema"
 				},
 				"units": {
-					"description": "The optional supply of units, such as health, resource stock, or uses, and depletion outcome of each item instance.",
+					"description": "The optional supply of units, such as health, resource stock, or uses, in each item instance.",
 					"$ref": "urn:serakki:schema:project#/$defs/UnitsSchema"
 				},
 				"merge": {
@@ -1884,6 +1875,14 @@
 				},
 				"clock": {
 					"$ref": "urn:serakki:schema:project#/$defs/ItemScheduleSchema"
+				},
+				"terminationMode": {
+					"description": "How existing work and blocked output are handled when lifetime or units end this item; omission uses loose-kill.",
+					"type": "string",
+					"enum": [
+						"loose-kill",
+						"kill-switch"
+					]
 				},
 				"maxQueueSize": {
 					"default": 1,

@@ -16,7 +16,7 @@
 				"uid": "cl8d30tvsx7cb06vuw2sa2qy",
 				"title": "Animal Feed",
 				"description": "All the animals needs to eat",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

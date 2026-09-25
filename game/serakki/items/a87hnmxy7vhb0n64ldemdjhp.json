@@ -22,7 +22,7 @@
 				"title": "Build Goose Farm",
 				"artwork": "oxittviuc7021lcpe04kybb9",
 				"description": "Build Goose Farm.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

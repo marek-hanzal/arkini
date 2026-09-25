@@ -105,6 +105,16 @@ it("does not publish a line spawn erased by the owner's depletion Template", () 
 	};
 	config.items.forge!.units = {
 		amount: 1,
+	};
+	config.items.forge!.lines.push({
+		...config.items.forge!.lines[0]!,
+		uid: "line:forge:termination:0",
+		title: "Termination",
+		trigger: "item-termination",
+		default: false,
+		show: false,
+		runtimeMs: 0,
+		input: [],
 		outcome: {
 			set: [
 				{
@@ -125,7 +135,7 @@ it("does not publish a line spawn erased by the owner's depletion Template", () 
 				},
 			],
 		},
-	};
+	});
 	const materialInput = config.items.forge!.lines[0]!.input[0]!;
 	if (materialInput.type !== "materials") throw new Error("Expected material input fixture.");
 	materialInput.units = {
@@ -195,6 +205,16 @@ it("keeps line output without mistaking it for a depleted owner's expired replac
 	};
 	config.items.forge!.units = {
 		amount: 1,
+	};
+	config.items.forge!.lines.push({
+		...config.items.forge!.lines[0]!,
+		uid: "line:forge:termination:1",
+		title: "Termination",
+		trigger: "item-termination",
+		default: false,
+		show: false,
+		runtimeMs: 0,
+		input: [],
 		outcome: {
 			set: [
 				{
@@ -220,7 +240,7 @@ it("keeps line output without mistaking it for a depleted owner's expired replac
 				},
 			],
 		},
-	};
+	});
 	const materialInput = config.items.forge!.lines[0]!.input[0]!;
 	if (materialInput.type !== "materials") throw new Error("Expected material input fixture.");
 	materialInput.units = {

@@ -9,7 +9,6 @@ interface ItemCleanup {
 	readonly clockRuleIndexes: Set<number>;
 	readonly mergeIndexes: Set<number>;
 	readonly lineIndexes: Set<number>;
-	removeUnitsOutcome: boolean;
 }
 
 export namespace forceDeleteFx {
@@ -18,7 +17,6 @@ export namespace forceDeleteFx {
 			readonly ownerItemUid: string;
 			readonly ruleNumber: number;
 		}>;
-		readonly removedUnitOutcomeOwnerIds: ReadonlyArray<string>;
 		readonly removedLines: ReadonlyArray<{
 			readonly ownerItemUid: string;
 			readonly lineUid: string;
@@ -50,7 +48,6 @@ const createItemCleanupFn = (): ItemCleanup => ({
 	clockRuleIndexes: new Set(),
 	mergeIndexes: new Set(),
 	lineIndexes: new Set(),
-	removeUnitsOutcome: false,
 });
 
 /** Mechanically removes one item and every authored structure that directly references it. */
@@ -86,9 +83,6 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 					throw new Error(`Invalid line reference path ${blocker.path.join(".")}.`);
 				cleanup.lineIndexes.add(fourth);
 			})
-			.with("units", () => {
-				cleanup.removeUnitsOutcome = true;
-			})
 			.otherwise(() => {
 				throw new Error(
 					`Unsupported item delete reference path ${blocker.path.join(".")}.`,
@@ -100,7 +94,6 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 		ownerItemUid: string;
 		ruleNumber: number;
 	}> = [];
-	const removedUnitOutcomeOwnerIds: string[] = [];
 	const removedLines: Array<{
 		ownerItemUid: string;
 		lineUid: string;
@@ -160,13 +153,6 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 					});
 			}
 		}
-		if (cleanup.removeUnitsOutcome && owner.units !== undefined) {
-			candidate.units = {
-				...owner.units,
-				outcome: undefined,
-			};
-			removedUnitOutcomeOwnerIds.push(ownerItemUid);
-		}
 		items[ownerItemUid] = candidate;
 	}
 
@@ -193,7 +179,6 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 						];
 			}),
 			removedClockRules,
-			removedUnitOutcomeOwnerIds,
 			removedLines,
 			removedMergeRules,
 		},

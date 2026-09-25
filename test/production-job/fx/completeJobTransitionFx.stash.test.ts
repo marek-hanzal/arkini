@@ -140,7 +140,7 @@ const stashConfig = GameConfigSchema.parse({
 		id: "game:stash-completion",
 		title: "Stash completion",
 		board: {
-			width: 2,
+			width: 3,
 			height: 1,
 		},
 	},

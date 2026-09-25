@@ -374,7 +374,7 @@ describe("mergeItemsFx", () => {
 		expect(result.after).toEqual(result.before);
 	});
 
-	it("runs the standard depletion output after the last spended source unit", () => {
+	it("queues the source termination line after its last spent unit", () => {
 		const result = Effect.runSync(
 			runMergeFx().pipe(
 				useGameFx({
@@ -382,42 +382,28 @@ describe("mergeItemsFx", () => {
 						rule: spendRule,
 						sourceUnits: {
 							amount: 1,
-							outcome: guaranteedMergeOutput(),
 						},
+						sourceTerminationOutcome: guaranteedMergeOutput(),
 					}),
-					state: makeState({}),
+					state: makeState(),
 				}),
 			),
 		);
-		const output = result.after.items.find((item) => item.item.uid === "output");
-		if (output === undefined) throw new Error("Expected depletion output.");
-
-		expect(result.transition.events).toEqual([
-			result.event,
+		expect(
+			result.after.items.find((item) => item.id === "runtime:source")?.remainingUnits,
+		).toBe(0);
+		expect(result.after.jobQueue).toMatchObject([
 			{
-				type: GameEventEnumSchema.enum.ItemDepleted,
-				itemId: "runtime:source",
-				itemUid: "source",
-				location: result.before.items.find((item) => item.id === "runtime:source")
-					?.location,
-			},
-			{
-				type: GameEventEnumSchema.enum.ItemRemoved,
-				snapshot: {
-					...result.before.items.find((item) => item.id === "runtime:source"),
-					remainingUnits: 0,
-					revision: expect.any(String),
-				},
-			},
-			{
-				type: GameEventEnumSchema.enum.ItemSpawned,
-				itemId: output.id,
-				itemUid: "output",
-				originItemId: "runtime:source",
-				location: output.location,
+				ownerItemId: "runtime:source",
+				lineUid: "termination:source",
 			},
 		]);
-		expect(result.after.items.some((item) => item.id === "runtime:source")).toBe(false);
+		expect(result.transition.events).toContainEqual(
+			expect.objectContaining({
+				type: "job:queued",
+				ownerItemId: "runtime:source",
+			}),
+		);
 	});
 
 	it("spends one real unit from a Spend merge target", () => {
@@ -458,7 +444,7 @@ describe("mergeItemsFx", () => {
 		]);
 	});
 
-	it("runs the standard depletion output after the last spended target unit", () => {
+	it("queues the target termination line after its last spent unit", () => {
 		const result = Effect.runSync(
 			runMergeFx().pipe(
 				useGameFx({
@@ -466,48 +452,28 @@ describe("mergeItemsFx", () => {
 						rule: targetSpendRule,
 						targetUnits: {
 							amount: 1,
-							outcome: guaranteedMergeOutput(),
 						},
+						targetTerminationOutcome: guaranteedMergeOutput(),
 					}),
 					state: makeState(),
 				}),
 			),
 		);
-		const output = result.after.items.find((item) => item.item.uid === "output");
-		if (output === undefined) throw new Error("Expected target depletion output.");
-
-		expect(result.transition.events).toEqual([
-			result.event,
-			expect.objectContaining({
-				type: "item:removed",
-				snapshot: expect.objectContaining({
-					id: "runtime:source",
-				}),
-			}),
+		expect(
+			result.after.items.find((item) => item.id === "runtime:target")?.remainingUnits,
+		).toBe(0);
+		expect(result.after.jobQueue).toMatchObject([
 			{
-				type: GameEventEnumSchema.enum.ItemDepleted,
-				itemId: "runtime:target",
-				itemUid: "target",
-				location: result.before.items.find((item) => item.id === "runtime:target")
-					?.location,
-			},
-			{
-				type: GameEventEnumSchema.enum.ItemRemoved,
-				snapshot: {
-					...result.before.items.find((item) => item.id === "runtime:target"),
-					remainingUnits: 0,
-					revision: expect.any(String),
-				},
-			},
-			{
-				type: GameEventEnumSchema.enum.ItemSpawned,
-				itemId: output.id,
-				itemUid: "output",
-				originItemId: "runtime:target",
-				location: output.location,
+				ownerItemId: "runtime:target",
+				lineUid: "termination:target",
 			},
 		]);
-		expect(result.after.items.some((item) => item.id === "runtime:target")).toBe(false);
+		expect(result.transition.events).toContainEqual(
+			expect.objectContaining({
+				type: "job:queued",
+				ownerItemId: "runtime:target",
+			}),
+		);
 	});
 
 	it("rejects a Spend target without Units without changing runtime", () => {

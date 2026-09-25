@@ -55,14 +55,6 @@ export const UnitsDetail = ({
 					value={item.units.amount}
 				/>
 			</EditorRootCard>
-			<EditorRootCard dataUi="EditorItemDepletionOutcomeCard">
-				<OutcomeDetail
-					emptyLabel={translator.textFn("No depletion outcome configured.")}
-					outcome={item.units.outcome}
-					description={<Mx label="Authored Units depletion outcome summary help" />}
-					title={translator.textFn("Depletion outcome")}
-				/>
-			</EditorRootCard>
 		</div>
 	);
 };

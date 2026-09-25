@@ -44,10 +44,6 @@ const ForceDeleteImpactList = ({
 		entries.push(
 			`${translator.textFn("Remove production line")} “${title}” ${translator.textFn("from")} ${readItemTitleFn(project, ownerItemUid)}`,
 		);
-	for (const ownerItemUid of impact.removedUnitOutcomeOwnerIds)
-		entries.push(
-			`${translator.textFn("Remove the unit depletion outcome from")} ${readItemTitleFn(project, ownerItemUid)}`,
-		);
 
 	return (
 		<div className="mt-4 rounded-xl border border-line bg-surface/70 p-4">

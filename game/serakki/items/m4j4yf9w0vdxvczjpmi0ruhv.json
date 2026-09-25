@@ -13,32 +13,7 @@
 			]
 		},
 		"units": {
-			"amount": 32,
-			"outcome": {
-				"set": [
-					{
-						"weight": 1,
-						"rules": [],
-						"roll": [
-							{
-								"type": "guaranteed",
-								"outcome": [
-									{
-										"type": "item",
-										"itemUid": "wfndxov0jyo5gn2gggzeir1p",
-										"quantity": {
-											"min": 1,
-											"max": 1
-										},
-										"placement": "drop",
-										"rules": []
-									}
-								]
-							}
-						]
-					}
-				]
-			}
+			"amount": 32
 		},
 		"maxQueueSize": 6,
 		"lines": [
@@ -48,7 +23,7 @@
 				"artwork": "rxpbi0mu35ylblwwky8w04bm",
 				"description": "Copper ore",
 				"default": false,
-				"clockWeight": 1,
+				"weight": 1,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 28000,
@@ -115,7 +90,7 @@
 				"title": "Copper Ore - Lantern",
 				"artwork": "d849jmpyesvhw3kxx0in38ni",
 				"description": "Copper ore",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": false,
 				"show": true,
 				"enable": true,
@@ -173,6 +148,43 @@
 										{
 											"type": "item",
 											"itemUid": "gepmb31cvdse7u75q4i4p4ek",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"uid": "d2f378b92bfc4acb91e679cf",
+				"title": "Depletion",
+				"trigger": "item-termination",
+				"weight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [],
+				"outcome": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"outcome": [
+										{
+											"type": "item",
+											"itemUid": "wfndxov0jyo5gn2gggzeir1p",
 											"quantity": {
 												"min": 1,
 												"max": 1

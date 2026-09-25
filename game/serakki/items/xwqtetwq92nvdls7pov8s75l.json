@@ -21,7 +21,7 @@
 				"title": "Stock Chicken Coop",
 				"artwork": "aha604t1wuq6u9ntedhp6cw0",
 				"description": "Provide starter feed and water so the enclosure can be stocked with animals.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

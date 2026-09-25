@@ -104,6 +104,7 @@ const jobAbortedEventSchema = z
 		reason: z.enum([
 			"owner-removed",
 			"material-expired",
+			"material-depleted",
 			"player-cancelled",
 		]),
 	})

@@ -22,7 +22,7 @@
 				"title": "Stonemason Camp",
 				"artwork": "u0ugyubcxh6gng4hljmts53j",
 				"description": "After this, you'll be master of Stones!",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

@@ -21,8 +21,8 @@ const configFn = (runtimeMs = 1000) =>
 		},
 		clock: {
 			durationMs: 100,
-			expiryMode: "kill-switch",
 		},
+		terminationMode: "kill-switch",
 		lines: [
 			{
 				...createLine({
@@ -114,7 +114,7 @@ describe("committed runtime removal snapshots", () => {
 		});
 	});
 
-	it("captures zero units and elapsed clock when a queued job depletes its owner at the lifetime boundary", () => {
+	it("captures zero units and the unadvanced Clock when a queued job depletes its owner", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const initial = yield* spawnClockItemFx();
@@ -185,14 +185,14 @@ describe("committed runtime removal snapshots", () => {
 
 			remainingUnits: 0,
 			schedule: {
-				remainingDurationMs: 0,
-				remainingIntervalMs: 150,
+				remainingDurationMs: 100,
+				remainingIntervalMs: 250,
 			},
 		});
 		expect(removal?.snapshot.revision).not.toBe(result.initial.revision);
 	});
 
-	it("retains job completion identity when settlement removes the depleted owner", () => {
+	it("retains job abort identity when a kill switch removes the depleted owner", () => {
 		const step = Effect.runSync(
 			Effect.gen(function* () {
 				const owner = yield* spawnClockItemFx();
@@ -216,7 +216,7 @@ describe("committed runtime removal snapshots", () => {
 		expect(step.runtime.items).toEqual([]);
 		expect(step.facts).toContainEqual(
 			expect.objectContaining({
-				type: "job:completed",
+				type: "job:aborted",
 				ownerItemId: "runtime:clock",
 				itemUid: "clock",
 			}),

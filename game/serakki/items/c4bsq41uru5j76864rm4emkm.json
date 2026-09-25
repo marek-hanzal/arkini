@@ -22,7 +22,7 @@
 				"title": "Build Herders Guild",
 				"artwork": "sfiecse95ohoctxsonulfpfa",
 				"description": "Build Herders Guild.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

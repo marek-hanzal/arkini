@@ -22,7 +22,7 @@
 				"title": "Build Dye Farm",
 				"artwork": "wd9pts2jmrb76pkx47xjq499",
 				"description": "Build Dye Farm.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

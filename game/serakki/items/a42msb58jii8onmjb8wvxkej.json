@@ -22,7 +22,7 @@
 				"title": "Build Animal Feed Workshop",
 				"artwork": "qgam58n66dfu2yc9s2cdtoug",
 				"description": "Build Animal Feed Workshop.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

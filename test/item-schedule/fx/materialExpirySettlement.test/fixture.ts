@@ -44,7 +44,7 @@ export const startMaterialJobFx = Effect.fn("startMaterialJobFx")(function* () {
 	});
 });
 
-export const lastUnitConfigFn = (expiryMode: "loose-kill" | "kill-switch") => {
+export const lastUnitConfigFn = (terminationMode: "loose-kill" | "kill-switch") => {
 	const base = createTemporaryMaterialLifecycleTestConfig();
 	const owner = base.items.owner!;
 	const line = owner.lines[0]!;
@@ -54,9 +54,9 @@ export const lastUnitConfigFn = (expiryMode: "loose-kill" | "kill-switch") => {
 			...base.items,
 			owner: {
 				...owner,
+				terminationMode,
 				units: {
 					amount: 1,
-					outcome: base.items.temporary!.lines[0]!.outcome,
 				},
 				lines: [
 					{
@@ -69,14 +69,17 @@ export const lastUnitConfigFn = (expiryMode: "loose-kill" | "kill-switch") => {
 							},
 						})),
 					},
+					{
+						...base.items.temporary!.lines[0]!,
+						uid: "line:owner:termination",
+						trigger: "item-termination",
+					},
 				],
 			},
 			temporary: {
 				...base.items.temporary,
-				clock: {
-					...base.items.temporary!.clock,
-					expiryMode,
-				},
+				clock: base.items.temporary!.clock,
+				terminationMode,
 				lines: [
 					{
 						...base.items.temporary!.lines[0]!,

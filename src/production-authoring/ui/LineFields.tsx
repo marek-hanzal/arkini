@@ -5,7 +5,7 @@ import { EditorTextControl } from "~/editor-control/ui/EditorValueControls";
 import { readEditorFieldErrorFn } from "~/editor-control/fn/readEditorFieldErrorFn";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
-import { LineClockModeEnumSchema } from "~/production-line/schema/LineClockModeEnumSchema";
+import { LineTriggerEnumSchema } from "~/production-line/schema/LineTriggerEnumSchema";
 import { withFieldGroupFn } from "~/authoring-form/ui/EditorForm";
 import { EditorValueField } from "~/editor-control/ui/EditorValueField";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
@@ -21,8 +21,9 @@ const defaultLine: LineSchema.Type = {
 	uid: "",
 	title: "",
 	description: "",
+	trigger: "manual",
 	default: false,
-	clockWeight: 1,
+	weight: 1,
 	show: true,
 	enable: true,
 	runtimeMs: 0,
@@ -77,7 +78,7 @@ export const LineFields = withFieldGroupFn({
 							<div className="flex min-w-0 items-end justify-between gap-3">
 								<group.Subscribe
 									selector={(state) => ({
-										clock: state.values.clock,
+										trigger: state.values.trigger,
 										default: state.values.default,
 										enable: state.values.enable,
 										show: state.values.show,
@@ -90,8 +91,8 @@ export const LineFields = withFieldGroupFn({
 										>
 											<EditorBooleanToggleGroup
 												options={[
-													...(markers.clock ===
-													LineClockModeEnumSchema.enum["clock-lifetime"]
+													...(markers.trigger !==
+													LineTriggerEnumSchema.enum.manual
 														? []
 														: [
 																{
@@ -138,20 +139,18 @@ export const LineFields = withFieldGroupFn({
 									)}
 								</group.Subscribe>
 								<group.Subscribe
-									selector={(state) => state.values.clock !== undefined}
+									selector={(state) =>
+										state.values.trigger !== LineTriggerEnumSchema.enum.manual
+									}
 								>
-									{(clock) =>
-										clock ? (
+									{(weighted) =>
+										weighted ? (
 											<div className="w-32 shrink-0">
-												<group.AppField name="clockWeight">
+												<group.AppField name="weight">
 													{(field) => (
 														<field.NumberField
-															label={translator.textFn(
-																"Clock weight",
-															)}
-															description={
-																<Mx label="Clock weight help" />
-															}
+															label={translator.textFn("Weight")}
+															description={<Mx label="Weight help" />}
 															min={1}
 															max={999}
 														/>

@@ -1,8 +1,7 @@
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
-import { readItemScheduleFn } from "~/item-schedule/fn/readItemScheduleFn";
 import { isLineAdmissionOpenFn } from "~/production-line/fn/isLineAdmissionOpenFn";
 import { advanceItemSchedulesFx } from "~/item-schedule/fx/advanceItemSchedulesFx";
-import { expireIdleScheduledItemsFx } from "~/item-schedule/fx/expireIdleScheduledItemsFx";
+import { settleTerminalItemsFx } from "~/item-terminal/fx/settleTerminalItemsFx";
 import { Effect } from "effect";
 
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
@@ -31,7 +30,7 @@ const readReadyMaterialJobIdsFn = (runtime: RuntimeSchema.Type) =>
 	new Set(
 		runtime.items.flatMap((item) => {
 			if (
-				item.schedule?.remainingDurationMs !== 0 ||
+				(item.schedule?.remainingDurationMs !== 0 && item.remainingUnits !== 0) ||
 				(item.location.scope !== LocationScopeEnumSchema.enum.Job &&
 					item.location.scope !== LocationScopeEnumSchema.enum.Reserved)
 			) {
@@ -92,7 +91,7 @@ const dispatchIdleQueueRequestsFx = Effect.fn("dispatchIdleQueueRequestsFx")(fun
 		const owner = draft.items.find((item) => item.id === request.ownerItemId);
 		if (
 			owner?.schedule?.remainingDurationMs === 0 &&
-			readItemScheduleFn(owner.item)?.expiryMode === "kill-switch" &&
+			owner.item.terminationMode === "kill-switch" &&
 			!isLineAdmissionOpenFn({
 				owner,
 				lineUid: request.lineUid,
@@ -125,7 +124,7 @@ const dispatchIdleQueueRequestsFx = Effect.fn("dispatchIdleQueueRequestsFx")(fun
 export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* (
 	stepStart: RuntimeSchema.Type,
 ) {
-	// Queue admission may emit external unit-depletion output. New scheduled
+	// Queue admission may trigger terminal work. New scheduled
 	// identities earn time only from the next boundary, regardless of that output path.
 	const boundaryStart = yield* dispatchIdleQueueRequestsFx(stepStart);
 	const deliveryStart = yield* advanceDeliveriesRuntimeFx(boundaryStart.runtime);
@@ -201,7 +200,7 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 		facts.push(...dispatched.facts);
 	}
 
-	const expired = yield* expireIdleScheduledItemsFx(draft);
+	const expired = yield* settleTerminalItemsFx(draft);
 	draft = expired.runtime;
 	facts.push(...expired.facts);
 	if (expired.facts.length > 0) {

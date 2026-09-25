@@ -149,8 +149,10 @@ it("follows merge replacement, expiry and depletion through exact operations", a
 		battery: itemFn("battery", {
 			units: {
 				amount: 3,
-				outcome: outputFn("ash"),
 			},
+			lines: [
+				expiryLineFn("battery-depletion", outputFn("ash")),
+			],
 		}),
 		portal: itemFn("portal", {
 			merge: [
@@ -184,9 +186,7 @@ it("follows merge replacement, expiry and depletion through exact operations", a
 	});
 	expect((await readFn(index, "item:match", "item:lit")).status).toBe("yes");
 	expect((await readFn(index, "item:lit", "item:unlit")).status).toBe("no");
-	expect((await readFn(index, "item:battery", "item:ash")).flows[0].steps[0].kind).toBe(
-		"depletion",
-	);
+	expect((await readFn(index, "item:battery", "item:ash")).flows[0].steps[0].kind).toBe("line");
 	// Transport moves an unspecified incoming instance; it never converts the receiver into that space.
 	expect((await readFn(index, "item:portal", "space:9")).status).toBe("no");
 	expect((await readFn(index, "item:unlit", "space:9")).status).toBe("no");

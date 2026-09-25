@@ -11,7 +11,7 @@ export namespace readItemOutcomeEntriesFn {
 	}
 }
 
-/** Reads line, unit-depletion, lifetime-expiry, and merge outputs owned by one canonical item. */
+/** Reads line and merge outputs owned by one canonical item. */
 export const readItemOutcomeEntriesFn = ({ itemUid, item }: readItemOutcomeEntriesFn.Props) => {
 	const lines = readItemLineEntriesFn({
 		itemUid,
@@ -30,18 +30,6 @@ export const readItemOutcomeEntriesFn = ({ itemUid, item }: readItemOutcomeEntri
 					} satisfies ItemOutcomeEntrySchema.Type,
 				],
 	);
-
-	if (item.units?.outcome !== undefined) {
-		entries.push({
-			outcome: item.units.outcome,
-			path: [
-				"items",
-				itemUid,
-				"units",
-				"outcome",
-			],
-		});
-	}
 
 	for (const [index, merge] of (item.merge ?? []).entries()) {
 		if (merge.outcome === undefined) {

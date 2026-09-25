@@ -22,7 +22,7 @@
 				"title": "Grain Farm",
 				"artwork": "s1txn4siry26ofn0zzn82hkm",
 				"description": "Soon there will be some farming simulator available...",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

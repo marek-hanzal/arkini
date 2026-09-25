@@ -22,7 +22,7 @@
 				"title": "Build Chicken Farm",
 				"artwork": "t00oswv00ifkupq0qr67cb53",
 				"description": "Build Chicken Farm.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

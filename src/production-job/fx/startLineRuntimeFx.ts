@@ -146,7 +146,7 @@ export namespace startLineRuntimeFx {
  *
  * Job identity is created before inputs move because consumed and reserved
  * material locations refer to it. Input ownership and unit spending commit together.
- * Depletion outcome conditions use this start's input snapshot, including prior
+ * Terminal line outcome conditions use this start's input snapshot, including prior
  * Tick transitions, rather than the outer transaction or partially applied inputs.
  */
 export const startLineRuntimeFx = Effect.fn("startLineRuntimeFx")(function* ({

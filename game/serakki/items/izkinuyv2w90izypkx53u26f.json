@@ -22,7 +22,7 @@
 				"title": "Build Pig Farm",
 				"artwork": "mg241ly73avd22s3ncv4e5q9",
 				"description": "Build Pig Farm.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

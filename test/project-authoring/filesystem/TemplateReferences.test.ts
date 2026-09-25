@@ -80,8 +80,10 @@ it.each([
 			{
 				units: {
 					amount: 1,
-					outcome,
 				},
+				lines: [
+					createExpiryLine(outcome, "line:template-units"),
+				],
 			},
 			{
 				lines: [
@@ -156,8 +158,10 @@ it.each([
 			uid: "unfinished",
 			units: {
 				amount: 1,
-				outcome: outcomeFn("not-authored-yet"),
 			},
+			lines: [
+				createExpiryLine(outcomeFn("not-authored-yet"), "line:unfinished-termination"),
+			],
 		});
 		const project = await Effect.runPromise(
 			repository.createProjectFx({
@@ -183,8 +187,22 @@ it.each([
 					...project.config.items.water!,
 					units: {
 						amount: 1,
-						outcome: outcomeFn("initial", inventory),
 					},
+					lines: [
+						{
+							uid: "water:termination",
+							title: "Termination",
+							trigger: "item-termination",
+							weight: 1,
+							default: false,
+							show: false,
+							enable: true,
+							runtimeMs: 0,
+							input: [],
+							outcome: outcomeFn("initial", inventory),
+							rules: [],
+						},
+					],
 				},
 			}),
 		);

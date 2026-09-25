@@ -23,8 +23,8 @@ const expiryOutput = createOutput([
 ]);
 const materialLine = createLine({
 	uid: "material",
-	default: true,
-	clock: "clock-interval",
+	default: false,
+	trigger: "clock-interval",
 	input: [
 		{
 			type: "materials",

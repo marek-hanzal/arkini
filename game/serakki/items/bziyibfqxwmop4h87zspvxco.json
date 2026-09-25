@@ -21,7 +21,7 @@
 				"title": "Open the Townhall II Supplies",
 				"artwork": "w0es5pxxoq5f5yz4x0sow9jq",
 				"description": "Unpack a few reusable containers for the first proper medicine batches.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

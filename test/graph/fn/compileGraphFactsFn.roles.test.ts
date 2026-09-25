@@ -200,11 +200,6 @@ it("preserves independent item roles in a compiler-valid cyclic authored world",
 		expect.arrayContaining([
 			expect.objectContaining({
 				from: "item:A",
-				to: "item:D",
-				kind: "depletion-item-outcome",
-			}),
-			expect.objectContaining({
-				from: "item:A",
 				to: "item:B",
 				kind: "line-item-outcome",
 			}),

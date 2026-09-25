@@ -6,7 +6,7 @@ import { fromStateFx } from "~/game-persistence/fx/fromStateFx";
 import { replayRuntimeStepsFx } from "~/game-tick/fx/replayRuntimeStepsFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { advanceItemSchedulesFx } from "~/item-schedule/fx/advanceItemSchedulesFx";
-import { selectClockLineFx } from "~/item-schedule/fx/selectClockLineFx";
+import { selectTriggeredLineFx } from "~/line-trigger/fx/selectTriggeredLineFx";
 import {
 	createExpiryLine,
 	createLine,
@@ -20,17 +20,17 @@ const weightedLines = [
 	{
 		...createLine({
 			uid: "light",
-			clock: "clock-interval",
+			trigger: "clock-interval",
 		}),
-		clockWeight: 1,
+		weight: 1,
 		runtimeMs: 100_000,
 	},
 	{
 		...createLine({
 			uid: "heavy",
-			clock: "clock-interval",
+			trigger: "clock-interval",
 		}),
-		clockWeight: 9,
+		weight: 9,
 		runtimeMs: 100_000,
 	},
 ];
@@ -43,8 +43,9 @@ describe("weighted Clock admission", () => {
 				const runtime = yield* readRuntimeFx();
 				const ids: string[] = [];
 				for (let index = 0; index < 100; index++) {
-					const line = yield* selectClockLineFx({
-						role: "clock-lifetime",
+					const line = yield* selectTriggeredLineFx({
+						trigger: "item-termination",
+						randomSeed: `sample:${index}`,
 						item: {
 							...owner,
 							id: `sample:${index}`,
@@ -67,7 +68,7 @@ describe("weighted Clock admission", () => {
 									]),
 									"expiry:light",
 								),
-								clockWeight: 1,
+								weight: 1,
 							},
 							{
 								...createExpiryLine(
@@ -78,7 +79,7 @@ describe("weighted Clock admission", () => {
 									]),
 									"expiry:heavy",
 								),
-								clockWeight: 9,
+								weight: 9,
 							},
 						],
 						clock: {
@@ -99,8 +100,9 @@ describe("weighted Clock admission", () => {
 				const ids = [];
 				for (let pulseSequence = 0; pulseSequence < 30; pulseSequence++) {
 					ids.push(
-						(yield* selectClockLineFx({
-							role: "clock-interval",
+						(yield* selectTriggeredLineFx({
+							trigger: "clock-interval",
+							randomSeed: `pulse:${pulseSequence}`,
 							runtime,
 							item: {
 								...owner,
@@ -120,7 +122,7 @@ describe("weighted Clock admission", () => {
 							{
 								...weightedLines[0],
 								uid: "gated",
-								clockWeight: 999,
+								weight: 999,
 								rules: [
 									{
 										type: "enable",
@@ -133,7 +135,7 @@ describe("weighted Clock admission", () => {
 							{
 								...weightedLines[0],
 								uid: "vetoed",
-								clockWeight: 999,
+								weight: 999,
 								rules: [
 									{
 										type: "disable",
@@ -188,8 +190,9 @@ describe("weighted Clock admission", () => {
 				const runtime = yield* readRuntimeFx();
 				const draws: string[] = [];
 				for (let pulseSequence = 0; pulseSequence < 300; pulseSequence++) {
-					const line = yield* selectClockLineFx({
-						role: "clock-interval",
+					const line = yield* selectTriggeredLineFx({
+						trigger: "clock-interval",
+						randomSeed: `pulse:${pulseSequence}`,
 						runtime,
 						item: {
 							...owner,
@@ -250,8 +253,9 @@ describe("weighted Clock admission", () => {
 			Effect.gen(function* () {
 				const owner = yield* spawnClockItemFx();
 				const runtime = yield* readRuntimeFx();
-				const selected = yield* selectClockLineFx({
-					role: "clock-interval",
+				const selected = yield* selectTriggeredLineFx({
+					trigger: "clock-interval",
+					randomSeed: "initial-pulse",
 					item: owner,
 					runtime,
 				});

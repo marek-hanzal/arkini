@@ -18,7 +18,7 @@
 				"title": "Purify Air",
 				"description": "Takes ugly air-pollution and make the air clean again",
 				"default": true,
-				"clockWeight": 1,
+				"weight": 1,
 				"show": true,
 				"enable": false,
 				"runtimeMs": 30000,

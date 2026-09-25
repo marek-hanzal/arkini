@@ -407,7 +407,7 @@ describe("job completion unit lifecycle", () => {
 						scope: "board",
 						space: 0,
 						position: {
-							x: 0,
+							x: 2,
 							y: 0,
 						},
 					},
@@ -496,7 +496,7 @@ describe("job completion unit lifecycle", () => {
 				scope: "board",
 				space: 0,
 				position: {
-					x: 0,
+					x: 1,
 					y: 0,
 				},
 			},
@@ -508,7 +508,7 @@ describe("job completion unit lifecycle", () => {
 					scope: "board",
 					space: 0,
 					position: {
-						x: 1,
+						x: 0,
 						y: 0,
 					},
 				},

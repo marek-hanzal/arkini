@@ -321,11 +321,12 @@ describe("receiver-owned Space merge", () => {
 			{
 				uid: "line",
 				title: "line",
+				trigger: "manual",
 				description: "line",
 				default: false,
 				enable: true,
 				show: true,
-				clockWeight: 1,
+				weight: 1,
 				runtimeMs: 1_000,
 				rules: [],
 				input: [

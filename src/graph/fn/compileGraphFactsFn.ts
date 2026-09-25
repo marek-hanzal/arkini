@@ -545,16 +545,6 @@ export const compileGraphFactsFn = (config: GameConfigSchema.Type): GraphFacts =
 				kind: "depletion",
 				data: item.units,
 			});
-			outcomeFn(
-				owner,
-				id,
-				item.units.outcome,
-				[
-					...source,
-					"outcome",
-				],
-				"depletion-item-outcome",
-			);
 		}
 		if (item.clock !== undefined) {
 			const source = [

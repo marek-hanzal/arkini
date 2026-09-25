@@ -42,7 +42,6 @@
 		"clock": {
 			"intervalMs": 180000,
 			"durationMs": 900000,
-			"expiryMode": "kill-switch",
 			"enable": true,
 			"rules": []
 		},
@@ -52,8 +51,8 @@
 				"uid": "qqh04db2jydhsyk3bl2qyic3",
 				"title": "Corruption",
 				"description": "You deserve it",
-				"clock": "clock-interval",
-				"clockWeight": 1,
+				"trigger": "clock-interval",
+				"weight": 1,
 				"default": false,
 				"show": false,
 				"enable": true,
@@ -91,6 +90,7 @@
 				},
 				"rules": []
 			}
-		]
+		],
+		"terminationMode": "kill-switch"
 	}
 }

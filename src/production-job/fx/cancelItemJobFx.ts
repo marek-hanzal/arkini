@@ -3,6 +3,8 @@ import { Effect } from "effect";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { abortJobRuntimeFx } from "~/production-job/fx/abortJobRuntimeFx";
+import { attemptTerminalItemFx } from "~/item-terminal/fx/attemptTerminalItemFx";
+import { readItemTerminalStateFn } from "~/item-terminal/fn/readItemTerminalStateFn";
 
 export namespace cancelItemJobFx {
 	export interface Props {
@@ -31,10 +33,22 @@ export const cancelItemJobFx = Effect.fn("cancelItemJobFx")(function* ({
 				reason: "player-cancelled",
 				runtime,
 			});
+			const owner = aborted.runtime.items.find((item) => item.id === ownerItemId);
+			const terminal =
+				owner === undefined || readItemTerminalStateFn(owner) === undefined
+					? undefined
+					: yield* attemptTerminalItemFx({
+							itemId: ownerItemId,
+							runtime: aborted.runtime,
+						});
+			if (terminal?.type === "blocked") return yield* Effect.fail(terminal.error);
 			return [
 				undefined,
-				aborted.runtime,
-				aborted.facts,
+				terminal?.runtime ?? aborted.runtime,
+				[
+					...aborted.facts,
+					...(terminal?.facts ?? []),
+				],
 			] as const;
 		}),
 	);

@@ -99,29 +99,29 @@ describe("editor MCP authoring schema registry", () => {
 		for (const id of roots) expect(ajv.getSchema(schemaUri(id)), id).toBeDefined();
 		const validateLine = ajv.getSchema(schemaUri("CompleteItemLineSchema"));
 		if (validateLine === undefined) throw new Error("Missing public line schema.");
-		const { clock: _clock, ...plainLine } = readLineAuthoringFn(createLine({}));
+		const plainLine = readLineAuthoringFn(createLine({}));
 		const lineWithoutWeight = {
 			...plainLine,
-			clockWeight: undefined,
+			weight: undefined,
 		};
 		expect(validateLine(lineWithoutWeight), JSON.stringify(validateLine.errors)).toBe(true);
 		expect(
 			validateLine({
 				...lineWithoutWeight,
-				clock: "clock-interval",
-			}),
-		).toBe(false);
-		expect(
-			validateLine({
-				...lineWithoutWeight,
-				clock: "clock-interval",
-				clockWeight: 1,
+				trigger: "clock-interval",
 			}),
 		).toBe(true);
 		expect(
 			validateLine({
 				...lineWithoutWeight,
-				clockWeight: 7,
+				trigger: "clock-interval",
+				weight: 1,
+			}),
+		).toBe(true);
+		expect(
+			validateLine({
+				...lineWithoutWeight,
+				weight: 7,
 			}),
 		).toBe(true);
 

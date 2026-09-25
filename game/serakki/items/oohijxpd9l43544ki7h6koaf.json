@@ -18,7 +18,7 @@
 				"title": "Explore Forest",
 				"artwork": "vh26v4kb2y915z79r4x5rlqs",
 				"description": "Search the nearby forest for wildlife. You may find something. Or nothing.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": false,

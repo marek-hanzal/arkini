@@ -12,32 +12,7 @@
 			]
 		},
 		"units": {
-			"amount": 24,
-			"outcome": {
-				"set": [
-					{
-						"weight": 1,
-						"rules": [],
-						"roll": [
-							{
-								"type": "guaranteed",
-								"outcome": [
-									{
-										"type": "item",
-										"itemUid": "amf7agzxa9ic4em9hrzuue60",
-										"quantity": {
-											"min": 1,
-											"max": 1
-										},
-										"placement": "drop",
-										"rules": []
-									}
-								]
-							}
-						]
-					}
-				]
-			}
+			"amount": 24
 		},
 		"merge": [
 			{
@@ -86,8 +61,8 @@
 				"uid": "expiry-evbffbj4huu519hwjjwwce06",
 				"title": "Expiry",
 				"description": "Resolves this item’s outcome when its lifetime ends.",
-				"clock": "clock-lifetime",
-				"clockWeight": 1,
+				"trigger": "item-termination",
+				"weight": 1,
 				"default": false,
 				"show": false,
 				"enable": true,
@@ -105,6 +80,43 @@
 										{
 											"type": "item",
 											"itemUid": "ysaolec07mflq4jonylq9h6v",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"uid": "f8f120f04df347d5a5db1c82",
+				"title": "Depletion",
+				"trigger": "item-termination",
+				"weight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [],
+				"outcome": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"outcome": [
+										{
+											"type": "item",
+											"itemUid": "amf7agzxa9ic4em9hrzuue60",
 											"quantity": {
 												"min": 1,
 												"max": 1

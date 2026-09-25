@@ -22,7 +22,7 @@
 				"title": "Build Composting Workshop",
 				"artwork": "d1nx3rme3j7j161hpd2cu7jv",
 				"description": "Build a Composting Workshop.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

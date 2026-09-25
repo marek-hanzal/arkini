@@ -20,7 +20,7 @@ import { resolveLineShowFn } from "~/production-line/fn/resolveLineShowFn";
 import { resolveLineEnableFn } from "~/production-line/fn/resolveLineEnableFn";
 import { readLineBlockingHintFn } from "~/item-detail-read/fn/readLineBlockingHintFn";
 import { isItemProductionAdmissionOpenFn } from "~/production-line/fn/isItemProductionAdmissionOpenFn";
-import { LineClockModeEnumSchema } from "~/production-line/schema/LineClockModeEnumSchema";
+import { LineTriggerEnumSchema } from "~/production-line/schema/LineTriggerEnumSchema";
 import { readEffectiveLineFn } from "~/production-line/fn/readEffectiveLineFn";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 
@@ -104,7 +104,7 @@ export const useItemDetailSceneController = ({
 					: undefined;
 			const boardOwnerItemId = boardLocation === undefined ? undefined : runtimeItem?.id;
 			const productionLines = item.lines.filter(
-				(line) => line.clock !== LineClockModeEnumSchema.enum["clock-lifetime"],
+				(line) => line.trigger === LineTriggerEnumSchema.enum.manual,
 			);
 			const lineStates = game.readFn(
 				Effect.forEach(productionLines, (line) => {

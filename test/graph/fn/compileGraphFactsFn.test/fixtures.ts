@@ -33,7 +33,7 @@ export const lineFn = (uid: string, fields: Record<string, unknown> = {}) => ({
 });
 export const expiryLineFn = (uid: string, outcome: ReturnType<typeof outputFn>) =>
 	lineFn(uid, {
-		clock: "clock-lifetime",
+		trigger: "item-termination",
 		runtimeMs: 0,
 		input: [],
 		outcome,
@@ -213,19 +213,18 @@ export const adversarialConfigFn = () => {
 			A: itemFn("A", {
 				units: {
 					amount: 20,
-					outcome: outputFn("D"),
 				},
+				terminationMode: "kill-switch",
 				clock: {
 					intervalMs: 100,
 					durationMs: 500,
-					expiryMode: "kill-switch",
 					rules: enable,
 				},
 				lines: [
 					lineFn("A-L", {
-						clock: "clock-interval",
-						clockWeight: 999,
-						default: true,
+						trigger: "clock-interval",
+						weight: 999,
+						default: false,
 						show: false,
 						enable: false,
 						input: [

@@ -22,7 +22,7 @@
 				"title": "Build Waste Incinerator",
 				"artwork": "mo6y7oa1ipuwt7pycm9s521t",
 				"description": "Build a sturdy incinerator for turning accumulated Waste into smoke and ash.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

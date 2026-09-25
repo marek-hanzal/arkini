@@ -13,6 +13,10 @@ import { createJobTestConfig, prepareJobLineFx } from "~test/production-job/supp
 import { existsWhen } from "~test/production-line/support/lineTestRuntime";
 import { setSpeedUpGameplayFx } from "~/game-cheat/fx/setSpeedUpGameplayFx";
 import { setCheatEnabledFx } from "~/game-cheat/fx/setCheatEnabledFx";
+import {
+	createClockConfig,
+	spawnClockItemFx,
+} from "~test/item-schedule/fx/clockSchedule.test/fixture";
 
 const props = {
 	ownerItemId: "runtime:forge",
@@ -102,6 +106,34 @@ const createTimedQueueJobConfig = () => {
 };
 
 describe("enqueueLineFx", () => {
+	it("rejects a player enqueue of a Clock interval line without changing the queue", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const owner = yield* spawnClockItemFx();
+				const before = yield* readRuntimeFx();
+				const attempt = yield* Effect.result(
+					enqueueLineFx({
+						ownerItemId: owner.id,
+						lineUid: "a",
+					}),
+				);
+				return {
+					attempt,
+					before,
+					after: yield* readRuntimeFx(),
+				};
+			}).pipe(
+				useGameFx({
+					config: createClockConfig(),
+				}),
+			),
+		);
+		expect(Result.isFailure(result.attempt)).toBe(true);
+		if (Result.isFailure(result.attempt))
+			expect(result.attempt.failure._tag).toBe("LineRunUnavailableError");
+		expect(result.after).toEqual(result.before);
+	});
+
 	it("appends an idle ready line without starting or filling it", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {

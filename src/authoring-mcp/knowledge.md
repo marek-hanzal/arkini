@@ -49,7 +49,7 @@ Outcomes can choose among weighted Space or Inventory destinations, subject to R
 
 ## Autonomous Item behavior
 
-An Item’s Clock can choose among multiple weighted `clock-interval` Lines. Line Rules and distance based input queries let it react to nearby Items and other conditions; each choice still follows the ordinary Line job lifecycle. A wolf can appear to hop around the Board when a `clock-lifetime` Line creates a fresh wolf instance on expiry. Another interval Line can require a nearby sheep, consume it, and produce a fed wolf and bones.
+An Item’s Clock can choose among multiple weighted `clock-interval` Lines. Line Rules and distance based input queries let it react to nearby Items and other conditions; each choice still follows the ordinary Line job lifecycle. A wolf can appear to hop around the Board when an `item-termination` Line creates a fresh wolf instance on expiry. Another interval Line can require a nearby sheep, consume it, and produce a fed wolf and bones.
 
 ## Order-driven production
 
@@ -59,7 +59,7 @@ Represent a request for a specific product as a physical Order Item. Make a `clo
 
 ## Manual and Clock roles
 
-An Item can own multiple Lines, each with its own inputs, runtime, rules, and outcome; they share one queue. At most one Line is `default`, the initial choice for manual production. Independently, `clock-interval` joins weighted selection at each Clock pulse, while `clock-lifetime` joins weighted selection at expiry. A Default Line may also be an interval Line, but an expiry Line cannot be Default. Visibility controls what the player sees; availability rules control what can run.
+An Item can own multiple Lines, each with its own inputs, runtime, rules, weight, and outcome; they share one queue. At most one manual Line is `default`, the initial choice for player production. `clock-interval` Lines join weighted selection at each Clock pulse. `item-termination` Lines join weighted selection when the item reaches Clock lifetime expiry or Units depletion. Visibility controls what the player sees; availability rules control what can run.
 
 ## When to use Default
 
@@ -71,4 +71,4 @@ A manual Line command records a request: no materials or Units are spent, and no
 
 ## Consumed and reserved materials
 
-Use `consume` for ingredients: the committed input is destroyed when the Job completes, without triggering its Units depletion outcome. Use `reserve` for tools or catalysts: the same Item instance and its owned state normally return to a free Board cell from the producer’s current position. Reserve needs room for that return; if ordinary completion cannot place the Item, the Job remains ready for retry.
+Use `consume` for ingredients: the committed input is destroyed when the Job completes, without spending its Units or starting a terminal line. Use `reserve` for tools or catalysts: the same Item instance and its owned state normally return to a free Board cell from the producer's current position. Reserve needs room for that return; if ordinary completion cannot place the Item, the Job remains ready for retry.

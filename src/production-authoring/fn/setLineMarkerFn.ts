@@ -1,7 +1,7 @@
 import type { LineSchema } from "~/production-line/schema/LineSchema";
-import { LineClockModeEnumSchema } from "~/production-line/schema/LineClockModeEnumSchema";
+import { LineTriggerEnumSchema } from "~/production-line/schema/LineTriggerEnumSchema";
 
-/** Keeps manual Default exclusive; expiry-only lines cannot be selected for production. */
+/** Keeps manual Default exclusive; triggered lines cannot be selected for manual production. */
 export const setLineMarkerFn = (
 	lines: ReadonlyArray<LineSchema.Type>,
 	index: number,
@@ -11,7 +11,7 @@ export const setLineMarkerFn = (
 		...line,
 		default:
 			lineIndex === index
-				? value && line.clock !== LineClockModeEnumSchema.enum["clock-lifetime"]
+				? value && line.trigger === LineTriggerEnumSchema.enum.manual
 				: value
 					? false
 					: line.default,

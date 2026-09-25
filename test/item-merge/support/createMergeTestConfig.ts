@@ -5,10 +5,12 @@ import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 
 const simpleItem = ({
 	units,
+	terminationOutcome,
 	id,
 	merge,
 }: {
 	units?: UnitsSchema.Type;
+	terminationOutcome?: OutcomeTableSchema.Type;
 	id: string;
 	merge?: readonly [
 		MergeSchema.Type,
@@ -16,7 +18,25 @@ const simpleItem = ({
 	];
 }) => ({
 	maxQueueSize: 1,
-	lines: [],
+	terminationMode: terminationOutcome === undefined ? undefined : "kill-switch",
+	lines:
+		terminationOutcome === undefined
+			? []
+			: [
+					{
+						uid: `termination:${id}`,
+						title: "Termination",
+						trigger: "item-termination" as const,
+						weight: 1,
+						default: false,
+						show: false,
+						enable: true,
+						runtimeMs: 0,
+						input: [],
+						outcome: terminationOutcome,
+						rules: [],
+					},
+				],
 
 	uid: id,
 	title: id,
@@ -39,6 +59,8 @@ export const createMergeTestConfig = ({
 	rule,
 	sourceUnits,
 	targetUnits,
+	sourceTerminationOutcome,
+	targetTerminationOutcome,
 }: {
 	board?: {
 		width: number;
@@ -52,6 +74,8 @@ export const createMergeTestConfig = ({
 		  ];
 	sourceUnits?: UnitsSchema.Type;
 	targetUnits?: UnitsSchema.Type;
+	sourceTerminationOutcome?: OutcomeTableSchema.Type;
+	targetTerminationOutcome?: OutcomeTableSchema.Type;
 }) =>
 	GameConfigSchema.parse({
 		resources: {
@@ -69,6 +93,7 @@ export const createMergeTestConfig = ({
 		items: {
 			source: simpleItem({
 				units: sourceUnits,
+				terminationOutcome: sourceTerminationOutcome,
 				id: "source",
 
 				merge: Array.isArray(rule)
@@ -82,6 +107,7 @@ export const createMergeTestConfig = ({
 			}),
 			target: simpleItem({
 				units: targetUnits,
+				terminationOutcome: targetTerminationOutcome,
 				id: "target",
 			}),
 			result: simpleItem({

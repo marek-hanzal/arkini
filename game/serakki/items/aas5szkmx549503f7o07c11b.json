@@ -22,7 +22,7 @@
 				"title": "Build Pumpkin Farm",
 				"artwork": "dvv4barhd6clyqk27xta73dv",
 				"description": "Build Pumpkin Farm.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

@@ -121,11 +121,12 @@ describe("item units / persistence", () => {
 					itemId: "runtime:exceeds",
 					reason: ItemUnitsIssueReasonEnumSchema.enum.ExceedsAmount,
 				}),
-				expect.objectContaining({
-					itemId: "runtime:depleted",
-					reason: ItemUnitsIssueReasonEnumSchema.enum.DepletedIdle,
-				}),
 			]),
 		);
+		expect(
+			result.issues.some(
+				(issue) => issue.type === "item:units" && issue.itemId === "runtime:depleted",
+			),
+		).toBe(false);
 	});
 });

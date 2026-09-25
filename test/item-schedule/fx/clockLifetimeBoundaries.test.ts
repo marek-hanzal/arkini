@@ -43,7 +43,7 @@ describe("Clock lifetime boundaries", () => {
 							{
 								...createLine({
 									uid: "pulse",
-									clock: "clock-interval",
+									trigger: "clock-interval",
 								}),
 								runtimeMs: 100,
 							},

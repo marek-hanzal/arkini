@@ -3,6 +3,7 @@ import { GraphDiscoveryBoundsSchema } from "~/graph/schema/GraphDiscoveryBoundsS
 import { IdSchema } from "~/game-value/schema/IdSchema";
 import { SourceActionSchema } from "~/item-merge/schema/SourceActionSchema";
 import { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
+import { LineTriggerEnumSchema } from "~/production-line/schema/LineTriggerEnumSchema";
 const NumericRangeSchema = z
 	.object({
 		gte: z.number().nonnegative().optional(),
@@ -103,12 +104,12 @@ export const GraphOperationsQuerySchema = GraphDiscoveryBoundsSchema.extend({
 					"receiver",
 				])
 				.optional(),
-			clock: z.boolean().optional(),
+			trigger: LineTriggerEnumSchema.optional(),
 			default: z.boolean().optional(),
 			show: z.boolean().optional(),
 			enable: z.boolean().optional(),
 			runtimeSeconds: NumericRangeSchema.optional(),
-			clockWeight: NumericRangeSchema.optional(),
+			weight: NumericRangeSchema.optional(),
 			durationSeconds: NumericRangeSchema.optional(),
 			intervalSeconds: NumericRangeSchema.optional(),
 		})

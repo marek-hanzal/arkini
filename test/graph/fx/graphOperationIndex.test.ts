@@ -119,10 +119,10 @@ it("combines scalar filters without treating missing fields as false and applies
 		graph.discoveryFx(project, {
 			kind: "operations",
 			filter: {
-				clock: true,
+				trigger: "clock-interval",
 				show: false,
 				enable: true,
-				clockWeight: {
+				weight: {
 					gt: 15,
 				},
 				runtimeSeconds: {
@@ -130,7 +130,7 @@ it("combines scalar filters without treating missing fields as false and applies
 					lte: 2,
 				},
 				hasOutcomes: true,
-				default: true,
+				default: false,
 			},
 		}),
 	);
@@ -141,7 +141,7 @@ it("combines scalar filters without treating missing fields as false and applies
 		graph.discoveryFx(project, {
 			kind: "operations",
 			filter: {
-				clock: false,
+				trigger: "manual",
 				hasOutcomes: false,
 			},
 		}),
@@ -239,7 +239,7 @@ it("combines scalar filters without treating missing fields as false and applies
 		graph.discoveryFx(project, {
 			kind: "operations",
 			filter: {
-				clock: true,
+				trigger: "clock-interval",
 			},
 			limit: 1,
 		}),
@@ -251,7 +251,7 @@ it("combines scalar filters without treating missing fields as false and applies
 					.discoveryFx(project, {
 						kind: "operations",
 						filter: {
-							clock: true,
+							trigger: "clock-interval",
 							show: false,
 						},
 						cursor: page.nextCursor,

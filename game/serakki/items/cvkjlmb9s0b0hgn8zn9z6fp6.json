@@ -22,7 +22,7 @@
 				"title": "Build Flower Farm",
 				"artwork": "l90rt6qrg0fvv2g7qak9uamt",
 				"description": "Build Flower Farm.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

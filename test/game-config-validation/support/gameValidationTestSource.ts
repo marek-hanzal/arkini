@@ -26,7 +26,7 @@ export const createSimpleItem = (id: string) =>
 
 export const createLine = ({
 	default: isDefault = false,
-	clock,
+	trigger = "manual",
 	uid = "line:test",
 	input = [
 		{
@@ -36,7 +36,7 @@ export const createLine = ({
 	outcome,
 }: {
 	default?: boolean;
-	clock?: LineSchema.Type["clock"];
+	trigger?: LineSchema.Type["trigger"];
 	uid?: string;
 	input?: ReadonlyArray<InputSchema.Type>;
 	outcome?: OutcomeTableSchema.Type;
@@ -46,7 +46,7 @@ export const createLine = ({
 		title: uid,
 		description: uid,
 		default: isDefault,
-		clock,
+		trigger,
 		runtimeMs: 0,
 		input,
 		outcome,
@@ -56,7 +56,7 @@ export const createLine = ({
 export const createExpiryLine = (outcome: OutcomeTableSchema.Type, uid = "line:expiry") =>
 	createLine({
 		uid,
-		clock: "clock-lifetime",
+		trigger: "item-termination",
 		input: [],
 		outcome,
 	});
@@ -66,15 +66,18 @@ export const createProducerItem = ({
 	input,
 	outcome,
 	lines,
+	clock,
 }: {
 	id: string;
 	input?: ReadonlyArray<InputSchema.Type>;
 	outcome?: OutcomeTableSchema.Type;
 	lines?: ReadonlyArray<LineSchema.Type>;
+	clock?: ItemSchema.Type["clock"];
 }) =>
 	ItemSchema.parse({
 		...createSimpleItem(id),
 		ui: "default",
+		clock,
 
 		lines: lines ?? [
 			createLine({

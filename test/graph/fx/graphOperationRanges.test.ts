@@ -24,8 +24,8 @@ it("applies inclusive and exclusive bounds at 30 to every numeric operation filt
 						lines: [
 							lineFn(`line-${value}`, {
 								runtimeMs: value * 1000,
-								clock: "clock-interval",
-								clockWeight: value,
+								trigger: "clock-interval",
+								weight: value,
 							}),
 						],
 					}),
@@ -37,7 +37,7 @@ it("applies inclusive and exclusive bounds at 30 to every numeric operation filt
 		"runtimeSeconds",
 		"durationSeconds",
 		"intervalSeconds",
-		"clockWeight",
+		"weight",
 	]) {
 		for (const [bounds, expected] of [
 			[

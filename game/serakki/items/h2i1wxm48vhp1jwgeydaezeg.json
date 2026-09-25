@@ -16,7 +16,7 @@
 				"uid": "pc7aopcgelvphxsatis54kak",
 				"title": "Boom",
 				"description": "Boom",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

@@ -1165,7 +1165,7 @@ describe("item section form session", () => {
 				createLine({
 					uid: "line:second",
 					default: false,
-					clock: "clock-interval",
+					trigger: "clock-interval",
 				}),
 			],
 		});
@@ -1174,7 +1174,7 @@ describe("item section form session", () => {
 		const { container, renderSection } = await render(<ProductionSection />);
 		expect(container.querySelector('input[name="lines[0].title"]')).not.toBeNull();
 		expect(container.querySelector('input[name="lines[1].title"]')).toBeNull();
-		expect(container.querySelector('input[name="lines[0].clockWeight"]')).toBeNull();
+		expect(container.querySelector('input[name="lines[0].weight"]')).toBeNull();
 		await renderSection(<ClockSection />, "clock");
 		expect(container.querySelector('input[name="lines[0].title"]')).toBeNull();
 		expect(container.querySelector('input[name="lines[1].title"]')).not.toBeNull();
@@ -1194,16 +1194,14 @@ describe("item section form session", () => {
 			}),
 		);
 		await changeInput(clockTitle, common.lines[1].title);
-		const weight = container.querySelector<HTMLInputElement>(
-			'input[name="lines[1].clockWeight"]',
-		);
-		if (weight === null) throw new Error("Missing Clock weight field.");
+		const weight = container.querySelector<HTMLInputElement>('input[name="lines[1].weight"]');
+		if (weight === null) throw new Error("Missing line weight field.");
 		await changeInput(weight, "7");
 		await act(async () => {
 			await state.unsavedSession?.saveFn();
 		});
 		expect(state.saveItem.mock.lastCall?.[0].item.lines[0].clock).toBeUndefined();
-		expect(state.saveItem.mock.lastCall?.[0].item.lines[1].clockWeight).toBe(7);
+		expect(state.saveItem.mock.lastCall?.[0].item.lines[1].weight).toBe(7);
 		await renderSection(<ClockSection />, "clock");
 		const remove = container.querySelector<HTMLButtonElement>(
 			'[data-ui="EditorClockLinesCollection"] [data-ui="EditorCollectionRemove"]',
@@ -1222,7 +1220,7 @@ describe("item section form session", () => {
 		]);
 	});
 
-	it("creates Clock lines with the selected role and no manual Default", async () => {
+	it("creates an interval line in Clock without a manual Default", async () => {
 		let session: ReturnType<typeof useFormSession> | undefined;
 		const Probe = () => {
 			session = useFormSession();
@@ -1238,33 +1236,24 @@ describe("item section form session", () => {
 		state.persisted = scheduled;
 		(state.project as Project).config.items[item.uid] = scheduled;
 		const { container } = await render(<Probe />);
-		for (const clock of [
-			"clock-interval",
-			"clock-lifetime",
-		] as const) {
-			const add = container.querySelector<HTMLButtonElement>(
-				'[data-ui="EditorClockLinesCollection"] [data-ui="EditorCollectionAdd"]',
-			);
-			if (add === null) throw new Error("Missing Clock line add control.");
-			await act(async () => add.click());
-			const option = document.querySelector<HTMLButtonElement>(
-				`[data-ui="ActionMenuOption"][data-ui-id="${clock}"]`,
-			);
-			if (option === null) throw new Error(`Missing ${clock} option.`);
-			await act(async () => option.click());
-		}
+		const add = container.querySelector<HTMLButtonElement>(
+			'[data-ui="EditorClockLinesCollection"] [data-ui="EditorCollectionAdd"]',
+		);
+		if (add === null) throw new Error("Missing Clock line add control.");
+		await act(async () => add.click());
+		const intervalOption = document.querySelector<HTMLButtonElement>(
+			'[data-ui="ActionMenuOption"][data-ui-id="clock-interval"]',
+		);
+		if (intervalOption === null) throw new Error("Missing interval option.");
+		await act(async () => intervalOption.click());
 		expect(
 			session?.form.state.values.lines?.map((line) => [
-				line.clock,
+				line.trigger,
 				line.default,
 			]),
 		).toEqual([
 			[
 				"clock-interval",
-				false,
-			],
-			[
-				"clock-lifetime",
 				false,
 			],
 		]);
@@ -1330,18 +1319,8 @@ describe("item section form session", () => {
 		if (duration === null) throw new Error("Missing clock lifetime field.");
 		const clear = container.querySelector<HTMLButtonElement>('button[title="Clear lifetime"]');
 		if (clear === null) throw new Error("Missing lifetime clear action");
-		const expiryMode = Array.from(container.querySelectorAll("button")).find(
-			(button) => button.textContent === "Loose-kill",
-		);
-		if (expiryMode === undefined) {
-			throw new Error("Missing lifetime-dependent Clock controls.");
-		}
 		await act(async () => clear.click());
 		expect(duration.value).toBe("");
-		const disabledExpiryMode = Array.from(container.querySelectorAll("button")).find(
-			(button) => button.textContent === "Loose-kill",
-		);
-		expect(disabledExpiryMode?.matches(":disabled")).toBe(true);
 		await act(async () => {
 			await state.unsavedSession?.saveFn();
 		});

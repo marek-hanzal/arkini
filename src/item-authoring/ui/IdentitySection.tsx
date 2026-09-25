@@ -4,6 +4,9 @@ import { readEditorFieldErrorFn } from "~/editor-control/fn/readEditorFieldError
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
+import { EditorChoiceControl } from "~/editor-control/ui/EditorValueControls";
+import { ProductionLinesSection } from "~/item-authoring/ui/ProductionLinesSection";
+import { Mx } from "~/translation/ui/Mx";
 
 import { EditorMusicSelection } from "~/music-authoring/ui/EditorMusicSelection";
 
@@ -63,6 +66,29 @@ export const IdentitySection = () => {
 					)}
 				</form.AppField>
 			</div>
+			<EditorFormSectionDivider title={translator.textFn("Item termination")} />
+			<form.AppField name="terminationMode">
+				{(field) => (
+					<EditorChoiceControl
+						label={translator.textFn("Termination mode")}
+						value={field.state.value ?? "loose-kill"}
+						options={[
+							{
+								value: "loose-kill",
+								label: translator.textFn("Loose-kill"),
+								description: <Mx label="Termination loose-kill help" />,
+							},
+							{
+								value: "kill-switch",
+								label: translator.textFn("Kill switch"),
+								description: <Mx label="Termination kill-switch help" />,
+							},
+						]}
+						onChangeFn={field.handleChange}
+					/>
+				)}
+			</form.AppField>
+			<ProductionLinesSection kind="termination" />
 		</div>
 	);
 };

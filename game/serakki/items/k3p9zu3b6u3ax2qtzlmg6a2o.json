@@ -13,12 +13,96 @@
 		"maxQueueSize": 6,
 		"lines": [
 			{
+				"uid": "601f88d7ad914891aa5dc676",
+				"title": "Corn",
+				"description": "Automatic corn production",
+				"trigger": "manual",
+				"weight": 1,
+				"default": true,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 30000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemUid": "jn0d9duoke8x541an3z3nnem"
+							},
+							"distance": "far"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemUid": "s9j877qispz12d8ry9h1d4wb"
+							},
+							"distance": "far"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 2,
+							"max": 2
+						}
+					}
+				],
+				"outcome": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"outcome": [
+										{
+											"type": "item",
+											"itemUid": "m0quqq3gbmugylp39ced2zco",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								},
+								{
+									"type": "guaranteed",
+									"outcome": [
+										{
+											"type": "item",
+											"itemUid": "ww797h0lugbws2jsb61ldy7g",
+											"quantity": {
+												"min": 2,
+												"max": 2
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
 				"uid": "pv8awh2w7gkl7169mgraroo6",
 				"title": "Corn",
 				"description": "Automatic corn production",
-				"clock": "clock-interval",
-				"clockWeight": 1,
-				"default": true,
+				"trigger": "manual",
+				"weight": 1,
+				"default": false,
 				"show": false,
 				"enable": true,
 				"runtimeMs": 30000,

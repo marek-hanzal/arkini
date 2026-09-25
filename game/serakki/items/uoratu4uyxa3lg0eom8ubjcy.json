@@ -22,7 +22,7 @@
 				"title": "Build Sawmill",
 				"artwork": "oo4txpzczam6kt5jue7vhf1a",
 				"description": "Let's build sawmill",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

@@ -4,10 +4,10 @@ import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { EngineFact } from "~/game-event/type/EngineFact";
 import { readItemScheduleFn } from "~/item-schedule/fn/readItemScheduleFn";
 import { resolveItemScheduleEnabledFx } from "~/item-schedule/fx/resolveItemScheduleEnabledFx";
-import { selectClockLineFx } from "~/item-schedule/fx/selectClockLineFx";
+import { selectTriggeredLineFx } from "~/line-trigger/fx/selectTriggeredLineFx";
 import { enqueueLineRuntimeFx } from "~/production-job/fx/enqueueLineRuntimeFx";
 import { SimulationStepMs } from "~/simulation-time/constant/SimulationStepMs";
-import { LineClockModeEnumSchema } from "~/production-line/schema/LineClockModeEnumSchema";
+import { LineTriggerEnumSchema } from "~/production-line/schema/LineTriggerEnumSchema";
 import { readLineInputAutofillCoverageFx } from "~/production-input/fx/readLineInputAutofillCoverageFx";
 
 /** Advances boundary identities only; a pulse admits ordinary intent before closing its final lifetime. */
@@ -34,6 +34,7 @@ export const advanceItemSchedulesFx = Effect.fn("advanceItemSchedulesFx")(functi
 			item === undefined ||
 			config === undefined ||
 			state === undefined ||
+			item.remainingUnits === 0 ||
 			state.remainingDurationMs === 0 ||
 			!(yield* resolveItemScheduleEnabledFx({
 				item: snapshot,
@@ -49,14 +50,17 @@ export const advanceItemSchedulesFx = Effect.fn("advanceItemSchedulesFx")(functi
 		const expired =
 			state.remainingDurationMs !== undefined && state.remainingDurationMs <= elapsed;
 		const pulse =
-			phase !== undefined && phase <= 0 && !(expired && config.expiryMode === "kill-switch");
+			phase !== undefined &&
+			phase <= 0 &&
+			!(expired && item.item.terminationMode === "kill-switch");
 		if (pulse) {
 			// A rejected choice consumes this pulse; never retry another line or mutate accepted work.
 			const attempt = yield* Effect.gen(function* () {
-				const line = yield* selectClockLineFx({
+				const line = yield* selectTriggeredLineFx({
 					item,
 					runtime: draft,
-					role: LineClockModeEnumSchema.enum["clock-interval"],
+					trigger: LineTriggerEnumSchema.enum["clock-interval"],
+					randomSeed: `serakki:clock-interval:v1:${item.id}:${item.item.uid}:${item.schedule?.pulseSequence ?? 0}`,
 				});
 				if (line === undefined) return undefined;
 				const coverage = yield* readLineInputAutofillCoverageFx({
@@ -70,6 +74,7 @@ export const advanceItemSchedulesFx = Effect.fn("advanceItemSchedulesFx")(functi
 					ownerItemId: item.id,
 					lineUid: line.uid,
 					runtime: draft,
+					trigger: LineTriggerEnumSchema.enum["clock-interval"],
 				});
 				return {
 					queued,

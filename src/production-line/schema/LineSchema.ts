@@ -6,7 +6,7 @@ import { IdSchema } from "~/game-value/schema/IdSchema";
 import { TimeSchema } from "~/game-value/schema/TimeSchema";
 import { TitleSchema } from "~/game-value/schema/TitleSchema";
 import { RuleSchema } from "./RuleSchema";
-import { LineClockModeEnumSchema } from "./LineClockModeEnumSchema";
+import { LineTriggerEnumSchema } from "./LineTriggerEnumSchema";
 
 /**
  * A single product line with its accepted inputs and produced outcome.
@@ -35,17 +35,17 @@ export const LineSchema = z
 		description: DescriptionSchema.optional().describe(
 			"Optional human-readable explanation of this product line's purpose.",
 		),
-		clock: LineClockModeEnumSchema.optional().describe(
-			"Optional weighted Clock role: interval admits a Job at each pulse; lifetime expiry runs this line as a Board Job or immediately settles its outcome when the owner is held internally.",
+		trigger: LineTriggerEnumSchema.default("manual").describe(
+			"The event that admits this line: manual action, Clock interval, or item termination.",
 		),
-		clockWeight: z
+		weight: z
 			.number()
 			.int()
 			.min(1)
 			.max(999)
 			.default(1)
 			.describe(
-				"Relative Clock selection weight among lines allowed by their evaluated rules.",
+				"Relative selection weight among triggered lines allowed by their evaluated rules.",
 			),
 		/**
 		 * Whether this line is the authored fallback default for its owning item.
@@ -110,14 +110,14 @@ export const LineSchema = z
 	})
 	.strict()
 	.superRefine((line, context) => {
-		if (line.clock === LineClockModeEnumSchema.enum["clock-lifetime"]) {
+		if (line.trigger !== LineTriggerEnumSchema.enum.manual) {
 			if (line.default)
 				context.addIssue({
 					code: "custom",
 					path: [
 						"default",
 					],
-					message: "An expiry line cannot be Default.",
+					message: "Only a manual line can be Default.",
 				});
 		}
 	})

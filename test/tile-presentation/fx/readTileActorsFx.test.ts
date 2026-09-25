@@ -123,7 +123,7 @@ describe("readTileActorsFx", () => {
 					lines: item.item.lines.map((line) => ({
 						...line,
 						runtimeMs: 0,
-						clock: "clock-interval",
+						trigger: "clock-interval",
 						input: [
 							{
 								type: "simple",
@@ -158,7 +158,7 @@ describe("readTileActorsFx", () => {
 		}
 	});
 
-	it("projects the saved pulse independently of a running job and full queue, with no Clock line selected", () => {
+	it("projects the saved pulse independently of a running job and full queue", () => {
 		const runtime = createTileActorRuntime({
 			active: true,
 		});
@@ -177,7 +177,6 @@ describe("readTileActorsFx", () => {
 							},
 							schedule: {
 								remainingIntervalMs: 7_500,
-								lineUids: [],
 							},
 						},
 			),

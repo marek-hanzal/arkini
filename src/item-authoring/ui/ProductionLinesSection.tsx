@@ -1,12 +1,12 @@
 import { createId } from "@paralleldrive/cuid2";
 import { useStore } from "@tanstack/react-form";
-import { Clock, Hourglass } from "lucide-react";
+import { Clock } from "lucide-react";
 import { createLineFn } from "~/production-authoring/fn/createLineFn";
 import { duplicateLineFn } from "~/production-authoring/fn/duplicateLineFn";
 import { setLineMarkerFn } from "~/production-authoring/fn/setLineMarkerFn";
 import { ProductionLineOption } from "~/production-authoring/ui/ProductionLineOption";
 import { LineFields } from "~/production-authoring/ui/LineFields";
-import { LineClockModeEnumSchema } from "~/production-line/schema/LineClockModeEnumSchema";
+import { LineTriggerEnumSchema } from "~/production-line/schema/LineTriggerEnumSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { EditorCollectionSelector } from "~/editor-control/ui/EditorCollectionSelector";
 import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
@@ -16,34 +16,48 @@ import { useFormValidationFocusIndex } from "~/item-authoring/ui/useFormValidati
 import { Mx } from "~/translation/ui/Mx";
 import { useTranslator } from "~/translation/ui/useTranslator";
 
-/** One canonical line collection, projected into manual and Clock authoring tabs. */
-export const ProductionLinesSection = ({ kind }: { readonly kind: "manual" | "clock" }) => {
+/** One canonical line collection, projected into manual, interval, and item termination authoring. */
+export const ProductionLinesSection = ({
+	kind,
+}: {
+	readonly kind: "manual" | "clock" | "termination";
+}) => {
 	const { form, project, productionLineUid } = useFormSession();
 	const translator = useTranslator();
 	const allLines = useStore(form.store, (state) => state.values.lines) ?? [];
 	const invalidLineIndex = useFormValidationFocusIndex(allLines);
 	const indices = allLines.flatMap((line, index) =>
-		(line.clock !== undefined) === (kind === "clock")
+		(
+			kind === "manual"
+				? line.trigger === LineTriggerEnumSchema.enum.manual
+				: kind === "clock"
+					? line.trigger === LineTriggerEnumSchema.enum["clock-interval"]
+					: line.trigger === LineTriggerEnumSchema.enum["item-termination"]
+		)
 			? [
 					index,
 				]
 			: [],
 	);
 	const lines = indices.map((index) => allLines[index]);
-	const title = translator.textFn(kind === "clock" ? "Production" : "Product lines");
-	const addLineFn = (clock?: LineSchema.Type["clock"]) => {
+	const title = translator.textFn(
+		kind === "termination"
+			? "Termination lines"
+			: kind === "manual"
+				? "Product lines"
+				: "Production",
+	);
+	const addLineFn = (trigger: LineSchema.Type["trigger"] = LineTriggerEnumSchema.enum.manual) => {
 		const currentLines = form.state.values.lines ?? [];
 		const line = createLineFn(currentLines, "", "", createId());
 		form.setFieldValue("lines", [
 			...currentLines,
 			{
 				...line,
-				...(clock === undefined
-					? {}
-					: {
-							clock,
-						}),
-				default: clock === undefined && !currentLines.some((existing) => existing.default),
+				trigger,
+				default:
+					trigger === LineTriggerEnumSchema.enum.manual &&
+					!currentLines.some((existing) => existing.default),
 			},
 		]);
 	};
@@ -51,22 +65,13 @@ export const ProductionLinesSection = ({ kind }: { readonly kind: "manual" | "cl
 		kind === "clock"
 			? [
 					{
-						id: LineClockModeEnumSchema.enum["clock-interval"],
+						id: LineTriggerEnumSchema.enum["clock-interval"],
 						label: translator.textFn("Clock - Interval"),
 						description: translator.textFn(
 							"Selects this line by weight at each Clock interval.",
 						),
 						icon: <Clock className="size-5" />,
-						onSelectFn: () => addLineFn(LineClockModeEnumSchema.enum["clock-interval"]),
-					},
-					{
-						id: LineClockModeEnumSchema.enum["clock-lifetime"],
-						label: translator.textFn("Clock - Expiry"),
-						description: translator.textFn(
-							"At lifetime expiry, selects this line by weight. On a Board it runs as a Job; inside another item or Job, its output settles immediately without inputs or runtime.",
-						),
-						icon: <Hourglass className="size-5" />,
-						onSelectFn: () => addLineFn(LineClockModeEnumSchema.enum["clock-lifetime"]),
+						onSelectFn: () => addLineFn(LineTriggerEnumSchema.enum["clock-interval"]),
 					},
 				]
 			: undefined;
@@ -74,7 +79,13 @@ export const ProductionLinesSection = ({ kind }: { readonly kind: "manual" | "cl
 		<EditorFormSection
 			description={
 				<Mx
-					label={kind === "clock" ? "Clock production lines help" : "Product lines help"}
+					label={
+						kind === "clock"
+							? "Clock production lines help"
+							: kind === "termination"
+								? "Termination lines help"
+								: "Product lines help"
+					}
 				/>
 			}
 			title={title}
@@ -88,7 +99,9 @@ export const ProductionLinesSection = ({ kind }: { readonly kind: "manual" | "cl
 						dataUi={
 							kind === "clock"
 								? "EditorClockLinesCollection"
-								: "EditorProductionLinesCollection"
+								: kind === "termination"
+									? "EditorTerminationLinesCollection"
+									: "EditorProductionLinesCollection"
 						}
 						count={lines.length}
 						itemLabelFn={(index) =>
@@ -121,7 +134,16 @@ export const ProductionLinesSection = ({ kind }: { readonly kind: "manual" | "cl
 						label={title}
 						navigationCard
 						addOptions={addOptions}
-						onAddFn={kind === "manual" ? () => addLineFn() : undefined}
+						onAddFn={
+							kind === "manual"
+								? () => addLineFn()
+								: kind === "termination"
+									? () =>
+											addLineFn(
+												LineTriggerEnumSchema.enum["item-termination"],
+											)
+									: undefined
+						}
 						onDuplicateFn={(index) => {
 							const currentLines = form.state.values.lines ?? [];
 							const absoluteIndex = indices[index];

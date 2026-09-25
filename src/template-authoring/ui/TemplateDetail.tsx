@@ -110,16 +110,6 @@ const TemplateDeleteBlockerLink = ({
 			: [
 					`${translator.textFn("Merge")} ${mergeIndex + 1}`,
 				]),
-		...(path[2] === "units"
-			? [
-					translator.textFn("Depletion outcome"),
-				]
-			: []),
-		...(path[2] === "clock"
-			? [
-					translator.textFn("Expiry outcome"),
-				]
-			: []),
 		...(outcomeSet === undefined
 			? []
 			: [

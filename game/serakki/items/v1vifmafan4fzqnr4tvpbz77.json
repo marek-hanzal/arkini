@@ -22,7 +22,7 @@
 				"title": "Build School - Tier 2",
 				"artwork": "sj22vclculpow2m4a5d58b8t",
 				"description": "Build a Tier 2 school using processed materials and Tier 2 labor.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

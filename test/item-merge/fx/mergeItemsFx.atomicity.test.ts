@@ -4,7 +4,6 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/useGameFx";
 import { mergeItemsFx } from "~/item-merge/fx/mergeItemsFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
-import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
 import { removeRuntimeItemForTestFx } from "~test/item-interaction/support/removeRuntimeItemForTestFx";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 import {
@@ -83,82 +82,6 @@ const blockedOutputState = (includeBlocker = true) =>
 	}) satisfies StateSchema.Type;
 
 describe("mergeItemsFx atomicity", () => {
-	it("rolls back when source depletion resets the target before its merge effect", () => {
-		const baseConfig = createMergeTestConfig({
-			sourceUnits: {
-				amount: 1,
-				outcome: {
-					set: [
-						{
-							weight: 1,
-							rules: [],
-							roll: [
-								{
-									type: "guaranteed",
-									outcome: [
-										{
-											type: "template",
-											templateUid: "empty",
-											rules: [],
-										},
-									],
-								},
-							],
-						},
-					],
-				},
-			},
-			rule: {
-				target: {
-					type: "item",
-					itemUid: "target",
-				},
-				action: "spend",
-				effect: "replace",
-				result: "result",
-			},
-		});
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				const attempt = yield* mergeAttemptFx();
-				return {
-					...attempt,
-					transition: yield* (yield* CommittedTransitionsFx).read,
-				};
-			}).pipe(
-				useGameFx({
-					config: {
-						...baseConfig,
-						templates: [
-							{
-								uid: "empty",
-								title: "Empty",
-								width: 4,
-								height: 2,
-								board: [],
-							},
-						],
-					},
-					state: blockedOutputState(false),
-				}),
-			),
-		);
-
-		expect(Result.isFailure(result.attempt)).toBe(true);
-		if (Result.isFailure(result.attempt)) {
-			expect(result.attempt.failure).toMatchObject({
-				_tag: "ItemNotFoundError",
-				itemId: "runtime:target",
-			});
-		}
-		expect(result.after).toEqual(result.before);
-		expect(result.transition.events).not.toContainEqual(
-			expect.objectContaining({
-				type: "item:merged",
-			}),
-		);
-	});
-
 	it("rolls back source consumption when optional output cannot fit completely", () => {
 		const config = createMergeTestConfig({
 			board: {

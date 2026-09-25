@@ -1,6 +1,5 @@
 import {
 	Effect,
-	Result,
 	board,
 	expect,
 	it,
@@ -9,70 +8,6 @@ import {
 	spawnItemFx,
 	startLineFx,
 } from "./itemUnits.test/fixture";
-
-it("rolls back the whole start when depletion outcome cannot be placed", () => {
-	const result = run(
-		Effect.gen(function* () {
-			const owner = yield* spawnItemFx({
-				id: "runtime:lumberjack",
-				itemUid: "producer:lumberjack",
-				location: board(0),
-			});
-			yield* spawnItemFx({
-				id: "runtime:messy",
-				itemUid: "units:messy",
-				location: board(1),
-			});
-			for (const [id, location] of [
-				[
-					"runtime:blocker:2",
-					board(2),
-				],
-				[
-					"runtime:blocker:3",
-					board(3),
-				],
-				[
-					"runtime:blocker:4",
-					board(0, 1),
-				],
-				[
-					"runtime:blocker:5",
-					board(1, 1),
-				],
-				[
-					"runtime:blocker:6",
-					board(2, 1),
-				],
-				[
-					"runtime:blocker:7",
-					board(3, 1),
-				],
-			] as const) {
-				yield* spawnItemFx({
-					id,
-					itemUid: "item:blocker",
-					location,
-				});
-			}
-			const before = yield* readRuntimeFx();
-			const attempt = yield* Effect.result(
-				startLineFx({
-					ownerItemId: owner.id,
-					lineUid: "line:lumberjack:messy",
-				}),
-			);
-			return {
-				after: yield* readRuntimeFx(),
-				attempt,
-				before,
-			};
-		}),
-	);
-
-	expect(Result.isFailure(result.attempt)).toBe(true);
-	expect(result.after).toEqual(result.before);
-});
 
 it("resolves idle depletion while preserving the exact owner with remaining units", () => {
 	const result = run(

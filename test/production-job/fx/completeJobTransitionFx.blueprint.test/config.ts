@@ -28,11 +28,13 @@ const blueprintItem = ({
 	lineUid,
 	outcome,
 	reserveTool = false,
+	terminationOutcome,
 }: {
 	id: string;
 	lineUid: string;
 	outcome?: z.input<typeof OutcomeTableSchema>;
 	reserveTool?: boolean;
+	terminationOutcome?: z.input<typeof OutcomeTableSchema>;
 }) =>
 	ItemSchema.parse({
 		uid: id,
@@ -90,6 +92,23 @@ const blueprintItem = ({
 				outcome,
 				rules: [],
 			},
+			...(terminationOutcome === undefined
+				? []
+				: [
+						{
+							uid: `termination:${id}`,
+							title: "Termination",
+							trigger: "item-termination" as const,
+							weight: 1,
+							default: false,
+							show: false,
+							enable: true,
+							runtimeMs: 0,
+							input: [],
+							outcome: terminationOutcome,
+							rules: [],
+						},
+					]),
 		],
 	});
 
@@ -201,47 +220,32 @@ export const blueprintConfig = GameConfigSchema.parse({
 				},
 			]),
 		}),
-		"blueprint:depletion-capped": {
-			...blueprintItem({
-				id: "blueprint:depletion-capped",
-				lineUid: "line:blueprint:depletion-capped",
-				outcome: blueprintOutput("item:target-unlimited"),
-				reserveTool: true,
-			}),
-			units: {
-				amount: 1,
-				outcome: blueprintOutput("item:depletion-product"),
+		"blueprint:depletion-capped": blueprintItem({
+			id: "blueprint:depletion-capped",
+			lineUid: "line:blueprint:depletion-capped",
+			outcome: blueprintOutput("item:target-unlimited"),
+			reserveTool: true,
+			terminationOutcome: blueprintOutput("item:depletion-product"),
+		}),
+		"blueprint:depletion-self": blueprintItem({
+			id: "blueprint:depletion-self",
+			lineUid: "line:blueprint:depletion-self",
+			outcome: blueprintOutput("item:target-unlimited"),
+			reserveTool: true,
+			terminationOutcome: blueprintOutput("blueprint:depletion-self"),
+		}),
+		"blueprint:depletion-random": blueprintItem({
+			id: "blueprint:depletion-random",
+			lineUid: "line:blueprint:depletion-random",
+			outcome: blueprintOutput("item:target-unlimited"),
+			reserveTool: true,
+			terminationOutcome: {
+				set: [
+					...blueprintOutput("item:target-unlimited").set,
+					...blueprintOutput("item:depletion-product").set,
+				],
 			},
-		},
-		"blueprint:depletion-self": {
-			...blueprintItem({
-				id: "blueprint:depletion-self",
-				lineUid: "line:blueprint:depletion-self",
-				outcome: blueprintOutput("item:target-unlimited"),
-				reserveTool: true,
-			}),
-			units: {
-				amount: 1,
-				outcome: blueprintOutput("blueprint:depletion-self"),
-			},
-		},
-		"blueprint:depletion-random": {
-			...blueprintItem({
-				id: "blueprint:depletion-random",
-				lineUid: "line:blueprint:depletion-random",
-				outcome: blueprintOutput("item:target-unlimited"),
-				reserveTool: true,
-			}),
-			units: {
-				amount: 1,
-				outcome: {
-					set: [
-						...blueprintOutput("item:target-unlimited").set,
-						...blueprintOutput("item:depletion-product").set,
-					],
-				},
-			},
-		},
+		}),
 		"item:target": simpleItem({
 			id: "item:target",
 		}),

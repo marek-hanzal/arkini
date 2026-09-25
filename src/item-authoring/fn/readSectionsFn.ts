@@ -12,14 +12,14 @@ const FormSections = [
 		shortcut: "a",
 	},
 	{
-		id: "production",
-		label: "Production",
-		shortcut: "p",
-	},
-	{
 		id: "merges",
 		label: "Merges",
 		shortcut: "m",
+	},
+	{
+		id: "production",
+		label: "Production",
+		shortcut: "p",
 	},
 	{
 		id: "units",

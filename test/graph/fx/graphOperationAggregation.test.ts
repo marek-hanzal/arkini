@@ -24,7 +24,7 @@ it("counts the whole filtered operation index rather than the listing limit, pre
 				"line",
 			],
 			filter: {
-				clock: true,
+				trigger: "clock-interval",
 				show: false,
 				enable: true,
 			},
@@ -38,7 +38,7 @@ it("counts the whole filtered operation index rather than the listing limit, pre
 				scope: "title",
 			},
 			filter: {
-				clockWeight: {
+				weight: {
 					gt: 15,
 				},
 			},

@@ -22,7 +22,7 @@
 				"title": "Build Herbalist",
 				"artwork": "t8fcvhnkshehi1vumbhhxdu7",
 				"description": "Build Herbalist.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

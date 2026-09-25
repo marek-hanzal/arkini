@@ -21,7 +21,7 @@
 				"title": "Well",
 				"artwork": "hki2ifgb69fb84zyd2ct3ied",
 				"description": "Find a new well",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

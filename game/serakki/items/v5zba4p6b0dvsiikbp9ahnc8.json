@@ -22,7 +22,7 @@
 				"title": "Build Gardener",
 				"artwork": "e66c5l38fesf2qr41s7335ux",
 				"description": "Build Gardener.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": true,

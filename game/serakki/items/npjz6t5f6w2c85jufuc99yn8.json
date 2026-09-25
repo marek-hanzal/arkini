@@ -18,12 +18,91 @@
 		"maxQueueSize": 8,
 		"lines": [
 			{
+				"uid": "be1450c917fb46a9a57574be",
+				"title": "Milk",
+				"description": "Milk",
+				"trigger": "manual",
+				"weight": 1,
+				"default": true,
+				"show": true,
+				"enable": true,
+				"runtimeMs": 28000,
+				"input": [
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemUid": "g820g0sxzhyuon040x3j5qje"
+							},
+							"distance": "far"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					},
+					{
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemUid": "eyekjhm9lxz8oqjm2qa0a0x0"
+							},
+							"distance": "far"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
+					}
+				],
+				"outcome": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"outcome": [
+										{
+											"type": "item",
+											"itemUid": "mroh4s4rsygi6qlncjqbqu2k",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"type": "item",
+											"itemUid": "gowelydmmo177puaatmcboii",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
 				"uid": "xg36dsreka2xdm574fqlmzdt",
 				"title": "Milk",
 				"description": "Milk",
-				"clock": "clock-interval",
-				"clockWeight": 1,
-				"default": true,
+				"trigger": "clock-interval",
+				"weight": 1,
+				"default": false,
 				"show": true,
 				"enable": true,
 				"runtimeMs": 28000,

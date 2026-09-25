@@ -18,7 +18,7 @@
 				"title": "Stone",
 				"artwork": "rdgbwmk5ornk307ygh9vpjsi",
 				"description": "Get the stone from stone deposit.",
-				"clockWeight": 1,
+				"weight": 1,
 				"default": true,
 				"show": true,
 				"enable": false,

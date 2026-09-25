@@ -138,7 +138,7 @@ import { ArtworkSection } from "~/item-authoring/ui/ArtworkSection";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { IdentitySection } from "~/item-authoring/ui/IdentitySection";
 import { ClockSection } from "~/item-authoring/ui/ClockSection";
-import { UnitsSection } from "~/item-authoring/ui/UnitsSection";
+import { AutomationSection } from "~/item-authoring/ui/AutomationSection";
 import { MergesSection } from "~/item-authoring/ui/MergesSection";
 import { ProductionSection } from "~/item-authoring/ui/ProductionSection";
 import type { OptionalCapability, SectionId } from "~/item-authoring/type/Section";
@@ -369,7 +369,7 @@ describe("item section form session", () => {
 				<ProjectResourceUrlProvider>
 					<Form
 						uid={item.uid}
-						sectionId="clock"
+						sectionId="automation"
 					>
 						<ArtworkEditProbe />
 					</Form>
@@ -404,7 +404,7 @@ describe("item section form session", () => {
 
 	it("returns to the current section after shortcut Save and Discard", async () => {
 		const { container, renderSection } = await render(<IdentitySection />);
-		await renderSection(<IdentitySection />, "clock");
+		await renderSection(<IdentitySection />, "automation");
 		const title = container.querySelector<HTMLInputElement>('input[name="title"]');
 		if (title === null) throw new Error("Missing title input");
 		await changeInput(title, "Changed");
@@ -428,7 +428,7 @@ describe("item section form session", () => {
 			expect.objectContaining({
 				to: "/editor/$projectId/editor/items/$itemUid/detail/$sectionId",
 				params: expect.objectContaining({
-					sectionId: "clock",
+					sectionId: "automation",
 				}),
 			}),
 		);
@@ -442,11 +442,40 @@ describe("item section form session", () => {
 		expect(state.navigate).toHaveBeenLastCalledWith(
 			expect.objectContaining({
 				params: expect.objectContaining({
-					sectionId: "clock",
+					sectionId: "automation",
 				}),
 			}),
 		);
 		expect(state.saveItem).toHaveBeenCalledTimes(saves);
+	});
+
+	it("edits and removes Units on the Item page without changing other item settings", async () => {
+		const configured = ItemSchema.parse({
+			...item,
+			units: {
+				amount: 3,
+			},
+		});
+		state.persisted = configured;
+		(state.project as Project).config.items[item.uid] = configured;
+		const { container } = await render(<IdentitySection />);
+		const units = container.querySelector<HTMLInputElement>('input[name="units.amount"]');
+		if (units === null) throw new Error("Missing Units field on Item page.");
+		await changeInput(units, "5");
+		await act(async () => {
+			await state.unsavedSession?.saveFn();
+		});
+		expect(state.saveItem.mock.lastCall?.[0].item).toMatchObject({
+			units: {
+				amount: 5,
+			},
+			title: configured.title,
+		});
+		await changeInput(units, "");
+		await act(async () => {
+			await state.unsavedSession?.saveFn();
+		});
+		expect(state.saveItem.mock.lastCall?.[0].item.units).toBeUndefined();
 	});
 	it.each([
 		"production",
@@ -898,8 +927,6 @@ describe("item section form session", () => {
 	it.each([
 		"merges",
 		"production",
-		"clock",
-		"units",
 	] as const)(
 		"disables all %s only in the draft until Save and preserves the other capabilities",
 		async (capability) => {
@@ -945,8 +972,6 @@ describe("item section form session", () => {
 			const section = {
 				merges: <MergesSection />,
 				production: <ProductionSection />,
-				clock: <ClockSection />,
-				units: <UnitsSection />,
 			}[capability];
 			const { container, renderSection } = await render(section);
 			await renderSection(section, capability);
@@ -965,8 +990,8 @@ describe("item section form session", () => {
 					item: expect.objectContaining({
 						uid: configured.uid,
 						maxQueueSize: configured.maxQueueSize,
-						clock: capability === "clock" ? undefined : configured.clock,
-						units: capability === "units" ? undefined : configured.units,
+						clock: configured.clock,
+						units: configured.units,
 						lines: capability === "production" ? [] : configured.lines,
 						merge: capability === "merges" ? undefined : configured.merge,
 					}),
@@ -1142,7 +1167,7 @@ describe("item section form session", () => {
 		]);
 	});
 
-	it("separates manual and Clock line editing without changing their shared form order", async () => {
+	it("separates manual and automatic line editing without changing their shared form order", async () => {
 		state.saveItem.mockImplementation(async ({ item }: { item: ItemSchema.Type }) => {
 			state.persisted = item;
 			(state.project as Project).config.items[item.uid] = item;
@@ -1175,13 +1200,13 @@ describe("item section form session", () => {
 		expect(container.querySelector('input[name="lines[0].title"]')).not.toBeNull();
 		expect(container.querySelector('input[name="lines[1].title"]')).toBeNull();
 		expect(container.querySelector('input[name="lines[0].weight"]')).toBeNull();
-		await renderSection(<ClockSection />, "clock");
+		await renderSection(<AutomationSection />, "automation");
 		expect(container.querySelector('input[name="lines[0].title"]')).toBeNull();
 		expect(container.querySelector('input[name="lines[1].title"]')).not.toBeNull();
 		const clockTitle = container.querySelector<HTMLInputElement>(
 			'input[name="lines[1].title"]',
 		);
-		if (clockTitle === null) throw new Error("Missing Clock line title field.");
+		if (clockTitle === null) throw new Error("Missing automatic line title field.");
 		await changeInput(clockTitle, "");
 		await act(async () => {
 			await state.unsavedSession?.saveFn();
@@ -1189,7 +1214,7 @@ describe("item section form session", () => {
 		expect(state.navigate).toHaveBeenLastCalledWith(
 			expect.objectContaining({
 				params: expect.objectContaining({
-					sectionId: "clock",
+					sectionId: "automation",
 				}),
 			}),
 		);
@@ -1202,11 +1227,11 @@ describe("item section form session", () => {
 		});
 		expect(state.saveItem.mock.lastCall?.[0].item.lines[0].clock).toBeUndefined();
 		expect(state.saveItem.mock.lastCall?.[0].item.lines[1].weight).toBe(7);
-		await renderSection(<ClockSection />, "clock");
+		await renderSection(<AutomationSection />, "automation");
 		const remove = container.querySelector<HTMLButtonElement>(
-			'[data-ui="EditorClockLinesCollection"] [data-ui="EditorCollectionRemove"]',
+			'[data-ui="EditorAutomationLinesCollection"] [data-ui="EditorCollectionRemove"]',
 		);
-		if (remove === null) throw new Error("Missing Clock line remove control.");
+		if (remove === null) throw new Error("Missing automatic line remove control.");
 		await act(async () => remove.click());
 		await act(async () => {
 			await state.unsavedSession?.saveFn();
@@ -1220,11 +1245,11 @@ describe("item section form session", () => {
 		]);
 	});
 
-	it("creates an interval line in Clock without a manual Default", async () => {
+	it("creates interval and ending lines in Automation without a manual Default", async () => {
 		let session: ReturnType<typeof useFormSession> | undefined;
 		const Probe = () => {
 			session = useFormSession();
-			return <ClockSection />;
+			return <AutomationSection />;
 		};
 		const scheduled = ItemSchema.parse({
 			...item,
@@ -1237,9 +1262,9 @@ describe("item section form session", () => {
 		(state.project as Project).config.items[item.uid] = scheduled;
 		const { container } = await render(<Probe />);
 		const add = container.querySelector<HTMLButtonElement>(
-			'[data-ui="EditorClockLinesCollection"] [data-ui="EditorCollectionAdd"]',
+			'[data-ui="EditorAutomationLinesCollection"] [data-ui="EditorCollectionAdd"]',
 		);
-		if (add === null) throw new Error("Missing Clock line add control.");
+		if (add === null) throw new Error("Missing automatic line add control.");
 		await act(async () => add.click());
 		const intervalOption = document.querySelector<HTMLButtonElement>(
 			'[data-ui="ActionMenuOption"][data-ui-id="clock-interval"]',
@@ -1257,6 +1282,60 @@ describe("item section form session", () => {
 				false,
 			],
 		]);
+		await act(async () => add.click());
+		const endingOption = document.querySelector<HTMLButtonElement>(
+			'[data-ui="ActionMenuOption"][data-ui-id="item-termination"]',
+		);
+		if (endingOption === null) throw new Error("Missing item ending option.");
+		await act(async () => endingOption.click());
+		expect(session?.form.state.values.lines?.map((line) => line.trigger)).toEqual([
+			"clock-interval",
+			"item-termination",
+		]);
+	});
+
+	it.each([
+		[
+			"units",
+			{
+				units: {
+					amount: 2,
+				},
+			},
+		],
+		[
+			"lifetime",
+			{
+				clock: {
+					durationMs: 10_000,
+				},
+			},
+		],
+		[
+			"neither",
+			{
+				clock: {
+					intervalMs: 5_000,
+				},
+			},
+		],
+	] as const)("offers Item ending only when %s can end the item", async (_source, settings) => {
+		const configured = ItemSchema.parse({
+			...item,
+			...settings,
+		});
+		state.persisted = configured;
+		(state.project as Project).config.items[item.uid] = configured;
+		const { container } = await render(<AutomationSection />);
+		const add = container.querySelector<HTMLButtonElement>(
+			'[data-ui="EditorAutomationLinesCollection"] [data-ui="EditorCollectionAdd"]',
+		);
+		if (add === null) throw new Error("Missing Automation add control.");
+		await act(async () => add.click());
+		const endingOption = document.querySelector<HTMLButtonElement>(
+			'[data-ui="ActionMenuOption"][data-ui-id="item-termination"]',
+		);
+		expect(endingOption !== null).toBe(_source !== "neither");
 	});
 
 	it.each([

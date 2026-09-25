@@ -1,4 +1,3 @@
-import { ItemInterfaceField } from "~/item-authoring/ui/ItemInterfaceField";
 import { Clock } from "lucide-react";
 import { EditorChoiceControl } from "~/editor-control/ui/EditorValueControls";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
@@ -12,8 +11,8 @@ import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
 import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Mx } from "~/translation/ui/Mx";
-import { ProductionLinesSection } from "~/item-authoring/ui/ProductionLinesSection";
-/** Composes shared time, rule, and outcome controls for the authored schedule. */
+import { ItemSectionDisableControl } from "~/item-authoring/ui/ItemSectionDisableControl";
+/** Composes time and rule controls for the authored schedule. */
 const ClockFields = () => {
 	const translator = useTranslator();
 	const { form, ruleIndex, whenIndex, outcomeIndex } = useFormSession();
@@ -26,7 +25,10 @@ const ClockFields = () => {
 			data-ui="EditorClockFields"
 		>
 			<EditorFormCard>
-				<EditorFormSectionDivider title={translator.textFn("Clock")} />
+				<EditorFormSectionDivider
+					title={translator.textFn("Clock")}
+					action={<ItemSectionDisableControl capability="clock" />}
+				/>
 				<div className="grid grid-cols-2 items-start gap-4">
 					<form.AppField name="clock.durationMs">
 						{(field) => (
@@ -74,7 +76,6 @@ const ClockFields = () => {
 								/>
 							)}
 						</form.AppField>
-						<ItemInterfaceField />
 					</div>
 				</div>
 				<SectionEnd />
@@ -109,7 +110,6 @@ const ClockFields = () => {
 					</form.Subscribe>
 				</EditorFormCard>
 			</EditorFormSection>
-			<ProductionLinesSection kind="clock" />
 		</div>
 	);
 };
@@ -118,10 +118,6 @@ const ClockFields = () => {
 export const ClockSection = () => {
 	const { form, enableClockFn } = useFormSession();
 	const translator = useTranslator();
-	const hasClockLines = useStore(
-		form.store,
-		(state) => state.values.lines?.some((line) => line.trigger === "clock-interval") ?? false,
-	);
 	return (
 		<form.Subscribe selector={(state) => state.values.clock}>
 			{(clock) =>
@@ -134,11 +130,10 @@ export const ClockSection = () => {
 							icon={Clock}
 							title={translator.textFn("No Clock configured")}
 							summary={translator.textFn("Item clock empty title")}
-							size="large"
+							size="normal"
 							actionLabel={translator.textFn("Enable")}
 							onEnableFn={enableClockFn}
 						/>
-						{hasClockLines ? <ProductionLinesSection kind="clock" /> : null}
 					</div>
 				) : (
 					<div

@@ -1,9 +1,8 @@
 import { readSpaceDestinationLabelFn } from "~/space/fn/readSpaceDestinationLabelFn";
 import { match } from "ts-pattern";
 import { Tx } from "~/translation/ui/Tx";
-import { DisabledCapabilityDetail } from "~/item-authoring/ui/DisabledCapabilityDetail";
 import { useTranslator } from "~/translation/ui/useTranslator";
-import { ArrowUpRight, BatteryCharging, Combine } from "lucide-react";
+import { ArrowUpRight, Combine } from "lucide-react";
 
 import type { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
@@ -15,49 +14,8 @@ import { OutcomeDetail } from "~/item-authoring/ui/OutcomeDetail";
 import { SelectorDetail } from "~/item-authoring/ui/SelectorDetail";
 import { DetailReference } from "~/item-authoring/ui/DetailReference";
 import { Mx } from "~/translation/ui/Mx";
+import { DisabledCapabilityDetail } from "~/item-authoring/ui/DisabledCapabilityDetail";
 import { TemplateDetailReference } from "~/template-authoring/ui/TemplateDetailReference";
-
-/** Presents the optional unit capability or its explicit disabled state. */
-export const UnitsDetail = ({
-	item,
-	preview = false,
-}: {
-	readonly item: ItemSchema.Type;
-	readonly preview?: boolean;
-}) => {
-	const translator = useTranslator();
-	if (item.units === undefined) {
-		const empty = (
-			<DisabledCapabilityDetail
-				actionLabel={translator.textFn("Enable")}
-				capability="units"
-				icon={BatteryCharging}
-				itemUid={item.uid}
-				title={translator.textFn(
-					preview ? "Item units empty title" : "No Units configured",
-				)}
-				summary={preview ? undefined : translator.textFn("Item units empty title")}
-				size={preview ? "normal" : "large"}
-			/>
-		);
-		return preview ? (
-			<EditorRootCard dataUi="EditorItemUnitsDisabledCard">{empty}</EditorRootCard>
-		) : (
-			empty
-		);
-	}
-	return (
-		<div className="grid gap-3">
-			<EditorRootCard dataUi="EditorItemUnitsCard">
-				<DetailFact
-					label={translator.textFn("Initial units")}
-					description={<Mx label="Authored Units amount summary help" />}
-					value={item.units.amount}
-				/>
-			</EditorRootCard>
-		</div>
-	);
-};
 
 export const MergeDetail = ({
 	index,

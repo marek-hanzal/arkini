@@ -31,7 +31,12 @@ export const DisabledCapabilityDetail = ({
 					params={{
 						projectId: project.projectId,
 						itemUid,
-						sectionId: capability,
+						sectionId:
+							capability === "units"
+								? "identity"
+								: capability === "clock"
+									? "automation"
+									: capability,
 					}}
 					search={{
 						enable: capability,

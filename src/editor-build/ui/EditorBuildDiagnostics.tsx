@@ -121,7 +121,7 @@ const readOwnedItemSectionFn = (diagnostic: GameDiagnosticSchema.Type): SectionI
 			},
 		)
 		.with("units:stochastic-renewal", "units:missing-renewal", () => {
-			return "units";
+			return "identity";
 		})
 		.with("resource:missing", () => {
 			return "artwork";
@@ -151,8 +151,8 @@ const readEditorGameDiagnosticTargetsFn = (
 						kind: "item",
 						itemUid: item.uid,
 						sectionId:
-							pathSection === "clock"
-								? "clock"
+							pathSection === "automation"
+								? pathSection
 								: (itemSection ?? pathSection ?? "identity"),
 						label: item.title,
 					} satisfies EditorDiagnosticTarget,

@@ -10,15 +10,16 @@ export const readSectionForPathFn = (
 ): SectionId => {
 	if (path[0] === "lines" && typeof path[1] === "number") {
 		const trigger = lines?.[path[1]]?.trigger;
-		if (trigger === LineTriggerEnumSchema.enum["item-termination"]) return "identity";
-		if (trigger === LineTriggerEnumSchema.enum["clock-interval"]) return "clock";
+		if (trigger !== undefined && trigger !== LineTriggerEnumSchema.enum.manual)
+			return "automation";
 	}
 	return match(path[0])
 		.returnType<SectionId>()
 		.with("artwork", () => "artwork")
-		.with("units", () => "units")
+		.with("units", () => "identity")
 		.with("merge", () => "merges")
-		.with("clock", () => "clock")
+		.with("clock", () => "automation")
+		.with("terminationMode", () => "automation")
 		.with("lines", "maxQueueSize", () => "production")
 		.otherwise(() => "identity");
 };

@@ -23,9 +23,18 @@ import { useItemSectionShortcuts } from "~/item-authoring/ui/useItemSectionShort
 
 const showSectionHeadingFn = (sectionId: SectionId) => {
 	return match(sectionId)
-		.with("merges", "units", "clock", "chain", "connections", "notes", "delete", () => {
-			return false;
-		})
+		.with(
+			"merges",
+			"production",
+			"automation",
+			"chain",
+			"connections",
+			"notes",
+			"delete",
+			() => {
+				return false;
+			},
+		)
 		.otherwise(() => {
 			return true;
 		});

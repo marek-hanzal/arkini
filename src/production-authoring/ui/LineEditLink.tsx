@@ -27,12 +27,7 @@ export const LineEditLink = ({
 			params={{
 				projectId: project.projectId,
 				itemUid,
-				sectionId:
-					trigger === "item-termination"
-						? "identity"
-						: trigger === "manual"
-							? "production"
-							: "clock",
+				sectionId: trigger === "manual" ? "production" : "automation",
 			}}
 			search={{
 				lineUid,

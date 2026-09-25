@@ -15,7 +15,7 @@ export const ProductionLineBadges = ({ line }: { readonly line: LineSchema.Type 
 				<Tx
 					label={
 						line.trigger === LineTriggerEnumSchema.enum["item-termination"]
-							? "Item termination"
+							? "Item ending"
 							: "Clock - Interval"
 					}
 				/>

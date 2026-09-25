@@ -4,6 +4,7 @@ import type { GraphEdge, GraphOperation } from "~/graph/type/GraphFacts";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { ButtonLink } from "~/ui/ui/Button";
+import { LineTriggerEnumSchema } from "~/production-line/schema/LineTriggerEnumSchema";
 
 /** Authored occurrence coordinates become an Editor destination, never a printed config path. */
 export const GraphOriginLink = ({
@@ -24,11 +25,34 @@ export const GraphOriginLink = ({
 			? project.config.items[ownerUid]
 			: undefined;
 		if (owner === undefined) return null;
-		const sectionId = match(operation.kind)
-			.with("line", () => "production" as const)
-			.with("merge", () => "merges" as const)
-			.with("clock", () => "clock" as const)
-			.with("depletion", () => "units" as const)
+		const sectionId = match(operation)
+			.with(
+				{
+					kind: "line",
+				},
+				({ data }) =>
+					data.trigger === LineTriggerEnumSchema.enum.manual
+						? ("production" as const)
+						: ("automation" as const),
+			)
+			.with(
+				{
+					kind: "merge",
+				},
+				() => "merges" as const,
+			)
+			.with(
+				{
+					kind: "clock",
+				},
+				() => "automation" as const,
+			)
+			.with(
+				{
+					kind: "depletion",
+				},
+				() => "identity" as const,
+			)
 			.exhaustive();
 		const location = [
 			owner.title,

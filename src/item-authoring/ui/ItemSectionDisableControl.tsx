@@ -2,14 +2,16 @@ import { match } from "ts-pattern";
 import { useStore } from "@tanstack/react-form";
 import { PowerOff } from "lucide-react";
 
-import type { OptionalCapability, SectionId } from "~/item-authoring/type/Section";
+import type { OptionalCapability } from "~/item-authoring/type/Section";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { LinkButton } from "~/ui/ui/LinkButton";
 import { Tooltip } from "~/ui/ui/Tooltip";
 import { Mx } from "~/translation/ui/Mx";
 
-const CapabilityHelp = ({ capability }: { readonly capability: OptionalCapability }) => {
+type DisableCapability = Exclude<OptionalCapability, "units">;
+
+const CapabilityHelp = ({ capability }: { readonly capability: DisableCapability }) => {
 	return match(capability)
 		.with("production", () => {
 			return <Mx label="Disable production help" />;
@@ -20,18 +22,19 @@ const CapabilityHelp = ({ capability }: { readonly capability: OptionalCapabilit
 		.with("clock", () => {
 			return <Mx label="Disable Clock help" />;
 		})
-		.with("units", () => {
-			return <Mx label="Disable Units help" />;
-		})
 		.exhaustive();
 };
 
-/** Clears only the active capability in the local form; the form session owns persistence. */
-export const ItemSectionDisableControl = ({ sectionId }: { readonly sectionId: SectionId }) => {
+/** Clears only the named capability in the local form; the form session owns persistence. */
+export const ItemSectionDisableControl = ({
+	capability,
+}: {
+	readonly capability: DisableCapability;
+}) => {
 	const { form, isSaving } = useFormSession();
 	const translator = useTranslator();
 	const configured = useStore(form.store, ({ values }) => {
-		return match(sectionId)
+		return match(capability)
 			.with("production", () => {
 				return values.lines?.some((line) => line.trigger === "manual") ?? false;
 			})
@@ -44,29 +47,17 @@ export const ItemSectionDisableControl = ({ sectionId }: { readonly sectionId: S
 					(values.lines?.some((line) => line.trigger === "clock-interval") ?? false)
 				);
 			})
-			.with("units", () => {
-				return values.units !== undefined;
-			})
-			.otherwise(() => {
-				return false;
-			});
+			.exhaustive();
 	});
-	if (
-		!configured ||
-		(sectionId !== "production" &&
-			sectionId !== "merges" &&
-			sectionId !== "clock" &&
-			sectionId !== "units")
-	)
-		return null;
+	if (!configured) return null;
 	return (
-		<Tooltip content={<CapabilityHelp capability={sectionId} />}>
+		<Tooltip content={<CapabilityHelp capability={capability} />}>
 			<LinkButton
 				className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap"
 				data-ui="ItemSectionDisableControl"
 				disabled={isSaving}
 				onClick={() => {
-					match(sectionId)
+					match(capability)
 						.with("production", () => {
 							form.setFieldValue(
 								"lines",
@@ -86,9 +77,6 @@ export const ItemSectionDisableControl = ({ sectionId }: { readonly sectionId: S
 									(line) => line.trigger !== "clock-interval",
 								),
 							);
-						})
-						.with("units", () => {
-							form.setFieldValue("units", undefined);
 						})
 						.exhaustive();
 				}}

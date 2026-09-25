@@ -206,9 +206,8 @@ export const FormSession = ({
 					discardFn={discardFn}
 					error={controller.error}
 					rootCard={
-						sectionId !== "clock" &&
+						sectionId !== "automation" &&
 						sectionId !== "artwork" &&
-						sectionId !== "units" &&
 						sectionId !== "merges" &&
 						sectionId !== "production"
 					}
@@ -255,7 +254,11 @@ export const FormSession = ({
 					}
 					secondaryNavigation={
 						<EditorSectionBar
-							actions={<ItemSectionDisableControl sectionId={sectionId} />}
+							actions={
+								sectionId === "production" || sectionId === "merges" ? (
+									<ItemSectionDisableControl capability={sectionId} />
+								) : undefined
+							}
 							help={help === undefined ? undefined : <EditorPageHelp {...help} />}
 						>
 							{sections.map((candidate) => (

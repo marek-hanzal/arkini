@@ -89,28 +89,41 @@ export const ProductionLineDetail = ({
 								<ArrowUpRight className="size-4 shrink-0 text-muted transition-colors group-hover:text-accent" />
 							</LineEditLink>
 						</h3>
-						<LineFlag
-							checked={line.default}
-							label={<Tx label="Default" />}
-							description={<Mx label="Authored production Default marker help" />}
-						/>
-						<LineFlag
-							checked={line.trigger !== LineTriggerEnumSchema.enum.manual}
-							label={
-								<>
-									<Tx
+						{line.trigger === LineTriggerEnumSchema.enum.manual && (
+							<LineFlag
+								checked={line.default}
+								label={<Tx label="Default" />}
+								description={<Mx label="Authored production Default marker help" />}
+							/>
+						)}
+						{line.trigger !== LineTriggerEnumSchema.enum.manual && (
+							<LineFlag
+								checked
+								label={
+									<>
+										<Tx
+											label={
+												line.trigger ===
+												LineTriggerEnumSchema.enum["item-termination"]
+													? "Item ending"
+													: "Clock - Interval"
+											}
+										/>{" "}
+										· {line.weight}
+									</>
+								}
+								description={
+									<Mx
 										label={
 											line.trigger ===
 											LineTriggerEnumSchema.enum["item-termination"]
-												? "Item termination"
-												: "Clock - Interval"
+												? "Authored production Item ending marker help"
+												: "Authored production Clock marker help"
 										}
-									/>{" "}
-									· {line.weight}
-								</>
-							}
-							description={<Mx label="Authored production Clock marker help" />}
-						/>
+									/>
+								}
+							/>
+						)}
 						<LineFlag
 							checked={line.show}
 							label={<Tx label="Visible" />}

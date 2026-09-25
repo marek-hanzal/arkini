@@ -96,24 +96,11 @@ Authored Clock status summary help:
     The Clock's starting state.
 
     Rules can still enable or disable it during play.
-Authored Clock summary help:
-  value: |
-    Clock gives the item time-based behavior:
-
-    - **Interval** repeatedly tries the selected production line.
-    - **Lifetime** expires the item and may create an output.
-
-    Lifetime also works without production.
 Authored Units amount summary help:
   value: |
     Units stored inside each new item.
 
     Each item keeps its own supply.
-Authored Units summary help:
-  value: |
-    Units are a spendable supply inside each item.
-
-    Spending Units affects only that item.
 Authored artwork summary help:
   value: |
     Combines a base image and optional overlay at one shared scale.
@@ -163,6 +150,9 @@ Authored production Enabled marker help:
     Whether this line starts enabled.
 
     Enable and Disable rules may change that during play.
+Authored production Item ending marker help:
+  value: |
+    This line participates in weighted selection when the item's Clock lifetime or Units run out, after its availability rules pass.
 Authored production Visible marker help:
   value: |
     Whether players see this line at the start.
@@ -200,6 +190,18 @@ Authtoken:
 Autofill started:
   value: Autofill started
   dynamic: true
+Automation:
+  value: Automation
+Automation lines:
+  value: Automation lines
+Automation lines help:
+  value: |
+    Automatic lines run without a player starting them.
+
+    - **Clock - Interval** selects one eligible line by weight at each interval while the item is on the Board.
+    - **Item ending** selects one eligible line by weight when either Clock lifetime or Units run out. Both causes share this pool.
+
+    Line rules filter each pool before selection. All admitted jobs use the item's ordinary queue and production flow.
 Availability:
   value: Availability
 Available:
@@ -322,9 +324,6 @@ Clock lifetime help:
 Clock loop:
   value: Clock repeats
   dynamic: true
-Clock production lines help:
-  value: |
-    Each interval line is an ordinary production job selected by weight when the Clock pulses. Its inputs, rules, runtime and outcomes use the same controls as manual production lines.
 Clock rules help:
   value: |
     These rules pause or resume the Clock.
@@ -341,6 +340,8 @@ Clock status help:
 Close:
   value: Close
   dynamic: true
+Common:
+  value: Common
 Condition:
   value: Condition
   dynamic: true
@@ -444,14 +445,9 @@ Disable:
   value: Disable
 Disable Clock help:
   value: |
-    Removes the Clock settings and its Interval and Expiry production lines. Manual production lines remain.
+    Removes the Clock timer settings and its interval lines from Automation. Item ending lines remain; Units can still trigger them.
 
     **Save** keeps the removal. **Discard** restores the saved Clock.
-Disable Units help:
-  value: |
-    Removes this item's Units and depletion output.
-
-    Inputs or merges that spend those Units may then become invalid. Nothing changes until **Save**.
 Disable merges help:
   value: |
     Removes every merge started by this item, including extra outputs.
@@ -459,7 +455,7 @@ Disable merges help:
     **Save** keeps the removal. **Discard** restores the saved merges.
 Disable production help:
   value: |
-    Removes manual production lines with their requirements, rules and output. Clock lines remain.
+    Removes manual production lines with their requirements, rules and output. Automatic lines remain in Automation.
 
     The queue size stays ready for future lines. **Discard** restores the saved Production.
 Disable removes all merge interactions from this item.:
@@ -655,13 +651,11 @@ Initial board → item {index}:
 Initial board → space {space} → slot {x}, {y}:
   value: Initial board → space {space} → slot {x}, {y}
   dynamic: true
-Initial units:
-  value: Initial units
 Initial units help:
   value: |
     Units given to each new item.
 
-    Unit costs and **Spend** merges reduce them. At zero, the item depletes and may create its depletion output.
+    Unit costs and **Spend** merges reduce them. At zero, the item ends and may run one weighted **Item ending** line from Automation.
 Input:
   value: Input
   dynamic: true
@@ -696,19 +690,22 @@ Item artwork help:
     **Base tile scale** sizes both images together. `1` uses the whole image canvas; transparent PNG padding still counts. Scale changes appearance only, never occupied cells.
 
     The preview updates immediately and matches Item detail.
+Item automation help:
+  value: |
+    Automation owns the Clock settings and jobs started by its interval or by the item ending.
+
+    When Clock lifetime or Units run out, they use the same weighted **Item ending** lines and the **Common** termination policy. Configure Units on the Item page. Removing the item for another reason does not run those lines.
 Item clock empty title:
-  value: Automate production or give this item a limited lifetime.
+  value: Give this item a repeating interval or a limited lifetime.
 Item clock help:
   value: |
-    Clock adds repeating production, a limited Lifetime, or both.
+    Clock sets an interval, a limited Lifetime, or both. Configure it alongside automatic production lines in Automation.
 
-    - **Interval** selects a weighted interval line. Leave empty for no repeating production.
-    - **Lifetime** selects a weighted expiry line when the timer ends. Leave empty for no time limit.
-    - **Wait for output** lets earlier work and the expiry job finish before removal.
-    - **Stop immediately** cancels earlier work; the expiry job still finishes, discarding output that cannot fit.
+    - **Interval** triggers one eligible weighted interval line while the item is on the Board. Leave empty for no repeating production.
+    - **Lifetime** ends the item and selects from the same ending lines used by Units. Leave empty for no time limit.
     - Every Enable rule must pass; any matching Disable rule pauses the Clock.
 
-    Time advances in every location while Clock rules allow it; production pulses require a Board. An item held inside another job skips the expiry line's inputs and runtime and immediately settles its output.
+    Time advances in every location while Clock rules allow it. An item held inside another job skips the ending line's inputs and runtime and immediately settles its output.
 Item connections help:
   value: |
     Connections searches the project's authored graph. Choose a relationship type and optionally a counterpart.
@@ -753,19 +750,19 @@ Item discarded:
 Item drop rejected:
   value: Item drop rejected
   dynamic: true
+Item ending:
+  value: Item ending
 Item expired:
   value: Item expired
   dynamic: true
 Item identity help:
   value: |
-    The Item page is the overview: artwork, Production, Merges, Units, Clock and Action in one place.
+    The Item page contains the item's name, description, interface, Units and other basic settings.
 
     - Each cell holds one item.
     - **Show all** opens the full detail page for a section; **Edit** opens its form.
 
-    Action cannot coexist with Production or Clock. Merges work independently.
-
-    Renaming **Item ID** updates project links; UID never changes.
+    Merges work independently of Production and Automation. The item UID never changes.
 Item interface:
   value: Item interface
 Item interface help:
@@ -808,15 +805,12 @@ Item production empty title:
   value: Let this item produce other items.
 Item production help:
   value: |
-    Production contains the jobs this item can perform.
+    Production contains the jobs a player can start on this item.
 
     - **Default** is the initial line for manual production.
-    - **Clock** marks lines for weighted selection at every Clock interval. Line rules filter the pool before one line is selected.
-    - All lines share one queue; the active job counts toward its size.
-    - A failed Clock attempt is skipped, not saved for later.
-    - Item interface **Default** enables player controls; **Simple** permits Board clicks on the Default line while hiding production controls.
-
-    Adding Production removes Action when you save. Clock may also exist without any line when you only need a Lifetime.
+    - Automatic lines live in **Automation** and share this item's queue.
+    - The active job counts toward queue capacity.
+    - Item interface **Default** shows all visible manual lines; **Simple** shows controls for the Default line.
 Item search shortcuts:
   value: ↑↓ Select · Enter Open · Esc Close
 Item sent through portal:
@@ -825,17 +819,13 @@ Item sent through portal:
 Item spawned:
   value: Item spawned
   dynamic: true
-Item termination:
-  value: Item termination
 Item unavailable:
   value: Item unavailable
-Item units empty title:
-  value: Give this item health, fuel, charges or another limited supply.
 Item units help:
   value: |
     Units are a spendable amount inside each item: health, fuel, charges, whatever fits your game.
 
-    **Initial units** sets the amount for every new item. Spending the last Unit removes it and may create **Depletion output**.
+    **Units** sets the amount for every new item. Spending the last Unit ends the item and can start one weighted **Item ending** line configured in Automation.
 Items:
   value: Items
 Items merged:
@@ -986,7 +976,7 @@ Merge source spend help:
   value: |
     **Spend** removes one Unit from the dragged item and keeps it in place.
 
-    At zero Units, that item depletes and may create its depletion output.
+    At zero Units, that item ends and may run one weighted **Item ending** line from Automation.
 Merge source unit cost:
   value: Merge source unit cost
   dynamic: true
@@ -1018,7 +1008,7 @@ Merge target spend help:
   value: |
     **Spend** removes one Unit from the target and leaves it in place.
 
-    At zero Units, that item depletes and may create its depletion output.
+    At zero Units, that item ends and may run one weighted **Item ending** line from Automation.
 Merge target unit cost:
   value: Merge target unit cost
   dynamic: true
@@ -1097,8 +1087,6 @@ No:
   value: No
 No Clock configured:
   value: No Clock configured
-No Units configured:
-  value: No Units configured
 No artwork matches this search.:
   value: No artwork matches this search.
 No assigned slots:
@@ -1114,6 +1102,8 @@ No authored operation owned by this item directly inputs or positively requires 
 No authored operation owned by this item outputs another item.:
   value: This item does not create another item.
   dynamic: true
+No automation lines defined:
+  value: No automation lines defined
 No configured Space matches this search.:
   value: No configured Space matches this search.
 No extra outcome configured.:
@@ -1595,6 +1585,8 @@ Selected target must have Units enabled.:
   value: Selected target must have Units enabled.
 Selects this line by weight at each Clock interval.:
   value: Selects this line by weight at each Clock interval.
+Selects this line by weight when lifetime or units run out.:
+  value: Selects this line by weight when lifetime or units run out.
 Self:
   value: Self
   dynamic: true
@@ -1602,9 +1594,11 @@ Self unit cost help:
   value: |
     Units spent from this item when the action or production starts.
 
-    The item stays in place. At zero Units, it depletes and may create its depletion output.
+    The item stays in place until its Units run out. Then it ends and may run one weighted **Item ending** line from Automation.
 Self-paid units input:
   value: Self-paid units input
+Set a Clock interval first.:
+  value: Set a Clock interval first.
 Set rules:
   value: Set rules
 Settings:
@@ -1728,11 +1722,6 @@ Templates help:
 Termination kill-switch help:
   value: |
     Cancels earlier jobs and queued work when the item runs out of lifetime or units. One eligible termination line can still run as a Job. Its completed output and the item removal settle together.
-Termination lines:
-  value: Termination lines
-Termination lines help:
-  value: |
-    When the item's lifetime or units run out, one eligible line is selected by weight. On the Board it runs as an ordinary Job. Removing the item for another reason does not run these lines.
 Termination loose-kill help:
   value: |
     Lets already accepted work finish before the item ends. Then one eligible termination line can run as a Job. If its output has nowhere to go, the completed Job waits for space.
@@ -1921,14 +1910,14 @@ added by invisible color cleanup:
   value: added by invisible color cleanup
 assigned:
   value: assigned
+automation:
+  value: automation
 blocking error:
   value: error
 blocking errors:
   value: errors
 chance:
   value: chance
-clock:
-  value: clock
 conditions:
   value: conditions
 consume:
@@ -1945,8 +1934,6 @@ from the game.:
   value: from the game.
 item-termination:
   value: item-termination
-kill-switch:
-  value: stop immediately
 managed:
   value: managed
 manual:
@@ -1973,8 +1960,6 @@ simple:
   value: simple
 space:
   value: space
-termination:
-  value: termination
 unit from owner:
   value: unit from this item
 unit from target:

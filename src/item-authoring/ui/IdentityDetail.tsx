@@ -5,14 +5,12 @@ import { CopyButton } from "~/ui/ui/CopyButton";
 import { Fact, FactList } from "~/ui/ui/FactList";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { ProductionSummaryDetail } from "~/item-authoring/ui/ProductionSummaryDetail";
-import { ClockDetail } from "~/item-authoring/ui/ClockDetail";
 import { ArtworkDetail } from "~/item-authoring/ui/ArtworkDetail";
-import { MergesDetail, UnitsDetail } from "~/item-authoring/ui/CapabilityDetails";
+import { MergesDetail } from "~/item-authoring/ui/CapabilityDetails";
 import { ItemDetailSectionHeader } from "~/item-authoring/ui/ItemDetailSectionHeader";
 import { DetailFact } from "~/item-authoring/ui/DetailDefinition";
 import { ConnectionsSummaryDetail } from "~/item-authoring/ui/ConnectionsSummaryDetail";
 import { Mx } from "~/translation/ui/Mx";
-import { ProductionDetail } from "~/item-authoring/ui/ProductionDetail";
 
 /** Presents the authored identity and storage contract of one item. */
 export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
@@ -59,6 +57,11 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 								label={translator.textFn("Queue capacity")}
 								description={<Mx label="Authored queue capacity summary help" />}
 								value={item.maxQueueSize}
+							/>
+							<DetailFact
+								label={translator.textFn("Units")}
+								description={<Mx label="Authored Units amount summary help" />}
+								value={item.units?.amount ?? translator.textFn("None")}
 							/>
 						</FactList>
 						<div className="grid min-w-0 grid-cols-2 items-start gap-x-8">
@@ -119,59 +122,7 @@ export const IdentityDetail = ({ item }: { readonly item: ItemSchema.Type }) => 
 				/>
 				<ProductionSummaryDetail item={item} />
 			</section>
-			<section
-				className="grid min-w-0 grid-rows-[auto_1fr] gap-3"
-				data-ui="EditorItemUnitsDetail"
-			>
-				<ItemDetailSectionHeader
-					itemUid={item.uid}
-					sectionId="units"
-					title={translator.textFn("Units")}
-					description={<Mx label="Authored Units summary help" />}
-				/>
-				<UnitsDetail
-					item={item}
-					preview
-				/>
-			</section>
-			<section
-				className="grid min-w-0 grid-rows-[auto_1fr] gap-3"
-				data-ui="EditorItemClockDetail"
-			>
-				<ItemDetailSectionHeader
-					itemUid={item.uid}
-					sectionId="clock"
-					title={translator.textFn("Clock")}
-					description={<Mx label="Authored Clock summary help" />}
-				/>
-				<ClockDetail
-					item={item}
-					preview
-				/>
-			</section>
 			<ConnectionsSummaryDetail item={item} />
-			<section
-				className="col-span-2 grid gap-3"
-				data-ui="EditorItemTerminationDetail"
-			>
-				<ItemDetailSectionHeader
-					itemUid={item.uid}
-					sectionId="identity"
-					title={translator.textFn("Item termination")}
-				/>
-				<EditorRootCard dataUi="EditorItemTerminationCard">
-					<DetailFact
-						label={translator.textFn("Termination mode")}
-						value={translator.textFn(
-							item.terminationMode === "kill-switch" ? "Kill switch" : "Loose-kill",
-						)}
-					/>
-				</EditorRootCard>
-				<ProductionDetail
-					item={item}
-					kind="termination"
-				/>
-			</section>
 		</div>
 	);
 };

@@ -22,14 +22,9 @@ const FormSections = [
 		shortcut: "p",
 	},
 	{
-		id: "units",
-		label: "Units",
-		shortcut: "u",
-	},
-	{
-		id: "clock",
-		label: "Clock",
-		shortcut: "c",
+		id: "automation",
+		label: "Automation",
+		shortcut: "t",
 	},
 ] as const satisfies ReadonlyArray<SectionDescriptor>;
 

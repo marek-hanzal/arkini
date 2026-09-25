@@ -16,16 +16,14 @@ export const ProductionDetail = ({
 	kind = "manual",
 }: {
 	readonly item: ItemSchema.Type;
-	readonly kind?: "manual" | "clock" | "termination";
+	readonly kind?: "manual" | "automation";
 }) => {
 	const translator = useTranslator();
 	const project = useEditorProject();
 	const lines = item.lines.filter((line) =>
 		kind === "manual"
 			? line.trigger === LineTriggerEnumSchema.enum.manual
-			: kind === "termination"
-				? line.trigger === LineTriggerEnumSchema.enum["item-termination"]
-				: line.trigger === LineTriggerEnumSchema.enum["clock-interval"],
+			: line.trigger !== LineTriggerEnumSchema.enum.manual,
 	);
 	if (kind !== "manual" && lines.length === 0) return null;
 	return (
@@ -52,7 +50,9 @@ export const ProductionDetail = ({
 					itemRelatedSearchTermsFn={(index) =>
 						readCapabilityRelatedTermsFn(lines[index], project.config.items)
 					}
-					label={translator.textFn("Product lines")}
+					label={translator.textFn(
+						kind === "manual" ? "Product lines" : "Automation lines",
+					)}
 					navigationCard
 				>
 					{(index) => (

@@ -10,6 +10,7 @@ export const ItemSectionHelp: Record<SectionId, EditorPageHelpContent> = {
 		content: (
 			<>
 				<Mx label="Item identity help" />
+				<Mx label="Item units help" />
 				<Mx label="Item detail music help" />
 			</>
 		),
@@ -30,13 +31,14 @@ export const ItemSectionHelp: Record<SectionId, EditorPageHelpContent> = {
 		title: <Tx label="Merges" />,
 		content: <Mx label="Item merges help" />,
 	},
-	units: {
-		title: <Tx label="Units" />,
-		content: <Mx label="Item units help" />,
-	},
-	clock: {
-		title: <Tx label="Clock" />,
-		content: <Mx label="Item clock help" />,
+	automation: {
+		title: <Tx label="Automation" />,
+		content: (
+			<>
+				<Mx label="Item clock help" />
+				<Mx label="Item automation help" />
+			</>
+		),
 	},
 	artwork: {
 		title: <Tx label="Artwork" />,

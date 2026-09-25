@@ -244,7 +244,7 @@ const GraphOperationDetails = ({
 			(operation) => (
 				<DetailFacts>
 					<DetailFact
-						label={translator.textFn("Initial units")}
+						label={translator.textFn("Units")}
 						value={operation.data.amount}
 					/>
 				</DetailFacts>

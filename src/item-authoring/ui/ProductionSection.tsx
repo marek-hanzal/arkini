@@ -5,7 +5,7 @@ import { EditorFormSection } from "~/editor-control/ui/EditorFormSection";
 import { Mx } from "~/translation/ui/Mx";
 import { useTranslator } from "~/translation/ui/useTranslator";
 
-/** Authors manual production capacity and lines. Clock lines live in the Clock tab. */
+/** Authors manual production capacity and lines; automatic lines live in Automation. */
 export const ProductionSection = () => {
 	const { form } = useFormSession();
 	const translator = useTranslator();

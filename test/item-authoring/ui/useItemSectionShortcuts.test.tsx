@@ -62,20 +62,16 @@ describe("Item Detail section shortcuts", () => {
 				"artwork",
 			],
 			[
-				"p",
-				"production",
-			],
-			[
 				"m",
 				"merges",
 			],
 			[
-				"u",
-				"units",
+				"p",
+				"production",
 			],
 			[
-				"c",
-				"clock",
+				"t",
+				"automation",
 			],
 			[
 				"h",

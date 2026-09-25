@@ -341,83 +341,102 @@ it("keeps category counts independent of the visible row cap and marks incomplet
 	expect(countFn("all")).toBe("—");
 });
 
-it("keeps operation edit identity and occurrence coordinates independent of the endpoints", async () => {
-	const line = LineSchema.parse({
-		uid: "specific-line",
-		title: "Specific line",
-		description: "Specific",
-		runtimeMs: 1000,
-		input: [
-			{
-				type: "simple",
+it.each([
+	[
+		"manual",
+		"production",
+	],
+	[
+		"clock-interval",
+		"automation",
+	],
+	[
+		"item-termination",
+		"automation",
+	],
+] as const)(
+	"routes %s line occurrences to %s without losing their coordinates",
+	async (trigger, sectionId) => {
+		const line = LineSchema.parse({
+			uid: "specific-line",
+			trigger,
+			title: "Specific line",
+			description: "Specific",
+			runtimeMs: 1000,
+			input: [
+				{
+					type: "simple",
+				},
+			],
+			rules: [],
+		});
+		const edge = {
+			id: "occurrence",
+			from: "item:A",
+			to: "item:B",
+			kind: "line-item-outcome",
+			operationId: "line",
+			source: [
+				"items",
+				"A",
+				"lines",
+				1,
+				"outcome",
+				"set",
+				2,
+				"roll",
+				3,
+				"outcome",
+				4,
+				"itemUid",
+			],
+			annotations: {
+				inputIndex: 1,
+				setIndex: 2,
+				rollIndex: 3,
+				outcomeIndex: 4,
+				ruleIndex: 5,
+				whenIndex: 6,
 			},
-		],
-		rules: [],
-	});
-	const edge = {
-		id: "occurrence",
-		from: "item:A",
-		to: "item:B",
-		kind: "line-item-outcome",
-		operationId: "line",
-		source: [
-			"items",
-			"A",
-			"lines",
-			1,
-			"outcome",
-			"set",
-			2,
-			"roll",
-			3,
-			"outcome",
-			4,
-			"itemUid",
-		],
-		annotations: {
-			inputIndex: 1,
-			setIndex: 2,
-			rollIndex: 3,
+		} as const;
+		const container = await mountFn(
+			<GraphEdgeRow
+				edge={edge}
+				nodes={emptyResultFn().nodes}
+				operation={{
+					id: "line",
+					owner: "item:A",
+					source: [
+						"items",
+						"A",
+						"lines",
+						1,
+					],
+					kind: "line",
+					data: line,
+				}}
+			/>,
+		);
+		const link = container.querySelector<HTMLAnchorElement>(
+			'[data-ui="EditorGraphOriginLink"]',
+		);
+		expect(JSON.parse(link?.dataset.params ?? "null")).toEqual({
+			projectId: "project",
+			itemUid: "A",
+			sectionId,
+		});
+		expect(JSON.parse(link?.dataset.search ?? "null")).toEqual({
+			lineUid: "specific-line",
+			input: 1,
+			outcomeSet: 2,
+			outcomeRoll: 3,
 			outcomeIndex: 4,
-			ruleIndex: 5,
-			whenIndex: 6,
-		},
-	} as const;
-	const container = await mountFn(
-		<GraphEdgeRow
-			edge={edge}
-			nodes={emptyResultFn().nodes}
-			operation={{
-				id: "line",
-				owner: "item:A",
-				source: [
-					"items",
-					"A",
-					"lines",
-					1,
-				],
-				kind: "line",
-				data: line,
-			}}
-		/>,
-	);
-	const link = container.querySelector<HTMLAnchorElement>('[data-ui="EditorGraphOriginLink"]');
-	expect(JSON.parse(link?.dataset.params ?? "null")).toEqual({
-		projectId: "project",
-		itemUid: "A",
-		sectionId: "production",
-	});
-	expect(JSON.parse(link?.dataset.search ?? "null")).toEqual({
-		lineUid: "specific-line",
-		input: 1,
-		outcomeSet: 2,
-		outcomeRoll: 3,
-		outcomeIndex: 4,
-		rule: 5,
-		when: 6,
-	});
-	expect(link?.parentElement?.closest("a")).toBeNull();
-});
+			rule: 5,
+			when: 6,
+		});
+		expect(link?.parentElement?.closest("a")).toBeNull();
+	},
+);
 
 it("sends Chain depth changes through the canonical consequence query", async () => {
 	state.result = {

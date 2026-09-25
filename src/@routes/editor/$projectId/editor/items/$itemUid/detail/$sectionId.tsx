@@ -1,7 +1,6 @@
 import { match } from "ts-pattern";
 import { ArtworkDetail } from "~/item-authoring/ui/ArtworkDetail";
-import { ClockDetail } from "~/item-authoring/ui/ClockDetail";
-import { UnitsDetail } from "~/item-authoring/ui/CapabilityDetails";
+import { AutomationDetail } from "~/item-authoring/ui/AutomationDetail";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { ItemChain } from "~/item-chain/ui/ItemChain";
 import { MergesCollectionDetail } from "~/item-authoring/ui/MergesCollectionDetail";
@@ -79,11 +78,8 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/d
 					</EditorRootCard>
 				);
 			})
-			.with("units", () => {
-				return <UnitsDetail item={item} />;
-			})
-			.with("clock", () => {
-				return <ClockDetail item={item} />;
+			.with("automation", () => {
+				return <AutomationDetail item={item} />;
 			})
 			.with("production", () => {
 				return <ProductionDetail item={item} />;

@@ -1,9 +1,8 @@
 import { match } from "ts-pattern";
-import { ClockSection } from "~/item-authoring/ui/ClockSection";
+import { AutomationSection } from "~/item-authoring/ui/AutomationSection";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 import { ArtworkSection } from "~/item-authoring/ui/ArtworkSection";
-import { UnitsSection } from "~/item-authoring/ui/UnitsSection";
 import { IdentitySection } from "~/item-authoring/ui/IdentitySection";
 import { MergesSection } from "~/item-authoring/ui/MergesSection";
 import { ProductionSection } from "~/item-authoring/ui/ProductionSection";
@@ -33,14 +32,11 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 			.with("artwork", () => {
 				return <ArtworkSection />;
 			})
-			.with("units", () => {
-				return <UnitsSection />;
-			})
 			.with("merges", () => {
 				return <MergesSection />;
 			})
-			.with("clock", () => {
-				return <ClockSection />;
+			.with("automation", () => {
+				return <AutomationSection />;
 			})
 			.with("production", () => {
 				return <ProductionSection />;

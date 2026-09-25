@@ -133,6 +133,7 @@ export const EditorCollectionSelector = ({
 							renderTriggerFn={(props) => (
 								<EditorIconButton
 									{...props}
+									disabled={addOptions.every((option) => option.disabled)}
 									data-ui="EditorCollectionAdd"
 								>
 									<Plus className="size-5" />

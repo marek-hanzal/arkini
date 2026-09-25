@@ -7,52 +7,24 @@ import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { DisabledCapabilityDetail } from "~/item-authoring/ui/DisabledCapabilityDetail";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { Mx } from "~/translation/ui/Mx";
-import { ProductionDetail } from "~/item-authoring/ui/ProductionDetail";
-import { EditorFormSectionDivider } from "~/editor-control/ui/EditorFormSectionDivider";
-import { LineTriggerEnumSchema } from "~/production-line/schema/LineTriggerEnumSchema";
 
-/** Presents the authored schedule and its Clock-owned production lines. */
-export const ClockDetail = ({
-	item,
-	preview = false,
-}: {
-	readonly item: ItemSchema.Type;
-	readonly preview?: boolean;
-}) => {
+/** Presents authored Clock timing and rules in the Automation detail. */
+export const ClockDetail = ({ item }: { readonly item: ItemSchema.Type }) => {
 	const translator = useTranslator();
 	const clock = item.clock;
-	const production =
-		!preview &&
-		item.lines.some((line) => line.trigger === LineTriggerEnumSchema.enum["clock-interval"]) ? (
-			<div className="grid gap-3">
-				<EditorFormSectionDivider title={translator.textFn("Production")} />
-				<ProductionDetail
-					item={item}
-					kind="clock"
-				/>
-			</div>
-		) : null;
 	if (clock === undefined) {
-		const empty = (
-			<DisabledCapabilityDetail
-				capability="clock"
-				itemUid={item.uid}
-				actionLabel={translator.textFn("Enable")}
-				icon={Clock}
-				title={translator.textFn(
-					preview ? "Item clock empty title" : "No Clock configured",
-				)}
-				summary={preview ? undefined : translator.textFn("Item clock empty title")}
-				size={preview ? "normal" : "large"}
-			/>
-		);
-		return preview ? (
-			<EditorRootCard dataUi="EditorClockDisabledCard">{empty}</EditorRootCard>
-		) : (
-			<div className="grid gap-3">
-				{empty}
-				{production}
-			</div>
+		return (
+			<EditorRootCard dataUi="EditorClockDisabledCard">
+				<DisabledCapabilityDetail
+					capability="clock"
+					itemUid={item.uid}
+					actionLabel={translator.textFn("Enable")}
+					icon={Clock}
+					title={translator.textFn("No Clock configured")}
+					summary={translator.textFn("Item clock empty title")}
+					size="normal"
+				/>
+			</EditorRootCard>
 		);
 	}
 
@@ -86,7 +58,6 @@ export const ClockDetail = ({
 				</DetailFacts>
 				<RulesDetail rules={clock.rules} />
 			</EditorRootCard>
-			{production}
 		</div>
 	);
 };

@@ -364,6 +364,11 @@ describe("EditorBuild", () => {
 					"producer:academy": {
 						uid: "academy-uid",
 						title: "Academy",
+						lines: [
+							{
+								trigger: "clock-interval",
+							},
+						],
 					},
 					"producer:library": {
 						uid: "library-uid",
@@ -393,7 +398,7 @@ describe("EditorBuild", () => {
 		expect(container.textContent).toContain("Invalid input unit contract");
 		expect(
 			container.querySelector(
-				'a[href="/editor/editor-test/editor/items/academy-uid/form/production"]',
+				'a[href="/editor/editor-test/editor/items/academy-uid/form/automation"]',
 			),
 		).not.toBeNull();
 		expect(

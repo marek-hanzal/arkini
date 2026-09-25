@@ -31,7 +31,7 @@ it("admits operation search and scalar filters over MCP and roundtrips compact c
 					...puppy.lines[0]!,
 					uid: `audit-line-${index}`,
 					title,
-					clock: true,
+					clock: "clock-interval",
 					show: false,
 					enable: true,
 					clockWeight: 20,
@@ -100,14 +100,14 @@ it("admits operation search and scalar filters over MCP and roundtrips compact c
 	expect(hydrated.operations.map((operation) => operation.data)).toMatchObject([
 		{
 			title: "Digest",
-			clock: true,
+			clock: "clock-interval",
 			show: false,
 			enable: true,
 			clockWeight: 20,
 		},
 		{
 			title: "Digest Meal",
-			clock: true,
+			clock: "clock-interval",
 			show: false,
 			enable: true,
 			clockWeight: 20,

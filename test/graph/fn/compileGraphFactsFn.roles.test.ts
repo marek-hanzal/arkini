@@ -206,7 +206,7 @@ it("preserves independent item roles in a compiler-valid cyclic authored world",
 			expect.objectContaining({
 				from: "item:A",
 				to: "item:B",
-				kind: "clock-item-outcome",
+				kind: "line-item-outcome",
 			}),
 		]),
 	);

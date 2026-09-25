@@ -35,7 +35,6 @@ export const readItemConnectionQueryFn = (
 			"line-item-outcome",
 			"merge-replacement",
 			"merge-item-outcome",
-			"clock-item-outcome",
 			"depletion-item-outcome",
 			"space-outcome",
 			"template-outcome",

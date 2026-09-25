@@ -22,7 +22,6 @@ const KindLabels = {
 	"merge-space": "Merge transport",
 	"merge-source-spend": "Merge source unit cost",
 	"merge-target-spend": "Merge target unit cost",
-	"clock-item-outcome": "Clock expiry output",
 	"depletion-item-outcome": "Unit depletion output",
 	"rule-reference": "Rule reference",
 	"space-outcome": "Space output",
@@ -276,7 +275,7 @@ export const GraphEdgeRow = ({
 }) => {
 	const translator = useTranslator();
 	const annotations = edge.annotations;
-	const table = operation?.kind === "clock" ? operation.data.onExpire : operation?.data.outcome;
+	const table = operation?.kind === "clock" ? undefined : operation?.data.outcome;
 	const set = annotations.setIndex === undefined ? undefined : table?.set[annotations.setIndex];
 	const unitPayer =
 		annotations.input?.units === undefined || operation === undefined

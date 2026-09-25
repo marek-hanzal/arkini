@@ -6,23 +6,32 @@ import { readClockLinesFn } from "~/production-line/fn/readClockLinesFn";
 import { resolveLineEnableFn } from "~/production-line/fn/resolveLineEnableFn";
 import { lineRulesFx } from "~/production-line/fx/lineRulesFx";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
+import { LineClockModeEnumSchema } from "~/production-line/schema/LineClockModeEnumSchema";
 
 /** Filters rules before drawing once; visibility and input admission do not bias the pool. */
 export const selectClockLineFx = Effect.fn("selectClockLineFx")(function* ({
 	item,
 	runtime,
+	role,
+	origin,
 }: {
 	readonly item: RuntimeItemSchema.Type;
 	readonly runtime: RuntimeSchema.Type;
+	readonly role: LineClockModeEnumSchema.Type;
+	readonly origin?: import("~/item-location/schema/BoardLocationSchema").BoardLocationSchema.Type;
 }) {
-	if (item.location.scope !== "board") return undefined;
+	if (role === LineClockModeEnumSchema.enum["clock-interval"] && item.location.scope !== "board")
+		return undefined;
+	const boardOrigin = origin ?? (item.location.scope === "board" ? item.location : undefined);
+	if (boardOrigin === undefined) return undefined;
 	const pool: LineSchema.Type[] = [];
 	for (const line of readClockLinesFn({
 		item: item.item,
 		schedule: item.schedule,
+		role,
 	})) {
 		const rules = yield* lineRulesFx({
-			origin: item.location,
+			origin: boardOrigin,
 			rules: line.rules,
 		}).pipe(
 			Effect.provideService(RuntimeFx, {
@@ -43,10 +52,16 @@ export const selectClockLineFx = Effect.fn("selectClockLineFx")(function* ({
 	let draw = yield* Random.nextBetween(0, totalWeight).pipe(
 		Random.withSeed(
 			[
-				"serakki:clock:v1",
+				role === LineClockModeEnumSchema.enum["clock-lifetime"]
+					? "serakki:clock-expiry:v1"
+					: "serakki:clock:v1",
 				item.id,
 				item.item.uid,
-				item.schedule?.pulseSequence ?? 0,
+				...(role === LineClockModeEnumSchema.enum["clock-interval"]
+					? [
+							item.schedule?.pulseSequence ?? 0,
+						]
+					: []),
 			].join(":"),
 		),
 	);

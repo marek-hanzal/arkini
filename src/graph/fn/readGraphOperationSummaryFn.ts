@@ -8,7 +8,7 @@ export const readGraphOperationSummaryFn = (
 	operation: GraphOperation,
 	ownerTitle: string,
 ): GraphDiscoveryOperation => {
-	const outcomes = operation.kind === "clock" ? operation.data.onExpire : operation.data.outcome;
+	const outcomes = operation.kind === "clock" ? undefined : operation.data.outcome;
 	const base = {
 		id: operation.id,
 		owner: operation.owner,
@@ -28,7 +28,7 @@ export const readGraphOperationSummaryFn = (
 				lineUid: data.uid,
 				runtimeSeconds: data.runtimeMs / 1000,
 				default: data.default,
-				clock: data.clock === true,
+				clock: data.clock !== undefined,
 				clockWeight: data.clockWeight,
 				show: data.show,
 				enable: data.enable,

@@ -274,8 +274,7 @@ it("admits omitted non-Clock weights but rejects missing Clock weights before ei
 	]) {
 		for (const clock of [
 			undefined,
-			false,
-			true,
+			"clock-interval",
 		]) {
 			const before = await readFn();
 			const first = before.config.items.forge.lines[0]!;
@@ -300,7 +299,7 @@ it("admits omitted non-Clock weights but rejects missing Clock weights before ei
 				name,
 				arguments: jsonToolInputFn(input),
 			});
-			if (clock === true) {
+			if (clock === "clock-interval") {
 				expect(result.isError).toBe(true);
 				expect((await readFn()).revision).toBe(before.revision);
 				expect(notifyFn).toHaveBeenCalledTimes(notifications);

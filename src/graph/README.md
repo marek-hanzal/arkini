@@ -41,7 +41,7 @@ Edges reference reified operation records. Full operation data preserves line in
 | `merge-item-outcome` | Merge owner → additional outcome item. |
 | `merge-source-spend`, `merge-target-spend` | Owner → spending participant. Keep source versus target/receiver roles distinct. |
 | `merge-space` | Receiver → destination space; the transported incoming item has no exact authored identity. |
-| `clock-item-outcome`, `depletion-item-outcome` | Owner → expiry/depletion item outcome, regardless of whether a live instance can currently trigger it. |
+| `depletion-item-outcome` | Owner → unit-depletion item outcome, regardless of whether a live instance can currently trigger it. Clock lifetime outcomes use `line-item-outcome` with the line role retained. |
 | `rule-reference` | Operation owner → item mentioned by a condition, including Count 0, show/hide and runtime rules. This is not material consumption. |
 | `space-outcome`, `template-outcome` | Outcome owner → navigation space or applied template. A template applies to the operation's origin space, even after a Space outcome in the same roll. |
 | `template-item` | Template → each placement occurrence, with x/y. |

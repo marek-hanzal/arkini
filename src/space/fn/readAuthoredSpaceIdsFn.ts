@@ -23,7 +23,6 @@ export const readAuthoredSpaceIdsFn = (config: GameConfigSchema.Type): ReadonlyS
 			collectOutcomeFn(merge.outcome);
 		}
 		collectOutcomeFn(item.units?.outcome);
-		collectOutcomeFn(item.clock?.onExpire);
 	}
 	return spaces;
 };

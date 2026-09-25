@@ -14,32 +14,7 @@
 			"intervalMs": 5000,
 			"durationMs": 60000,
 			"enable": true,
-			"rules": [],
-			"onExpire": {
-				"set": [
-					{
-						"weight": 1,
-						"rules": [],
-						"roll": [
-							{
-								"type": "guaranteed",
-								"outcome": [
-									{
-										"type": "item",
-										"itemUid": "r171qefgjo6x0m7pnl3vgtfj",
-										"quantity": {
-											"min": 1,
-											"max": 1
-										},
-										"placement": "drop",
-										"rules": []
-									}
-								]
-							}
-						]
-					}
-				]
-			}
+			"rules": []
 		},
 		"maxQueueSize": 1,
 		"lines": [
@@ -47,7 +22,7 @@
 				"uid": "xctwx8uokssb6ckxvbow4jym",
 				"title": "Make a Wish",
 				"description": "Milky way",
-				"clock": true,
+				"clock": "clock-interval",
 				"clockWeight": 1,
 				"default": false,
 				"show": false,
@@ -154,6 +129,44 @@
 										{
 											"type": "item",
 											"itemUid": "oy7hz2unlgoos52f57q9tstx",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"uid": "expiry-urdeb97ivb7urtbzj8k7oab1",
+				"title": "Expiry",
+				"description": "Resolves this item’s outcome when its lifetime ends.",
+				"clock": "clock-lifetime",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [],
+				"outcome": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"outcome": [
+										{
+											"type": "item",
+											"itemUid": "r171qefgjo6x0m7pnl3vgtfj",
 											"quantity": {
 												"min": 1,
 												"max": 1

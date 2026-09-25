@@ -7,7 +7,11 @@ import { replayRuntimeStepsFx } from "~/game-tick/fx/replayRuntimeStepsFx";
 import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
 import { advanceItemSchedulesFx } from "~/item-schedule/fx/advanceItemSchedulesFx";
 import { selectClockLineFx } from "~/item-schedule/fx/selectClockLineFx";
-import { createLine } from "~test/game-config-validation/support/gameValidationTestSource";
+import {
+	createExpiryLine,
+	createLine,
+	createOutput,
+} from "~test/game-config-validation/support/gameValidationTestSource";
 import { existsWhen } from "~test/production-line/support/lineTestRuntime";
 import { useGameFx } from "~test/support/useGameFx";
 import { createClockConfig, spawnClockItemFx } from "./clockSchedule.test/fixture";
@@ -16,7 +20,7 @@ const weightedLines = [
 	{
 		...createLine({
 			uid: "light",
-			clock: true,
+			clock: "clock-interval",
 		}),
 		clockWeight: 1,
 		runtimeMs: 100_000,
@@ -24,7 +28,7 @@ const weightedLines = [
 	{
 		...createLine({
 			uid: "heavy",
-			clock: true,
+			clock: "clock-interval",
 		}),
 		clockWeight: 9,
 		runtimeMs: 100_000,
@@ -32,6 +36,61 @@ const weightedLines = [
 ];
 
 describe("weighted Clock admission", () => {
+	it("draws lifetime lines by their weights without interval overrides", () => {
+		const selected = Effect.runSync(
+			Effect.gen(function* () {
+				const owner = yield* spawnClockItemFx();
+				const runtime = yield* readRuntimeFx();
+				const ids: string[] = [];
+				for (let index = 0; index < 100; index++) {
+					const line = yield* selectClockLineFx({
+						role: "clock-lifetime",
+						item: {
+							...owner,
+							id: `sample:${index}`,
+						},
+						runtime,
+					});
+					if (line !== undefined) ids.push(line.uid);
+				}
+				return ids;
+			}).pipe(
+				useGameFx({
+					config: createClockConfig({
+						lines: [
+							{
+								...createExpiryLine(
+									createOutput([
+										{
+											itemUid: "result",
+										},
+									]),
+									"expiry:light",
+								),
+								clockWeight: 1,
+							},
+							{
+								...createExpiryLine(
+									createOutput([
+										{
+											itemUid: "expired",
+										},
+									]),
+									"expiry:heavy",
+								),
+								clockWeight: 9,
+							},
+						],
+						clock: {
+							durationMs: 100,
+						},
+					}),
+				}),
+			),
+		);
+		expect(selected.filter((id) => id === "expiry:heavy").length).toBeGreaterThan(70);
+		expect(selected).toContain("expiry:light");
+	});
 	it("excludes failed gates and disable vetoes before selection while allowing hidden rule-enabled lines", () => {
 		const selected = Effect.runSync(
 			Effect.gen(function* () {
@@ -41,6 +100,7 @@ describe("weighted Clock admission", () => {
 				for (let pulseSequence = 0; pulseSequence < 30; pulseSequence++) {
 					ids.push(
 						(yield* selectClockLineFx({
+							role: "clock-interval",
 							runtime,
 							item: {
 								...owner,
@@ -129,6 +189,7 @@ describe("weighted Clock admission", () => {
 				const draws: string[] = [];
 				for (let pulseSequence = 0; pulseSequence < 300; pulseSequence++) {
 					const line = yield* selectClockLineFx({
+						role: "clock-interval",
 						runtime,
 						item: {
 							...owner,
@@ -190,6 +251,7 @@ describe("weighted Clock admission", () => {
 				const owner = yield* spawnClockItemFx();
 				const runtime = yield* readRuntimeFx();
 				const selected = yield* selectClockLineFx({
+					role: "clock-interval",
 					item: owner,
 					runtime,
 				});

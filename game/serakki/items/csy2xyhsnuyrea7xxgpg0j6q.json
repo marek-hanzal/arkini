@@ -13,54 +13,68 @@
 		"clock": {
 			"durationMs": 60000,
 			"enable": true,
-			"rules": [],
-			"onExpire": {
-				"set": [
-					{
-						"weight": 1,
-						"rules": [],
-						"roll": [
-							{
-								"type": "guaranteed",
-								"outcome": [
-									{
-										"type": "item",
-										"itemUid": "whgs98b1abnac63cfsm022z8",
-										"quantity": {
-											"min": 1,
-											"max": 1
-										},
-										"placement": "drop",
-										"rules": []
-									},
-									{
-										"type": "item",
-										"itemUid": "kgwuy9zokikfg1oo8417by1s",
-										"quantity": {
-											"min": 1,
-											"max": 1
-										},
-										"placement": "drop",
-										"rules": []
-									},
-									{
-										"type": "item",
-										"itemUid": "l70n80ujrm55lpl6z2n4hcty",
-										"quantity": {
-											"min": 1,
-											"max": 1
-										},
-										"placement": "drop",
-										"rules": []
-									}
-								]
-							}
-						]
-					}
-				]
-			}
+			"rules": []
 		},
 		"maxQueueSize": 1,
-		"lines": []
+		"lines": [
+			{
+				"uid": "expiry-csy2xyhsnuyrea7xxgpg0j6q",
+				"title": "Expiry",
+				"description": "Resolves this item’s outcome when its lifetime ends.",
+				"clock": "clock-lifetime",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [],
+				"outcome": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"outcome": [
+										{
+											"type": "item",
+											"itemUid": "whgs98b1abnac63cfsm022z8",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"type": "item",
+											"itemUid": "kgwuy9zokikfg1oo8417by1s",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"type": "item",
+											"itemUid": "l70n80ujrm55lpl6z2n4hcty",
+											"quantity": {
+												"min": 1,
+												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			}
+		]
 	}
 }

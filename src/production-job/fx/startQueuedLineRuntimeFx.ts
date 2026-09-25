@@ -10,7 +10,7 @@ import type { JobQueueRequestSchema } from "~/production-job/schema/JobQueueRequ
 import { JobOwnerBusyError } from "~/production-job/error/JobOwnerBusyError";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
-import { isItemProductionAdmissionOpenFn } from "~/production-line/fn/isItemProductionAdmissionOpenFn";
+import { isLineAdmissionOpenFn } from "~/production-line/fn/isLineAdmissionOpenFn";
 
 export namespace startQueuedLineRuntimeFx {
 	export interface Props {
@@ -65,7 +65,12 @@ export const startQueuedLineRuntimeFx = Effect.fn("startQueuedLineRuntimeFx")(fu
 	});
 	// Exhausted owners may use settled material, but optional top-ups must not
 	// turn that accepted work into a blocked Autofill request.
-	if (isItemProductionAdmissionOpenFn(owner)) {
+	if (
+		isLineAdmissionOpenFn({
+			owner,
+			lineUid,
+		})
+	) {
 		const coverage = yield* readLineInputAutofillCoverageFx({
 			lineUid,
 			ownerItemId,

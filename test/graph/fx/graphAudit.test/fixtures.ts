@@ -1,5 +1,6 @@
 import {
 	configFn,
+	expiryLineFn,
 	itemFn,
 	lineFn,
 	outputFn,
@@ -134,9 +135,11 @@ export const factualAuditProjectFn = () => ({
 				],
 			}),
 			activeClock: itemFn("activeClock", {
+				lines: [
+					expiryLineFn("activeClock-expiry", outputFn("product")),
+				],
 				clock: {
 					durationMs: 100,
-					onExpire: outputFn("product"),
 				},
 			}),
 			product: itemFn("product"),

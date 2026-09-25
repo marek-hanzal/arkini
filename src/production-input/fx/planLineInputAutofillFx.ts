@@ -20,6 +20,7 @@ export namespace planLineInputAutofillFx {
 		readonly ownerItemId: IdSchema.Type;
 		readonly lineUid: IdSchema.Type;
 		readonly runtime: RuntimeSchema.Type;
+		readonly excludedSourceItemIds?: ReadonlySet<IdSchema.Type>;
 	}
 
 	export interface Entry {
@@ -60,6 +61,7 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 	ownerItemId,
 	lineUid,
 	runtime,
+	excludedSourceItemIds,
 }: planLineInputAutofillFx.Props) {
 	const { line, owner } = yield* readBoardItemLineFx({
 		ownerItemId,
@@ -87,7 +89,8 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 				item.location.scope === LocationScopeEnumSchema.enum.Input &&
 				item.location.ownerItemId === ownerItemId &&
 				item.location.lineUid === lineUid &&
-				item.location.inputIndex === inputIndex,
+				item.location.inputIndex === inputIndex &&
+				item.schedule?.remainingDurationMs !== 0,
 		);
 		const storedQuantity = storedItems.length;
 		const incomingQuantity = includeIncomingDeliveries
@@ -113,13 +116,19 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 			runtime,
 			query: input.query,
 		});
-		for (const candidate of matchingItems) candidatesById.set(candidate.id, candidate);
+		for (const candidate of matchingItems)
+			if (!excludedSourceItemIds?.has(candidate.id))
+				candidatesById.set(candidate.id, candidate);
 
 		slots.push({
 			closed,
 			input,
 			inputIndex,
-			matchingRuntimeItemIds: new Set(matchingItems.map((item) => item.id)),
+			matchingRuntimeItemIds: new Set(
+				matchingItems
+					.filter((item) => !excludedSourceItemIds?.has(item.id))
+					.map((item) => item.id),
+			),
 			maxQuantity: initialResolution.required.max,
 			minQuantity: initialResolution.required.min,
 			plannedQuantity,

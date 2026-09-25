@@ -76,6 +76,20 @@ const emptyChanceOutput = (itemId: string) => ({
 	],
 });
 
+const expiryLineFn = (
+	uid: string,
+	outcome: ReturnType<typeof guaranteedOutput> | ReturnType<typeof emptyChanceOutput>,
+) => ({
+	uid,
+	title: "Expiry",
+	description: "Expiry",
+	clock: "clock-lifetime",
+	runtimeMs: 0,
+	input: [],
+	outcome,
+	rules: [],
+});
+
 export const createTemporaryLifetimeTestConfig = () =>
 	GameConfigSchema.parse({
 		resources: {
@@ -154,13 +168,17 @@ export const createTemporaryLifetimeTestConfig = () =>
 					id: "temporaryOutput",
 				}),
 
-				lines: [],
+				lines: [
+					expiryLineFn(
+						"expiry:temporaryOutput",
+						guaranteedOutput({
+							itemId: "result",
+						}),
+					),
+				],
 				maxQueueSize: 1,
 				clock: {
 					durationMs: 600,
-					onExpire: guaranteedOutput({
-						itemId: "result",
-					}),
 				},
 			},
 			temporaryEmptyOutput: {
@@ -168,11 +186,12 @@ export const createTemporaryLifetimeTestConfig = () =>
 					id: "temporaryEmptyOutput",
 				}),
 
-				lines: [],
+				lines: [
+					expiryLineFn("expiry:temporaryEmptyOutput", emptyChanceOutput("result")),
+				],
 				maxQueueSize: 1,
 				clock: {
 					durationMs: 600,
-					onExpire: emptyChanceOutput("result"),
 				},
 			},
 			temporaryRandomOutput: {
@@ -180,18 +199,22 @@ export const createTemporaryLifetimeTestConfig = () =>
 					id: "temporaryRandomOutput",
 				}),
 
-				lines: [],
+				lines: [
+					expiryLineFn(
+						"expiry:temporaryRandomOutput",
+						guaranteedOutput({
+							itemId: "result",
+							placement: "random",
+							quantity: {
+								min: 2,
+								max: 3,
+							},
+						}),
+					),
+				],
 				maxQueueSize: 1,
 				clock: {
 					durationMs: 600,
-					onExpire: guaranteedOutput({
-						itemId: "result",
-						placement: "random",
-						quantity: {
-							min: 2,
-							max: 3,
-						},
-					}),
 				},
 			},
 			temporaryCappedOutput: {
@@ -199,13 +222,17 @@ export const createTemporaryLifetimeTestConfig = () =>
 					id: "temporaryCappedOutput",
 				}),
 
-				lines: [],
+				lines: [
+					expiryLineFn(
+						"expiry:temporaryCappedOutput",
+						guaranteedOutput({
+							itemId: "cappedResult",
+						}),
+					),
+				],
 				maxQueueSize: 1,
 				clock: {
 					durationMs: 600,
-					onExpire: guaranteedOutput({
-						itemId: "cappedResult",
-					}),
 				},
 			},
 			producer: {

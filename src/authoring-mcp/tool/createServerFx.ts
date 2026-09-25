@@ -272,7 +272,7 @@ const readItemLinesTextFx = Effect.fn("readItemLinesTextFx")((project: Project, 
 						...item.lines.map((line) =>
 							[
 								`- ${JSON.stringify(line.title)} [line:${JSON.stringify(line.uid)}]`,
-								`  Default: ${line.default}; Clock: ${line.clock === true}; Clock weight: ${line.clockWeight}; Show: ${line.show}; Enable: ${line.enable}`,
+								`  Default: ${line.default}; Clock: ${line.clock ?? "none"}; Clock weight: ${line.clockWeight}; Show: ${line.show}; Enable: ${line.enable}`,
 							].join("\n"),
 						),
 					]),
@@ -429,9 +429,7 @@ const createServerFn = (
 			inputSchema: KnowledgeInputSchema,
 		},
 		async () =>
-			runToolFn(
-				Effect.promise(async () => (await import("../knowledge.md?raw")).default),
-			),
+			runToolFn(Effect.promise(async () => (await import("../knowledge.md?raw")).default)),
 	);
 	server.registerTool(
 		"schema_json",

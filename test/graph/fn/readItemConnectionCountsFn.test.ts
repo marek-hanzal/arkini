@@ -37,7 +37,7 @@ it("counts parallel occurrences and both self-edge directions without doubling t
 		[
 			"item:B",
 			"item:A",
-			"clock-item-outcome",
+			"line-item-outcome",
 		],
 		[
 			"item:A",

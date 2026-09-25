@@ -14,42 +14,7 @@
 			"intervalMs": 30000,
 			"durationMs": 300000,
 			"enable": true,
-			"rules": [],
-			"onExpire": {
-				"set": [
-					{
-						"weight": 1,
-						"rules": [],
-						"roll": [
-							{
-								"type": "guaranteed",
-								"outcome": [
-									{
-										"type": "item",
-										"itemUid": "xf44x3an4an91b5xqmxevd11",
-										"quantity": {
-											"min": 4,
-											"max": 8
-										},
-										"placement": "drop",
-										"rules": []
-									},
-									{
-										"type": "item",
-										"itemUid": "xsy4q5tb13eivk2tmqhtrj4q",
-										"quantity": {
-											"min": 1,
-											"max": 2
-										},
-										"placement": "drop",
-										"rules": []
-									}
-								]
-							}
-						]
-					}
-				]
-			}
+			"rules": []
 		},
 		"maxQueueSize": 1,
 		"lines": [
@@ -57,7 +22,7 @@
 				"uid": "g8qx9c438ag10b7zws7iteve",
 				"title": "Idle",
 				"description": "The sick animal rests and does nothing this time.",
-				"clock": true,
+				"clock": "clock-interval",
 				"clockWeight": 9,
 				"default": false,
 				"show": false,
@@ -75,7 +40,7 @@
 				"title": "Spread Disease",
 				"artwork": "fnom9s6mxxkza9m7iahgp5k9",
 				"description": "The sick animal may contaminate its immediate surroundings.",
-				"clock": true,
+				"clock": "clock-interval",
 				"clockWeight": 1,
 				"default": false,
 				"show": false,
@@ -101,6 +66,54 @@
 											"quantity": {
 												"min": 1,
 												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"uid": "expiry-k38iwxi6ciqjf2h5qa9xvyvq",
+				"title": "Expiry",
+				"description": "Resolves this item’s outcome when its lifetime ends.",
+				"clock": "clock-lifetime",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [],
+				"outcome": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"outcome": [
+										{
+											"type": "item",
+											"itemUid": "xf44x3an4an91b5xqmxevd11",
+											"quantity": {
+												"min": 4,
+												"max": 8
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"type": "item",
+											"itemUid": "xsy4q5tb13eivk2tmqhtrj4q",
+											"quantity": {
+												"min": 1,
+												"max": 2
 											},
 											"placement": "drop",
 											"rules": []

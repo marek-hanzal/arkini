@@ -92,11 +92,21 @@ export const createTemporaryMaterialLifecycleTestConfig = (runtimeMs = 1_000) =>
 			temporary: {
 				...baseItem("temporary"),
 
-				lines: [],
+				lines: [
+					{
+						uid: "expiry:temporary",
+						title: "Expiry",
+						description: "Expiry",
+						clock: "clock-lifetime",
+						runtimeMs: 0,
+						input: [],
+						outcome: guaranteedOutput("residue"),
+						rules: [],
+					},
+				],
 				maxQueueSize: 1,
 				clock: {
 					durationMs: 600,
-					onExpire: guaranteedOutput("residue"),
 				},
 			},
 			residue: {

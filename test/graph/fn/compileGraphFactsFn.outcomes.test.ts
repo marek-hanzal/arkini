@@ -3,6 +3,7 @@ import { compileGraphFactsFn } from "~/graph/fn/compileGraphFactsFn";
 import {
 	adversarialConfigFn,
 	configFn,
+	expiryLineFn,
 	itemFn,
 	lineFn,
 	outputFn,
@@ -58,10 +59,19 @@ it("does not collapse repeated drops or lose rules inside zero-chance Space and 
 			2,
 			undefined,
 		],
+		[
+			"item:A",
+			"item:B",
+			0,
+			0,
+			0,
+			1,
+			undefined,
+		],
 	]);
-	expect(new Set(outputs.map((edge) => edge.id)).size).toBe(4);
-	expect(new Set(outputs.map((edge) => edge.annotations.setId)).size).toBe(2);
-	expect(new Set(outputs.map((edge) => edge.annotations.rollId)).size).toBe(3);
+	expect(new Set(outputs.map((edge) => edge.id)).size).toBe(5);
+	expect(new Set(outputs.map((edge) => edge.annotations.setId)).size).toBe(3);
+	expect(new Set(outputs.map((edge) => edge.annotations.rollId)).size).toBe(4);
 	expect(outputs[0]?.annotations.outcome).toMatchObject({
 		placement: "random",
 		quantity: {
@@ -313,17 +323,20 @@ it("retains authored Clock flags and outcomes even when no executable schedule c
 			A: itemFn("A", {
 				lines: [
 					lineFn("L", {
-						clock: true,
+						clock: "clock-interval",
 						clockWeight: 3,
 						outcome: outputFn("B"),
 					}),
 				],
 			}),
 			B: itemFn("B", {
+				lines: [
+					expiryLineFn("B-expiry", outputFn("A")),
+				],
 				clock: {
 					intervalMs: 100,
+					durationMs: 100,
 					enable: false,
-					onExpire: outputFn("A"),
 				},
 			}),
 		}),
@@ -334,7 +347,7 @@ it("retains authored Clock flags and outcomes even when no executable schedule c
 				kind: "line",
 				owner: "item:A",
 				data: expect.objectContaining({
-					clock: true,
+					clock: "clock-interval",
 					clockWeight: 3,
 				}),
 			}),
@@ -356,7 +369,7 @@ it("retains authored Clock flags and outcomes even when no executable schedule c
 				to: "item:B",
 			}),
 			expect.objectContaining({
-				kind: "clock-item-outcome",
+				kind: "line-item-outcome",
 				from: "item:B",
 				to: "item:A",
 			}),

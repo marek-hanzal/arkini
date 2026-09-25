@@ -4,6 +4,7 @@ import { readTemplateDeleteBlockersFn } from "~/template-authoring/fn/readTempla
 import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import {
 	createLine,
+	createExpiryLine,
 	createProducerItem,
 } from "~test/game-config-validation/support/gameValidationTestSource";
 import { editorTestConfig } from "~test/project-authoring/support/editorTestPayload";
@@ -43,10 +44,10 @@ it("blocks deleting a generated-room template referenced by every outcome owner 
 					createLine({
 						outcome,
 					}),
+					createExpiryLine(outcome, "line:A-expiry"),
 				],
 				clock: {
 					durationMs: 1000,
-					onExpire: outcome,
 				},
 				units: {
 					amount: 1,
@@ -100,8 +101,9 @@ it("blocks deleting a generated-room template referenced by every outcome owner 
 			[
 				"items",
 				"A",
-				"clock",
-				"onExpire",
+				"lines",
+				1,
+				"outcome",
 				...tail,
 			],
 			[

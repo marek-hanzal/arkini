@@ -16,7 +16,7 @@ export const searchProjectFn = () => {
 		LineSchema.parse(
 			lineFn("a", {
 				title: "Digest Food",
-				clock: true,
+				clock: "clock-interval",
 				clockWeight: 15,
 				show: false,
 				runtimeMs: 1000,
@@ -25,7 +25,7 @@ export const searchProjectFn = () => {
 		LineSchema.parse(
 			lineFn("b", {
 				title: "Digest",
-				clock: true,
+				clock: "clock-interval",
 				clockWeight: 16,
 				show: false,
 				runtimeMs: 2000,

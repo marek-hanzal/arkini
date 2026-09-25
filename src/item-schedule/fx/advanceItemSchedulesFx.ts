@@ -1,11 +1,14 @@
 import { Effect } from "effect";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
+import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { EngineFact } from "~/game-event/type/EngineFact";
 import { readItemScheduleFn } from "~/item-schedule/fn/readItemScheduleFn";
 import { resolveItemScheduleEnabledFx } from "~/item-schedule/fx/resolveItemScheduleEnabledFx";
 import { selectClockLineFx } from "~/item-schedule/fx/selectClockLineFx";
 import { enqueueLineRuntimeFx } from "~/production-job/fx/enqueueLineRuntimeFx";
 import { SimulationStepMs } from "~/simulation-time/constant/SimulationStepMs";
+import { LineClockModeEnumSchema } from "~/production-line/schema/LineClockModeEnumSchema";
+import { readLineInputAutofillCoverageFx } from "~/production-input/fx/readLineInputAutofillCoverageFx";
 
 /** Advances boundary identities only; a pulse admits ordinary intent before closing its final lifetime. */
 export const advanceItemSchedulesFx = Effect.fn("advanceItemSchedulesFx")(function* ({
@@ -18,6 +21,8 @@ export const advanceItemSchedulesFx = Effect.fn("advanceItemSchedulesFx")(functi
 	let draft = runtime;
 	const facts: EngineFact[] = [];
 	let dispatched = false;
+	// One Board source cannot satisfy two owners pulsing in the same scheduler pass.
+	const claimedSourceItemIds = new Set<IdSchema.Type>();
 	const owners = stepStart.items
 		.filter((item) => item.schedule !== undefined)
 		.sort((a, b) => a.id.localeCompare(b.id));
@@ -51,13 +56,25 @@ export const advanceItemSchedulesFx = Effect.fn("advanceItemSchedulesFx")(functi
 				const line = yield* selectClockLineFx({
 					item,
 					runtime: draft,
+					role: LineClockModeEnumSchema.enum["clock-interval"],
 				});
 				if (line === undefined) return undefined;
-				return yield* enqueueLineRuntimeFx({
+				const coverage = yield* readLineInputAutofillCoverageFx({
+					ownerItemId: item.id,
+					lineUid: line.uid,
+					runtime: draft,
+					excludedSourceItemIds: claimedSourceItemIds,
+				});
+				if (coverage.type === "incomplete") return undefined;
+				const queued = yield* enqueueLineRuntimeFx({
 					ownerItemId: item.id,
 					lineUid: line.uid,
 					runtime: draft,
 				});
+				return {
+					queued,
+					claimed: coverage.plan.entry.map((entry) => entry.sourceItemId),
+				};
 			}).pipe(
 				Effect.catchTags({
 					JobQueueFullError: () => Effect.succeed(undefined),
@@ -66,8 +83,9 @@ export const advanceItemSchedulesFx = Effect.fn("advanceItemSchedulesFx")(functi
 				}),
 			);
 			if (attempt !== undefined) {
-				draft = attempt.runtime;
-				facts.push(...attempt.events);
+				draft = attempt.queued.runtime;
+				facts.push(...attempt.queued.events);
+				for (const sourceItemId of attempt.claimed) claimedSourceItemIds.add(sourceItemId);
 			}
 			dispatched = true;
 		}

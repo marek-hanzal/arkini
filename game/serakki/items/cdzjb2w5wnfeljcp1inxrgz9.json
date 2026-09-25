@@ -23,7 +23,7 @@
 				"uid": "ydhnnfx22jr78oxvb8sfd2ql",
 				"title": "Plague",
 				"description": "You want to stop this. Really",
-				"clock": true,
+				"clock": "clock-interval",
 				"clockWeight": 1,
 				"default": false,
 				"show": false,

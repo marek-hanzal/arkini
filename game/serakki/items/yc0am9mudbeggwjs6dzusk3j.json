@@ -411,7 +411,6 @@
 				"title": "Wooden Sticks",
 				"artwork": "sph5etm2s4wtaq97o9zpzcvr",
 				"description": "Cut processed planks into a larger batch of straight wooden sticks with less waste.",
-				"clock": false,
 				"clockWeight": 1,
 				"default": false,
 				"show": true,

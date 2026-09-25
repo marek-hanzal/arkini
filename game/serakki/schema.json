@@ -1310,10 +1310,6 @@
 					"items": {
 						"$ref": "urn:serakki:schema:project#/$defs/action.RuleSchema"
 					}
-				},
-				"onExpire": {
-					"description": "Output resolved at owner expiry in both modes; kill-switch places what fits after returned materials and logs the excess as lost, within the same atomic removal.",
-					"$ref": "urn:serakki:schema:project#/$defs/OutcomeTableSchema"
 				}
 			},
 			"required": [
@@ -1333,7 +1329,7 @@
 					]
 				}
 			],
-			"description": "Clock-line admission, finite lifetime, or both, with availability rules and expiry outcome."
+			"description": "Clock-line admission, finite lifetime, or both, with availability rules; expiry selects a weighted expiry line."
 		},
 		"TimeSchema": {
 			"type": "integer",
@@ -1440,8 +1436,12 @@
 					"$ref": "urn:serakki:schema:project#/$defs/DescriptionSchema"
 				},
 				"clock": {
-					"description": "Whether this line participates in weighted Clock selection, independently of Default.",
-					"type": "boolean"
+					"description": "Optional weighted Clock role: interval admits a Job at each pulse; lifetime expiry runs this line as a Board Job or immediately settles its outcome when the owner is held internally.",
+					"type": "string",
+					"enum": [
+						"clock-interval",
+						"clock-lifetime"
+					]
 				},
 				"clockWeight": {
 					"default": 1,
@@ -1471,16 +1471,10 @@
 				},
 				"input": {
 					"type": "array",
-					"prefixItems": [
-						{
-							"$ref": "urn:serakki:schema:project#/$defs/InputSchema"
-						}
-					],
 					"items": {
 						"$ref": "urn:serakki:schema:project#/$defs/InputSchema"
 					},
-					"minItems": 1,
-					"description": "One or more input requirements for this product line."
+					"description": "Input requirements for this product line."
 				},
 				"outcome": {
 					"description": "The optional result produced when this product line completes.",

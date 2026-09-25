@@ -325,7 +325,6 @@ describe("receiver-owned Space merge", () => {
 				default: false,
 				enable: true,
 				show: true,
-				clock: false,
 				clockWeight: 1,
 				runtimeMs: 1_000,
 				rules: [],

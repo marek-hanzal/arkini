@@ -10,7 +10,6 @@ interface ItemCleanup {
 	readonly mergeIndexes: Set<number>;
 	readonly lineIndexes: Set<number>;
 	removeUnitsOutcome: boolean;
-	removeExpiryOutcome: boolean;
 }
 
 export namespace forceDeleteFx {
@@ -20,7 +19,6 @@ export namespace forceDeleteFx {
 			readonly ruleNumber: number;
 		}>;
 		readonly removedUnitOutcomeOwnerIds: ReadonlyArray<string>;
-		readonly removedExpiryOutcomeOwnerIds: ReadonlyArray<string>;
 		readonly removedLines: ReadonlyArray<{
 			readonly ownerItemUid: string;
 			readonly lineUid: string;
@@ -53,7 +51,6 @@ const createItemCleanupFn = (): ItemCleanup => ({
 	mergeIndexes: new Set(),
 	lineIndexes: new Set(),
 	removeUnitsOutcome: false,
-	removeExpiryOutcome: false,
 });
 
 /** Mechanically removes one item and every authored structure that directly references it. */
@@ -75,8 +72,7 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 		itemCleanups.set(second, cleanup);
 		match(third)
 			.with("clock", () => {
-				if (fourth === "onExpire") cleanup.removeExpiryOutcome = true;
-				else if (fourth === "rules" && typeof fifth === "number")
+				if (fourth === "rules" && typeof fifth === "number")
 					cleanup.clockRuleIndexes.add(fifth);
 				else throw new Error(`Invalid clock reference path ${blocker.path.join(".")}.`);
 			})
@@ -105,7 +101,6 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 		ruleNumber: number;
 	}> = [];
 	const removedUnitOutcomeOwnerIds: string[] = [];
-	const removedExpiryOutcomeOwnerIds: string[] = [];
 	const removedLines: Array<{
 		ownerItemUid: string;
 		lineUid: string;
@@ -172,14 +167,6 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 			};
 			removedUnitOutcomeOwnerIds.push(ownerItemUid);
 		}
-		if (cleanup.removeExpiryOutcome) {
-			if (owner.clock !== undefined)
-				candidate.clock = {
-					...(candidate.clock as typeof owner.clock),
-					onExpire: undefined,
-				};
-			removedExpiryOutcomeOwnerIds.push(ownerItemUid);
-		}
 		items[ownerItemUid] = candidate;
 	}
 
@@ -207,7 +194,6 @@ export const forceDeleteFx = Effect.fn("forceDeleteEditorItemFx")(function* ({
 			}),
 			removedClockRules,
 			removedUnitOutcomeOwnerIds,
-			removedExpiryOutcomeOwnerIds,
 			removedLines,
 			removedMergeRules,
 		},

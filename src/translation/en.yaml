@@ -79,10 +79,10 @@ Artwork usage help:
   value: Shows every saved Item that references this Artwork.
 Assigned:
   value: Assigned
+At lifetime expiry, selects this line by weight. On a Board it runs as a Job; inside another item or Job, its output settles immediately without inputs or runtime. Select again to remove its Clock role.:
+  value: At lifetime expiry, selects this line by weight. On a Board it runs as a Job; inside another item or Job, its output settles immediately without inputs or runtime. Select again to remove its Clock role.
 Audio not found:
   value: Audio not found
-Authored Clock expiry outcome summary help:
-  value: Authored Clock expiry outcome summary help
 Authored Clock interval summary help:
   value: |
     How often the Clock selects one eligible weighted production line.
@@ -90,10 +90,10 @@ Authored Clock interval summary help:
     **None** means no repeating production. Lifetime can still expire.
 Authored Clock kill-switch summary help:
   value: |
-    **Stop immediately** removes the item at the end of its Lifetime, even if a job is unfinished or output has nowhere to go.
+    **Stop immediately** cancels earlier work when Lifetime ends. A selected expiry line still runs to completion on the Board; output that cannot fit is discarded.
 Authored Clock lifetime summary help:
   value: |
-    How long the item may stay on a Board before it expires.
+    How long the item may exist before it expires, including while held as input or inside a job.
 
     **Unlimited** means it never expires on its own.
 Authored Clock loose-kill summary help:
@@ -312,8 +312,10 @@ Clear lifetime:
   value: Clear lifetime
 Clock:
   value: Clock
-Clock expiry outcome help:
-  value: Clock expiry outcome help
+Clock - Expiry:
+  value: Clock - Expiry
+Clock - Interval:
+  value: Clock - Interval
 Clock expiry output:
   value: Clock expiry output
   dynamic: true
@@ -326,9 +328,9 @@ Clock interval help:
     Failed rules or a full queue skip that attempt. Leave empty for Lifetime only.
 Clock kill-switch help:
   value: |
-    **Stop immediately** removes the item when Lifetime ends and cancels unfinished work.
+    **Stop immediately** cancels earlier work when Lifetime ends. A selected expiry line on the Board still runs for its authored time.
 
-    Reserved items return first, then unused materials, then expiry output. Anything that cannot fit is lost.
+    At completion, output and returned material that cannot fit are lost. An item held inside another job expires immediately.
 Clock lifetime help:
   value: |
     How long this item remains alive before expiring.
@@ -754,13 +756,13 @@ Item clock help:
   value: |
     Clock adds repeating production, a limited Lifetime, or both.
 
-    - **Interval** tries the line marked Clock. Leave empty for no repeating production.
-    - **Lifetime** expires the item. Leave empty for no time limit.
-    - **Wait for output** lets started jobs finish before removal.
-    - **Stop immediately** cancels unfinished work at expiry; anything that cannot fit is lost.
+    - **Interval** selects a weighted interval line. Leave empty for no repeating production.
+    - **Lifetime** selects a weighted expiry line when the timer ends. Leave empty for no time limit.
+    - **Wait for output** lets earlier work and the expiry job finish before removal.
+    - **Stop immediately** cancels earlier work; the expiry job still finishes, discarding output that cannot fit.
     - Every Enable rule must pass; any matching Disable rule pauses the Clock.
 
-    Time advances in every location while Clock rules allow it; production pulses require a Board. Enabling Clock removes Action.
+    Time advances in every location while Clock rules allow it; production pulses require a Board. An item held inside another job skips the expiry line's inputs and runtime and immediately settles its output.
 Item connections help:
   value: |
     Connections searches the project's authored graph. Choose a relationship type and optionally a counterpart.
@@ -1179,8 +1181,6 @@ No configured Space matches this search.:
   value: No configured Space matches this search.
 No depletion outcome configured.:
   value: No depletion outcome configured.
-No expiry outcome configured.:
-  value: No expiry outcome configured.
 No extra outcome configured.:
   value: No extra outcome configured.
 No image selected:
@@ -1515,8 +1515,6 @@ Remove project:
   value: Remove project
 Remove project?:
   value: Remove project?
-Remove the expiry outcome from:
-  value: Remove the expiry outcome from
 Remove the unit depletion outcome from:
   value: Remove the unit depletion outcome from
 Rename:
@@ -1669,6 +1667,8 @@ Selected target must have Units enabled before choosing Spend.:
   value: Selected target must have Units enabled before choosing Spend.
 Selected target must have Units enabled.:
   value: Selected target must have Units enabled.
+Selects this line by weight at each Clock interval. Select again to remove its Clock role.:
+  value: Selects this line by weight at each Clock interval. Select again to remove its Clock role.
 Self:
   value: Self
   dynamic: true
@@ -1981,6 +1981,8 @@ blocking errors:
   value: errors
 chance:
   value: chance
+clock-lifetime:
+  value: clock-lifetime
 conditions:
   value: conditions
 consume:

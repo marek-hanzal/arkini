@@ -13,6 +13,9 @@ import { resolveLineShowFn } from "~/production-line/fn/resolveLineShowFn";
 import type { LineRun } from "~/production-line/type/LineRun";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { RuleTypeSchema as LineRuleTypeSchema } from "~/production-line/schema/RuleTypeSchema";
+import { LineRunUnavailableError } from "~/production-line/error/LineRunUnavailableError";
+import { LineClockModeEnumSchema } from "~/production-line/schema/LineClockModeEnumSchema";
+import { isLineAdmissionOpenFn } from "~/production-line/fn/isLineAdmissionOpenFn";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
 import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
@@ -34,10 +37,7 @@ const planLineRunFn = ({
 	runtimeMs,
 }: {
 	readonly enable: boolean;
-	readonly input: readonly [
-		InputRun.Resolution,
-		...InputRun.Resolution[],
-	];
+	readonly input: readonly InputRun.Resolution[];
 	readonly lineUid: IdSchema.Type;
 	readonly ownerItemId: IdSchema.Type;
 	readonly runtimeMs: TimeSchema.Type;
@@ -49,17 +49,11 @@ const planLineRunFn = ({
 		if (plan === undefined) return undefined;
 		inputPlans.push(plan);
 	}
-	const [firstInputPlan, ...remainingInputPlans] = inputPlans;
-	if (firstInputPlan === undefined) return undefined;
-
 	return {
 		ownerItemId,
 		lineUid,
 		runtimeMs,
-		input: [
-			firstInputPlan,
-			...remainingInputPlans,
-		],
+		input: inputPlans,
 	} satisfies LineRun.Plan;
 };
 
@@ -128,7 +122,19 @@ export const resolveLineRunFx = Effect.fn("resolveLineRunFx")(function* ({
 			}),
 		);
 	}
-
+	if (
+		line.clock === LineClockModeEnumSchema.enum["clock-lifetime"] &&
+		!isLineAdmissionOpenFn({
+			owner,
+			lineUid,
+		})
+	)
+		return yield* Effect.fail(
+			new LineRunUnavailableError({
+				ownerItemId,
+				lineUid,
+			}),
+		);
 	const rules = yield* lineRulesFx({
 		origin: owner.location,
 		rules: line.rules,
@@ -170,17 +176,7 @@ export const resolveLineRunFx = Effect.fn("resolveLineRunFx")(function* ({
 			);
 		}
 	}
-	const [firstInput, ...remainingInputs] = resolvedInputs;
-	if (firstInput === undefined) {
-		return yield* Effect.die(new Error("LineSchema unexpectedly resolved without an input."));
-	}
-	const input = [
-		firstInput,
-		...remainingInputs,
-	] satisfies readonly [
-		InputRun.Resolution,
-		...InputRun.Resolution[],
-	];
+	const input = resolvedInputs;
 	const plan = planLineRunFn({
 		enable,
 		input,

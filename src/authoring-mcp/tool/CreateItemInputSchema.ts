@@ -23,7 +23,7 @@ export const CreateItemInputSchema = z
 		),
 		lines: z
 			.array(
-				LineSchema.omit({
+				z.object(LineSchema.shape).omit({
 					uid: true,
 				}),
 			)

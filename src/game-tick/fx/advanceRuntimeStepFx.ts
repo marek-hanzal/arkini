@@ -1,5 +1,6 @@
 import { readRuntimeItemByIdFx } from "~/game-runtime/fx/readRuntimeItemByIdFx";
 import { readItemScheduleFn } from "~/item-schedule/fn/readItemScheduleFn";
+import { isLineAdmissionOpenFn } from "~/production-line/fn/isLineAdmissionOpenFn";
 import { advanceItemSchedulesFx } from "~/item-schedule/fx/advanceItemSchedulesFx";
 import { expireIdleScheduledItemsFx } from "~/item-schedule/fx/expireIdleScheduledItemsFx";
 import { Effect } from "effect";
@@ -91,7 +92,11 @@ const dispatchIdleQueueRequestsFx = Effect.fn("dispatchIdleQueueRequestsFx")(fun
 		const owner = draft.items.find((item) => item.id === request.ownerItemId);
 		if (
 			owner?.schedule?.remainingDurationMs === 0 &&
-			readItemScheduleFn(owner.item)?.expiryMode === "kill-switch"
+			readItemScheduleFn(owner.item)?.expiryMode === "kill-switch" &&
+			!isLineAdmissionOpenFn({
+				owner,
+				lineUid: request.lineUid,
+			})
 		)
 			continue;
 

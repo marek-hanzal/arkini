@@ -14,6 +14,7 @@ import { OutcomeDetail } from "~/item-authoring/ui/OutcomeDetail";
 import { ProductionLineInputs } from "~/item-authoring/ui/ProductionLineInputs";
 import { Mx } from "~/translation/ui/Mx";
 import { EditorResourceThumbnail } from "~/authoring-form/ui/EditorResourceThumbnail";
+import { LineClockModeEnumSchema } from "~/production-line/schema/LineClockModeEnumSchema";
 
 const LineFlag = ({
 	checked,
@@ -93,10 +94,18 @@ export const ProductionLineDetail = ({
 							description={<Mx label="Authored production Default marker help" />}
 						/>
 						<LineFlag
-							checked={line.clock === true}
+							checked={line.clock !== undefined}
 							label={
 								<>
-									<Tx label="Clock" /> · {line.clockWeight}
+									<Tx
+										label={
+											line.clock ===
+											LineClockModeEnumSchema.enum["clock-lifetime"]
+												? "Clock - Expiry"
+												: "Clock - Interval"
+										}
+									/>{" "}
+									· {line.clockWeight}
 								</>
 							}
 							description={<Mx label="Authored production Clock marker help" />}

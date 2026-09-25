@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Effect, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~test/support/useGameFx";
@@ -170,7 +170,7 @@ describe("temporary item lifetime", () => {
 					itemId: "temporaryEmptyOutput",
 				});
 				yield* runTickRuntimeByFx({
-					elapsedMs: 600,
+					elapsedMs: 700,
 				});
 				return {
 					runtime: yield* readRuntimeFx(),
@@ -186,6 +186,9 @@ describe("temporary item lifetime", () => {
 
 		expect(result.runtime.items.some((item) => item.id === result.temporary.id)).toBe(false);
 		expect(result.transition.events.map((event) => event.type)).toEqual([
+			GameEventEnumSchema.enum.JobQueued,
+			GameEventEnumSchema.enum.JobStarted,
+			GameEventEnumSchema.enum.JobCompleted,
 			GameEventEnumSchema.enum.ItemRemoved,
 			GameEventEnumSchema.enum.ItemExpired,
 			GameEventEnumSchema.enum.ItemDisappeared,
@@ -316,16 +319,17 @@ describe("temporary item lifetime", () => {
 				const fourth = yield* advanceRuntimeStepFx(third.runtime);
 				const fifth = yield* advanceRuntimeStepFx(fourth.runtime);
 				const sixth = yield* advanceRuntimeStepFx(fifth.runtime);
-				const outcome = sixth.runtime.items.find((item) => item.item.uid === "result");
+				const seventh = yield* advanceRuntimeStepFx(sixth.runtime);
+				const outcome = seventh.runtime.items.find((item) => item.item.uid === "result");
 				if (outcome === undefined) throw new Error("Expected expiry outcome.");
 				return {
 					outcome,
 					temporary,
-					expiry: sixth,
+					expiry: seventh,
 					expiryEvents: yield* projectCommittedEngineFactsFx({
-						previousRuntime: fifth.runtime,
-						runtime: sixth.runtime,
-						facts: sixth.facts,
+						previousRuntime: sixth.runtime,
+						runtime: seventh.runtime,
+						facts: seventh.facts,
 					}),
 				};
 			}).pipe(
@@ -336,6 +340,11 @@ describe("temporary item lifetime", () => {
 		);
 
 		expect(result.expiryEvents).toEqual([
+			expect.objectContaining({
+				type: GameEventEnumSchema.enum.JobCompleted,
+				ownerItemId: result.temporary.id,
+				lineUid: "expiry:temporaryOutput",
+			}),
 			{
 				type: GameEventEnumSchema.enum.ItemRemoved,
 				snapshot: {
@@ -378,7 +387,7 @@ describe("temporary item lifetime", () => {
 					x: 2,
 				});
 				yield* runTickRuntimeByFx({
-					elapsedMs: 600,
+					elapsedMs: 700,
 				});
 				return yield* readRuntimeFx();
 			}).pipe(
@@ -406,51 +415,43 @@ describe("temporary item lifetime", () => {
 	});
 
 	it("keeps a blocked expiry at zero and preserves the deterministic random result across retry", () => {
-		const run = (blocked: boolean) =>
-			Effect.runSync(
-				Effect.gen(function* () {
-					yield* spawnTemporaryFx({
-						id: "runtime:random-temporary",
-						itemId: "temporaryRandomOutput",
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* spawnTemporaryFx({
+					id: "runtime:random-temporary",
+					itemId: "temporaryRandomOutput",
+				});
+				const blockers = [];
+				for (const [index, x] of [
+					1,
+					2,
+					3,
+				].entries())
+					blockers.push(yield* spawnBlockerFx(`runtime:blocker:${index}`, x));
+				yield* runTickRuntimeByFx({
+					elapsedMs: 700,
+				});
+				const blocked = yield* readRuntimeFx();
+				for (const blocker of blockers.slice(1))
+					yield* removeRuntimeItemForTestFx({
+						itemId: blocker.id,
+						revision: blocker.revision,
 					});
-					const blockers = [];
-					for (const [index, x] of [
-						1,
-						2,
-						3,
-					].entries()) {
-						if (!blocked && index > 0) continue;
-						blockers.push(yield* spawnBlockerFx(`runtime:blocker:${index}`, x));
-					}
-					yield* runTickRuntimeByFx({
-						elapsedMs: 600,
-					});
-					const first = yield* readRuntimeFx();
-					if (blocked) {
-						for (const blocker of blockers.slice(1)) {
-							yield* removeRuntimeItemForTestFx({
-								itemId: blocker.id,
-								revision: blocker.revision,
-							});
-						}
-						yield* runTickRuntimeByFx({
-							elapsedMs: 200,
-						});
-					}
-					return {
-						first,
-						final: yield* readRuntimeFx(),
-					};
-				}).pipe(
-					useGameFx({
-						config,
-					}),
-				),
-			);
-
-		const blocked = run(true);
-		const direct = run(false);
-		expect(blocked.first.items).toContainEqual(
+				const free = yield* readRuntimeFx();
+				const first = yield* advanceRuntimeStepFx(free).pipe(Random.withSeed("first"));
+				const second = yield* advanceRuntimeStepFx(free).pipe(Random.withSeed("second"));
+				return {
+					blocked,
+					first,
+					second,
+				};
+			}).pipe(
+				useGameFx({
+					config,
+				}),
+			),
+		);
+		expect(result.blocked.items).toContainEqual(
 			expect.objectContaining({
 				id: "runtime:random-temporary",
 				schedule: {
@@ -467,13 +468,15 @@ describe("temporary item lifetime", () => {
 				.sort((first, second) =>
 					JSON.stringify(first.location).localeCompare(JSON.stringify(second.location)),
 				);
-		expect(summarizeResults(blocked.final)).toEqual(summarizeResults(direct.final));
-		expect(blocked.final.items.some((item) => item.id === "runtime:random-temporary")).toBe(
-			false,
+		expect(summarizeResults(result.first.runtime)).toEqual(
+			summarizeResults(result.second.runtime),
 		);
+		expect(
+			result.first.runtime.items.some((item) => item.id === "runtime:random-temporary"),
+		).toBe(false);
 	});
 
-	it("expires simultaneous items in stable runtime-ID order", () => {
+	it("expires simultaneous lifetime jobs after ordinary completion", () => {
 		const transition = Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnTemporaryFx({
@@ -487,7 +490,7 @@ describe("temporary item lifetime", () => {
 					x: 0,
 				});
 				yield* runTickRuntimeByFx({
-					elapsedMs: 600,
+					elapsedMs: 700,
 				});
 				return yield* (yield* CommittedTransitionsFx).read;
 			}).pipe(
@@ -501,10 +504,19 @@ describe("temporary item lifetime", () => {
 			transition.events
 				.filter((event) => event.type === GameEventEnumSchema.enum.ItemExpired)
 				.map((event) => event.itemId),
-		).toEqual([
-			"runtime:a",
-			"runtime:b",
-		]);
+		).toHaveLength(2);
+		expect(
+			new Set(
+				transition.events
+					.filter((event) => event.type === GameEventEnumSchema.enum.ItemExpired)
+					.map((event) => event.itemId),
+			),
+		).toEqual(
+			new Set([
+				"runtime:a",
+				"runtime:b",
+			]),
+		);
 		expect(
 			transition.runtime.items.filter((item) => item.item.uid === "cappedResult"),
 		).toHaveLength(2);

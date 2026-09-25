@@ -5,7 +5,6 @@ import { useFormSession } from "~/item-authoring/ui/FormContext";
 import type { RuleSchema } from "~/production-action/schema/RuleSchema";
 import { useStore } from "@tanstack/react-form";
 import { RulesControl } from "~/production-authoring/ui/RulesControl";
-import { OutcomeControl } from "~/production-authoring/ui/OutcomeControl";
 import { EditorCapabilityStatus } from "~/editor-control/ui/EditorCapabilityStatus";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
 import { SectionEnd } from "~/ui/ui/SectionEnd";
@@ -127,28 +126,6 @@ const ClockFields = () => {
 							/>
 						)}
 					</form.Subscribe>
-				</EditorFormCard>
-			</EditorFormSection>
-			<EditorFormSection
-				title={translator.textFn("Expiry outcome")}
-				description={<Mx label="Clock expiry outcome help" />}
-			>
-				<EditorFormCard>
-					<fieldset
-						className="m-0 min-w-0 border-0 p-0"
-						disabled={clock.durationMs === undefined}
-					>
-						<form.Subscribe selector={(state) => state.values.clock?.onExpire}>
-							{(outcome) => (
-								<OutcomeControl
-									value={outcome}
-									onChangeFn={(next) =>
-										form.setFieldValue("clock.onExpire", next)
-									}
-								/>
-							)}
-						</form.Subscribe>
-					</fieldset>
 				</EditorFormCard>
 			</EditorFormSection>
 		</div>

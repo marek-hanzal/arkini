@@ -123,7 +123,7 @@ describe("readTileActorsFx", () => {
 					lines: item.item.lines.map((line) => ({
 						...line,
 						runtimeMs: 0,
-						clock: true,
+						clock: "clock-interval",
 						input: [
 							{
 								type: "simple",

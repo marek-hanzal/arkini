@@ -23,7 +23,7 @@
 				"title": "Ghost",
 				"artwork": "l8fcutyu853b3qmfb8tnig91",
 				"description": "Underground is waking up!",
-				"clock": true,
+				"clock": "clock-interval",
 				"clockWeight": 1,
 				"default": false,
 				"show": false,

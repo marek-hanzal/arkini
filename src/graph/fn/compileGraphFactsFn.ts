@@ -576,16 +576,6 @@ export const compileGraphFactsFn = (config: GameConfigSchema.Type): GraphFacts =
 				...source,
 				"rules",
 			]);
-			outcomeFn(
-				owner,
-				id,
-				item.clock.onExpire,
-				[
-					...source,
-					"onExpire",
-				],
-				"clock-item-outcome",
-			);
 		}
 	}
 	for (const [index, template] of (config.templates ?? []).entries()) {

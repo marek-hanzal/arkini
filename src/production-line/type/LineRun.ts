@@ -9,10 +9,7 @@ export namespace LineRun {
 		readonly ownerItemId: IdSchema.Type;
 		readonly lineUid: IdSchema.Type;
 		readonly runtimeMs: TimeSchema.Type;
-		readonly input: readonly [
-			InputRun.Plan,
-			...InputRun.Plan[],
-		];
+		readonly input: readonly InputRun.Plan[];
 	}
 
 	export interface Resolution {
@@ -22,10 +19,7 @@ export namespace LineRun {
 		readonly enable: boolean;
 		readonly rules: ReadonlyArray<lineRuleFx.Result>;
 		readonly runtimeMs: TimeSchema.Type;
-		readonly input: readonly [
-			InputRun.Resolution,
-			...InputRun.Resolution[],
-		];
+		readonly input: readonly InputRun.Resolution[];
 		readonly ready: boolean;
 		readonly plan?: Plan;
 	}

@@ -43,18 +43,6 @@ export const readItemOutcomeEntriesFn = ({ itemUid, item }: readItemOutcomeEntri
 		});
 	}
 
-	if (item.clock?.onExpire !== undefined) {
-		entries.push({
-			outcome: item.clock.onExpire,
-			path: [
-				"items",
-				itemUid,
-				"clock",
-				"onExpire",
-			],
-		});
-	}
-
 	for (const [index, merge] of (item.merge ?? []).entries()) {
 		if (merge.outcome === undefined) {
 			continue;

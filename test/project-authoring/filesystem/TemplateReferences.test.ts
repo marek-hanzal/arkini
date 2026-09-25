@@ -2,7 +2,10 @@ import { Effect } from "effect";
 import { afterEach, beforeEach, expect, it } from "vitest";
 import { ItemSchema } from "~/item-definition/schema/ItemSchema";
 import { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
-import { createLine } from "~test/game-config-validation/support/gameValidationTestSource";
+import {
+	createExpiryLine,
+	createLine,
+} from "~test/game-config-validation/support/gameValidationTestSource";
 import { editorTestPayload } from "~test/project-authoring/support/editorTestPayload";
 import {
 	createProjectTestHarness,
@@ -81,9 +84,11 @@ it.each([
 				},
 			},
 			{
+				lines: [
+					createExpiryLine(outcome, "line:template-expiry"),
+				],
 				clock: {
 					durationMs: 1000,
-					onExpire: outcome,
 				},
 			},
 			{

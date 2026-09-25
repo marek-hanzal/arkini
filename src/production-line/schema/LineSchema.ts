@@ -6,6 +6,7 @@ import { IdSchema } from "~/game-value/schema/IdSchema";
 import { TimeSchema } from "~/game-value/schema/TimeSchema";
 import { TitleSchema } from "~/game-value/schema/TitleSchema";
 import { RuleSchema } from "./RuleSchema";
+import { LineClockModeEnumSchema } from "./LineClockModeEnumSchema";
 
 /**
  * A single product line with its accepted inputs and produced outcome.
@@ -34,12 +35,9 @@ export const LineSchema = z
 		description: DescriptionSchema.describe(
 			"The human-readable explanation of this product line's purpose.",
 		),
-		clock: z
-			.boolean()
-			.optional()
-			.describe(
-				"Whether this line participates in weighted Clock selection, independently of Default.",
-			),
+		clock: LineClockModeEnumSchema.optional().describe(
+			"Optional weighted Clock role: interval admits a Job at each pulse; lifetime expiry runs this line as a Board Job or immediately settles its outcome when the owner is held internally.",
+		),
 		clockWeight: z
 			.number()
 			.int()
@@ -87,17 +85,8 @@ export const LineSchema = z
 		runtimeMs: TimeSchema.describe(
 			"The runtime of this product line in milliseconds; zero completes immediately.",
 		),
-		/**
-		 * One or more input requirements for this product line.
-		 */
-		input: z
-			.tuple(
-				[
-					InputSchema,
-				],
-				InputSchema,
-			)
-			.describe("One or more input requirements for this product line."),
+		/** Input requirements for this product line; an empty list starts without material. */
+		input: z.array(InputSchema).describe("Input requirements for this product line."),
 		/**
 		 * Optional result produced when this product line completes.
 		 *
@@ -120,6 +109,18 @@ export const LineSchema = z
 			),
 	})
 	.strict()
+	.superRefine((line, context) => {
+		if (line.clock === LineClockModeEnumSchema.enum["clock-lifetime"]) {
+			if (line.default)
+				context.addIssue({
+					code: "custom",
+					path: [
+						"default",
+					],
+					message: "An expiry line cannot be Default.",
+				});
+		}
+	})
 	.meta({
 		id: "LineSchema",
 		description: "A single product line with its accepted inputs and produced outcome.",

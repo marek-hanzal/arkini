@@ -115,7 +115,6 @@
 				"title": "Copper Ore - Lantern",
 				"artwork": "d849jmpyesvhw3kxx0in38ni",
 				"description": "Copper ore",
-				"clock": false,
 				"clockWeight": 1,
 				"default": false,
 				"show": true,

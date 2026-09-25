@@ -22,7 +22,6 @@ const edgeKinds: Record<GraphEdgeKindSchema.Type, string> = {
 		"Merge source participant spending relation; inspect operation action and edge role.",
 	"merge-target-spend":
 		"Merge target participant spending relation; inspect operation effect and edge role.",
-	"clock-item-outcome": "Clock owner → expiry item outcome.",
 	"depletion-item-outcome": "Unit owner → depletion item outcome.",
 	"rule-reference":
 		"Rule owner → referenced item; a condition reference is not a production or consumption relation.",

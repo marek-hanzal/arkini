@@ -18,7 +18,7 @@ import { settleJobRuntimeFx } from "./settleJobRuntimeFx";
 export namespace abortJobRuntimeFx {
 	export interface Props {
 		readonly jobId: IdSchema.Type;
-		readonly reason: "material-expired" | "player-cancelled";
+		readonly reason: "material-expired" | "player-cancelled" | "owner-removed";
 		readonly overflow?: "discard";
 		readonly runtime: RuntimeSchema.Type;
 	}

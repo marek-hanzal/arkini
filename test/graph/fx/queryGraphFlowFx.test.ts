@@ -7,6 +7,7 @@ import { GraphFlowQuerySchema } from "~/graph/schema/GraphFlowQuerySchema";
 import type { GraphOperationIndex } from "~/graph/type/GraphOperationIndex";
 import {
 	configFn,
+	expiryLineFn,
 	itemFn,
 	lineFn,
 	outputFn,
@@ -137,9 +138,11 @@ it("follows merge replacement, expiry and depletion through exact operations", a
 		}),
 		unlit: itemFn("unlit"),
 		lit: itemFn("lit", {
+			lines: [
+				expiryLineFn("lit-expiry", outputFn("ash")),
+			],
 			clock: {
 				durationMs: 1000,
-				onExpire: outputFn("ash"),
 			},
 		}),
 		ash: itemFn("ash"),
@@ -169,7 +172,7 @@ it("follows merge replacement, expiry and depletion through exact operations", a
 	]);
 	expect(result.flows[0].steps.map((step) => step.kind)).toEqual([
 		"merge",
-		"clock",
+		"line",
 	]);
 	expect(result.flows[0].steps[0].evidence).toMatchObject({
 		fromRole: "target",
@@ -198,6 +201,7 @@ it("keeps disabled, zero-chance, missing and parallel authored output occurrence
 	const config = configFn({
 		A: itemFn("A", {
 			lines: [
+				expiryLineFn("A-expiry", outputFn("B")),
 				lineFn("disabled", {
 					enable: false,
 					outcome: outputFn("missing"),
@@ -218,7 +222,7 @@ it("keeps disabled, zero-chance, missing and parallel authored output occurrence
 			],
 			clock: {
 				intervalMs: 1000,
-				onExpire: outputFn("B"),
+				durationMs: 1000,
 			},
 		}),
 		B: itemFn("B"),

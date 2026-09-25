@@ -36,7 +36,7 @@ export const createLine = ({
 	outcome,
 }: {
 	default?: boolean;
-	clock?: boolean;
+	clock?: LineSchema.Type["clock"];
 	uid?: string;
 	input?: ReadonlyArray<InputSchema.Type>;
 	outcome?: OutcomeTableSchema.Type;
@@ -51,6 +51,14 @@ export const createLine = ({
 		input,
 		outcome,
 		rules: [],
+	});
+
+export const createExpiryLine = (outcome: OutcomeTableSchema.Type, uid = "line:expiry") =>
+	createLine({
+		uid,
+		clock: "clock-lifetime",
+		input: [],
+		outcome,
 	});
 
 export const createProducerItem = ({

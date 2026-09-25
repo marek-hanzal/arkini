@@ -9,6 +9,7 @@ export namespace readLineInputAutofillCoverageFx {
 		readonly lineUid: IdSchema.Type;
 		readonly ownerItemId: IdSchema.Type;
 		readonly runtime: RuntimeSchema.Type;
+		readonly excludedSourceItemIds?: ReadonlySet<IdSchema.Type>;
 	}
 
 	interface Coverage {
@@ -31,12 +32,18 @@ export namespace readLineInputAutofillCoverageFx {
  * not physically available to queued start admission until their canonical settlement.
  */
 export const readLineInputAutofillCoverageFx = Effect.fn("readLineInputAutofillCoverageFx")(
-	function* ({ lineUid, ownerItemId, runtime }: readLineInputAutofillCoverageFx.Props) {
+	function* ({
+		lineUid,
+		ownerItemId,
+		runtime,
+		excludedSourceItemIds,
+	}: readLineInputAutofillCoverageFx.Props) {
 		const plan = yield* planLineInputAutofillFx({
 			includeIncomingDeliveries: false,
 			lineUid,
 			ownerItemId,
 			runtime,
+			excludedSourceItemIds,
 		});
 		if (plan.remainingMissingQuantity > 0) {
 			return {

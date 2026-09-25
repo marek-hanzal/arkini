@@ -2,7 +2,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { ProductionLineOption } from "~/production-authoring/ui/ProductionLineOption";
 import { readCapabilityRelatedTermsFn } from "~/item-authoring/fn/readCapabilityRelatedTermsFn";
 import { createLineFn } from "~/production-authoring/fn/createLineFn";
-import { setLineMarkerFn } from "~/production-authoring/fn/setLineMarkerFn";
+import { setLineClockFn, setLineMarkerFn } from "~/production-authoring/fn/setLineMarkerFn";
 import { useTranslator } from "~/translation/ui/useTranslator";
 
 import { useFormSession } from "~/item-authoring/ui/FormContext";
@@ -129,14 +129,23 @@ const ProductionFields = withFieldGroupFn({
 												form={group}
 												fields={`lines[${index}]`}
 												label={null}
-												onMarkerChangeFn={(marker, value) =>
+												onMarkerChangeFn={(value) =>
 													form.setFieldValue(
 														"lines",
 														setLineMarkerFn(
 															form.state.values.lines ?? [],
 															index,
-															marker,
 															value,
+														),
+													)
+												}
+												onClockChangeFn={(clock) =>
+													form.setFieldValue(
+														"lines",
+														setLineClockFn(
+															form.state.values.lines ?? [],
+															index,
+															clock,
 														),
 													)
 												}

@@ -68,6 +68,13 @@ it("answers who produces B separately from merges into B and rule mentions of B"
 			0,
 			0,
 		],
+		[
+			"item:A",
+			"item:B",
+			0,
+			0,
+			0,
+		],
 	]);
 	expect(productions.edges[0].annotations.chance).toBe(0);
 	const accepts = await Effect.runPromise(

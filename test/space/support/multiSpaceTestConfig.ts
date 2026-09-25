@@ -210,13 +210,23 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 				id: "temporary",
 			}),
 
-			lines: [],
+			lines: [
+				{
+					uid: "expiry:temporary",
+					title: "Expiry",
+					description: "Expiry",
+					clock: "clock-lifetime",
+					runtimeMs: 0,
+					input: [],
+					outcome: guaranteedOutput("log"),
+					rules: [],
+				},
+			],
 			maxQueueSize: 1,
 			clock: {
 				durationMs: 600,
 				enable: true,
 				rules: [],
-				onExpire: guaranteedOutput("log"),
 			},
 		},
 	},

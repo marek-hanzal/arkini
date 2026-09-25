@@ -13,7 +13,6 @@ export const GraphEdgeKindSchema = z.enum([
 	"merge-space",
 	"merge-source-spend",
 	"merge-target-spend",
-	"clock-item-outcome",
 	"depletion-item-outcome",
 	"rule-reference",
 	"space-outcome",

@@ -142,7 +142,6 @@
 				"title": "Wooden Sticks",
 				"artwork": "sph5etm2s4wtaq97o9zpzcvr",
 				"description": "Roughly split fresh wood into simple straight sticks. Cheap, crude, and good enough for arrow shafts.",
-				"clock": false,
 				"clockWeight": 1,
 				"default": false,
 				"show": true,

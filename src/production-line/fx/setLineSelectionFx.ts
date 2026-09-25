@@ -9,6 +9,8 @@ import { LineNotFoundError } from "~/production-line/error/LineNotFoundError";
 import { narrowLineOwnerItemFn } from "~/production-line/fn/narrowLineOwnerItemFn";
 import { modifyRuntimeFx } from "~/game-runtime/fx/modifyRuntimeFx";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
+import { LineClockModeEnumSchema } from "~/production-line/schema/LineClockModeEnumSchema";
+import { LineRunUnavailableError } from "~/production-line/error/LineRunUnavailableError";
 
 export namespace setLineSelectionFx {
 	export type Props = {
@@ -90,6 +92,17 @@ export const setLineSelectionFx = Effect.fn("setLineSelectionFx")(function* (
 					}),
 				);
 			}
+			const wrongRole = selectedLineUids.find((id) => {
+				const line = lines?.find((candidate) => candidate.uid === id);
+				return line?.clock === LineClockModeEnumSchema.enum["clock-lifetime"];
+			});
+			if (wrongRole !== undefined)
+				return yield* Effect.fail(
+					new LineRunUnavailableError({
+						ownerItemId,
+						lineUid: wrongRole,
+					}),
+				);
 			const schedule = owner.schedule;
 			if (
 				selection === "clock" &&

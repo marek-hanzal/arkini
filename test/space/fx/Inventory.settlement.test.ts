@@ -1,4 +1,5 @@
 import { LineSchema } from "~/production-line/schema/LineSchema";
+import { createExpiryLine } from "~test/game-config-validation/support/gameValidationTestSource";
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import { useGameFx } from "~test/support/useGameFx";
@@ -67,7 +68,7 @@ describe("Inventory settlement", () => {
 					ownerItemId: worker.id,
 				});
 				yield* runTickRuntimeByFx({
-					elapsedMs: 100,
+					elapsedMs: 200,
 				});
 				const working = yield* readRuntimeFx();
 				const removed = yield* removeInventoryItemFx("first");
@@ -103,8 +104,10 @@ describe("Inventory settlement", () => {
 			durationMs: 100,
 			enable: true,
 			rules: [],
-			onExpire: config.items.warehouse!.lines[0]!.outcome,
 		};
+		config.items.warehouse!.lines.push(
+			createExpiryLine(config.items.warehouse!.lines[0]!.outcome!, "expiry:warehouse"),
+		);
 		const state = inventoryStateFn([
 			{
 				id: "first",
@@ -118,7 +121,7 @@ describe("Inventory settlement", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* runTickRuntimeByFx({
-					elapsedMs: 100,
+					elapsedMs: 200,
 				});
 				return yield* readRuntimeFx();
 			}).pipe(

@@ -114,7 +114,7 @@ describe("committed runtime removal snapshots", () => {
 		});
 	});
 
-	it("captures zero units and elapsed clock when a queued job spends the last unit before same-tick kill-switch expiry", () => {
+	it("captures zero units and elapsed clock when a queued job depletes its owner at the lifetime boundary", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const initial = yield* spawnClockItemFx();
@@ -175,7 +175,7 @@ describe("committed runtime removal snapshots", () => {
 		);
 		expect(result.transition.events).toContainEqual(
 			expect.objectContaining({
-				type: "item:expired",
+				type: "item:depleted",
 			}),
 		);
 		expect(removal?.snapshot).toMatchObject({

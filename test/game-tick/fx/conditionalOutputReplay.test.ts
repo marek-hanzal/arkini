@@ -10,7 +10,7 @@ import { spawnItemFx } from "~test/support/spawnItemFx";
 import { useGameFx } from "~test/support/useGameFx";
 import { createConfig, type OutputPath } from "./conditionalOutputReplay.test/fixture";
 
-const run = (path: OutputPath, steps: readonly number[], markerDuration = 500) => {
+const run = (path: OutputPath, steps: readonly number[], markerDuration = 400) => {
 	const config = createConfig(path, markerDuration);
 	return Effect.runSync(
 		Effect.gen(function* () {
@@ -74,7 +74,7 @@ it.each<OutputPath>([
 		path,
 		[
 			500,
-			100,
+			200,
 		],
 	);
 	expect(split).toContain("result");
@@ -82,20 +82,20 @@ it.each<OutputPath>([
 		run(
 			path,
 			[
-				600,
+				700,
 			],
 		),
 	).toEqual(split);
 });
 
-it("later expiry sees earlier stable-ID expiry outcome within the same fixed step", () => {
+it("later expiry completion sees an earlier lifetime job outcome", () => {
 	expect(
 		run(
 			"expiry",
 			[
-				600,
+				700,
 			],
-			600,
+			500,
 		),
 	).toEqual([
 		"blocker",

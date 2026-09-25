@@ -20,6 +20,7 @@ import { resolveLineShowFn } from "~/production-line/fn/resolveLineShowFn";
 import { resolveLineEnableFn } from "~/production-line/fn/resolveLineEnableFn";
 import { readLineBlockingHintFn } from "~/item-detail-read/fn/readLineBlockingHintFn";
 import { isItemProductionAdmissionOpenFn } from "~/production-line/fn/isItemProductionAdmissionOpenFn";
+import { LineClockModeEnumSchema } from "~/production-line/schema/LineClockModeEnumSchema";
 import { readEffectiveLineFn } from "~/production-line/fn/readEffectiveLineFn";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 
@@ -102,8 +103,11 @@ export const useItemDetailSceneController = ({
 					? runtimeItem.location
 					: undefined;
 			const boardOwnerItemId = boardLocation === undefined ? undefined : runtimeItem?.id;
+			const productionLines = item.lines.filter(
+				(line) => line.clock !== LineClockModeEnumSchema.enum["clock-lifetime"],
+			);
 			const lineStates = game.readFn(
-				Effect.forEach(item.lines, (line) => {
+				Effect.forEach(productionLines, (line) => {
 					// Only a live Board owner supplies a physical origin for visibility rules.
 					if (boardLocation === undefined || boardOwnerItemId === undefined)
 						return Effect.succeed({
@@ -206,7 +210,7 @@ export const useItemDetailSceneController = ({
 				runtimeItem?.location.scope === "board" &&
 				finalSnapshot === undefined &&
 				item.ui === "default" &&
-				item.lines.length > 0
+				productionLines.length > 0
 			) {
 				const queue = game.readFn(
 					resolveJobQueueFx({

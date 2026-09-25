@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { isItemProductionAdmissionOpenFn } from "~/production-line/fn/isItemProductionAdmissionOpenFn";
+import { isLineAdmissionOpenFn } from "~/production-line/fn/isLineAdmissionOpenFn";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { ItemUnitsUnavailableError } from "~/production-action/error/ItemUnitsUnavailableError";
@@ -68,7 +68,13 @@ export const attemptQueuedLineStartFx = Effect.fn("attemptQueuedLineStartFx")(fu
 		});
 		if (result.type === "incomplete") {
 			const owner = runtime.items.find((item) => item.id === request.ownerItemId);
-			if (owner !== undefined && !isItemProductionAdmissionOpenFn(owner))
+			if (
+				owner !== undefined &&
+				!isLineAdmissionOpenFn({
+					owner,
+					lineUid: request.lineUid,
+				})
+			)
 				return {
 					type: "blocked",
 					runtime,

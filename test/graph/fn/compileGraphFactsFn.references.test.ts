@@ -3,6 +3,7 @@ import { compileGraphFactsFn } from "~/graph/fn/compileGraphFactsFn";
 import {
 	adversarialConfigFn,
 	configFn,
+	expiryLineFn,
 	itemFn,
 	lineFn,
 	outputFn,
@@ -162,8 +163,9 @@ it("retains unresolved authoring references and self output without importing ru
 			{
 				A: itemFn("A", {
 					lines: [
+						expiryLineFn("A-expiry", outputFn("missing")),
 						lineFn("L", {
-							clock: true,
+							clock: "clock-interval",
 							enable: false,
 							outcome: outputFn("A"),
 							rules: [
@@ -181,7 +183,7 @@ it("retains unresolved authoring references and self output without importing ru
 					],
 					clock: {
 						intervalMs: 100,
-						onExpire: outputFn("missing"),
+						durationMs: 100,
 					},
 					merge: [
 						{
@@ -227,7 +229,7 @@ it("retains unresolved authoring references and self output without importing ru
 			expect.objectContaining({
 				from: "item:A",
 				to: "item:missing",
-				kind: "clock-item-outcome",
+				kind: "line-item-outcome",
 			}),
 			expect.objectContaining({
 				from: "start",

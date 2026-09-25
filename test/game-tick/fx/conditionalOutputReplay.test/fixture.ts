@@ -74,16 +74,38 @@ export const createConfig = (path: OutputPath, markerDuration = 500) => {
 			...base.items,
 			temporaryPlain: {
 				...base.items.temporaryPlain,
+				lines: [
+					{
+						uid: "expiry:temporaryPlain",
+						title: "Expiry",
+						description: "Expiry",
+						clock: "clock-lifetime",
+						runtimeMs: 0,
+						input: [],
+						outcome: outcome("blocker"),
+						rules: [],
+					},
+				],
 				clock: {
 					durationMs: markerDuration,
-					onExpire: outcome("blocker"),
 				},
 			},
 			temporaryOutput: {
 				...base.items.temporaryOutput,
+				lines: [
+					{
+						uid: "expiry:temporaryOutput",
+						title: "Expiry",
+						description: "Expiry",
+						clock: "clock-lifetime",
+						runtimeMs: 0,
+						input: [],
+						outcome: outcome("result", true),
+						rules: [],
+					},
+				],
 				clock: {
 					durationMs: 600,
-					onExpire: outcome("result", true),
 				},
 			},
 			payer: {

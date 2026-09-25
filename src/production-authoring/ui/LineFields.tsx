@@ -1,10 +1,11 @@
-import { Star, Eye, Power, Clock } from "lucide-react";
+import { Star, Eye, Power, Clock, Hourglass } from "lucide-react";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { EditorTextControl } from "~/editor-control/ui/EditorValueControls";
 import { readEditorFieldErrorFn } from "~/editor-control/fn/readEditorFieldErrorFn";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
+import { LineClockModeEnumSchema } from "~/production-line/schema/LineClockModeEnumSchema";
 import { withFieldGroupFn } from "~/authoring-form/ui/EditorForm";
 import { EditorValueField } from "~/editor-control/ui/EditorValueField";
 import { EditorFormCard } from "~/editor-control/ui/EditorFormCard";
@@ -34,12 +35,10 @@ export const LineFields = withFieldGroupFn({
 	defaultValues: defaultLine,
 	props: {
 		label: undefined as string | null | undefined,
-		onMarkerChangeFn: undefined as unknown as (
-			marker: "default" | "clock",
-			value: boolean,
-		) => void,
+		onMarkerChangeFn: undefined as unknown as (value: boolean) => void,
+		onClockChangeFn: undefined as unknown as (clock: LineSchema.Type["clock"]) => void,
 	},
-	render: ({ group, label, onMarkerChangeFn }) => {
+	render: ({ group, label, onMarkerChangeFn, onClockChangeFn }) => {
 		const translator = useTranslator();
 		const { ruleIndex, whenIndex, outcomeIndex } = useFormSession();
 		return (
@@ -79,7 +78,7 @@ export const LineFields = withFieldGroupFn({
 							<div className="flex min-w-0 items-end justify-between gap-3">
 								<group.Subscribe
 									selector={(state) => ({
-										clock: state.values.clock === true,
+										clock: state.values.clock,
 										default: state.values.default,
 										enable: state.values.enable,
 										show: state.values.show,
@@ -99,7 +98,7 @@ export const LineFields = withFieldGroupFn({
 														icon: <Star className="size-4 shrink-0" />,
 														label: translator.textFn("Default"),
 														onChangeFn: (value) =>
-															onMarkerChangeFn("default", value),
+															onMarkerChangeFn(value),
 														selected: markers.default,
 														value: "default",
 													},
@@ -131,9 +130,72 @@ export const LineFields = withFieldGroupFn({
 														),
 														icon: <Clock className="size-4 shrink-0" />,
 														label: translator.textFn("Clock"),
-														onChangeFn: (value) =>
-															onMarkerChangeFn("clock", value),
-														selected: markers.clock,
+														onChangeFn: () => {},
+														menuOptions: [
+															{
+																id: LineClockModeEnumSchema.enum[
+																	"clock-interval"
+																],
+																label: translator.textFn(
+																	"Clock - Interval",
+																),
+																description: translator.textFn(
+																	"Selects this line by weight at each Clock interval. Select again to remove its Clock role.",
+																),
+																icon: <Clock className="size-5" />,
+																selected:
+																	markers.clock ===
+																	LineClockModeEnumSchema.enum[
+																		"clock-interval"
+																	],
+																onSelectFn: () =>
+																	onClockChangeFn(
+																		markers.clock ===
+																			LineClockModeEnumSchema
+																				.enum[
+																				"clock-interval"
+																			]
+																			? undefined
+																			: LineClockModeEnumSchema
+																					.enum[
+																					"clock-interval"
+																				],
+																	),
+															},
+															{
+																id: LineClockModeEnumSchema.enum[
+																	"clock-lifetime"
+																],
+																label: translator.textFn(
+																	"Clock - Expiry",
+																),
+																description: translator.textFn(
+																	"At lifetime expiry, selects this line by weight. On a Board it runs as a Job; inside another item or Job, its output settles immediately without inputs or runtime. Select again to remove its Clock role.",
+																),
+																icon: (
+																	<Hourglass className="size-5" />
+																),
+																selected:
+																	markers.clock ===
+																	LineClockModeEnumSchema.enum[
+																		"clock-lifetime"
+																	],
+																onSelectFn: () =>
+																	onClockChangeFn(
+																		markers.clock ===
+																			LineClockModeEnumSchema
+																				.enum[
+																				"clock-lifetime"
+																			]
+																			? undefined
+																			: LineClockModeEnumSchema
+																					.enum[
+																					"clock-lifetime"
+																				],
+																	),
+															},
+														],
+														selected: markers.clock !== undefined,
 														value: "clock",
 													},
 												]}
@@ -141,7 +203,9 @@ export const LineFields = withFieldGroupFn({
 										</EditorValueField>
 									)}
 								</group.Subscribe>
-								<group.Subscribe selector={(state) => state.values.clock === true}>
+								<group.Subscribe
+									selector={(state) => state.values.clock !== undefined}
+								>
 									{(clock) =>
 										clock ? (
 											<div className="w-32 shrink-0">

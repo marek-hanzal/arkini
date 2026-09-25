@@ -42,7 +42,7 @@ export const createClockConfig = (
 							...createLine({
 								uid: "a",
 								default: true,
-								clock: true,
+								clock: "clock-interval",
 								outcome: createOutput([
 									{
 										itemUid: "result",

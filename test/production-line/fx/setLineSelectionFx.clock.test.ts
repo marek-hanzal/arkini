@@ -28,13 +28,12 @@ const config = GameConfigSchema.parse({
 					...workshop.lines[0],
 					uid: "manual",
 					default: true,
-					clock: false,
 				},
 				{
 					...workshop.lines[0],
 					uid: "pulse",
 					default: false,
-					clock: true,
+					clock: "clock-interval",
 				},
 			],
 		},
@@ -66,6 +65,7 @@ describe("independent Clock line selection", () => {
 						runtime: before,
 					})?.uid,
 					clock: readClockLinesFn({
+						role: "clock-interval",
 						item: owner.item,
 						schedule: owner.schedule,
 					}).map((line) => line.uid),
@@ -96,6 +96,7 @@ describe("independent Clock line selection", () => {
 					}),
 				});
 				const clock = readClockLinesFn({
+					role: "clock-interval",
 					item: owner.item,
 					schedule: restored.items[0].schedule,
 				});

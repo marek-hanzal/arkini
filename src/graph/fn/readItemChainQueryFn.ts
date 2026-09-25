@@ -14,7 +14,6 @@ export const readItemChainQueryFn = (
 		"merge-replacement",
 		"merge-target-replacement",
 		"merge-item-outcome",
-		"clock-item-outcome",
 		"depletion-item-outcome",
 		"merge-space",
 		"space-outcome",

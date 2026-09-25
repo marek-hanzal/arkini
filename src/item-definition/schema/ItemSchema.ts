@@ -9,6 +9,7 @@ import { z } from "zod";
 import { ItemScheduleSchema } from "~/item-schedule/schema/ItemScheduleSchema";
 
 import { LineSchema } from "~/production-line/schema/LineSchema";
+import { LineClockModeEnumSchema } from "~/production-line/schema/LineClockModeEnumSchema";
 import { PositiveIntegerSchema } from "~/game-value/schema/PositiveIntegerSchema";
 
 /**
@@ -117,6 +118,21 @@ export const ItemSchema = z
 			.describe("Optional production lines; an item without lines is passive."),
 	})
 	.strict()
+	.superRefine((item, context) => {
+		if (item.clock?.durationMs !== undefined) return;
+		item.lines.forEach((line, index) => {
+			if (line.clock === LineClockModeEnumSchema.enum["clock-lifetime"])
+				context.addIssue({
+					code: "custom",
+					path: [
+						"lines",
+						index,
+						"clock",
+					],
+					message: "An expiry line requires a finite Clock lifetime.",
+				});
+		});
+	})
 	.meta({
 		id: "ItemSchema",
 		description: "An ordinary item with optional production and Clock scheduling.",

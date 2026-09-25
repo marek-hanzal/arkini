@@ -40,7 +40,7 @@ const runFn = (config: GameConfigSchema.Type) =>
 	);
 
 describe("committed material expiry settlement", () => {
-	it("places expiry outcome once after aborting the material owner job", () => {
+	it("resolves committed material expiry immediately despite its line runtime and inputs", () => {
 		const base = createTemporaryMaterialLifecycleTestConfig();
 		const config = GameConfigSchema.parse({
 			...base,
@@ -48,10 +48,30 @@ describe("committed material expiry settlement", () => {
 				...base.items,
 				temporary: {
 					...base.items.temporary,
-					clock: {
-						...base.items.temporary!.clock,
-						onExpire: base.items.owner!.lines[0]!.outcome,
-					},
+					lines: [
+						{
+							...base.items.temporary!.lines[0]!,
+							runtimeMs: 1_000,
+							input: [
+								{
+									type: "materials",
+									query: {
+										distance: "far",
+										selector: {
+											type: "item",
+											itemUid: "blocker",
+										},
+									},
+									quantity: {
+										min: 1,
+										max: 1,
+									},
+									mode: "consume",
+								},
+							],
+							outcome: base.items.owner!.lines[0]!.outcome,
+						},
+					],
 				},
 			},
 		});
@@ -93,7 +113,12 @@ describe("committed material expiry settlement", () => {
 			},
 		];
 		// Both outputs must still see the owner removed earlier in the same candidate.
-		config.items.temporary!.clock!.onExpire = outcome;
+		config.items.temporary!.lines = [
+			{
+				...config.items.temporary!.lines[0]!,
+				outcome,
+			},
+		];
 
 		const result = runFn(config);
 		expect(result.expired.runtime.jobs).toEqual([]);

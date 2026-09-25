@@ -427,7 +427,7 @@ it("sends Chain depth changes through the canonical consequence query", async ()
 				id: "expiry",
 				from: "item:A",
 				to: "item:B",
-				kind: "clock-item-outcome",
+				kind: "line-item-outcome",
 				source: [],
 				annotations: {},
 			},

@@ -28,12 +28,7 @@ const readEdgeFn = (edge: GraphEdge): GraphDiscoveryEdge => {
 		)
 		.with(
 			{
-				kind: P.union(
-					"line-item-outcome",
-					"merge-item-outcome",
-					"clock-item-outcome",
-					"depletion-item-outcome",
-				),
+				kind: P.union("line-item-outcome", "merge-item-outcome", "depletion-item-outcome"),
 				outcome: {
 					type: "item",
 				},

@@ -189,14 +189,14 @@ describe("validateItemLineUidsFn", () => {
 				{
 					...createLine({
 						uid: "line:plank",
-						clock: true,
+						clock: "clock-interval",
 					}),
 					clockWeight: 1,
 				},
 				{
 					...createLine({
 						uid: "line:beam",
-						clock: true,
+						clock: "clock-interval",
 					}),
 					clockWeight: 3,
 				},

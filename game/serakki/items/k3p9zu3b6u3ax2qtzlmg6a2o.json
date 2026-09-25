@@ -16,7 +16,7 @@
 				"uid": "pv8awh2w7gkl7169mgraroo6",
 				"title": "Corn",
 				"description": "Automatic corn production",
-				"clock": true,
+				"clock": "clock-interval",
 				"clockWeight": 1,
 				"default": true,
 				"show": false,

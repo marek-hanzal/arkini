@@ -27,7 +27,6 @@
 				"default": true,
 				"show": true,
 				"enable": true,
-				"clock": false,
 				"runtimeMs": 0,
 				"input": [
 					{

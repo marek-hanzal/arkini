@@ -2,7 +2,6 @@ import { z } from "zod";
 import { ItemScheduleExpiryModeSchema } from "~/item-schedule/schema/ItemScheduleExpiryModeSchema";
 import { TimeSchema } from "~/game-value/schema/TimeSchema";
 import { RuleSchema } from "~/production-action/schema/RuleSchema";
-import { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
 
 /** Optional periodic production admission and active-time lifetime of an owner. */
 export const ItemScheduleSchema = z
@@ -22,9 +21,6 @@ export const ItemScheduleSchema = z
 		),
 		enable: z.boolean().default(true),
 		rules: z.array(RuleSchema).default([]),
-		onExpire: OutcomeTableSchema.optional().describe(
-			"Output resolved at owner expiry in both modes; kill-switch places what fits after returned materials and logs the excess as lost, within the same atomic removal.",
-		),
 	})
 	.strict()
 	.superRefine(({ intervalMs, durationMs }, context) => {
@@ -56,7 +52,7 @@ export const ItemScheduleSchema = z
 			},
 		],
 		description:
-			"Clock-line admission, finite lifetime, or both, with availability rules and expiry outcome.",
+			"Clock-line admission, finite lifetime, or both, with availability rules; expiry selects a weighted expiry line.",
 	});
 export type ItemScheduleSchema = typeof ItemScheduleSchema;
 export namespace ItemScheduleSchema {

@@ -40,7 +40,7 @@ const setup = async () => {
 							{
 								...line,
 								uid: "last",
-								clock: true,
+								clock: "clock-interval",
 								clockWeight: 7,
 								show: false,
 								enable: false,

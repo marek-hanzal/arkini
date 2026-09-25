@@ -11,9 +11,10 @@ import { spawnItemFx } from "~test/support/spawnItemFx";
 import { useGameFx } from "~test/support/useGameFx";
 import {
 	createLine,
+	createExpiryLine,
 	createOutput,
 } from "~test/game-config-validation/support/gameValidationTestSource";
-import { createClockConfig, spawnClockItemFx } from "./clockSchedule.test/fixture";
+import { createClockConfig, spawnClockItemFx, tickClockFx } from "./clockSchedule.test/fixture";
 
 const configFn = (mode: "kill-switch" | "loose-kill", runtimeMs = 100) => {
 	const config = createClockConfig({
@@ -21,7 +22,7 @@ const configFn = (mode: "kill-switch" | "loose-kill", runtimeMs = 100) => {
 			{
 				...createLine({
 					uid: "a",
-					clock: true,
+					clock: "clock-interval",
 					default: true,
 					outcome: createOutput([
 						{
@@ -31,22 +32,24 @@ const configFn = (mode: "kill-switch" | "loose-kill", runtimeMs = 100) => {
 				}),
 				runtimeMs,
 			},
+			createExpiryLine(
+				createOutput([
+					{
+						itemUid: "expired",
+					},
+					{
+						itemUid: "expired",
+					},
+					{
+						itemUid: "expired",
+					},
+				]),
+			),
 		],
 		clock: {
 			expiryMode: mode,
 			durationMs: 100,
 			intervalMs: 100,
-			onExpire: createOutput([
-				{
-					itemUid: "expired",
-				},
-				{
-					itemUid: "expired",
-				},
-				{
-					itemUid: "expired",
-				},
-			]),
 		},
 	});
 	return {
@@ -95,6 +98,81 @@ describe("Clock kill switch", () => {
 	it.each([
 		"kill-switch",
 		"loose-kill",
+	] as const)("settles a timed expiry job on a full Board according to %s", (mode) => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* spawnClockItemFx();
+				yield* fillBoardFx();
+				const started = yield* tickClockFx(100);
+				const working = yield* tickClockFx(200);
+				const completed = yield* tickClockFx(100);
+				return {
+					started,
+					working,
+					completed,
+				};
+			}).pipe(
+				useGameFx({
+					config: createClockConfig({
+						lines: [
+							{
+								...createExpiryLine(
+									createOutput([
+										{
+											itemUid: "expired",
+										},
+										{
+											itemUid: "expired",
+										},
+										{
+											itemUid: "expired",
+										},
+									]),
+								),
+								runtimeMs: 300,
+							},
+						],
+						clock: {
+							durationMs: 100,
+							intervalMs: undefined,
+							expiryMode: mode,
+						},
+					}),
+				}),
+			),
+		);
+		expect(result.started.jobs).toMatchObject([
+			{
+				remainingMs: 300,
+			},
+		]);
+		expect(result.working.jobs).toMatchObject([
+			{
+				remainingMs: 100,
+			},
+		]);
+		expect(result.working.items.some((item) => item.item.uid === "clock")).toBe(true);
+		if (mode === "kill-switch") {
+			expect(result.completed.jobs).toEqual([]);
+			expect(result.completed.items.some((item) => item.item.uid === "clock")).toBe(false);
+			expect(
+				result.completed.items.filter((item) => item.item.uid === "expired"),
+			).toHaveLength(1);
+		} else {
+			expect(result.completed.jobs).toMatchObject([
+				{
+					remainingMs: 0,
+				},
+			]);
+			expect(result.completed.items.some((item) => item.item.uid === "clock")).toBe(true);
+			expect(
+				result.completed.items.filter((item) => item.item.uid === "expired"),
+			).toHaveLength(0);
+		}
+	});
+	it.each([
+		"kill-switch",
+		"loose-kill",
 	] as const)("settles a full-board blocked job according to %s", (mode) => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
@@ -106,9 +184,12 @@ describe("Clock kill switch", () => {
 				yield* fillBoardFx();
 				const before = yield* readRuntimeFx();
 				const step = yield* advanceWithEventsFx(before);
+				const completed =
+					mode === "kill-switch" ? yield* advanceWithEventsFx(step.runtime) : undefined;
 				return {
 					before,
 					step,
+					completed,
 				};
 			}).pipe(
 				useGameFx({
@@ -129,15 +210,23 @@ describe("Clock kill switch", () => {
 				}),
 			]);
 		} else {
-			expect(result.step.runtime.jobs).toEqual([]);
+			expect(result.step.runtime.jobs).toMatchObject([
+				{
+					lineUid: "line:expiry",
+				},
+			]);
 			expect(result.step.runtime.jobQueue).toEqual([]);
 			expect(result.step.runtime.items.some((item) => item.id === "runtime:clock")).toBe(
-				false,
+				true,
 			);
+			expect(result.completed?.runtime.jobs).toEqual([]);
 			expect(
-				result.step.runtime.items.filter((item) => item.item.uid === "expired"),
+				result.completed?.runtime.items.some((item) => item.id === "runtime:clock"),
+			).toBe(false);
+			expect(
+				result.completed?.runtime.items.filter((item) => item.item.uid === "expired"),
 			).toHaveLength(1);
-			expect(result.step.runtime.items.some((item) => item.item.uid === "result")).toBe(
+			expect(result.completed?.runtime.items.some((item) => item.item.uid === "result")).toBe(
 				false,
 			);
 			expect(result.step.events).toContainEqual(
@@ -146,7 +235,9 @@ describe("Clock kill switch", () => {
 					reason: "owner-removed",
 				}),
 			);
-			const losses = result.step.events.filter((event) => event.type === "item:discarded");
+			const losses = result.completed?.events.filter(
+				(event) => event.type === "item:discarded",
+			);
 			expect(losses).toHaveLength(2);
 			expect(losses).toEqual(
 				expect.arrayContaining([
@@ -182,22 +273,34 @@ describe("Clock kill switch", () => {
 						},
 					],
 				};
-				return yield* advanceWithEventsFx(previousRuntime);
+				const boundary = yield* advanceWithEventsFx(previousRuntime);
+				const completed = yield* advanceWithEventsFx(boundary.runtime);
+				return {
+					boundary,
+					completed,
+				};
 			}).pipe(
 				useGameFx({
 					config: configFn("kill-switch"),
 				}),
 			),
 		);
-		expect(result.runtime.jobs).toEqual([]);
-		expect(result.runtime.jobQueue).toEqual([]);
-		expect(result.runtime.items.filter((item) => item.item.uid === "result")).toHaveLength(1);
-		expect(result.events.filter((event) => event.type === "job:completed")).toHaveLength(1);
+		expect(result.boundary.runtime.jobs).toMatchObject([
+			{
+				lineUid: "line:expiry",
+			},
+		]);
+		expect(result.boundary.runtime.jobQueue).toEqual([]);
 		expect(
-			result.events.some(
-				(event) => event.type === "job:started" || event.type === "job:aborted",
-			),
-		).toBe(false);
+			result.boundary.runtime.items.filter((item) => item.item.uid === "result"),
+		).toHaveLength(1);
+		expect(
+			result.boundary.events.filter((event) => event.type === "job:completed"),
+		).toHaveLength(1);
+		expect(result.boundary.events.some((event) => event.type === "job:aborted")).toBe(false);
+		expect(result.completed.runtime.items.some((item) => item.id === "runtime:clock")).toBe(
+			false,
+		);
 	});
 
 	it("cancels unfinished work at expiry rather than waiting for its duration", () => {
@@ -208,16 +311,30 @@ describe("Clock kill switch", () => {
 					ownerItemId: "runtime:clock",
 					lineUid: "a",
 				});
-				return yield* advanceWithEventsFx(yield* readRuntimeFx());
+				const boundary = yield* advanceWithEventsFx(yield* readRuntimeFx());
+				const completed = yield* advanceWithEventsFx(boundary.runtime);
+				return {
+					boundary,
+					completed,
+				};
 			}).pipe(
 				useGameFx({
 					config: configFn("kill-switch", 1000),
 				}),
 			),
 		);
-		expect(result.runtime.jobs).toEqual([]);
-		expect(result.runtime.items.some((item) => item.item.uid === "result")).toBe(false);
-		expect(result.events.filter((event) => event.type === "job:aborted")).toHaveLength(1);
+		expect(result.boundary.runtime.jobs).toMatchObject([
+			{
+				lineUid: "line:expiry",
+			},
+		]);
+		expect(result.boundary.runtime.items.some((item) => item.item.uid === "result")).toBe(
+			false,
+		);
+		expect(result.boundary.events.filter((event) => event.type === "job:aborted")).toHaveLength(
+			1,
+		);
+		expect(result.completed.runtime.jobs).toEqual([]);
 	});
 
 	it("rolls back removal and cancelled work when expiry outcome fails for a non-capacity reason", () => {

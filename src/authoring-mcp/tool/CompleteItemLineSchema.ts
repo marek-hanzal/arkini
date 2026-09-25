@@ -1,24 +1,27 @@
 import { z } from "zod";
 import { LineSchema } from "~/production-line/schema/LineSchema";
+import { LineClockModeEnumSchema } from "~/production-line/schema/LineClockModeEnumSchema";
 
-const CompleteLineBaseSchema = LineSchema.omit({
-	uid: true,
-}).extend({
-	default: LineSchema.shape.default.removeDefault(),
-	show: LineSchema.shape.show.removeDefault(),
-	enable: LineSchema.shape.enable.removeDefault(),
-});
+const CompleteLineBaseSchema = z
+	.object(LineSchema.shape)
+	.omit({
+		uid: true,
+	})
+	.extend({
+		default: LineSchema.shape.default.removeDefault(),
+		show: LineSchema.shape.show.removeDefault(),
+		enable: LineSchema.shape.enable.removeDefault(),
+	});
 
 export const CompleteItemLineSchema = z
-	.discriminatedUnion("clock", [
-		// A disabled Clock retains its authored weight across complete read/replace calls.
+	.union([
+		CompleteLineBaseSchema.omit({
+			clock: true,
+		}).strict(),
 		CompleteLineBaseSchema.extend({
-			clock: z.literal(false).optional(),
-		}),
-		CompleteLineBaseSchema.extend({
-			clock: z.literal(true),
+			clock: LineClockModeEnumSchema,
 			clockWeight: LineSchema.shape.clockWeight.removeDefault(),
-		}),
+		}).strict(),
 	])
 	.meta({
 		id: "CompleteItemLineSchema",

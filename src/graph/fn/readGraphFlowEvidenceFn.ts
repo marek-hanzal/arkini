@@ -83,7 +83,7 @@ export const readGraphFlowEvidenceFn = (
 				kind: "line",
 			},
 			({ data }) => [
-				`Line ${textFn(data.title)}; uid=${data.uid}; runtimeSeconds=${data.runtimeMs / 1000}; enable=${data.enable}; show=${data.show}; default=${data.default}; clock=${data.clock === true}; clockWeight=${data.clockWeight}`,
+				`Line ${textFn(data.title)}; uid=${data.uid}; runtimeSeconds=${data.runtimeMs / 1000}; enable=${data.enable}; show=${data.show}; default=${data.default}; clock=${data.clock ?? "none"}; clockWeight=${data.clockWeight}`,
 				...data.input.map((input, index) => {
 					const requirement = match(input)
 						.with(
@@ -155,7 +155,7 @@ export const readGraphFlowEvidenceFn = (
 			],
 		)
 		.exhaustive();
-	const table = operation.kind === "clock" ? operation.data.onExpire : operation.data.outcome;
+	const table = operation.kind === "clock" ? undefined : operation.data.outcome;
 	const { setIndex, rollIndex, outcomeIndex, outcome } = output.annotations;
 	const set = setIndex === undefined ? undefined : table?.set[setIndex];
 	const roll = rollIndex === undefined ? undefined : set?.roll[rollIndex];

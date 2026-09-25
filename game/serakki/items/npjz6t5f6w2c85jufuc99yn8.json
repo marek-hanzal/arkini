@@ -21,7 +21,7 @@
 				"uid": "xg36dsreka2xdm574fqlmzdt",
 				"title": "Milk",
 				"description": "Milk",
-				"clock": true,
+				"clock": "clock-interval",
 				"clockWeight": 1,
 				"default": true,
 				"show": true,

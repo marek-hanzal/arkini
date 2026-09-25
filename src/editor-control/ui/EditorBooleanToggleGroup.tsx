@@ -1,13 +1,15 @@
-import { Info } from "lucide-react";
-import type { ReactNode } from "react";
+import { ChevronDown, Info } from "lucide-react";
+import { cloneElement, type ReactNode } from "react";
 
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { Tooltip } from "~/ui/ui/Tooltip";
+import { ActionMenu, type ActionMenuOption } from "~/ui/ui/ActionMenu";
 
 interface EditorBooleanToggleGroupOption {
 	readonly icon?: ReactNode;
 	readonly description: ReactNode;
 	readonly label: string;
+	readonly menuOptions?: readonly ActionMenuOption[];
 	readonly onChangeFn: (selected: boolean) => void;
 	readonly selected: boolean;
 	readonly value: string;
@@ -25,28 +27,46 @@ export const EditorBooleanToggleGroup = ({
 	>
 		{options.map((option, optionIndex) => {
 			const overlapClassName = optionIndex === 0 ? "" : "-ml-px";
-			return (
+			const button = (
+				<button
+					key={option.value}
+					type="button"
+					className={`ak-segmented-option relative inline-flex h-full min-h-0 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-none border px-3 py-0 text-sm font-semibold ${overlapClassName} ${optionIndex === 0 ? "rounded-l-md" : ""} ${optionIndex === options.length - 1 ? "rounded-r-md" : ""}`}
+					onClick={
+						option.menuOptions === undefined
+							? () => option.onChangeFn(!option.selected)
+							: undefined
+					}
+					{...readDataUiFn({
+						dataUi: "EditorBooleanToggleGroupOption",
+						state: {
+							selected: option.selected,
+							value: option.value,
+						},
+					})}
+				>
+					{option.icon}
+					{option.label}
+					{option.menuOptions === undefined ? (
+						<Info className="size-3.5 opacity-70" />
+					) : (
+						<ChevronDown className="size-3.5 opacity-70" />
+					)}
+				</button>
+			);
+			return option.menuOptions === undefined ? (
 				<Tooltip
 					content={option.description}
 					key={option.value}
 				>
-					<button
-						type="button"
-						className={`ak-segmented-option relative inline-flex h-full min-h-0 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-none border px-3 py-0 text-sm font-semibold ${overlapClassName} ${optionIndex === 0 ? "rounded-l-md" : ""} ${optionIndex === options.length - 1 ? "rounded-r-md" : ""}`}
-						onClick={() => option.onChangeFn(!option.selected)}
-						{...readDataUiFn({
-							dataUi: "EditorBooleanToggleGroupOption",
-							state: {
-								selected: option.selected,
-								value: option.value,
-							},
-						})}
-					>
-						{option.icon}
-						{option.label}
-						<Info className="size-3.5 opacity-70" />
-					</button>
+					{button}
 				</Tooltip>
+			) : (
+				<ActionMenu
+					key={option.value}
+					options={option.menuOptions}
+					renderTriggerFn={(props) => cloneElement(button, props)}
+				/>
 			);
 		})}
 	</div>

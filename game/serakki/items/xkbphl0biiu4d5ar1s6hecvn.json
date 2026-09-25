@@ -43,42 +43,7 @@
 			"intervalMs": 5000,
 			"durationMs": 30000,
 			"enable": true,
-			"rules": [],
-			"onExpire": {
-				"set": [
-					{
-						"weight": 1,
-						"rules": [],
-						"roll": [
-							{
-								"type": "guaranteed",
-								"outcome": [
-									{
-										"type": "item",
-										"itemUid": "rp06r6pjrhyhxxkujos2r1md",
-										"quantity": {
-											"min": 3,
-											"max": 4
-										},
-										"placement": "drop",
-										"rules": []
-									},
-									{
-										"type": "item",
-										"itemUid": "ubo4ux37gz2ya3qfsj78a9oq",
-										"quantity": {
-											"min": 2,
-											"max": 3
-										},
-										"placement": "drop",
-										"rules": []
-									}
-								]
-							}
-						]
-					}
-				]
-			}
+			"rules": []
 		},
 		"maxQueueSize": 1,
 		"lines": [
@@ -86,7 +51,7 @@
 				"uid": "odggw9w5fi0fwmdwi7tvk9qb",
 				"title": "Air Pollution",
 				"description": "It's burning, bro",
-				"clock": true,
+				"clock": "clock-interval",
 				"clockWeight": 1,
 				"default": true,
 				"show": false,
@@ -112,6 +77,54 @@
 											"quantity": {
 												"min": 1,
 												"max": 1
+											},
+											"placement": "drop",
+											"rules": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"rules": []
+			},
+			{
+				"uid": "expiry-xkbphl0biiu4d5ar1s6hecvn",
+				"title": "Expiry",
+				"description": "Resolves this item’s outcome when its lifetime ends.",
+				"clock": "clock-lifetime",
+				"clockWeight": 1,
+				"default": false,
+				"show": false,
+				"enable": true,
+				"runtimeMs": 0,
+				"input": [],
+				"outcome": {
+					"set": [
+						{
+							"weight": 1,
+							"rules": [],
+							"roll": [
+								{
+									"type": "guaranteed",
+									"outcome": [
+										{
+											"type": "item",
+											"itemUid": "rp06r6pjrhyhxxkujos2r1md",
+											"quantity": {
+												"min": 3,
+												"max": 4
+											},
+											"placement": "drop",
+											"rules": []
+										},
+										{
+											"type": "item",
+											"itemUid": "ubo4ux37gz2ya3qfsj78a9oq",
+											"quantity": {
+												"min": 2,
+												"max": 3
 											},
 											"placement": "drop",
 											"rules": []

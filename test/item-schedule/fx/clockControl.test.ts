@@ -20,7 +20,7 @@ it("admits production commands independently of the owner's UI presentation", ()
 				...createLine({
 					uid: "a",
 					default: true,
-					clock: true,
+					clock: "clock-interval",
 				}),
 				runtimeMs: 400,
 			},
@@ -86,7 +86,7 @@ it("does not age a Clock created by a job completion until the next simulation b
 				...createLine({
 					uid: "a",
 					default: true,
-					clock: true,
+					clock: "clock-interval",
 					outcome: createOutput([
 						{
 							itemUid: "clock",
@@ -130,7 +130,7 @@ it("runs a manually chosen line ahead of the next pulse without shifting cadence
 				...createLine({
 					uid: "automatic",
 					default: true,
-					clock: true,
+					clock: "clock-interval",
 				}),
 				runtimeMs: 100,
 			},

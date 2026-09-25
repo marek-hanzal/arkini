@@ -6,6 +6,7 @@ import { forceDeleteFx } from "~/item-authoring/fx/forceDeleteFx";
 import { editorTestConfig } from "~test/project-authoring/support/editorTestPayload";
 import {
 	createLine,
+	createExpiryLine,
 	createOutput,
 	createProducerItem,
 	createSimpleItem,
@@ -57,13 +58,14 @@ describe("forceDeleteFx", () => {
 			},
 		]);
 	});
-	it("clears Clock timer references and expiry outcome, retaining owners after their final line is removed", () => {
+	it("clears Clock timer references and expiry line, retaining owners after their final line is removed", () => {
 		const clock = {
 			...createProducerItem({
 				id: "clock",
 			}),
 			clock: {
 				intervalMs: 1000,
+				durationMs: 1000,
 				rules: [
 					{
 						type: "enable",
@@ -81,8 +83,10 @@ describe("forceDeleteFx", () => {
 						],
 					},
 				],
-				onExpire: waterOutput,
 			},
+			lines: [
+				createExpiryLine(waterOutput, "expiry:clock"),
+			],
 		};
 		const config = GameConfigSchema.parse({
 			...editorTestConfig,
@@ -110,16 +114,23 @@ describe("forceDeleteFx", () => {
 			clock: expect.objectContaining({
 				rules: [],
 			}),
-			lines: clock.lines,
+			lines: [],
 		});
-		expect(result.config.items.clock).toHaveProperty("clock.onExpire", undefined);
+		expect(result.config.items.clock?.lines).toEqual([]);
 		expect(result.config.items["clock-with-line"]).toMatchObject({
 			lines: [],
 			clock: {
 				intervalMs: 1000,
 			},
 		});
-		expect(result.impact.removedExpiryOutcomeOwnerIds).toContain("clock");
+		expect(result.impact.removedLines).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					ownerItemUid: "clock",
+					lineUid: "expiry:clock",
+				}),
+			]),
+		);
 	});
 
 	it("removes every directly referencing structure and keeps unrelated authoring intact", () => {
@@ -203,7 +214,6 @@ describe("forceDeleteFx", () => {
 			removedUnitOutcomeOwnerIds: [
 				"oil",
 			],
-			removedExpiryOutcomeOwnerIds: [],
 			removedLines: [
 				{
 					ownerItemUid: "producer",

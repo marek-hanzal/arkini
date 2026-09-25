@@ -24,7 +24,7 @@ it("applies inclusive and exclusive bounds at 30 to every numeric operation filt
 						lines: [
 							lineFn(`line-${value}`, {
 								runtimeMs: value * 1000,
-								clock: true,
+								clock: "clock-interval",
 								clockWeight: value,
 							}),
 						],

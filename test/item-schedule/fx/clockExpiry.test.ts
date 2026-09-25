@@ -1,13 +1,17 @@
 import { setCheatEnabledFx } from "~/game-cheat/fx/setCheatEnabledFx";
 import { setSpeedUpGameplayFx } from "~/game-cheat/fx/setSpeedUpGameplayFx";
+import { advanceRuntimeStepFx } from "~/game-tick/fx/advanceRuntimeStepFx";
+import { readRuntimeFx } from "~/game-runtime/fx/readRuntimeFx";
+import { enqueueLineRuntimeFx } from "~/production-job/fx/enqueueLineRuntimeFx";
 import { Effect, Random } from "effect";
 import { describe, expect, it } from "vitest";
-import { expireIdleScheduledItemsFx } from "~/item-schedule/fx/expireIdleScheduledItemsFx";
 import { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
 import { useGameFx } from "~test/support/useGameFx";
 import { spawnItemFx } from "~test/support/spawnItemFx";
+import { bufferInputMaterialForTestFx } from "~test/support/bufferInputMaterialForTestFx";
 import {
 	createLine,
+	createExpiryLine,
 	createOutput,
 } from "~test/game-config-validation/support/gameValidationTestSource";
 import { createClockConfig, spawnClockItemFx, tickClockFx } from "./clockSchedule.test/fixture";
@@ -20,7 +24,7 @@ const expiryOutput = createOutput([
 const materialLine = createLine({
 	uid: "material",
 	default: true,
-	clock: true,
+	clock: "clock-interval",
 	input: [
 		{
 			type: "materials",
@@ -41,6 +45,161 @@ const materialLine = createLine({
 });
 
 describe("Clock expiry settlement", () => {
+	it("reserves terminal-line enqueue for the Clock scheduler", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* spawnClockItemFx();
+				const runtime = yield* readRuntimeFx();
+				const expired = {
+					...runtime,
+					items: runtime.items.map((item) => ({
+						...item,
+						schedule: {
+							...item.schedule!,
+							remainingDurationMs: 0,
+						},
+					})),
+				};
+				return yield* enqueueLineRuntimeFx({
+					ownerItemId: "runtime:clock",
+					lineUid: "line:expiry",
+					runtime: expired,
+				}).pipe(
+					Effect.map(() => "queued" as const),
+					Effect.catchTag("LineRunUnavailableError", () =>
+						Effect.succeed("unavailable" as const),
+					),
+				);
+			}).pipe(
+				useGameFx({
+					config: createClockConfig({
+						lines: [
+							createExpiryLine(expiryOutput),
+						],
+						clock: {
+							intervalMs: undefined,
+							durationMs: 100,
+						},
+					}),
+				}),
+			),
+		);
+		expect(result).toBe("unavailable");
+	});
+
+	it("starts a lifetime line with its stored input through ordinary job settlement", () => {
+		const input = {
+			type: "materials" as const,
+			query: {
+				distance: "far" as const,
+				selector: {
+					type: "item" as const,
+					itemUid: "permit",
+				},
+			},
+			mode: "consume" as const,
+			quantity: {
+				min: 1,
+				max: 1,
+			},
+		};
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* spawnClockItemFx();
+				const material = yield* spawnClockItemFx("permit", 1);
+				yield* bufferInputMaterialForTestFx({
+					ownerItemId: "runtime:clock",
+					lineUid: "line:expiry",
+					inputIndex: 0,
+					sourceItemId: material.id,
+					sourceItemRevision: material.revision,
+				});
+				const started = yield* tickClockFx(100);
+				const completed = yield* tickClockFx(100);
+				return {
+					started,
+					completed,
+				};
+			}).pipe(
+				useGameFx({
+					config: createClockConfig({
+						lines: [
+							{
+								...createExpiryLine(expiryOutput),
+								input: [
+									input,
+								],
+								runtimeMs: 100,
+							},
+						],
+						clock: {
+							durationMs: 100,
+							intervalMs: undefined,
+						},
+					}),
+				}),
+			),
+		);
+		expect(result.started.jobs).toMatchObject([
+			{
+				lineUid: "line:expiry",
+				remainingMs: 100,
+			},
+		]);
+		expect(
+			result.started.items.find((item) => item.item.uid === "permit")?.location.scope,
+		).toBe("job");
+		expect(result.completed.jobs).toEqual([]);
+		expect(result.completed.items.map((item) => item.item.uid)).toEqual([
+			"expired",
+		]);
+	});
+	it("runs an expiry line as a timed job before settling its output and owner", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* spawnClockItemFx();
+				const triggered = yield* tickClockFx(100);
+				const working = yield* tickClockFx(200);
+				const completed = yield* tickClockFx(100);
+				return {
+					triggered,
+					working,
+					completed,
+				};
+			}).pipe(
+				useGameFx({
+					config: createClockConfig({
+						lines: [
+							{
+								...createExpiryLine(expiryOutput),
+								runtimeMs: 300,
+							},
+						],
+						clock: {
+							durationMs: 100,
+						},
+					}),
+				}),
+			),
+		);
+		expect(result.triggered.jobs).toMatchObject([
+			{
+				lineUid: "line:expiry",
+				remainingMs: 300,
+			},
+		]);
+		expect(result.working.jobs).toMatchObject([
+			{
+				remainingMs: 100,
+			},
+		]);
+		expect(result.working.items.some((item) => item.item.uid === "expired")).toBe(false);
+		expect(result.completed.jobs).toEqual([]);
+		expect(result.completed.items.some((item) => item.item.uid === "clock")).toBe(false);
+		expect(result.completed.items.filter((item) => item.item.uid === "expired")).toHaveLength(
+			1,
+		);
+	});
 	it.each([
 		1,
 		5,
@@ -78,9 +237,12 @@ describe("Clock expiry settlement", () => {
 						speedUpMultiplier,
 						config: createClockConfig({
 							maxQueueSize: 2,
+							lines: [
+								...createClockConfig().items.clock!.lines,
+								createExpiryLine(expiryOutput),
+							],
 							clock: {
 								durationMs: 500,
-								onExpire: expiryOutput,
 							},
 						}),
 					}),
@@ -121,17 +283,22 @@ describe("Clock expiry settlement", () => {
 				yield* spawnClockItemFx();
 				const expired = yield* tickClockFx(500);
 				const settled = yield* tickClockFx(200);
+				const completed = yield* tickClockFx(100);
 				return {
 					expired,
 					settled,
+					completed,
 				};
 			}).pipe(
 				useGameFx({
 					config: createClockConfig({
 						maxQueueSize: 1,
+						lines: [
+							...createClockConfig().items.clock!.lines,
+							createExpiryLine(expiryOutput),
+						],
 						clock: {
 							durationMs: 500,
-							onExpire: expiryOutput,
 						},
 					}),
 				}),
@@ -140,7 +307,12 @@ describe("Clock expiry settlement", () => {
 		expect(result.expired.jobs).toHaveLength(1);
 		expect(result.expired.jobQueue).toHaveLength(0);
 		expect(result.settled.items.filter((item) => item.item.uid === "result")).toHaveLength(1);
-		expect(result.settled.items.filter((item) => item.item.uid === "clock")).toHaveLength(0);
+		expect(result.settled.jobs).toMatchObject([
+			{
+				lineUid: "line:expiry",
+			},
+		]);
+		expect(result.completed.items.filter((item) => item.item.uid === "clock")).toHaveLength(0);
 	});
 
 	it("does not start Autofill for incomplete final-pulse work", () => {
@@ -267,12 +439,8 @@ describe("Clock expiry settlement", () => {
 					...retry,
 					items: retry.items.filter((item) => !item.id.startsWith("blocker:")),
 				};
-				const first = yield* expireIdleScheduledItemsFx(free).pipe(
-					Random.withSeed("first"),
-				);
-				const second = yield* expireIdleScheduledItemsFx(free).pipe(
-					Random.withSeed("second"),
-				);
+				const first = yield* advanceRuntimeStepFx(free).pipe(Random.withSeed("first"));
+				const second = yield* advanceRuntimeStepFx(free).pipe(Random.withSeed("second"));
 				return {
 					blocked,
 					retry,
@@ -286,11 +454,11 @@ describe("Clock expiry settlement", () => {
 							createLine({
 								uid: "unused",
 							}),
+							createExpiryLine(outcome),
 						],
 						clock: {
 							intervalMs: 100,
 							durationMs: 100,
-							onExpire: outcome,
 						},
 					}),
 				}),

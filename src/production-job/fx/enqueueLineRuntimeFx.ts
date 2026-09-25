@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { isItemProductionAdmissionOpenFn } from "~/production-line/fn/isItemProductionAdmissionOpenFn";
+import { isLineAdmissionOpenFn } from "~/production-line/fn/isLineAdmissionOpenFn";
 import { LineRunUnavailableError } from "~/production-line/error/LineRunUnavailableError";
 
 import type { IdSchema } from "~/game-value/schema/IdSchema";
@@ -18,6 +18,7 @@ export namespace enqueueLineRuntimeFx {
 		readonly lineUid: IdSchema.Type;
 		readonly ownerItemId: IdSchema.Type;
 		readonly runtime: RuntimeSchema.Type;
+		readonly allowTerminalLine?: boolean;
 	}
 
 	export interface Result {
@@ -37,12 +38,19 @@ export const enqueueLineRuntimeFx = Effect.fn("enqueueLineRuntimeFx")(function* 
 	lineUid,
 	ownerItemId,
 	runtime,
+	allowTerminalLine = false,
 }: enqueueLineRuntimeFx.Props) {
 	const owner = yield* readRuntimeItemByIdFx({
 		itemId: ownerItemId,
 		runtime,
 	});
-	if (!isItemProductionAdmissionOpenFn(owner))
+	if (
+		!isLineAdmissionOpenFn({
+			owner,
+			lineUid,
+			allowTerminalLine,
+		})
+	)
 		return yield* Effect.fail(
 			new LineRunUnavailableError({
 				ownerItemId,

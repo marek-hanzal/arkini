@@ -61,7 +61,7 @@ describe("multi-space simulation", () => {
 					location: boardLocation(3, 1),
 				});
 				yield* runTickRuntimeByFx({
-					elapsedMs: 600,
+					elapsedMs: 700,
 				});
 				return yield* readRuntimeFx();
 			}).pipe(

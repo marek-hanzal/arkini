@@ -24,7 +24,6 @@
 				"uid": "mvwspxfz1nmwcvjm2tyb0oim",
 				"title": "Travel",
 				"description": "Travel to the destination space.",
-				"clock": false,
 				"clockWeight": 1,
 				"default": true,
 				"show": true,

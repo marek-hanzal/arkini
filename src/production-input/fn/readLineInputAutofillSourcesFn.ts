@@ -28,6 +28,7 @@ export const readLineInputAutofillSourcesFn = ({
 		if (
 			candidate === undefined ||
 			candidate.id === owner.id ||
+			candidate.schedule?.remainingDurationMs === 0 ||
 			candidate.location.space !== owner.location.space ||
 			busyOwnerItemIds.has(candidate.id) ||
 			!matchesItemSelectorFn({

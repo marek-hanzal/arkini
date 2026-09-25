@@ -145,6 +145,7 @@ import type { OptionalCapability, SectionId } from "~/item-authoring/type/Sectio
 import {
 	createLine,
 	createOutput,
+	createExpiryLine,
 	createProducerItem,
 } from "~test/game-config-validation/support/gameValidationTestSource";
 
@@ -300,16 +301,6 @@ const completeFirstProductionLine = async (container: HTMLElement) => {
 		throw new Error("Missing new production line identity fields.");
 	await changeInput(title, "Test production line");
 	await changeTextArea(description, "Produces the test outcome.");
-	const addInput = container.querySelector<HTMLButtonElement>(
-		'[data-ui="EditorInputsCollection"] [data-ui="EditorCollectionAdd"]',
-	);
-	if (addInput === null) throw new Error("Missing new production line input control.");
-	await act(async () => addInput.click());
-	const simple = document.querySelector<HTMLButtonElement>(
-		'[data-ui="ActionMenuOption"][data-ui-id="simple"]',
-	);
-	if (simple === null) throw new Error("Missing Simple input option.");
-	await act(async () => simple.click());
 };
 
 describe("item section form session", () => {
@@ -1170,7 +1161,7 @@ describe("item section form session", () => {
 				createLine({
 					uid: "line:second",
 					default: true,
-					clock: true,
+					clock: "clock-interval",
 				}),
 			],
 		};
@@ -1185,6 +1176,13 @@ describe("item section form session", () => {
 			].find((candidate) => candidate.textContent === label);
 			if (button === undefined) throw new Error(`Missing ${label} toggle.`);
 			await act(async () => button.click());
+			if (label === "Clock") {
+				const option = document.querySelector<HTMLButtonElement>(
+					'[data-ui="ActionMenuOption"][data-ui-id="clock-interval"]',
+				);
+				if (option === null) throw new Error("Missing Clock interval option.");
+				await act(async () => option.click());
+			}
 			await act(async () => {
 				await state.unsavedSession?.saveFn();
 			});
@@ -1198,17 +1196,17 @@ describe("item section form session", () => {
 			},
 			{
 				default: false,
-				clock: true,
+				clock: "clock-interval",
 			},
 		]);
 		expect(await toggle("Clock")).toMatchObject([
 			{
 				default: true,
-				clock: true,
+				clock: "clock-interval",
 			},
 			{
 				default: false,
-				clock: true,
+				clock: "clock-interval",
 			},
 		]);
 		const weight = container.querySelector<HTMLInputElement>(
@@ -1225,21 +1223,21 @@ describe("item section form session", () => {
 		expect(await toggle("Default")).toMatchObject([
 			{
 				default: false,
-				clock: true,
+				clock: "clock-interval",
 			},
 			{
 				default: false,
-				clock: true,
+				clock: "clock-interval",
 			},
 		]);
 		expect(await toggle("Clock")).toMatchObject([
 			{
 				default: false,
-				clock: false,
+				clock: undefined,
 			},
 			{
 				default: false,
-				clock: true,
+				clock: "clock-interval",
 			},
 		]);
 	});
@@ -1307,10 +1305,7 @@ describe("item section form session", () => {
 		const expiryMode = Array.from(container.querySelectorAll("button")).find(
 			(button) => button.textContent === "Loose-kill",
 		);
-		const addExpiryOutput = container.querySelector<HTMLButtonElement>(
-			'[data-ui="EditorOutcomeSetsCollection"] [data-ui="EditorCollectionAdd"]',
-		);
-		if (expiryMode === undefined || addExpiryOutput === null) {
+		if (expiryMode === undefined) {
 			throw new Error("Missing lifetime-dependent Clock controls.");
 		}
 		await act(async () => clear.click());
@@ -1318,11 +1313,7 @@ describe("item section form session", () => {
 		const disabledExpiryMode = Array.from(container.querySelectorAll("button")).find(
 			(button) => button.textContent === "Loose-kill",
 		);
-		const disabledAddExpiryOutput = container.querySelector<HTMLButtonElement>(
-			'[data-ui="EditorOutcomeSetsCollection"] [data-ui="EditorCollectionAdd"]',
-		);
 		expect(disabledExpiryMode?.matches(":disabled")).toBe(true);
-		expect(disabledAddExpiryOutput?.matches(":disabled")).toBe(true);
 		await act(async () => {
 			await state.unsavedSession?.saveFn();
 		});
@@ -1339,17 +1330,20 @@ describe("item section form session", () => {
 		);
 	});
 
-	it("clears the Clock interval while preserving the edited lifetime and expiry outcome", async () => {
-		const onExpire = createOutput([
+	it("clears the Clock interval while preserving the edited lifetime and expiry line", async () => {
+		const expiryOutcome = createOutput([
 			{
 				itemUid: item.uid,
 			},
 		]);
 		const scheduled = ItemSchema.parse({
 			...item,
+			lines: [
+				createExpiryLine(expiryOutcome),
+			],
 			clock: {
 				intervalMs: 1500,
-				onExpire,
+				durationMs: 1000,
 			},
 		});
 		state.persisted = scheduled;
@@ -1371,10 +1365,11 @@ describe("item section form session", () => {
 		});
 		const saved = state.saveItem.mock.lastCall?.[0].item;
 		expect(saved).toMatchObject({
-			lines: [],
+			lines: [
+				createExpiryLine(expiryOutcome),
+			],
 			clock: {
 				durationMs: 5000,
-				onExpire,
 			},
 		});
 		expect(saved.clock.intervalMs).toBeUndefined();

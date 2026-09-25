@@ -32,7 +32,7 @@ const fixtureFn = async () => {
 				(_, index) =>
 					lineFn(`light-${index}`, {
 						runtimeMs: 30000,
-						clock: true,
+						clock: "clock-interval",
 						clockWeight: 30,
 						outcome: outputFn("candle"),
 					}),

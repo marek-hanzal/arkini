@@ -10,23 +10,25 @@ interface ItemDetailDefaultProps {
 	readonly target: ItemDetailTarget;
 }
 
-/** Full production controls followed by the item's facts. */
+/** Item facts precede production; the scene initially scrolls to the lines. */
 export const ItemDetailDefault = ({ detail, disabled, stale, target }: ItemDetailDefaultProps) => (
 	<div data-ui="ItemDetailDefault">
-		<ItemLines
-			key={`${target.kind}:${target.kind === "runtime" ? target.itemId : target.itemUid}`}
-			lines={detail.lines}
-			disabledLineUids={detail.disabledLineUids}
-			lineBlockingHints={detail.lineBlockingHints}
-			materialReadyLineUids={detail.materialReadyLineUids}
-			playReadyLineUids={detail.playReadyLineUids}
-			ownerItemId={target.kind === "runtime" ? target.itemId : undefined}
-			disabled={disabled || stale}
-			makeDisabled={!detail.canMake}
-		/>
 		<ItemInfo
 			detail={detail}
 			stale={stale}
 		/>
+		{stale ? null : (
+			<ItemLines
+				key={`${target.kind}:${target.kind === "runtime" ? target.itemId : target.itemUid}`}
+				lines={detail.lines}
+				disabledLineUids={detail.disabledLineUids}
+				lineBlockingHints={detail.lineBlockingHints}
+				materialReadyLineUids={detail.materialReadyLineUids}
+				playReadyLineUids={detail.playReadyLineUids}
+				ownerItemId={target.kind === "runtime" ? target.itemId : undefined}
+				disabled={disabled}
+				makeDisabled={!detail.canMake}
+			/>
+		)}
 	</div>
 );

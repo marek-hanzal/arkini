@@ -95,11 +95,7 @@ const producer = ({
 			runtimeMs: 100,
 			input:
 				input === null
-					? [
-							{
-								type: "simple" as const,
-							},
-						]
+					? []
 					: [
 							input,
 						],

@@ -20,6 +20,8 @@ export const settleTerminalItemsFx = Effect.fn("settleTerminalItemsFx")(function
 		const item = draft.items.find((candidate) => candidate.id === itemId);
 		if (item === undefined) continue;
 		if (item.location.scope === "terminal") continue;
+		if (draft.jobs.some((job) => job.ownerItemId === itemId && job.terminalCause !== undefined))
+			continue;
 		const terminal = readItemTerminalStateFn(item);
 		if (terminal === undefined) continue;
 		const terminalLineUids = new Set(

@@ -100,6 +100,12 @@ export const abortJobRuntimeFx = Effect.fn("abortJobRuntimeFx")(function* ({
 		program: settleJobRuntimeFx({
 			job,
 			owner: jobOwner,
+			ownerExit:
+				owner !== undefined && job.terminalCause !== undefined
+					? {
+							cause: job.terminalCause,
+						}
+					: undefined,
 			reservations,
 			overflow,
 			runtime: draft,

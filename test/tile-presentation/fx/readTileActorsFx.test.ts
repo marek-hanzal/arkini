@@ -77,6 +77,41 @@ describe("readTileActorsFx", () => {
 		expect(completed?.badgeCount).toBe(1);
 	});
 
+	it("keeps a queued instant request visible while its material is missing", () => {
+		const runtime = createTileActorRuntime({
+			queued: 1,
+		});
+		const instant = RuntimeSchema.parse({
+			...runtime,
+			items: runtime.items.map((item) => ({
+				...item,
+				item: {
+					...item.item,
+					lines: item.item.lines.map((line) => ({
+						...line,
+						runtimeMs: 0,
+					})),
+				},
+			})),
+		});
+		expect(readMainActor(instant)?.badgeCount).toBe(1);
+		expect(
+			readMainActor({
+				...instant,
+				items: instant.items.map((item) => ({
+					...item,
+					item: {
+						...item.item,
+						lines: item.item.lines.map((line) => ({
+							...line,
+							input: [],
+						})),
+					},
+				})),
+			})?.badgeCount,
+		).toBeUndefined();
+	});
+
 	it("projects depletion from canonical units without a unit badge", () => {
 		const runtime = createTileActorRuntime();
 		const actor = readMainActor(
@@ -96,6 +131,40 @@ describe("readTileActorsFx", () => {
 		);
 		expect(actor?.colorFraction).toBe(0.4);
 		expect(actor?.badgeCount).toBeUndefined();
+	});
+
+	it("keeps a zero-unit owner colored until its active job settles", () => {
+		const runtime = createTileActorRuntime({
+			active: true,
+			owner: "blueprint",
+		});
+		const depleted = RuntimeSchema.parse({
+			...runtime,
+			items: runtime.items.map((item) => ({
+				...item,
+				remainingUnits: 0,
+			})),
+			jobs: runtime.jobs.map((job) => ({
+				...job,
+				terminalCause: "depleted",
+			})),
+		});
+		expect(readMainActor(depleted)?.colorFraction).toBe(1);
+		expect(
+			readMainActor({
+				...depleted,
+				jobs: depleted.jobs.map((job) => ({
+					...job,
+					remainingMs: 0,
+				})),
+			})?.colorFraction,
+		).toBe(1);
+		expect(
+			readMainActor({
+				...depleted,
+				jobs: [],
+			})?.colorFraction,
+		).toBe(0);
 	});
 
 	it("projects temporary lifetime without an activity effect", () => {
@@ -124,11 +193,7 @@ describe("readTileActorsFx", () => {
 						...line,
 						runtimeMs: 0,
 						trigger: "clock-interval",
-						input: [
-							{
-								type: "simple",
-							},
-						],
+						input: [],
 					})),
 				},
 				schedule: {

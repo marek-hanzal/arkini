@@ -23,11 +23,7 @@ it("discovers indexed operations without a root, including owners with no relati
 			title: "Idle",
 			description: "Idle operation",
 			runtimeMs: 0,
-			input: [
-				{
-					type: "simple",
-				},
-			],
+			input: [],
 			rules: [],
 		}),
 	];

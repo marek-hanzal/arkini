@@ -45,11 +45,7 @@ export const queueConfig = GameConfigSchema.parse({
 					title: "Later",
 					description: "Run without materials.",
 					runtimeMs: 1_000,
-					input: [
-						{
-							type: "simple",
-						},
-					],
+					input: [],
 					rules: [],
 				},
 				{

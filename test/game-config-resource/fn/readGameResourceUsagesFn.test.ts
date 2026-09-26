@@ -18,11 +18,7 @@ describe("readGameResourceUsagesFn", () => {
 							description: "Gather water",
 							artwork: "line-art",
 							runtimeMs: 0,
-							input: [
-								{
-									type: "simple",
-								},
-							],
+							input: [],
 							rules: [],
 						},
 					],

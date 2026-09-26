@@ -1,5 +1,5 @@
 import { match } from "ts-pattern";
-import { MousePointer2, Flame, LockKeyhole, Crosshair, LocateFixed } from "lucide-react";
+import { Flame, LockKeyhole, Crosshair, LocateFixed } from "lucide-react";
 import type { ActionMenuOption } from "~/ui/ui/ActionMenu";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
@@ -18,7 +18,6 @@ import {
 	useFormValidationIssues,
 } from "~/item-authoring/ui/useFormValidationIssues";
 import { readEditorFormValidationIssuesFn } from "~/editor-control/fn/readEditorFormValidationIssuesFn";
-import { readRequiredEditorCollectionErrorFn } from "~/editor-control/fn/readRequiredEditorCollectionErrorFn";
 import { Mx } from "~/translation/ui/Mx";
 import { BoardDistancePresentation } from "~/item-query/ui/QueryPresentation";
 
@@ -54,13 +53,6 @@ export const InputsControl = ({ allowMaterials = true, onChangeFn, value }: Inpu
 			structuredClone(input),
 		]);
 	const addOptions: ActionMenuOption[] = [
-		{
-			id: "simple",
-			label: translator.textFn("Simple"),
-			description: translator.textFn("No items or units required."),
-			icon: <MousePointer2 className="size-5" />,
-			onSelectFn: () => addInputFn(DraftDefaults.inputs.simple),
-		},
 		...(allowMaterials
 			? [
 					{
@@ -137,12 +129,6 @@ export const InputsControl = ({ allowMaterials = true, onChangeFn, value }: Inpu
 				initialSelectedIndex={inputIndex}
 				key={inputIndex}
 				count={value.length}
-				error={readRequiredEditorCollectionErrorFn(
-					validationIssues,
-					value.length,
-					1,
-					translator.textFn("Add at least one input."),
-				)}
 				itemLabelFn={(index) =>
 					match(value[index])
 						.with(
@@ -173,12 +159,6 @@ export const InputsControl = ({ allowMaterials = true, onChangeFn, value }: Inpu
 									input.query.selector.itemUid,
 									translator.textFn("No item selected"),
 								)}`,
-						)
-						.with(
-							{
-								type: "simple",
-							},
-							() => `${translator.textFn("Simple input")} ${index + 1}`,
 						)
 						.exhaustive()
 				}

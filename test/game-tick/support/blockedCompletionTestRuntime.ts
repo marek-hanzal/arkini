@@ -79,11 +79,7 @@ export const createBlockedCompletionTestConfig = () => {
 					{
 						...line,
 						uid: "line:free-forge:run",
-						input: [
-							{
-								type: "simple",
-							},
-						],
+						input: [],
 						outcome: undefined,
 					},
 				],

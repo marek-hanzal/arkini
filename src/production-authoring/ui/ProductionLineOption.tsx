@@ -1,6 +1,6 @@
 import { readSpaceDestinationLabelFn } from "~/space/fn/readSpaceDestinationLabelFn";
 import type { SpaceDestinationSchema } from "~/space/schema/SpaceDestinationSchema";
-import { match, P } from "ts-pattern";
+import { match } from "ts-pattern";
 import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 import { ArrowRight, PanelsTopLeft } from "lucide-react";
 import { EditorCollectionOption } from "~/editor-control/ui/EditorCollectionOption";
@@ -17,24 +17,7 @@ const readItemSidesFn = (line: LineSchema.Type) => {
 	const outputs = new Set<string>();
 	const spaces = new Map<string, SpaceDestinationSchema.Type>();
 	const templates = new Set<string>();
-	for (const input of line.input) {
-		match(input)
-			.with(
-				{
-					type: P.union("materials", "units"),
-				},
-				({ query }) => {
-					inputs.add(query.selector.itemUid);
-				},
-			)
-			.with(
-				{
-					type: "simple",
-				},
-				() => {},
-			)
-			.exhaustive();
-	}
+	for (const input of line.input) inputs.add(input.query.selector.itemUid);
 	for (const rule of line.rules)
 		for (const when of rule.when) inputs.add(when.query.selector.itemUid);
 	for (const set of line.outcome?.set ?? []) {

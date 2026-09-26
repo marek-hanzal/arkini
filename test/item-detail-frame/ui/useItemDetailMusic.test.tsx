@@ -117,6 +117,7 @@ it("replaces detail requests directly and releases them for missing music, vanis
 			phase: "exiting",
 			generation: 1,
 			restoreFocus: true,
+			exitDelayMs: 0,
 			target: {
 				kind: "definition",
 				itemUid: "definition:second",

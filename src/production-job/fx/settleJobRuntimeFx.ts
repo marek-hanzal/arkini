@@ -48,7 +48,7 @@ export namespace settleJobRuntimeFx {
 
 /**
  * Settles completion or material abort after the job and consumed roots are detached.
- * A terminal line frees its owner's cell before outcome and returns; abort supplies no line outcome.
+ * A terminal exit frees its owner's cell before outcome and returns; abort supplies no line outcome.
  * Outcome conditions read the caller-provided input snapshot, never this partial draft.
  */
 export const settleJobRuntimeFx = Effect.fn("settleJobRuntimeFx")(function* (

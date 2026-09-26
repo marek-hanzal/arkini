@@ -28,11 +28,7 @@
 				"show": false,
 				"enable": true,
 				"runtimeMs": 0,
-				"input": [
-					{
-						"type": "simple"
-					}
-				],
+				"input": [],
 				"rules": []
 			},
 			{
@@ -46,11 +42,7 @@
 				"show": false,
 				"enable": false,
 				"runtimeMs": 0,
-				"input": [
-					{
-						"type": "simple"
-					}
-				],
+				"input": [],
 				"outcome": {
 					"set": [
 						{
@@ -105,11 +97,7 @@
 				"show": false,
 				"enable": false,
 				"runtimeMs": 0,
-				"input": [
-					{
-						"type": "simple"
-					}
-				],
+				"input": [],
 				"outcome": {
 					"set": [
 						{
@@ -164,11 +152,7 @@
 				"show": false,
 				"enable": false,
 				"runtimeMs": 0,
-				"input": [
-					{
-						"type": "simple"
-					}
-				],
+				"input": [],
 				"outcome": {
 					"set": [
 						{
@@ -223,11 +207,7 @@
 				"show": false,
 				"enable": false,
 				"runtimeMs": 0,
-				"input": [
-					{
-						"type": "simple"
-					}
-				],
+				"input": [],
 				"outcome": {
 					"set": [
 						{
@@ -282,11 +262,7 @@
 				"show": false,
 				"enable": false,
 				"runtimeMs": 0,
-				"input": [
-					{
-						"type": "simple"
-					}
-				],
+				"input": [],
 				"outcome": {
 					"set": [
 						{
@@ -341,11 +317,7 @@
 				"show": false,
 				"enable": false,
 				"runtimeMs": 0,
-				"input": [
-					{
-						"type": "simple"
-					}
-				],
+				"input": [],
 				"outcome": {
 					"set": [
 						{

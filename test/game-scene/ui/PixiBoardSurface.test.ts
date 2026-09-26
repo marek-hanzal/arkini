@@ -263,6 +263,7 @@ describe("PixiBoardSurface", () => {
 			primaryAction: {
 				kind: "enqueue-default-line",
 				lineUid: "line:default",
+				canEnqueue: true,
 				queue: {
 					available: true,
 					capacity: 5,
@@ -299,5 +300,22 @@ describe("PixiBoardSurface", () => {
 			origin: canvas,
 		});
 		expect(boardState.openItemDetail).toHaveBeenCalledTimes(1);
+		boardState.openItemDetail.mockClear();
+		await createProps.onActivateFn(
+			{
+				...producer,
+				primaryAction: {
+					...producer.primaryAction,
+					canEnqueue: false,
+				},
+			},
+			"primary",
+			canvas,
+		);
+		expect(boardState.enqueueLine).toHaveBeenCalledTimes(2);
+		expect(boardState.openItemDetail).toHaveBeenCalledWith({
+			itemId: producer.id,
+			origin: canvas,
+		});
 	});
 });

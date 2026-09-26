@@ -4,7 +4,7 @@
 		"uid": "eheyi27mvxb5ggoh90s3nyjm",
 		"title": "Townhall I blueprint",
 		"description": "The plan that turns a campsite into something suspiciously close to a settlement. More structure, more options, more paperwork.",
-		"ui": "default",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -22,6 +22,7 @@
 				"title": "Townhall I",
 				"artwork": "c7uw765u5c2hqnjvv3zmwkgn",
 				"description": "Turn the Base Camp into the first proper Townhall and unpack a small supply chest from the next stage of civilization.",
+				"trigger": "manual",
 				"weight": 1,
 				"default": true,
 				"show": true,

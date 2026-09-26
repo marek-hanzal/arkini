@@ -21,11 +21,7 @@
 				"show": true,
 				"enable": true,
 				"runtimeMs": 30000,
-				"input": [
-					{
-						"type": "simple"
-					}
-				],
+				"input": [],
 				"outcome": {
 					"set": [
 						{

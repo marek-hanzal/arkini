@@ -118,7 +118,7 @@ export const createItemDetailControllerFx = Effect.fnUntraced(function* (): Gene
 	);
 
 	const closeFx = Effect.fn("ItemDetailController.closeFx")(
-		({ restoreFocus = true }: CloseItemDetailProps = {}) =>
+		({ restoreFocus = true, exitDelayMs = 0 }: CloseItemDetailProps = {}) =>
 			Effect.gen(function* () {
 				const current = state;
 				return yield* match(current)
@@ -134,10 +134,15 @@ export const createItemDetailControllerFx = Effect.fnUntraced(function* (): Gene
 						},
 						(current) =>
 							Effect.gen(function* () {
-								if (!restoreFocus && current.restoreFocus)
+								const nextExitDelayMs = Math.min(current.exitDelayMs, exitDelayMs);
+								if (
+									(!restoreFocus && current.restoreFocus) ||
+									nextExitDelayMs !== current.exitDelayMs
+								)
 									publishFn({
 										...current,
-										restoreFocus: false,
+										restoreFocus: current.restoreFocus && restoreFocus,
+										exitDelayMs: nextExitDelayMs,
 									});
 								if (exitCompletion !== undefined)
 									yield* Deferred.await(exitCompletion.deferred);
@@ -159,6 +164,7 @@ export const createItemDetailControllerFx = Effect.fnUntraced(function* (): Gene
 									target: current.target,
 									generation: current.generation,
 									restoreFocus,
+									exitDelayMs,
 								});
 								yield* Deferred.await(deferred);
 							}),

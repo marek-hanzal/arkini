@@ -106,6 +106,7 @@ export const TemplateForm = ({
 					{section === "general" ? (
 						<EditorFormCard>
 							<EditorTextControl
+								autoFocus
 								label={translator.textFn("Title")}
 								value={value.title}
 								error={fieldErrorFn("title")}

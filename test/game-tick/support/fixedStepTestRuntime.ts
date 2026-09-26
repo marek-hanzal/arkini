@@ -33,11 +33,7 @@ export const createFixedStepTestConfig = () => {
 						title: "Enable",
 						description: "Produce one permit.",
 						runtimeMs: 200,
-						input: [
-							{
-								type: "simple",
-							},
-						],
+						input: [],
 						outcome: {
 							set: [
 								{
@@ -77,11 +73,7 @@ export const createFixedStepTestConfig = () => {
 						title: "Depend",
 						description: "Wait for the permit.",
 						runtimeMs: 400,
-						input: [
-							{
-								type: "simple",
-							},
-						],
+						input: [],
 						rules: [
 							{
 								type: "enable",

@@ -11,6 +11,10 @@ export const JobSchema = z
 		lineUid: IdSchema.describe("The configured product line executed by this run."),
 		durationMs: TimeSchema.describe("The duration captured when this job started."),
 		remainingMs: TimeSchema.describe("The real work time still required by this job."),
+		terminalCause: z
+			.literal("depleted")
+			.optional()
+			.describe("Why this job removes its still-visible owner when its outcome settles."),
 	})
 	.strict()
 	.meta({

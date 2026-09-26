@@ -298,7 +298,7 @@ it("replaces one space and its full ownership tree while retaining another space
 	expect(result.after.templateUidBySpace[7]).toBe(result.before.templateUidBySpace[7]);
 });
 
-it("discards a departed owner and its active job when replacing its origin space", () => {
+it("discards a self-depleted or departed owner and its active job when replacing its origin space", () => {
 	const base = createJobTestConfig();
 	const config = GameConfigSchema.parse({
 		...base,
@@ -332,7 +332,14 @@ it("discards a departed owner and its active job when replacing its origin space
 						runtimeMs: 1000,
 						input: [
 							{
-								type: "simple",
+								type: "units" as const,
+								query: {
+									distance: "self" as const,
+									selector: {
+										type: "item" as const,
+										itemUid: "forge",
+									},
+								},
 								units: {
 									from: "self",
 									cost: 1,
@@ -375,9 +382,39 @@ it("discards a departed owner and its active job when replacing its origin space
 			yield* assertRuntimeFx({
 				runtime: transition.runtime,
 			});
+			const departed = {
+				...before,
+				items: before.items.map((item) =>
+					item.id === "runtime:forge" && item.location.scope === "board"
+						? {
+								...item,
+								location: {
+									scope: "terminal" as const,
+									origin: item.location,
+								},
+							}
+						: item,
+				),
+				jobs: before.jobs.map((job) => ({
+					...job,
+					terminalCause: undefined,
+				})),
+			} satisfies RuntimeSchema.Type;
+			yield* assertRuntimeFx({
+				runtime: departed,
+			});
+			const departedTransition = yield* applyBoardTemplateRuntimeFx({
+				runtime: departed,
+				space: 0,
+				templateUid: "replacement",
+			});
+			yield* assertRuntimeFx({
+				runtime: departedTransition.runtime,
+			});
 			return {
 				before,
 				transition,
+				departedTransition,
 			};
 		}).pipe(
 			useGameFx({
@@ -387,12 +424,17 @@ it("discards a departed owner and its active job when replacing its origin space
 	);
 
 	expect(result.before.items.find((item) => item.id === "runtime:forge")?.location.scope).toBe(
-		"terminal",
+		"board",
 	);
 	expect(result.before.jobs).toHaveLength(1);
-	expect(result.transition.removed.map((item) => item.id)).toContain("runtime:forge");
-	expect(result.transition.runtime.items.map((item) => item.item.uid)).toEqual([
-		"tool",
-	]);
-	expect(result.transition.runtime.jobs).toEqual([]);
+	for (const transition of [
+		result.transition,
+		result.departedTransition,
+	]) {
+		expect(transition.removed.map((item) => item.id)).toContain("runtime:forge");
+		expect(transition.runtime.items.map((item) => item.item.uid)).toEqual([
+			"tool",
+		]);
+		expect(transition.runtime.jobs).toEqual([]);
+	}
 });

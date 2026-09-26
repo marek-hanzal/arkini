@@ -177,6 +177,7 @@ export const EditorArtworkEdit = ({ filter, query, resourceUid }: EditorArtworkE
 		>
 			<div className="grid w-full max-w-3xl gap-6">
 				<EditorTextControl
+					autoFocus
 					error={controller.titleError}
 					label={translator.textFn("Title")}
 					onChangeFn={controller.setTitleFn}

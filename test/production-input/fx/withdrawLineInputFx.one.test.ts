@@ -15,7 +15,7 @@ import {
 	queuedInputTestConfig,
 } from "~test/production-input/fx/withdrawLineInputFx.queue.test/prepareQueuedBufferedLineFx";
 
-it("returns exactly one piece per click, retaining other identities and the queue", () => {
+it("returns exactly one piece per click, retaining other identities after clearing its queue", () => {
 	Effect.runSync(
 		Effect.gen(function* () {
 			yield* prepareQueuedBufferedLineFx();
@@ -29,7 +29,9 @@ it("returns exactly one piece per click, retaining other identities and the queu
 				});
 				const after = yield* readRuntimeFx();
 				expect(result.withdrawnItemCount).toBe(1);
-				expect(after.jobQueue).toEqual(before.jobQueue);
+				expect(after.jobQueue).toEqual(
+					before.jobQueue.filter((request) => request.ownerItemId !== ownerItemId),
+				);
 				expect(after.items.filter((item) => item.location.scope === "input").length).toBe(
 					remaining,
 				);

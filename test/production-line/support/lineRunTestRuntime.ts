@@ -77,9 +77,6 @@ export const lineRunTestConfig = GameConfigSchema.parse({
 								max: 3,
 							},
 						},
-						{
-							type: "simple",
-						},
 					],
 					rules: [
 						{

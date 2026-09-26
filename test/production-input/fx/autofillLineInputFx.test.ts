@@ -131,7 +131,7 @@ it("targets only the clicked reserve slot, accounts for incoming stock and settl
 	);
 });
 
-it("rejects a stale fill click after even one piece arrives and leaves all material untouched", () => {
+it("tops up a partly buffered slot without overfilling or claiming its sibling", () => {
 	Effect.runSync(
 		Effect.gen(function* () {
 			yield* spawnOwnerFx();
@@ -145,30 +145,55 @@ it("rejects a stale fill click after even one piece arrives and leaves all mater
 			yield* runTickRuntimeByFx({
 				elapsedMs: 2000,
 			});
-			yield* spawnItemFx({
-				id: "runtime:extra",
-				itemUid: "water",
-				location: {
-					scope: "board",
-					space: 0,
-					position: {
-						x: 4,
-						y: 1,
+			for (const x of [
+				2,
+				3,
+				4,
+			])
+				yield* spawnItemFx({
+					id: `runtime:extra:${x}`,
+					itemUid: "water",
+					location: {
+						scope: "board",
+						space: 0,
+						position: {
+							x,
+							y: 1,
+						},
 					},
-				},
-			});
-			const before = yield* readRuntimeFx();
+				});
 			expect(
-				yield* Effect.flip(
-					autofillLineInputFx({
-						...target,
-						inputIndex: 0,
-					}),
-				),
-			).toMatchObject({
-				_tag: "LineInputNotEmptyError",
+				yield* autofillLineInputFx({
+					...target,
+					inputIndex: 0,
+				}),
+			).toBe(2);
+			expect(
+				yield* autofillLineInputFx({
+					...target,
+					inputIndex: 0,
+				}),
+			).toBe(0);
+			yield* runTickRuntimeByFx({
+				elapsedMs: 2000,
 			});
-			expect(yield* readRuntimeFx()).toEqual(before);
+			const settled = yield* readRuntimeFx();
+			expect(
+				settled.items.filter(
+					(item) => item.location.scope === "input" && item.location.inputIndex === 0,
+				),
+			).toHaveLength(3);
+			expect(
+				settled.items.filter(
+					(item) => item.location.scope === "input" && item.location.inputIndex === 1,
+				),
+			).toHaveLength(0);
+			expect(
+				yield* autofillLineInputFx({
+					...target,
+					inputIndex: 0,
+				}),
+			).toBe(0);
 		}).pipe(
 			useGameFx({
 				config,

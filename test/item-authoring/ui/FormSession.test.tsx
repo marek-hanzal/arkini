@@ -702,6 +702,7 @@ describe("item section form session", () => {
 		if (title === null) throw new Error("Missing item title input.");
 
 		await changeInput(title, "Changed water");
+		title.blur();
 		await act(async () =>
 			document.body.dispatchEvent(
 				new KeyboardEvent("keydown", {
@@ -1033,6 +1034,7 @@ describe("item section form session", () => {
 					lines: [
 						expect.objectContaining({
 							default: true,
+							input: [],
 						}),
 					],
 				}),

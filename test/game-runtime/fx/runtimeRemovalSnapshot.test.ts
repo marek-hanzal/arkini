@@ -29,7 +29,14 @@ const configFn = (runtimeMs = 1000) =>
 					uid: "work",
 					input: [
 						{
-							type: "simple",
+							type: "units" as const,
+							query: {
+								distance: "self" as const,
+								selector: {
+									type: "item" as const,
+									itemUid: "clock",
+								},
+							},
 							units: {
 								from: "self",
 								cost: 1,

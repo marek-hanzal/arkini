@@ -39,16 +39,6 @@ export const applyInputRunPlanFx = Effect.fn("applyInputRunPlanFx")(function* ({
 	return yield* match(plan)
 		.with(
 			{
-				type: TypeSchema.enum.Simple,
-			},
-			() =>
-				Effect.succeed({
-					events: [],
-					runtime,
-				} satisfies applyInputRunPlanFx.Result),
-		)
-		.with(
-			{
 				type: TypeSchema.enum.Materials,
 				mode: ModeSchema.enum.Consume,
 			},

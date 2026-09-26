@@ -3,6 +3,7 @@ import { ItemDetailSimple } from "~/item-detail/ui/ItemDetailSimple";
 import { useItemDetailSceneController } from "~/item-detail/ui/useItemDetailSceneController";
 import { Tx } from "~/translation/ui/Tx";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
+import { useLayoutEffect, useRef } from "react";
 
 interface ItemDetailSceneProps extends useItemDetailSceneController.Props {
 	readonly disabled: boolean;
@@ -13,12 +14,25 @@ export const ItemDetailScene = ({ disabled, target }: ItemDetailSceneProps) => {
 	const controller = useItemDetailSceneController({
 		target,
 	});
+	const panelRef = useRef<HTMLDivElement>(null);
+	const targetKey = target.kind === "runtime" ? target.itemId : target.itemUid;
+	useLayoutEffect(() => {
+		if (controller.detail?.ui !== "default") return;
+		const panel = panelRef.current;
+		const lines = panel?.querySelector<HTMLElement>('[data-ui="ItemLines"]');
+		if (panel === null || lines === null || lines === undefined) return;
+		panel.scrollTop += lines.getBoundingClientRect().top - panel.getBoundingClientRect().top;
+	}, [
+		targetKey,
+		controller.detail?.ui,
+	]);
 	return (
 		<div
 			className="flex min-h-0 flex-1 flex-col"
 			data-ui="ItemDetailScene"
 		>
 			<div
+				ref={panelRef}
 				className="min-h-0 flex-1 overflow-auto [container-type:size] transition-opacity duration-300 data-[ui-stale=true]:opacity-45"
 				{...readDataUiFn({
 					dataUi: "ItemDetailPanel",

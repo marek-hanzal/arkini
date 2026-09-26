@@ -4,7 +4,7 @@
 		"uid": "gr30098zsatmrlc4vorfmjgm",
 		"title": "Grain Farm Blueprint",
 		"description": "Blueprint for Grain Farm. Usual boring stuff.",
-		"ui": "default",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -22,6 +22,7 @@
 				"title": "Grain Farm",
 				"artwork": "s1txn4siry26ofn0zzn82hkm",
 				"description": "Soon there will be some farming simulator available...",
+				"trigger": "manual",
 				"weight": 1,
 				"default": true,
 				"show": true,

@@ -364,8 +364,17 @@ export const mountController = ({
 	Object.defineProperty(pixiApplication, "canvas", {
 		configurable: true,
 		value: {
+			addEventListener: vi.fn(),
+			removeEventListener: vi.fn(),
 			releasePointerCapture,
 			setPointerCapture: vi.fn(),
+		},
+	});
+	Object.defineProperty(pixiApplication, "screen", {
+		configurable: true,
+		value: {
+			width: 800,
+			height: 80,
 		},
 	});
 	let controller: MainDragController;

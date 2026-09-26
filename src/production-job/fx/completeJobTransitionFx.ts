@@ -12,7 +12,7 @@ import { JobNotFoundError } from "~/production-job/error/JobNotFoundError";
 import { JobNotReadyError } from "~/production-job/error/JobNotReadyError";
 import { makeJobSettlementRandomFx } from "~/production-job/fx/makeJobSettlementRandomFx";
 import { readItemLineFn } from "~/production-line/fn/readItemLineFn";
-import { readTerminalLineOwnerExitFn } from "~/item-terminal/fn/readTerminalLineOwnerExitFn";
+import { readJobOwnerExitFn } from "~/item-terminal/fn/readJobOwnerExitFn";
 import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
 import { removeRuntimeItemIdentityFx } from "~/game-runtime/fx/removeRuntimeItemIdentityFx";
 import { RuntimeFx } from "~/game-runtime/context/RuntimeFx";
@@ -95,9 +95,10 @@ export const completeJobTransitionFx = Effect.fn("completeJobTransitionFx")(func
 	const ownerExit =
 		owner === undefined
 			? undefined
-			: readTerminalLineOwnerExitFn({
+			: readJobOwnerExitFn({
 					owner,
 					line,
+					job,
 				});
 	let completionRuntime = {
 		...runtime,

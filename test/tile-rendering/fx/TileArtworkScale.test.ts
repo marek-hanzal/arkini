@@ -83,6 +83,7 @@ const createHarnessFn = (item: TileActorItem) => {
 				item: nextItem,
 				palette,
 				size,
+				zoom: 1,
 				textures,
 			}),
 		);

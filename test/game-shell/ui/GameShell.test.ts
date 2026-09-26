@@ -50,9 +50,12 @@ const game = {
 	config: {
 		items: {},
 	},
-	getSnapshotFn: () => ({}),
+	getSnapshotFn: () => ({
+		currentSpace: 0,
+	}),
 	id: "game:shell-overlay-precedence",
 	readOrThrowFn: (request: unknown) => request,
+	subscribeTransitionsFn: () => () => {},
 } as unknown as GameEngine;
 
 afterEach(async () => {

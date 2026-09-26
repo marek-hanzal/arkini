@@ -14,8 +14,6 @@ Add a game:
   value: Add a game
 Add at least one condition.:
   value: Add at least one condition.
-Add at least one input.:
-  value: Add at least one input.
 Add at least one item.:
   value: Add at least one item.
   dynamic: true
@@ -1126,8 +1124,6 @@ No items can be placed here.:
   value: No items can be placed here.
 No items match this search.:
   value: No items match this search.
-No items or units required.:
-  value: No items or units required.
 No items yet:
   value: No items yet
 No matches found.:
@@ -1253,8 +1249,6 @@ Output set:
   value: Output set
 Overlay artwork:
   value: Overlay artwork
-Owner units:
-  value: Units from this item
 PNG files:
   value: PNG files
 Page help:
@@ -1611,8 +1605,6 @@ Show all:
   value: Show all
 Simple:
   value: Simple
-Simple input:
-  value: Simple input
 Size:
   value: Size
 Source:

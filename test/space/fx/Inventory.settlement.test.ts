@@ -24,11 +24,7 @@ describe("Inventory settlement", () => {
 				title: "Work",
 				description: "Work",
 				runtimeMs: 1000,
-				input: [
-					{
-						type: "simple",
-					},
-				],
+				input: [],
 				rules: [],
 				outcome: {
 					set: [

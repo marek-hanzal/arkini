@@ -12,6 +12,7 @@ import { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { StateSchema } from "~/game-persistence/schema/StateSchema";
 import { runTickRuntimeByFx } from "~test/game-tick/support/runTickRuntimeByFx";
 import { CommittedTransitionsFx } from "~/game-runtime/context/CommittedTransitionsFx";
+import { fromRuntimeFn } from "~/game-persistence/fn/fromRuntimeFn";
 
 const outcome = {
 	set: [
@@ -145,7 +146,14 @@ const lifecycleConfig = GameConfigSchema.parse({
 					runtimeMs: 200,
 					input: [
 						{
-							type: "simple",
+							type: "units" as const,
+							query: {
+								distance: "self" as const,
+								selector: {
+									type: "item" as const,
+									itemUid: "producer:phoenix",
+								},
+							},
 							units: {
 								from: "self",
 								cost: 1,
@@ -194,7 +202,14 @@ const lifecycleConfig = GameConfigSchema.parse({
 					runtimeMs: 200,
 					input: [
 						{
-							type: "simple",
+							type: "units" as const,
+							query: {
+								distance: "self" as const,
+								selector: {
+									type: "item" as const,
+									itemUid: "producer:terminal",
+								},
+							},
 							units: {
 								from: "self",
 								cost: 1,
@@ -210,11 +225,7 @@ const lifecycleConfig = GameConfigSchema.parse({
 					description: "Wait before removal.",
 					trigger: "item-termination",
 					runtimeMs: 300,
-					input: [
-						{
-							type: "simple",
-						},
-					],
+					input: [],
 					rules: [],
 				},
 			],
@@ -233,7 +244,14 @@ const lifecycleConfig = GameConfigSchema.parse({
 					runtimeMs: 200,
 					input: [
 						{
-							type: "simple",
+							type: "units" as const,
+							query: {
+								distance: "self" as const,
+								selector: {
+									type: "item" as const,
+									itemUid: "producer:terminal-rejected",
+								},
+							},
 							units: {
 								from: "self",
 								cost: 1,
@@ -251,7 +269,14 @@ const lifecycleConfig = GameConfigSchema.parse({
 					runtimeMs: 300,
 					input: [
 						{
-							type: "simple",
+							type: "units" as const,
+							query: {
+								distance: "self" as const,
+								selector: {
+									type: "item" as const,
+									itemUid: "producer:terminal-rejected",
+								},
+							},
 							units: {
 								from: "self",
 								cost: 1,
@@ -277,7 +302,14 @@ const lifecycleConfig = GameConfigSchema.parse({
 					runtimeMs: 200,
 					input: [
 						{
-							type: "simple",
+							type: "units" as const,
+							query: {
+								distance: "self" as const,
+								selector: {
+									type: "item" as const,
+									itemUid: "producer:finite-queue",
+								},
+							},
 							units: {
 								from: "self",
 								cost: 1,
@@ -303,7 +335,14 @@ const lifecycleConfig = GameConfigSchema.parse({
 					runtimeMs: 200,
 					input: [
 						{
-							type: "simple",
+							type: "units" as const,
+							query: {
+								distance: "self" as const,
+								selector: {
+									type: "item" as const,
+									itemUid: "blueprint:empty",
+								},
+							},
 							units: {
 								from: "self",
 								cost: 1,
@@ -325,11 +364,7 @@ const lifecycleConfig = GameConfigSchema.parse({
 					title: "Repeat",
 					description: "Repeat without consuming the owner.",
 					runtimeMs: 200,
-					input: [
-						{
-							type: "simple",
-						},
-					],
+					input: [],
 					outcome,
 					rules: [],
 				},
@@ -421,7 +456,7 @@ describe("job completion unit lifecycle", () => {
 		]);
 	});
 
-	it("detaches a depleted producer at job start and drops into its freed cell", () => {
+	it("keeps a self-depleted producer visible until its job completes and drops into its freed cell", () => {
 		const result = run(
 			Effect.gen(function* () {
 				const owner = yield* spawnItemFx({
@@ -475,32 +510,45 @@ describe("job completion unit lifecycle", () => {
 				const started = yield* readRuntimeFx();
 				const startEvents = (yield* (yield* CommittedTransitionsFx).read).events;
 				yield* runTickRuntimeByFx({
-					elapsedMs: 200,
+					elapsedMs: 100,
+				});
+				const midway = yield* readRuntimeFx();
+				const midwayEvents = (yield* (yield* CommittedTransitionsFx).read).events;
+				yield* runTickRuntimeByFx({
+					elapsedMs: 100,
 				});
 				return {
 					started,
 					startEvents,
+					midway,
+					midwayEvents,
 					completed: yield* readRuntimeFx(),
+					completionEvents: (yield* (yield* CommittedTransitionsFx).read).events,
 				};
 			}),
 		);
 		const runtime = result.completed;
-		expect(result.started.items.find((item) => item.id === "runtime:trader")?.location).toEqual(
-			{
-				scope: "terminal",
-				origin: {
-					scope: "board",
-					space: 0,
-					position: {
-						x: 0,
-						y: 0,
-					},
-				},
+		expect(
+			result.started.items.find((item) => item.id === "runtime:trader")?.location,
+		).toMatchObject({
+			scope: "board",
+			position: {
+				x: 0,
+				y: 0,
 			},
-		);
+		});
 		expect(result.started.jobs).toHaveLength(1);
-		expect(result.startEvents.map((event) => event.type)).toContain("item:disappeared");
-		expect(result.startEvents.map((event) => event.type)).toContain("item:depleted");
+		expect(
+			result.started.items.find((item) => item.id === "runtime:trader")?.remainingUnits,
+		).toBe(0);
+		expect(result.startEvents.map((event) => event.type)).not.toContain("item:depleted");
+		expect(result.startEvents.map((event) => event.type)).not.toContain("item:disappeared");
+		expect(
+			result.midway.items.find((item) => item.id === "runtime:trader")?.location.scope,
+		).toBe("board");
+		expect(result.midway.items.some((item) => item.item.uid === "item:gift")).toBe(false);
+		expect(result.midwayEvents.map((event) => event.type)).not.toContain("item:depleted");
+		expect(result.completionEvents.map((event) => event.type)).toContain("item:depleted");
 
 		expect(runtime.items.some((item) => item.item.uid === "producer:trader")).toBe(false);
 		expect(runtime.items).toEqual(
@@ -524,6 +572,60 @@ describe("job completion unit lifecycle", () => {
 					}),
 				}),
 			]),
+		);
+	});
+
+	it("restores a self-depleted active job without releasing its Board cell early", () => {
+		const state = run(
+			Effect.gen(function* () {
+				const owner = yield* spawnItemFx({
+					id: "runtime:phoenix",
+					itemUid: "producer:phoenix",
+					location: {
+						scope: "board",
+						space: 0,
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+				});
+				yield* startLineFx({
+					ownerItemId: owner.id,
+					lineUid: "line:phoenix:renew",
+				});
+				return fromRuntimeFn({
+					runtime: yield* readRuntimeFx(),
+				});
+			}),
+		);
+		expect(state.jobs[0]?.terminalCause).toBe("depleted");
+		const restored = Effect.runSync(
+			Effect.gen(function* () {
+				yield* runTickRuntimeByFx({
+					elapsedMs: 100,
+				});
+				const midway = yield* readRuntimeFx();
+				yield* runTickRuntimeByFx({
+					elapsedMs: 100,
+				});
+				return {
+					midway,
+					completed: yield* readRuntimeFx(),
+				};
+			}).pipe(
+				useGameFx({
+					config: lifecycleConfig,
+					state,
+				}),
+			),
+		);
+		expect(
+			restored.midway.items.find((item) => item.id === "runtime:phoenix")?.location.scope,
+		).toBe("board");
+		expect(restored.completed.items.some((item) => item.id === "runtime:phoenix")).toBe(false);
+		expect(restored.completed.items.some((item) => item.item.uid === "producer:phoenix")).toBe(
+			true,
 		);
 	});
 
@@ -595,7 +697,7 @@ describe("job completion unit lifecycle", () => {
 		expect(result.finishEvents.map((event) => event.type)).toContain("item:disappeared");
 	});
 
-	it("frees the cell when a selected termination line cannot be admitted", () => {
+	it("holds the cell through work when a selected termination line cannot be admitted", () => {
 		const result = run(
 			Effect.gen(function* () {
 				const owner = yield* spawnItemFx({
@@ -629,9 +731,9 @@ describe("job completion unit lifecycle", () => {
 		expect(
 			result.started.items.find((item) => item.id === "runtime:terminal-rejected")?.location
 				.scope,
-		).toBe("terminal");
+		).toBe("board");
 		expect(result.started.jobQueue).toEqual([]);
-		expect(result.startEvents.map((event) => event.type)).toContain("item:disappeared");
+		expect(result.startEvents.map((event) => event.type)).not.toContain("item:disappeared");
 		expect(
 			result.completed.items.find((item) => item.item.uid === "item:gift")?.location,
 		).toMatchObject({
@@ -742,7 +844,7 @@ describe("job completion unit lifecycle", () => {
 	});
 
 	it("allows a depleted blueprint to complete without any outcome", () => {
-		const runtime = run(
+		const result = run(
 			Effect.gen(function* () {
 				const owner = yield* spawnItemFx({
 					id: "runtime:empty-blueprint",
@@ -760,15 +862,36 @@ describe("job completion unit lifecycle", () => {
 					ownerItemId: owner.id,
 					lineUid: "line:blueprint:empty",
 				});
+				const started = yield* readRuntimeFx();
 				yield* runTickRuntimeByFx({
-					elapsedMs: 200,
+					elapsedMs: 100,
 				});
-				return yield* readRuntimeFx();
+				const midway = yield* readRuntimeFx();
+				yield* runTickRuntimeByFx({
+					elapsedMs: 100,
+				});
+				return {
+					started,
+					midway,
+					completed: yield* readRuntimeFx(),
+				};
 			}),
 		);
 
-		expect(runtime.items).toEqual([]);
-		expect(runtime.jobs).toEqual([]);
+		expect(result.started.items[0]).toMatchObject({
+			id: "runtime:empty-blueprint",
+			remainingUnits: 0,
+			location: {
+				scope: "board",
+				position: {
+					x: 0,
+					y: 0,
+				},
+			},
+		});
+		expect(result.midway.items[0]?.location.scope).toBe("board");
+		expect(result.completed.items).toEqual([]);
+		expect(result.completed.jobs).toEqual([]);
 	});
 
 	it("keeps a craft owner and allows the same line to start again", () => {

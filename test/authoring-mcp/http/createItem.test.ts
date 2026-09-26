@@ -116,11 +116,7 @@ describe("editor MCP item creation", () => {
 						description: "Travel",
 						runtimeMs: 0,
 						default: true,
-						input: [
-							{
-								type: "simple",
-							},
-						],
+						input: [],
 						rules: [],
 						outcome: {
 							set: [
@@ -248,11 +244,7 @@ it("generates fresh project-wide line UIDs when the same authoring lines create 
 				title: "Same line title",
 				description: "Copied authoring value",
 				runtimeMs: 0,
-				input: [
-					{
-						type: "simple",
-					},
-				],
+				input: [],
 				rules: [],
 			},
 		],

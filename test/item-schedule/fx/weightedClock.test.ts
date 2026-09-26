@@ -274,7 +274,14 @@ describe("weighted Clock admission", () => {
 												...line,
 												input: [
 													{
-														type: "simple" as const,
+														type: "units" as const,
+														query: {
+															distance: "self" as const,
+															selector: {
+																type: "item" as const,
+																itemUid: "clock",
+															},
+														},
 														units: {
 															from: "self" as const,
 															cost: 2,

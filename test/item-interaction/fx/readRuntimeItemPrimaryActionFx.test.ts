@@ -70,11 +70,7 @@ const config = GameConfigSchema.parse({
 					description: "Produce one resource.",
 					default: true,
 					runtimeMs: 1_000,
-					input: [
-						{
-							type: "simple",
-						},
-					],
+					input: [],
 					rules: [],
 				},
 			],
@@ -158,6 +154,7 @@ describe("readRuntimeItemPrimaryActionFx", () => {
 				expect(result.action).toEqual({
 					kind: "enqueue-default-line",
 					lineUid: "line:produce",
+					canEnqueue: true,
 					queue: {
 						available: true,
 						capacity: 1,
@@ -196,6 +193,7 @@ describe("readRuntimeItemPrimaryActionFx", () => {
 		).toEqual({
 			kind: "enqueue-default-line",
 			lineUid: "line:produce",
+			canEnqueue: true,
 			queue: {
 				available: true,
 				capacity: 1,
@@ -254,6 +252,7 @@ describe("readRuntimeItemPrimaryActionFx", () => {
 		).toEqual({
 			kind: "enqueue-default-line",
 			lineUid: "line:produce",
+			canEnqueue: false,
 			queue: {
 				available: false,
 				capacity: 1,

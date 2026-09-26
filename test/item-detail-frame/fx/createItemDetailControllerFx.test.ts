@@ -68,4 +68,35 @@ describe("Item Detail frame controller", () => {
 			phase: "closed",
 		});
 	});
+
+	it("lets an immediate close preempt a delayed Board-change exit", async () => {
+		const controller = Effect.runSync(createItemDetailControllerFx());
+		Effect.runSync(controller.openTargetFx(runtimeTarget()));
+		const entering = controller.getSnapshotFn();
+		if (entering.phase !== "entering") throw new Error("Expected entering state.");
+		const delayed = Effect.runPromise(
+			controller.closeFx({
+				restoreFocus: false,
+				exitDelayMs: 360,
+			}),
+		);
+		await Promise.resolve();
+		expect(controller.getSnapshotFn()).toMatchObject({
+			phase: "exiting",
+			restoreFocus: false,
+			exitDelayMs: 360,
+		});
+		const immediate = Effect.runPromise(controller.closeFx());
+		await Promise.resolve();
+		expect(controller.getSnapshotFn()).toMatchObject({
+			phase: "exiting",
+			restoreFocus: false,
+			exitDelayMs: 0,
+		});
+		Effect.runSync(controller.completeExitFx(entering.generation));
+		await Promise.all([
+			delayed,
+			immediate,
+		]);
+	});
 });

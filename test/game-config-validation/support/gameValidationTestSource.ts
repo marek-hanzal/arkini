@@ -28,11 +28,7 @@ export const createLine = ({
 	default: isDefault = false,
 	trigger = "manual",
 	uid = "line:test",
-	input = [
-		{
-			type: "simple",
-		},
-	],
+	input = [],
 	outcome,
 }: {
 	default?: boolean;

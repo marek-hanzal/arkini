@@ -33,6 +33,13 @@ export interface MainDragController {
 	readonly settleOriginGhostFx: (actor: PixiTileActor) => Effect.Effect<void, never, never>;
 	/** Coalesces canonical/layout invalidation onto the current drag frame slot. */
 	readonly requestRefreshFx: Effect.Effect<void, never, never>;
+	/** Rechecks the stationary pointer after a committed actor finishes traveling. */
+	readonly refreshHoverFx: Effect.Effect<void, never, never>;
+	/** Rechecks a DOM-owned pointer release that Pixi did not receive during camera pan. */
+	readonly refreshHoverAtFx: (pointer: {
+		readonly x: number;
+		readonly y: number;
+	}) => Effect.Effect<void, never, never>;
 	/** Reprojects a held pointer after a camera change without promoting a pressed gesture. */
 	readonly refreshPointerFx: (pointer: {
 		readonly pointerId?: number;
@@ -128,6 +135,10 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 	let interactionBlocked = false;
 	let thresholdCrossed = false;
 	let hoveredActor: PixiTileActor | null = null;
+	let hoverPointer: {
+		x: number;
+		y: number;
+	} | null = null;
 
 	const dragPreview = yield* createMainDragPreviewFx({
 		actorStore,
@@ -185,13 +196,39 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 		const actor = actorStore.actors.get(facts.occupant.id);
 		return actor !== undefined && isMovingFn(actor);
 	};
+	const refreshHoverAtPointerFn = () => {
+		if (closed || interactionBlocked || activeDrag !== null || hoverPointer === null) return;
+		const pointer = hoverPointer;
+		if (
+			pointer.x < 0 ||
+			pointer.y < 0 ||
+			pointer.x > application.app.screen.width ||
+			pointer.y > application.app.screen.height
+		)
+			return;
+		const point = application.stage.toLocal(pointer);
+		const facts = RendererRuntime.runSync(surface.readTargetFactsFx(point.x, point.y));
+		const actor =
+			facts.occupant === null ? null : (actorStore.actors.get(facts.occupant.id) ?? null);
+		setHoveredActorFn(
+			actor !== null &&
+				!actor.dragging &&
+				!isMovingFn(actor) &&
+				!RendererRuntime.runSync(dropSubmission.isPendingActorFx(actor.item.id))
+				? actor
+				: null,
+		);
+	};
 
 	const settleActorFn = (actor: PixiTileActor) => {
 		RendererRuntime.runSync(
 			settleDraggedActorFx({
 				actor,
 				animator,
-				onCompleteFn: () => RendererRuntime.runSync(dragOriginGhosts.settleFx(actor)),
+				onCompleteFn: () => {
+					RendererRuntime.runSync(dragOriginGhosts.settleFx(actor));
+					refreshHoverAtPointerFn();
+				},
 				surface,
 			}),
 		);
@@ -378,6 +415,10 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 	};
 
 	const onPointerMoveFn = (event: FederatedPointerEvent) => {
+		hoverPointer = {
+			x: event.global.x,
+			y: event.global.y,
+		};
 		const drag = activeDrag;
 		if (drag === null || event.pointerId !== drag.pointerId) return;
 		const point = application.stage.toLocal(event.global);
@@ -391,6 +432,10 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 	};
 
 	const finishPointerFn = (event: FederatedPointerEvent) => {
+		hoverPointer = {
+			x: event.global.x,
+			y: event.global.y,
+		};
 		const pendingDrag = activeDrag;
 		if (pendingDrag === null || event.pointerId !== pendingDrag.pointerId) {
 			return;
@@ -451,8 +496,10 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 				dropSubmission.submitFx({
 					actor: drag.actor,
 					commandTarget: targetFacts.commandTarget,
-					onReturnSettledFn: () =>
-						RendererRuntime.runSync(dragOriginGhosts.settleFx(drag.actor)),
+					onReturnSettledFn: () => {
+						RendererRuntime.runSync(dragOriginGhosts.settleFx(drag.actor));
+						refreshHoverAtPointerFn();
+					},
 					sourceItem,
 				}),
 			);
@@ -506,6 +553,10 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 	application.stage.on("pointerup", finishPointerFn);
 	application.stage.on("pointerupoutside", finishPointerFn);
 	application.stage.on("pointercancel", cancelPointerFn);
+	const clearHoverPointerFn = () => {
+		hoverPointer = null;
+	};
+	application.app.canvas.addEventListener("pointerleave", clearHoverPointerFn);
 	const keyboardTarget = typeof window === "undefined" ? null : window;
 	keyboardTarget?.addEventListener("keydown", removeDraggedItemFn, {
 		capture: true,
@@ -652,6 +703,13 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 				y: drag.lastPointerY,
 			});
 		}),
+		refreshHoverFx: Effect.sync(() => refreshHoverAtPointerFn()),
+		refreshHoverAtFx: Effect.fn("MainDragController.refreshHoverAtFx")((pointer) =>
+			Effect.sync(() => {
+				hoverPointer = pointer;
+				refreshHoverAtPointerFn();
+			}),
+		),
 		refreshPointerFx: Effect.fn("MainDragController.refreshPointerFx")((pointer) =>
 			Effect.gen(function* () {
 				const drag = activeDrag;
@@ -687,6 +745,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 			application.stage.off("pointerup", finishPointerFn);
 			application.stage.off("pointerupoutside", finishPointerFn);
 			application.stage.off("pointercancel", cancelPointerFn);
+			application.app.canvas.removeEventListener("pointerleave", clearHoverPointerFn);
 			keyboardTarget?.removeEventListener("keydown", removeDraggedItemFn, {
 				capture: true,
 			});

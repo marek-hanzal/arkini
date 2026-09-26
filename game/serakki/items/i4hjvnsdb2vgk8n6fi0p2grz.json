@@ -4,7 +4,7 @@
 		"uid": "i4hjvnsdb2vgk8n6fi0p2grz",
 		"title": "Lumber Camp Blueprint",
 		"description": "Plans for a camp dedicated to turning nearby trees into a reliable supply of wood. Forestry, with fewer meetings.",
-		"ui": "default",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -22,6 +22,7 @@
 				"title": "Lumber Camp",
 				"artwork": "vmfdb9sa06isuopjs1kqn7n2",
 				"description": "Build a new lumber-camp",
+				"trigger": "manual",
 				"weight": 1,
 				"default": true,
 				"show": true,

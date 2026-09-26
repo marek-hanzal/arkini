@@ -24,6 +24,7 @@ export namespace readItemLineInputsFx {
 		readonly type: "materials" | "units";
 		readonly inputIndex: number;
 		readonly itemUid: IdSchema.Type;
+		readonly distance: MaterialSchema.Type["query"]["distance"];
 		readonly quantity: MaterialSchema.Type["quantity"];
 		readonly filled: number;
 		readonly available: boolean;
@@ -85,6 +86,7 @@ export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* 
 				type: "units",
 				inputIndex,
 				itemUid: input.query.selector.itemUid,
+				distance: input.query.distance,
 				quantity: {
 					min: 1,
 					max: 1,
@@ -175,11 +177,12 @@ export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* 
 			type: "materials",
 			inputIndex,
 			itemUid: input.query.selector.itemUid,
+			distance: input.query.distance,
 			quantity: input.quantity,
 			filled,
 			committed,
 			canAutofill:
-				filled === 0 &&
+				filled + incoming.length < input.quantity.max &&
 				owner?.location.scope === "board" &&
 				liveLine !== undefined &&
 				isItemProductionAdmissionOpenFn(owner) &&
@@ -188,7 +191,6 @@ export const readItemLineInputsFx = Effect.fn("readItemLineInputsFx")(function* 
 					lineUid: line.uid,
 					runtime,
 				}) &&
-				incoming.length < input.quantity.max &&
 				sources.length > 0,
 			canWithdraw: buffered > 0 && !committed && owner?.location.scope === "board",
 			clock,

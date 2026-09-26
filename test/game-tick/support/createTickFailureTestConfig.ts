@@ -24,11 +24,7 @@ export const createTickFailureTestConfig = () => {
 					{
 						...line,
 						runtimeMs: 200,
-						input: [
-							{
-								type: "simple",
-							},
-						],
+						input: [],
 						outcome: {
 							set: [
 								{

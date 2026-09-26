@@ -26,7 +26,7 @@ export interface GraphDiscoveryEdge {
 		GraphEdge["annotations"],
 		"alternative" | "chance" | "inputIndex" | "role" | "boardLocal"
 	> & {
-		readonly inputType?: "simple" | "materials" | "units";
+		readonly inputType?: "materials" | "units";
 		readonly mode?: "consume" | "reserve";
 		readonly distance?: QuerySchema.Type["distance"];
 		readonly quantityMin?: number;

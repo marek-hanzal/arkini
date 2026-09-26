@@ -49,7 +49,8 @@ export const PixiBoardSurface = () => {
 			if (
 				intent !== "detail" &&
 				item.location.scope === "board" &&
-				item.primaryAction.kind === "enqueue-default-line"
+				item.primaryAction.kind === "enqueue-default-line" &&
+				item.primaryAction.canEnqueue
 			) {
 				enqueueLineFn({
 					kind: intent === "fill-default-line-queue" ? "fill" : "enqueue",

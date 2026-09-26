@@ -94,11 +94,7 @@ const createTimedQueueJobConfig = () => {
 				...forge,
 				lines: forge.lines.map((line) => ({
 					...line,
-					input: [
-						{
-							type: "simple",
-						},
-					],
+					input: [],
 				})),
 			},
 		},

@@ -83,7 +83,14 @@ const craftItem = ({
 										cost: 1,
 										from: "self",
 									},
-									type: "simple",
+									type: "units" as const,
+									query: {
+										distance: "self" as const,
+										selector: {
+											type: "item" as const,
+											itemUid: id,
+										},
+									},
 								},
 							]
 						: [

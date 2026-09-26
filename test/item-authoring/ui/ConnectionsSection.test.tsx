@@ -363,11 +363,7 @@ it.each([
 			title: "Specific line",
 			description: "Specific",
 			runtimeMs: 1000,
-			input: [
-				{
-					type: "simple",
-				},
-			],
+			input: [],
 			rules: [],
 		});
 		const edge = {

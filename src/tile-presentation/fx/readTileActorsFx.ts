@@ -1,6 +1,6 @@
 import { readItemScheduleFn } from "~/item-schedule/fn/readItemScheduleFn";
 import { resolveItemScheduleEnabledFx } from "~/item-schedule/fx/resolveItemScheduleEnabledFx";
-import { Array, Effect } from "effect";
+import { Array, Effect, Result } from "effect";
 
 import type { GameEngine } from "~/playable-game/type/GameEngine";
 import type { JobSchema } from "~/production-job/schema/JobSchema";
@@ -12,21 +12,53 @@ import { resolveActiveJobStatusFx } from "~/production-job/fx/resolveActiveJobSt
 import { JobStatusEnumSchema } from "~/production-job/schema/JobStatusEnumSchema";
 import { LocationScopeEnumSchema } from "~/item-location/schema/LocationScopeEnumSchema";
 import { narrowBoardRuntimeItemFn } from "~/game-runtime/fn/narrowBoardRuntimeItemFn";
+import { resolveLineRunFx } from "~/production-line/fx/resolveLineRunFx";
+import { readLineInputDeliveryClaimsFn } from "~/production-delivery/fn/readLineInputDeliveryClaimsFn";
 import type { RuntimeItemSchema } from "~/game-runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/game-runtime/schema/RuntimeSchema";
 
-const readQueueBadgeCountFn = ({
-	ownerItemId,
+const readQueueBadgeCountFx = Effect.fn("readTileActorsFx.readQueueBadgeCountFx")(function* ({
+	item,
 	runtime,
 }: {
-	readonly ownerItemId: string;
+	readonly item: RuntimeItemSchema.Type;
 	readonly runtime: RuntimeSchema.Type;
-}) => {
-	const count =
-		runtime.jobs.filter((job) => job.ownerItemId === ownerItemId && job.durationMs > 0).length +
-		runtime.jobQueue.filter((request) => request.ownerItemId === ownerItemId).length;
+}) {
+	const jobs = runtime.jobs.filter((job) => job.ownerItemId === item.id);
+	const requests = runtime.jobQueue.filter((request) => request.ownerItemId === item.id);
+	let count = jobs.filter((job) => job.durationMs > 0).length;
+	for (const [index, request] of requests.entries()) {
+		// Only the immediately startable instant request is a one-frame x1 artifact.
+		// A request waiting for inputs, delivery, or an earlier job remains real queue work.
+		if (jobs.length > 0 || index > 0) {
+			count += 1;
+			continue;
+		}
+		const resolved = yield* Effect.result(
+			resolveLineRunFx({
+				ownerItemId: item.id,
+				lineUid: request.lineUid,
+				runtime,
+			}),
+		);
+		if (Result.isFailure(resolved)) {
+			count += 1;
+			continue;
+		}
+		const run = resolved.success;
+		if (
+			run.runtimeMs > 0 ||
+			!run.ready ||
+			readLineInputDeliveryClaimsFn({
+				ownerItemId: item.id,
+				lineUid: request.lineUid,
+				runtime,
+			}).length > 0
+		)
+			count += 1;
+	}
 	return count > 0 ? count : undefined;
-};
+});
 
 const clampRatioFn = (ratio: number) => Math.max(0, Math.min(1, ratio));
 
@@ -79,15 +111,18 @@ export const readTileActorsFx = Effect.fnUntraced(function* ({
 				item: item.item,
 			});
 			const running = activeJobStatus === JobStatusEnumSchema.enum.Running;
-			const queueBadgeCount = readQueueBadgeCountFn({
-				ownerItemId: item.id,
+			const queueBadgeCount = yield* readQueueBadgeCountFx({
+				item,
 				runtime,
 			});
 			const totalUnits = item.item.units?.amount;
+			const remainingUnits = readItemRemainingUnitsFn(item);
 			const colorFraction =
 				totalUnits === undefined
 					? undefined
-					: clampRatioFn((readItemRemainingUnitsFn(item) ?? totalUnits) / totalUnits);
+					: remainingUnits === 0 && activeJob !== undefined
+						? 1
+						: clampRatioFn((remainingUnits ?? totalUnits) / totalUnits);
 			const progressRatio = readProgressRatioFn({
 				activeJob,
 				item,

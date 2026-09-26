@@ -49,6 +49,10 @@ export namespace useItemDetailSceneController {
 			readonly remainingMs: number;
 			readonly totalMs: number;
 		};
+		readonly activeJob?: {
+			readonly remainingMs: number;
+			readonly durationMs: number;
+		};
 	}
 	export interface Output {
 		readonly detail?: Detail;
@@ -222,6 +226,7 @@ export const useItemDetailSceneController = ({
 				canMake = queue.value.available;
 			}
 			const lifetimeDurationMs = readItemScheduleFn(item)?.durationMs;
+			const activeJob = runtime.jobs.find((job) => job.ownerItemId === runtimeItem?.id);
 			return {
 				defaultLine,
 				defaultLineDisabled:
@@ -274,6 +279,13 @@ export const useItemDetailSceneController = ({
 									runtimeItem?.schedule?.remainingDurationMs ??
 									lifetimeDurationMs,
 								totalMs: lifetimeDurationMs,
+							},
+				activeJob:
+					activeJob === undefined
+						? undefined
+						: {
+								remainingMs: activeJob.remainingMs,
+								durationMs: activeJob.durationMs,
 							},
 			};
 		},

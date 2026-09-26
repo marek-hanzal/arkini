@@ -53,8 +53,9 @@ hit geometry or admission. Hover grows only the tile art, shows a small detail c
 larger hit area, and yields smoothly to drag, blocked interaction and canonical travel. Pointer-anchored
 zoom preserves both hover and an active item drag.
 
-A short left click admits the effective Default line, or opens Item Detail if there is no
-Default line. Ctrl+left click fills that line's queue, or opens Detail if there is no Default.
+A short left click admits the effective Default line when admission is available, or opens
+Item Detail when it is unavailable or no Default line exists. Ctrl+left click fills that
+line's queue with the same Detail fallback.
 A short right click opens Detail without a production command; right drag remains camera pan.
 Queue playback owns Autofill and job start after admission.
 

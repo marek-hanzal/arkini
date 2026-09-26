@@ -121,7 +121,7 @@ const applyLineUnitPlansFx = Effect.fn("applyLineUnitPlansFx")(function* ({
 			facts: [],
 		};
 	return yield* settleActionUnitsFx({
-		actionId: job.lineUid,
+		actionId: job.id,
 		units: plan.input.flatMap(({ units }) =>
 			units === undefined
 				? []

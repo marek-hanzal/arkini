@@ -6,8 +6,6 @@ import { isItemProductionAdmissionOpenFn } from "~/production-line/fn/isItemProd
 import { isLineInputClosedFn } from "~/production-line/fn/isLineInputClosedFn";
 import { LineInputClosedError } from "~/production-line/error/LineInputClosedError";
 import { ItemProductionControlUnavailableError } from "~/production-line/error/ItemProductionControlUnavailableError";
-import { LineInputNotEmptyError } from "~/production-input/error/LineInputNotEmptyError";
-import { filterInputSlotItemsFn } from "~/production-input/fn/filterInputSlotItemsFn";
 import { readItemMaterialInputFx } from "~/production-input/fx/readItemMaterialInputFx";
 import { autofillLineInputsRuntimeFx } from "~/production-input/fx/autofillLineInputsRuntimeFx";
 
@@ -19,7 +17,7 @@ export namespace autofillLineInputFx {
 	}
 }
 
-/** Fills one empty slot through ordinary delivery, without creating production intent. */
+/** Tops up one material slot through ordinary delivery, without creating production intent. */
 export const autofillLineInputFx = Effect.fn("autofillLineInputFx")(function* (
 	props: autofillLineInputFx.Props,
 ) {
@@ -47,13 +45,6 @@ export const autofillLineInputFx = Effect.fn("autofillLineInputFx")(function* (
 				})
 			)
 				return yield* Effect.fail(new LineInputClosedError(props));
-			if (
-				filterInputSlotItemsFn({
-					...props,
-					items: runtime.items,
-				}).length > 0
-			)
-				return yield* Effect.fail(new LineInputNotEmptyError(props));
 			const autofill = yield* autofillLineInputsRuntimeFx({
 				...props,
 				runtime,

@@ -64,11 +64,7 @@ const config = GameConfigSchema.parse({
 					title: "Run",
 					description: "Run without material.",
 					runtimeMs: 1_000,
-					input: [
-						{
-							type: "simple",
-						},
-					],
+					input: [],
 					rules: [],
 				},
 				{

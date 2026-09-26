@@ -23,11 +23,7 @@ export const lineFn = (uid: string, fields: Record<string, unknown> = {}) => ({
 	title: uid,
 	description: uid,
 	runtimeMs: 0,
-	input: [
-		{
-			type: "simple",
-		},
-	],
+	input: [],
 	rules: [],
 	...fields,
 });
@@ -259,7 +255,14 @@ export const adversarialConfigFn = () => {
 								},
 							},
 							{
-								type: "simple",
+								type: "units" as const,
+								query: {
+									distance: "self" as const,
+									selector: {
+										type: "item" as const,
+										itemUid: "A",
+									},
+								},
 								units: {
 									from: "self",
 									cost: 1,

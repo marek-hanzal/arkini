@@ -115,6 +115,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 			item,
 			palette: readPaletteFn(),
 			size: pose.size,
+			zoom: application.stage.scale.x,
 			textures,
 		});
 	});
@@ -269,6 +270,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 					const latest = RendererRuntime.runSync(surface.readActorPoseFx(actor.item));
 					if (latest !== null) latest.layer.addChild(actor.container);
 					RendererRuntime.runSync(drag.settleOriginGhostFx(actor));
+					RendererRuntime.runSync(drag.refreshHoverFx);
 				},
 			});
 			return;
@@ -486,6 +488,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 										surface.readActorPoseFx(created.item),
 									);
 									if (latest !== null) latest.layer.addChild(created.container);
+									RendererRuntime.runSync(drag.refreshHoverFx);
 								},
 							});
 						} else
@@ -551,6 +554,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 			});
 		}
 		yield* drag.requestRefreshFx;
+		yield* drag.refreshHoverFx;
 	});
 
 	const boardArriveFx = Effect.fn("MainReconciler.boardArriveFx")(function* (
@@ -623,6 +627,7 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 				item: actor.item,
 				palette: readPaletteFn(),
 				size: pose.size,
+				zoom: application.stage.scale.x,
 				textures,
 			});
 		}

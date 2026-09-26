@@ -48,6 +48,7 @@ export const createDragActor = (actorItem: TileActorItem): PixiTileActor => {
 	const hoverLayer = new Container();
 	lifecycleLayer.addChild(hoverLayer);
 	const infoButton = new Graphics();
+	const infoShadow = new Graphics();
 	infoButton.visible = false;
 	container.addChild(lifecycleLayer);
 	const visual = {
@@ -86,6 +87,7 @@ export const createDragActor = (actorItem: TileActorItem): PixiTileActor => {
 		lifecycleLayer,
 		hoverLayer,
 		infoButton,
+		infoShadow,
 		onPointerDownFn: null,
 		onPointerEnterFn: null,
 		onPointerLeaveFn: null,

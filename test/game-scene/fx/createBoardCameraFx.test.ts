@@ -40,6 +40,7 @@ const mountFn = (
 	} as DOMRect);
 	const stage = new Container();
 	const cancelFn = vi.fn();
+	const refreshHoverAtFn = vi.fn();
 	const refreshPointerFn = vi.fn();
 	const blockFn = vi.fn();
 	const screen = {
@@ -88,6 +89,7 @@ const mountFn = (
 			} as unknown as PixiApplicationOwner,
 			drag: {
 				cancelInteractionFx: Effect.sync(cancelFn),
+				refreshHoverAtFx: (pointer) => Effect.sync(() => refreshHoverAtFn(pointer)),
 				refreshPointerFx: (pointer) => Effect.sync(() => refreshPointerFn(pointer)),
 				setInteractionBlockedFx: (blocked: boolean) => Effect.sync(() => blockFn(blocked)),
 			},
@@ -144,6 +146,7 @@ const mountFn = (
 		canvas,
 		blockFn,
 		cancelFn,
+		refreshHoverAtFn,
 		refreshPointerFn,
 		pointerFn,
 		wheelFn,
@@ -243,6 +246,7 @@ describe.each(cases)("$name camera", ({ surfaces }) => {
 		mounted.pointerFn("pointerup", 102, 100, 2);
 		expect(tileDownFn).toHaveBeenCalledOnce();
 		expect(tileUpFn).toHaveBeenCalledOnce();
+		expect(mounted.refreshHoverAtFn).not.toHaveBeenCalled();
 		expect(mounted.stage.x).toBe(x);
 		mounted.pointerFn("pointerdown", 100, 100, 2);
 		mounted.pointerFn("pointermove", 150, 120, 2);
@@ -251,6 +255,10 @@ describe.each(cases)("$name camera", ({ surfaces }) => {
 		expect(mounted.stage.x).toBe(x + 70);
 		expect(tileUpFn).toHaveBeenCalledOnce();
 		expect(mounted.blockFn).toHaveBeenLastCalledWith(false);
+		expect(mounted.refreshHoverAtFn).toHaveBeenCalledExactlyOnceWith({
+			x: 150,
+			y: 80,
+		});
 	});
 
 	it("anchors zoom at the pointer and preserves world framing through resize", () => {

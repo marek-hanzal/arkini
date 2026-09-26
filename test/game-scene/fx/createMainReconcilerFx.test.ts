@@ -168,6 +168,9 @@ describe("main reconciliation / snapshot ownership", () => {
 			x: 500,
 			y: 200,
 		});
+		const hoverRefreshesBeforeArrival = harness.refreshHover.mock.calls.length;
+		harness.travels[0]?.onCompleteFn?.();
+		expect(harness.refreshHover).toHaveBeenCalledTimes(hoverRefreshesBeforeArrival + 1);
 	});
 
 	it("flies multiple spawned outputs from a producer removed in the same commit", () => {

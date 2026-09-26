@@ -82,7 +82,14 @@ const blueprintItem = ({
 						]
 					: [
 							{
-								type: "simple" as const,
+								type: "units" as const,
+								query: {
+									distance: "self" as const,
+									selector: {
+										type: "item" as const,
+										itemUid: id,
+									},
+								},
 								units: {
 									from: "self" as const,
 									cost: 1,
@@ -292,11 +299,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 					title: "Produce",
 					description: "Produce one singleton.",
 					runtimeMs: 200,
-					input: [
-						{
-							type: "simple",
-						},
-					],
+					input: [],
 					outcome: guaranteedOutput([
 						{
 							itemId: "item:queue-product",
@@ -329,11 +332,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 					title: "Produce blueprint",
 					description: "Produce one blueprint.",
 					runtimeMs: 200,
-					input: [
-						{
-							type: "simple",
-						},
-					],
+					input: [],
 					outcome: blueprintOutput("blueprint:plain"),
 					rules: [],
 				},
@@ -358,11 +357,7 @@ export const blueprintConfig = GameConfigSchema.parse({
 					title: "Produce shared",
 					description: "Produce one shared item.",
 					runtimeMs: 200,
-					input: [
-						{
-							type: "simple",
-						},
-					],
+					input: [],
 					outcome: blueprintOutput("item:shared"),
 					rules: [],
 				},

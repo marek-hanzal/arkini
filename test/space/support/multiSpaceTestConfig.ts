@@ -195,11 +195,7 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 					title: "Run",
 					description: "Produces one log.",
 					runtimeMs: 200,
-					input: [
-						{
-							type: "simple",
-						},
-					],
+					input: [],
 					outcome: guaranteedOutput("log"),
 					rules: [],
 				},

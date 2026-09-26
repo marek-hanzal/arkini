@@ -87,11 +87,7 @@ const config = GameConfigSchema.parse({
 					title: "Other producer work",
 					description: "Keeps the owner busy while delivery settles.",
 					runtimeMs: 1_000,
-					input: [
-						{
-							type: "simple",
-						},
-					],
+					input: [],
 					rules: [],
 				},
 			],

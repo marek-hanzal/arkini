@@ -4,7 +4,7 @@
 		"uid": "t3pxaejvpchlcp9mgmtjlza2",
 		"title": "House - Tier 2 Blueprint",
 		"description": "Plans for a larger household capable of organizing Tier 2 labor.",
-		"ui": "default",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -22,6 +22,7 @@
 				"title": "Build House - Tier 2",
 				"artwork": "f0vnkcqwb0i3r7l5dqs3852l",
 				"description": "Build a Tier 2 house using processed materials and several units of basic labor.",
+				"trigger": "manual",
 				"weight": 1,
 				"default": true,
 				"show": true,

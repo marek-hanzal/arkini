@@ -18,6 +18,13 @@ export const ItemDetailDialog = ({ state }: useItemDetailMotion.Props) => {
 		focusKey: `${state.target.kind}:${state.target.kind === "runtime" ? state.target.itemId : state.target.itemUid}`,
 	});
 	const disabled = state.phase === "exiting";
+	const transition =
+		state.phase === "exiting"
+			? {
+					...itemDetailTransition,
+					delay: state.exitDelayMs / 1000,
+				}
+			: itemDetailTransition;
 	return (
 		<motion.div
 			className="absolute inset-0 z-[70] grid cursor-default place-items-center overflow-hidden bg-overlay/70 p-[var(--ak-viewport-padding)] text-overlay-foreground"
@@ -29,7 +36,7 @@ export const ItemDetailDialog = ({ state }: useItemDetailMotion.Props) => {
 			animate={{
 				opacity: motionState.backdropOpacity,
 			}}
-			transition={itemDetailTransition}
+			transition={transition}
 			onPointerDown={(event) => {
 				if (event.target !== event.currentTarget || state.phase === "exiting") return;
 				closeItemDetailFn();
@@ -54,7 +61,7 @@ export const ItemDetailDialog = ({ state }: useItemDetailMotion.Props) => {
 					y: 10,
 				}}
 				animate={motionState.dialog}
-				transition={itemDetailTransition}
+				transition={transition}
 				onAnimationComplete={motionState.completeMotionPhaseFn}
 			>
 				<button

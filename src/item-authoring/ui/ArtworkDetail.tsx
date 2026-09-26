@@ -4,6 +4,7 @@ import { useTranslator } from "~/translation/ui/useTranslator";
 import { ArtworkTilePreview } from "~/item-authoring/ui/ArtworkTilePreview";
 import { EditorArtworkDetailLink } from "~/artwork-authoring/ui/EditorArtworkDetailLink";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
+import { useEditorProject } from "~/authoring-session/ui/useEditorProject";
 
 /** Presents artwork layers in authored composition order. */
 export const ArtworkDetail = ({
@@ -14,6 +15,7 @@ export const ArtworkDetail = ({
 	readonly layout?: "summary" | "detail";
 }) => {
 	const translator = useTranslator();
+	const { resources } = useEditorProject();
 	return (
 		<div
 			className="group/artwork flex min-w-0 flex-wrap items-start gap-5 data-[ui-layout=detail]:flex-col data-[ui-layout=detail]:items-center"
@@ -39,7 +41,10 @@ export const ArtworkDetail = ({
 								className="font-mono text-sm"
 								resourceUid={resourceUid}
 							>
-								{resourceUid}
+								{resources.find(
+									(resource) =>
+										resource.uid === resourceUid && resource.type === "artwork",
+								)?.title ?? resourceUid}
 							</EditorArtworkDetailLink>
 						}
 					/>

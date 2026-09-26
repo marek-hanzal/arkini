@@ -173,7 +173,7 @@ it("counts earlier target costs and uses an alternate payer before depleting a q
 	);
 });
 
-it("lets a self-targeted final unit start and clears the departed owner's queue", () => {
+it("lets a self-targeted final unit start, holds its cell, and clears its queue", () => {
 	Effect.runSync(
 		Effect.gen(function* () {
 			yield* spawnItemFx({
@@ -196,10 +196,7 @@ it("lets a self-targeted final unit start and clears the departed owner's queue"
 			expect(runtime.items[0]).toMatchObject({
 				id: "payer",
 				remainingUnits: 0,
-				location: {
-					scope: "terminal",
-					origin: board(0),
-				},
+				location: board(0),
 			});
 			expect(runtime.jobs[0]).toMatchObject({
 				ownerItemId: "payer",

@@ -58,18 +58,9 @@ describe("resolveLineRunFx", () => {
 						],
 					},
 				},
-				{
-					resolution: {
-						type: "simple",
-						ready: true,
-					},
-					plan: {
-						type: "simple",
-					},
-				},
 			],
 		});
-		expect(result.plan?.input).toHaveLength(2);
+		expect(result.plan?.input).toHaveLength(1);
 	});
 
 	it("keeps the line unplanned while one material input is missing", () => {

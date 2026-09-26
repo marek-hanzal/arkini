@@ -3,6 +3,7 @@
 	"item": {
 		"uid": "kfex38vvnfqn5iavk06en63s",
 		"title": "Wooden Scoop",
+		"description": "Dark magical item which may do something you may not expect!",
 		"ui": "simple",
 		"artwork": {
 			"scale": 1,
@@ -14,8 +15,9 @@
 		"lines": [
 			{
 				"uid": "k7yi5d8jhfl1a4r5p1nrdcai",
-				"title": "destroy-the-world",
+				"title": "The End is Near!",
 				"description": "boom",
+				"trigger": "manual",
 				"weight": 1,
 				"default": true,
 				"show": true,
@@ -23,7 +25,19 @@
 				"runtimeMs": 30000,
 				"input": [
 					{
-						"type": "simple"
+						"type": "materials",
+						"query": {
+							"selector": {
+								"type": "item",
+								"itemUid": "laqx08cmv2c9mqs5qz5tv8yj"
+							},
+							"distance": "far"
+						},
+						"mode": "consume",
+						"quantity": {
+							"min": 1,
+							"max": 1
+						}
 					}
 				],
 				"outcome": {

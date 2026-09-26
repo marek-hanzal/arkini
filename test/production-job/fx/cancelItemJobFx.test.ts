@@ -237,6 +237,10 @@ it("settles a zero-unit owner and removes its pending work when its active job i
 	});
 	const state = {
 		...clearItemJobQueueState,
+		jobs: clearItemJobQueueState.jobs.map((job) => ({
+			...job,
+			terminalCause: "depleted" as const,
+		})),
 		items: clearItemJobQueueState.items.map((item, index) => ({
 			...item,
 			remainingUnits: index === 0 ? 0 : undefined,

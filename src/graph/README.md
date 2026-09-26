@@ -33,7 +33,7 @@ Edges reference reified operation records. Full operation data preserves line in
 
 | Edge kinds | Direction and meaning |
 | --- | --- |
-| `line-material`, `line-unit-selector`, `line-unit-cost` | Selected material/provider or self payer → line owner. Input data keeps consume/reserve, quantity, cost and query distance. A simple input can also pay self units. |
+| `line-material`, `line-unit-selector`, `line-unit-cost` | Selected material/provider or self payer → line owner. Input data keeps consume/reserve, quantity, cost and query distance. |
 | `line-item-outcome` | Line owner → outcome item; Clock-selected and manual lines share this kind and preserve their flags. |
 | `merge-target` | Source-owned merge owner → selected target. Never a claim of production. |
 | `merge-replacement` | Merge owner → replacement; operation and role identify whose instance is replaced. |
@@ -122,14 +122,14 @@ Cache lifetime follows the project session. Identical project identity/revision/
 
 | Audit | Exact match |
 | --- | --- |
-| `dangling` | No authored edge of any kind (including references and template placement), and no configured behavior. Bare Clock/units or an empty simple line do not prevent this match. |
+| `dangling` | No authored edge of any kind (including references and template placement), and no configured behavior. Bare Clock/units or a line without inputs or outputs do not prevent this match. |
 | `no-producer` | No authored operation output providing this item. Template placement is separate and never suppresses this match. |
 | `no-usage` | No line input/unit-payer role or explicit merge source/target/receiver participation. Mere ownership of a line, Clock or depletion operation, outputs, references and template placement do not count as usage. |
 | `no-behavior` | No configured behavior under the structural definition below. This is independent of use by other operations. |
 | `source-only` | Present in an authored template and has no authored producer; templates may be unassigned. |
 | `reference-only` | Has rule-reference edges but no other edge or configured behavior. |
 
-Configured behavior means a merge interaction; a line with an authored output, non-simple input or unit cost; or a Clock/depletion operation with an authored output. Item, space and template outputs all count, without evaluating flags, rules or quantities. A Clock-selected line contributes its own line behavior. Clock/units configurations without outputs and simple lines without outputs or unit costs are reported separately as `configuration-only`. The word behavior describes these fields, not a prediction that anything executes. A produced item without further usage or behavior still has its incoming production relationship and is not dangling. There is no dead-end/sink judgment.
+Configured behavior means a merge interaction; a line with an authored output or input; or a Clock/depletion operation with an authored output. Item, space and template outputs all count, without evaluating flags, rules or quantities. A Clock-selected line contributes its own line behavior. Clock/units configurations without outputs and lines without inputs or outputs are reported separately as `configuration-only`. The word behavior describes these fields, not a prediction that anything executes. A produced item without further usage or behavior still has its incoming production relationship and is not dangling. There is no dead-end/sink judgment.
 
 Each match returns six independent fact groups: `producer`, `usage`, `behavior`, `configuration-only`, `reference`, and `template`. Operation groups count distinct operation identities; template groups count distinct templates, not placement occurrences. Each group includes its full count and up to three deterministic sample references, including explicit zero counts. Samples carry exact snapshot-bound operation references usable by `graph_operations_json`, with titled owners and authored scalar summaries. Template samples carry exact titled node IDs. The displayed sample count never masquerades as the full relationship count; further relationships remain queryable through `graph_operations` and `graph_connections`. Count mode emits no match rows or evidence.
 

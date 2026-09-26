@@ -84,11 +84,7 @@ describe("readItemDetailQueue", () => {
 		workshop.lines.push({
 			...workshop.lines[0],
 			uid: "line:workshop:ready",
-			input: [
-				{
-					type: "simple",
-				},
-			],
+			input: [],
 		});
 		const base = queuedRuntime(
 			lineRunRuntime({

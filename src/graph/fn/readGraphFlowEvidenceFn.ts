@@ -88,12 +88,6 @@ export const readGraphFlowEvidenceFn = (
 					const requirement = match(input)
 						.with(
 							{
-								type: "simple",
-							},
-							() => "simple (no material)",
-						)
-						.with(
-							{
 								type: "materials",
 							},
 							(value) =>

@@ -132,11 +132,7 @@ export const createBlockedQueueFixture = (blocker: Blocker) => {
 						title: "Ready",
 						description: "Ready work",
 						runtimeMs: 1_000,
-						input: [
-							{
-								type: "simple",
-							},
-						],
+						input: [],
 						rules: [],
 					},
 				],

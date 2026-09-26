@@ -218,7 +218,14 @@ export const factualAuditProjectFn = () => ({
 					lineFn("pay", {
 						input: [
 							{
-								type: "simple",
+								type: "units" as const,
+								query: {
+									distance: "self" as const,
+									selector: {
+										type: "item" as const,
+										itemUid: "payer",
+									},
+								},
 								units: {
 									from: "self",
 									cost: 1,

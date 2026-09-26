@@ -23,11 +23,7 @@
 				"show": true,
 				"enable": false,
 				"runtimeMs": 30000,
-				"input": [
-					{
-						"type": "simple"
-					}
-				],
+				"input": [],
 				"outcome": {
 					"set": [
 						{

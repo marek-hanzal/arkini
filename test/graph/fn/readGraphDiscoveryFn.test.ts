@@ -446,7 +446,7 @@ it("retains target-paid unit selection distance without leaking enclosing outcom
 	});
 	expect(metadataFn("line-unit-cost", 5)).not.toHaveProperty("distance");
 	expect(metadataFn("line-unit-cost", 3)).toMatchObject({
-		inputType: "simple",
+		inputType: "units",
 		unitCost: 1,
 		unitFrom: "self",
 	});

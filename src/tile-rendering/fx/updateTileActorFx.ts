@@ -8,6 +8,7 @@ import { readActorCursorFn } from "~/tile-rendering/fn/readActorCursorFn";
 import { transitionActorVisualFx } from "~/tile-rendering/fx/transitionActorVisualFx";
 import { updateActorVisualFx } from "~/tile-rendering/fx/updateActorVisualFx";
 import { updateActorProgressFx } from "~/tile-rendering/fx/updateActorProgressFx";
+import { readTileInfoGeometryFn } from "~/tile-rendering/fn/readTileInfoGeometryFn";
 import type { DemandFrameLoop } from "~/tile-rendering/service/DemandFrameLoop";
 import type { TextureStore } from "~/tile-rendering/fx/createTextureStoreFx";
 
@@ -23,6 +24,7 @@ export namespace updateTileActorFx {
 		readonly item: TileActorItem;
 		readonly palette: PixiScenePalette;
 		readonly size: number;
+		readonly zoom: number;
 		readonly textures: TextureStore;
 	}
 }
@@ -45,6 +47,7 @@ export const updateTileActorFx = Effect.fn("updateTileActorFx")(function* ({
 	item,
 	palette,
 	size,
+	zoom,
 	textures,
 }: updateTileActorFx.Props) {
 	const pendingMatches =
@@ -67,7 +70,10 @@ export const updateTileActorFx = Effect.fn("updateTileActorFx")(function* ({
 	actor.lifecycleLayer.pivot.set(size / 2, size / 2);
 	actor.hoverLayer.position.set(size / 2, size / 2);
 	actor.hoverLayer.pivot.set(size / 2, size / 2);
-	actor.infoButton.position.set(size - 26, 26);
+	const info = readTileInfoGeometryFn(zoom, size);
+	actor.infoButton.position.set(info.inset, info.inset);
+	actor.infoButton.scale.set(info.scale);
+	actor.infoShadow.position.set(info.shadowOffset, info.shadowOffset);
 	actor.visualLayer.position.set(size / 2, size / 2);
 	actor.visualLayer.pivot.set(size / 2, size / 2);
 	actor.container.hitArea = {

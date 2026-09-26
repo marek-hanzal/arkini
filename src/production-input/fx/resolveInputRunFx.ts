@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import { resolveActionInputFx } from "~/production-action/fx/resolveActionInputFx";
+import { resolveActionUnitsInputFx } from "~/production-action/fx/resolveActionUnitsInputFx";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/game-value/schema/NonNegativeIntegerSchema";
 import type { InputSchema } from "~/production-input/schema/InputSchema";
@@ -37,19 +37,6 @@ export const resolveInputRunFx = Effect.fn("resolveInputRunFx")(function* ({
 	return yield* match(input)
 		.with(
 			{
-				type: TypeSchema.enum.Simple,
-			},
-			(input) => {
-				return resolveActionInputFx({
-					input,
-					ownerItemId,
-					reservedUnits,
-					runtime,
-				});
-			},
-		)
-		.with(
-			{
 				type: TypeSchema.enum.Materials,
 			},
 			(input) => {
@@ -75,7 +62,7 @@ export const resolveInputRunFx = Effect.fn("resolveInputRunFx")(function* ({
 				type: TypeSchema.enum.Units,
 			},
 			(input) => {
-				return resolveActionInputFx({
+				return resolveActionUnitsInputFx({
 					input,
 					ownerItemId,
 					reservedUnits,

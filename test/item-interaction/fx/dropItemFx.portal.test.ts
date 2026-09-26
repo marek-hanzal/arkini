@@ -51,11 +51,7 @@ const portalConfig = GameConfigSchema.parse({
 					description: "Travel",
 					default: true,
 					runtimeMs: 0,
-					input: [
-						{
-							type: "simple",
-						},
-					],
+					input: [],
 					rules: [],
 					outcome: {
 						set: [

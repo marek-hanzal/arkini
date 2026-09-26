@@ -34,11 +34,7 @@ describe("validateGameResourcesFn", () => {
 							description: "Gather resources",
 							artwork: "line-art",
 							runtimeMs: 0,
-							input: [
-								{
-									type: "simple",
-								},
-							],
+							input: [],
 							rules: [],
 						},
 					],
@@ -427,11 +423,7 @@ describe("validateGameResourcesFn", () => {
 					title: id,
 					description: id,
 					runtimeMs: 0,
-					input: [
-						{
-							type: "simple" as const,
-						},
-					],
+					input: [],
 					outcome: {
 						set: [
 							{

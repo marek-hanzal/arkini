@@ -191,6 +191,7 @@ const EditorAudioResourceEdit = ({
 				className="grid w-full max-w-3xl gap-6"
 			>
 				<EditorTextControl
+					autoFocus
 					label={translator.textFn("Name")}
 					value={controller.title}
 					onChangeFn={controller.setTitleFn}

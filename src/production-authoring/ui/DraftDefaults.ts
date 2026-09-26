@@ -44,9 +44,6 @@ const query = {
 /** Defaults cloned by production-line controls when adding nested contracts. */
 export const DraftDefaults = {
 	inputs: {
-		simple: {
-			type: "simple",
-		},
 		materials: {
 			type: "materials",
 			query,

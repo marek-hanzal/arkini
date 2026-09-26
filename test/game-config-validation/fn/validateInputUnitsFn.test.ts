@@ -125,7 +125,14 @@ describe("validateInputUnitsFn", () => {
 			id: "missing",
 			input: [
 				{
-					type: "simple",
+					type: "units" as const,
+					query: {
+						distance: "self" as const,
+						selector: {
+							type: "item" as const,
+							itemUid: "missing",
+						},
+					},
 					units: {
 						from: "self",
 						cost: 1,
@@ -138,7 +145,14 @@ describe("validateInputUnitsFn", () => {
 				id: "insufficient",
 				input: [
 					{
-						type: "simple",
+						type: "units" as const,
+						query: {
+							distance: "self" as const,
+							selector: {
+								type: "item" as const,
+								itemUid: "insufficient",
+							},
+						},
 						units: {
 							from: "self",
 							cost: 2,
@@ -176,14 +190,28 @@ describe("validateInputUnitsFn", () => {
 				id: "aggregate-self",
 				input: [
 					{
-						type: "simple",
+						type: "units" as const,
+						query: {
+							distance: "self" as const,
+							selector: {
+								type: "item" as const,
+								itemUid: "aggregate-self",
+							},
+						},
 						units: {
 							from: "self",
 							cost: 1,
 						},
 					},
 					{
-						type: "simple",
+						type: "units" as const,
+						query: {
+							distance: "self" as const,
+							selector: {
+								type: "item" as const,
+								itemUid: "aggregate-self",
+							},
+						},
 						units: {
 							from: "self",
 							cost: 1,
@@ -217,7 +245,14 @@ describe("validateInputUnitsFn", () => {
 					default: true,
 					input: [
 						{
-							type: "simple" as const,
+							type: "units" as const,
+							query: {
+								distance: "self" as const,
+								selector: {
+									type: "item" as const,
+									itemUid: "space:cumulative",
+								},
+							},
 							units: {
 								from: "self" as const,
 								cost: 2,
@@ -408,7 +443,14 @@ describe("validateInputUnitsFn", () => {
 				id: "shrine",
 				input: [
 					{
-						type: "simple",
+						type: "units" as const,
+						query: {
+							distance: "self" as const,
+							selector: {
+								type: "item" as const,
+								itemUid: "shrine",
+							},
+						},
 						units: {
 							from: "self",
 							cost: 2,

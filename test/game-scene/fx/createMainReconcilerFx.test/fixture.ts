@@ -173,6 +173,7 @@ export const createActor = (item: TileActorItem): PixiTileActor => {
 		lifecycleLayer,
 		hoverLayer,
 		infoButton: new Graphics(),
+		infoShadow: new Graphics(),
 		visualLayer,
 		progressBar,
 		clockRing: new Graphics(),
@@ -335,11 +336,13 @@ export const createDrag = () => {
 	const detached: PixiTileActor[] = [];
 	const hoverClears: PixiTileActor[] = [];
 	const requestRefresh = vi.fn();
+	const refreshHover = vi.fn();
 	const settledOriginGhosts: PixiTileActor[] = [];
 	return {
 		detached,
 		hoverClears,
 		requestRefresh,
+		refreshHover,
 		settledOriginGhosts,
 		drag: {
 			attachActorFx: () => Effect.void,
@@ -354,6 +357,8 @@ export const createDrag = () => {
 					detached.push(actor);
 				}),
 			requestRefreshFx: Effect.sync(requestRefresh),
+			refreshHoverFx: Effect.sync(refreshHover),
+			refreshHoverAtFx: () => Effect.void,
 			refreshPointerFx: () => Effect.void,
 			settleOriginGhostFx: (actor: PixiTileActor) =>
 				Effect.sync(() => {
@@ -483,6 +488,11 @@ export const createReconcilerHarness = ({
 			actorStore: store,
 			animator: animatorHarness.animator,
 			application: {
+				stage: {
+					scale: {
+						x: 1,
+					},
+				},
 				frames: {
 					invalidateFx: Effect.sync(invalidate),
 				},

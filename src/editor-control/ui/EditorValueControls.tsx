@@ -100,6 +100,7 @@ const EditorNumericControl = ({
 
 export const EditorTextControl = ({
 	autoComplete,
+	autoFocus,
 	description,
 	error,
 	label,
@@ -112,6 +113,7 @@ export const EditorTextControl = ({
 	value,
 }: {
 	readonly autoComplete?: string;
+	readonly autoFocus?: boolean;
 	readonly onChangeFn: (value: string) => void;
 	readonly placeholder?: string;
 	readonly readOnly?: boolean;
@@ -125,6 +127,7 @@ export const EditorTextControl = ({
 	>
 		<input
 			type="text"
+			autoFocus={autoFocus}
 			name={name}
 			value={value}
 			autoComplete={autoComplete}

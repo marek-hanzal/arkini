@@ -48,11 +48,7 @@ vi.mock("~/production-authoring/ui/InputControl", () => ({
 			data-input
 			data-input-value={JSON.stringify(input)}
 		>
-			{input.type === "materials"
-				? input.query.selector.itemUid
-				: input.type === "units"
-					? input.query.selector.itemUid
-					: "simple"}
+			{input.query.selector.itemUid}
 		</output>
 	),
 }));
@@ -100,11 +96,7 @@ const renderCollection = async (allowMaterials = true) => {
 	document.body.append(container);
 	const root = createRoot(container);
 	roots.push(root);
-	let value: InputSchema.Type[] = [
-		{
-			type: "simple",
-		},
-	];
+	let value: InputSchema.Type[] = [];
 	const onChangeFn = vi.fn((next: InputSchema.Type[]) => {
 		value = next;
 		renderFn();
@@ -142,7 +134,8 @@ it("opens and dismisses the add menu without changing inputs or selection", asyn
 		.querySelector("[data-input]")
 		?.getAttribute("data-input-value");
 	await act(async () => add.click());
-	expect(findOption("simple")).not.toBeNull();
+	expect(document.querySelector('[data-ui="ActionMenuOption"][data-ui-id="simple"]')).toBeNull();
+	expect(findOption("materials-consume")).not.toBeNull();
 	expect(onChangeFn).not.toHaveBeenCalled();
 	await act(async () => {
 		document.body.dispatchEvent(
@@ -174,12 +167,6 @@ it("creates and selects each chosen input variant while preserving existing inpu
 			InputSchema.Type,
 		]
 	> = [
-		[
-			"simple",
-			{
-				type: "simple",
-			},
-		],
 		[
 			"materials-consume",
 			{
@@ -236,11 +223,7 @@ it("creates and selects each chosen input variant while preserving existing inpu
 			},
 		],
 	];
-	const expected: InputSchema.Type[] = [
-		{
-			type: "simple",
-		},
-	];
+	const expected: InputSchema.Type[] = [];
 	for (const [id, input] of variants) {
 		await act(async () => add.click());
 		await act(async () => findOption(id).click());
@@ -271,9 +254,6 @@ it("rejects self Units until enabled on the current form and binds an admitted d
 	await act(async () => findOption("units-self").click());
 	expect(onChangeFn).toHaveBeenCalledExactlyOnceWith([
 		{
-			type: "simple",
-		},
-		{
 			type: "units",
 			units: {
 				cost: 1,
@@ -301,9 +281,6 @@ it("does not offer material input creation for actions", async () => {
 	).toBeNull();
 	await act(async () => findOption("units-target").click());
 	expect(onChangeFn).toHaveBeenCalledWith([
-		{
-			type: "simple",
-		},
 		{
 			type: "units",
 			units: {
@@ -377,7 +354,18 @@ it("allows clearing the last input to choose another type", async () => {
 	const onChangeFn = vi.fn();
 	const value: InputSchema.Type[] = [
 		{
-			type: "simple",
+			type: "units",
+			query: {
+				distance: "self",
+				selector: {
+					type: "item",
+					itemUid: "owner",
+				},
+			},
+			units: {
+				from: "self",
+				cost: 1,
+			},
 		},
 	];
 	try {

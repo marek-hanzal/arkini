@@ -1496,64 +1496,13 @@
 		"InputSchema": {
 			"oneOf": [
 				{
-					"$ref": "urn:serakki:schema:project#/$defs/input.SimpleSchema"
-				},
-				{
 					"$ref": "urn:serakki:schema:project#/$defs/input.MaterialSchema"
 				},
 				{
 					"$ref": "urn:serakki:schema:project#/$defs/input.UnitsSchema"
 				}
 			],
-			"description": "A simple, material-item, or Board unit-cost input requirement for a product line."
-		},
-		"input.SimpleSchema": {
-			"type": "object",
-			"properties": {
-				"units": {
-					"description": "The optional unit cost paid by the action owner or this requirement's resolved target.",
-					"$ref": "urn:serakki:schema:project#/$defs/input.UnitCostSchema"
-				},
-				"type": {
-					"type": "string",
-					"enum": [
-						"simple"
-					],
-					"description": "Identifies this input as having no consumable resource requirement."
-				}
-			},
-			"required": [
-				"type"
-			],
-			"additionalProperties": false,
-			"description": "An explicit action requirement with no consumable resource requirement."
-		},
-		"input.UnitCostSchema": {
-			"type": "object",
-			"properties": {
-				"cost": {
-					"description": "The positive number of units paid when the enclosing action commits.",
-					"$ref": "urn:serakki:schema:project#/$defs/PositiveIntegerSchema"
-				},
-				"from": {
-					"description": "Whether the cost is paid by the action owner or the requirement's resolved target.",
-					"$ref": "urn:serakki:schema:project#/$defs/input.UnitSourceSchema"
-				}
-			},
-			"required": [
-				"cost",
-				"from"
-			],
-			"additionalProperties": false,
-			"description": "One action-requirement unit cost and the runtime item that pays it."
-		},
-		"input.UnitSourceSchema": {
-			"type": "string",
-			"enum": [
-				"self",
-				"target"
-			],
-			"description": "Whether one requirement cost is paid by the action owner or its resolved target."
+			"description": "A material-item or Board unit-cost input requirement for a product line."
 		},
 		"input.MaterialSchema": {
 			"type": "object",
@@ -1591,6 +1540,33 @@
 			],
 			"additionalProperties": false,
 			"description": "A directly delivered material item required by a product line."
+		},
+		"input.UnitCostSchema": {
+			"type": "object",
+			"properties": {
+				"cost": {
+					"description": "The positive number of units paid when the enclosing action commits.",
+					"$ref": "urn:serakki:schema:project#/$defs/PositiveIntegerSchema"
+				},
+				"from": {
+					"description": "Whether the cost is paid by the action owner or the requirement's resolved target.",
+					"$ref": "urn:serakki:schema:project#/$defs/input.UnitSourceSchema"
+				}
+			},
+			"required": [
+				"cost",
+				"from"
+			],
+			"additionalProperties": false,
+			"description": "One action-requirement unit cost and the runtime item that pays it."
+		},
+		"input.UnitSourceSchema": {
+			"type": "string",
+			"enum": [
+				"self",
+				"target"
+			],
+			"description": "Whether one requirement cost is paid by the action owner or its resolved target."
 		},
 		"input.ModeSchema": {
 			"type": "string",

@@ -15,6 +15,10 @@ interface Props {
 	readonly application: PixiApplicationOwner;
 	readonly drag: {
 		readonly cancelInteractionFx: Effect.Effect<void>;
+		readonly refreshHoverAtFx: (pointer: {
+			readonly x: number;
+			readonly y: number;
+		}) => Effect.Effect<void>;
 		readonly refreshPointerFx?: (pointer: {
 			readonly pointerId?: number;
 			readonly x: number;
@@ -23,6 +27,7 @@ interface Props {
 		readonly setInteractionBlockedFx: (blocked: boolean) => Effect.Effect<void>;
 	};
 	readonly dragThreshold: number;
+	readonly onScaleFn?: (zoom: number) => void;
 	readonly surfaces: readonly [
 		SurfaceLayout,
 		...SurfaceLayout[],
@@ -49,6 +54,7 @@ export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 	application,
 	drag,
 	dragThreshold,
+	onScaleFn,
 	surfaces,
 }: Props) {
 	const { app, stage, frames } = application;
@@ -92,6 +98,7 @@ export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 	};
 
 	const invalidateFn = () => {
+		onScaleFn?.(stage.scale.x);
 		// Pixi hitArea is local even though it covers the whole screen, including empty space.
 		stage.hitArea = new Rectangle(
 			-stage.x / stage.scale.x,
@@ -296,9 +303,20 @@ export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 		stopEdgePanFn();
 		if (pan === null || event.pointerId !== pan.pointerId) return;
 		if (event.type === "pointerup") pointerMoveFn(event);
-		if (pan?.phase === "dragging") event.stopImmediatePropagation();
+		const wasDragging = pan?.phase === "dragging";
+		if (wasDragging) event.stopImmediatePropagation();
 		finishPanFn();
 		stopEdgePanFn();
+		if (wasDragging && event.type === "pointerup") {
+			const bounds = canvas.getBoundingClientRect();
+			if (bounds.width > 0 && bounds.height > 0)
+				RendererRuntime.runSync(
+					drag.refreshHoverAtFx({
+						x: ((event.clientX - bounds.left) * width) / bounds.width,
+						y: ((event.clientY - bounds.top) * height) / bounds.height,
+					}),
+				);
+		}
 	};
 	const wheelFn = (event: WheelEvent) => {
 		if (closed || blocked) return;

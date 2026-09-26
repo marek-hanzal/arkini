@@ -245,12 +245,6 @@ export const InputControl = ({
 			{match(input)
 				.with(
 					{
-						type: "simple",
-					},
-					() => null,
-				)
-				.with(
-					{
 						type: "materials",
 					},
 					(material) => (

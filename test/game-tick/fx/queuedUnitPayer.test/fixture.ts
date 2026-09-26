@@ -69,11 +69,7 @@ export const createConfig = (amount = 1, inputCount = 1) =>
 							},
 						},
 					]),
-					line("free", [
-						{
-							type: "simple",
-						},
-					]),
+					line("free", []),
 					line("self", [
 						{
 							...targetUnitInput("payer"),
@@ -110,11 +106,7 @@ export const createConfig = (amount = 1, inputCount = 1) =>
 
 				maxQueueSize: 1,
 				lines: [
-					line("independent-free", [
-						{
-							type: "simple",
-						},
-					]),
+					line("independent-free", []),
 				],
 			},
 			absent: {

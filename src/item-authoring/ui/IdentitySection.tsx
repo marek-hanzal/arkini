@@ -25,6 +25,7 @@ export const IdentitySection = () => {
 							{(field) => (
 								<EditorTextControl
 									autoComplete="off"
+									autoFocus
 									label={translator.textFn("Title")}
 									name={field.name}
 									value={field.state.value}

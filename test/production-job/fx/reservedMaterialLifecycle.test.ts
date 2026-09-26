@@ -107,7 +107,14 @@ const config = GameConfigSchema.parse({
 					runtimeMs: 200,
 					input: [
 						{
-							type: "simple",
+							type: "units" as const,
+							query: {
+								distance: "self" as const,
+								selector: {
+									type: "item" as const,
+									itemUid: "producer:worker",
+								},
+							},
 							units: {
 								from: "self",
 								cost: 1,

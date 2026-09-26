@@ -280,9 +280,6 @@ export const GraphEdgeRow = ({
 								from: "self",
 							},
 						},
-						{
-							type: "simple",
-						},
 						() => operation.owner,
 					)
 					.with(
@@ -404,8 +401,7 @@ export const GraphEdgeRow = ({
 								/>
 							</DetailFacts>
 						)}
-						{annotations.input === undefined ||
-						annotations.input.type === "simple" ? null : (
+						{annotations.input === undefined ? null : (
 							<QueryDetail query={annotations.input.query} />
 						)}
 						{annotations.outcome?.type === "item" ? (

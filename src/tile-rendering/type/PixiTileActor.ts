@@ -8,7 +8,8 @@ export interface PixiTileActor {
 	readonly container: Container;
 	readonly lifecycleLayer: Container;
 	readonly hoverLayer: Container;
-	readonly infoButton: Graphics;
+	readonly infoButton: Container;
+	readonly infoShadow: Graphics;
 	readonly visualLayer: Container;
 	readonly progressBar: Graphics;
 	readonly clockRing: Graphics;

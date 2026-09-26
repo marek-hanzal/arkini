@@ -32,10 +32,12 @@ export type ItemDetailState =
 			readonly target: ItemDetailTarget;
 			readonly generation: number;
 			readonly restoreFocus: boolean;
+			readonly exitDelayMs: number;
 	  };
 
 export interface CloseItemDetailProps {
 	readonly restoreFocus?: boolean;
+	readonly exitDelayMs?: number;
 }
 
 interface OpenItemDetailProps {

@@ -86,20 +86,20 @@ export const readGraphSchemaTextFn = () =>
 				input: "graph_audit requires audit, with optional mode list/count, limit, cursor, revision, snapshotId, maxExpansions and timeoutMs. Only present authored items are audited. Reports facts, never design correctness or gameplay feasibility. All authored outputs count regardless of enable flags, chance, weight, quantity, rules or missing participants.",
 				kinds: {
 					dangling:
-						"No authored relationship of any kind and no configured behavior. Bare Clock/units configuration or an empty simple line does not prevent this match.",
+						"No authored relationship of any kind and no configured behavior. Bare Clock/units configuration or a line without inputs or outputs does not prevent this match.",
 					"no-producer":
 						"No authored operation output for this item. Template placements are independent facts and never suppress this match.",
 					"no-usage":
 						"No actual line input/unit payer or merge source/target/receiver participation. Mere line/Clock/depletion ownership, outputs, references and templates are not usage.",
 					"no-behavior":
-						"No configured behavior: merge interaction; line with an output, non-simple input or unit cost; Clock/depletion with an output. Item/space/template outputs all count. No rule or availability evaluation.",
+						"No configured behavior: merge interaction; line with an output or input; Clock/depletion with an output. Item/space/template outputs all count. No rule or availability evaluation.",
 					"source-only":
 						"Appears in an authored template and has no authored producer. Unassigned templates count.",
 					"reference-only":
 						"Has rule-reference edges but no other edge or configured behavior.",
 				},
 				evidence:
-					"Each match reports six independent groups: producer, usage, behavior, configuration-only, reference, template. Counts are distinct operations or distinct templates, not edge/placement occurrences. Each group carries up to three deterministic sample identities with the full count. Operation samples include authored scalar summaries and exact references for graph_operations_json. Templates include node identities. configuration-only includes Clock/units without outputs and simple lines without outputs or unit costs. Such presence is not interpreted as behavior. Further relationships are queryable via graph_operations or graph_connections. Count mode returns no rows/evidence.",
+					"Each match reports six independent groups: producer, usage, behavior, configuration-only, reference, template. Counts are distinct operations or distinct templates, not edge/placement occurrences. Each group carries up to three deterministic sample identities with the full count. Operation samples include authored scalar summaries and exact references for graph_operations_json. Templates include node identities. configuration-only includes Clock/units without outputs and lines without inputs or outputs. Such presence is not interpreted as behavior. Further relationships are queryable via graph_operations or graph_connections. Count mode returns no rows/evidence.",
 				pagination:
 					"Audit scans the snapshot item index and pages a frozen result in exact node-ID order. Cursor binds snapshot, audit kind and mode. Continuation does not recompute the analysis. Interrupted scans report lower bounds; retry without cursor and with larger safety bounds for a new scan. limit bounds returned rows, never the analyzed scope; count mode returns no rows. Completed scans have exact totals even while their result pages are truncated.",
 			},

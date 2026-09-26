@@ -22,11 +22,7 @@
 				"show": true,
 				"enable": true,
 				"runtimeMs": 24000,
-				"input": [
-					{
-						"type": "simple"
-					}
-				],
+				"input": [],
 				"outcome": {
 					"set": [
 						{
@@ -63,11 +59,7 @@
 				"show": true,
 				"enable": true,
 				"runtimeMs": 36000,
-				"input": [
-					{
-						"type": "simple"
-					}
-				],
+				"input": [],
 				"outcome": {
 					"set": [
 						{
@@ -104,11 +96,7 @@
 				"show": true,
 				"enable": true,
 				"runtimeMs": 60000,
-				"input": [
-					{
-						"type": "simple"
-					}
-				],
+				"input": [],
 				"outcome": {
 					"set": [
 						{
@@ -145,11 +133,7 @@
 				"show": true,
 				"enable": true,
 				"runtimeMs": 120000,
-				"input": [
-					{
-						"type": "simple"
-					}
-				],
+				"input": [],
 				"outcome": {
 					"set": [
 						{

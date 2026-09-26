@@ -78,6 +78,18 @@ it("preserves independent item roles in a compiler-valid cyclic authored world",
 			[
 				"item:A",
 				"item:A",
+				"line-unit-selector",
+				[
+					"input",
+					3,
+					"query",
+					"selector",
+					"itemUid",
+				],
+			],
+			[
+				"item:A",
+				"item:A",
 				"line-unit-cost",
 				[
 					"input",
@@ -169,7 +181,7 @@ it("preserves independent item roles in a compiler-valid cyclic authored world",
 			],
 		]),
 	);
-	expect(inputs).toHaveLength(12);
+	expect(inputs).toHaveLength(13);
 	expect(
 		inputs
 			.filter((edge) => edge.kind === "line-material" && edge.to === "item:A")

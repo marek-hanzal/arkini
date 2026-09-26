@@ -21,6 +21,7 @@
 				"title": "Open the Foundation Chest",
 				"artwork": "afvqdox9cfwh135dujkqm0ds",
 				"description": "Unpack the carefully chosen pile of tools, paper, light, hunting gear, and other things future-you will be annoyed to discover were important.",
+				"trigger": "manual",
 				"weight": 1,
 				"default": true,
 				"show": true,

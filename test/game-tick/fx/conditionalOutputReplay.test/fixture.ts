@@ -152,18 +152,25 @@ export const createConfig = (path: OutputPath, markerDuration = 500) => {
 					{
 						...line,
 						runtimeMs: 600,
-						input: [
-							{
-								type: "simple",
-								units:
-									path === "deferred-depletion"
-										? {
-												from: "self",
+						input:
+							path === "deferred-depletion"
+								? [
+										{
+											type: "units" as const,
+											query: {
+												distance: "self" as const,
+												selector: {
+													type: "item" as const,
+													itemUid: "producer",
+												},
+											},
+											units: {
+												from: "self" as const,
 												cost: 1,
-											}
-										: undefined,
-							},
-						],
+											},
+										},
+									]
+								: [],
 						outcome: path === "line" ? outcome("result", true) : undefined,
 					},
 					{

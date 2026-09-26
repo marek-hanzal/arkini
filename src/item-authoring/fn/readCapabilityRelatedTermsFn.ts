@@ -1,4 +1,3 @@
-import { match, P } from "ts-pattern";
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { MergeSchema } from "~/item-merge/schema/MergeSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
@@ -11,24 +10,7 @@ export const readCapabilityRelatedTermsFn = (
 ): readonly string[] => {
 	const ids = new Set<string>();
 	if ("input" in capability) {
-		for (const input of capability.input) {
-			match(input)
-				.with(
-					{
-						type: P.union("materials", "units"),
-					},
-					({ query }) => {
-						ids.add(query.selector.itemUid);
-					},
-				)
-				.with(
-					{
-						type: "simple",
-					},
-					() => {},
-				)
-				.exhaustive();
-		}
+		for (const input of capability.input) ids.add(input.query.selector.itemUid);
 		for (const rule of capability.rules)
 			for (const when of rule.when) ids.add(when.query.selector.itemUid);
 	} else {

@@ -40,44 +40,6 @@ const bufferedItem = ({ id, inputIndex }: { id: string; inputIndex: number }) =>
 };
 
 describe("resolveInputRunFx", () => {
-	it("returns the explicit empty plan for a simple input", () => {
-		const result = Effect.runSync(
-			resolveInputRunFx({
-				input: workshopLine.input[1],
-				inputIndex: 1,
-				lineUid: "line:workshop:build",
-				ownerItemId: owner.id,
-				reservedUnits: new Map(),
-				runtime: {
-					cheats: {
-						enabled: false,
-						everEnabled: false,
-						speedUpGameplay: false,
-					},
-					currentSpace: 0,
-					templateUidBySpace: {},
-					items: [
-						owner,
-					],
-					jobs: [],
-
-					jobQueue: [],
-					defaultLineByOwnerItemId: {},
-				},
-			}),
-		);
-
-		expect(result).toEqual({
-			resolution: {
-				type: "simple",
-				ready: true,
-			},
-			plan: {
-				type: "simple",
-			},
-		});
-	});
-
 	it("plans only materials owned by the exact input slot", () => {
 		const runtime = {
 			cheats: {

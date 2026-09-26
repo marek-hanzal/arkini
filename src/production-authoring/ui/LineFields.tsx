@@ -27,7 +27,7 @@ const defaultLine: LineSchema.Type = {
 	show: true,
 	enable: true,
 	runtimeMs: 0,
-	input: [] as unknown as LineSchema.Type["input"],
+	input: [],
 	rules: [],
 };
 

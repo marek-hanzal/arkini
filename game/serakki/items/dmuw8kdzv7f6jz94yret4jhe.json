@@ -4,7 +4,7 @@
 		"uid": "dmuw8kdzv7f6jz94yret4jhe",
 		"title": "Stonemason Camp Blueprint",
 		"description": "Plans for making stone somebody's full-time problem. Heavy work, solid results.",
-		"ui": "default",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -13,7 +13,7 @@
 			]
 		},
 		"units": {
-			"amount": 1
+			"amount": 2
 		},
 		"maxQueueSize": 1,
 		"lines": [
@@ -22,6 +22,7 @@
 				"title": "Stonemason Camp",
 				"artwork": "u0ugyubcxh6gng4hljmts53j",
 				"description": "After this, you'll be master of Stones!",
+				"trigger": "manual",
 				"weight": 1,
 				"default": true,
 				"show": true,

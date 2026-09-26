@@ -21,6 +21,7 @@ interface AttemptTerminalItemProps {
 	itemId: IdSchema.Type;
 	runtime: RuntimeSchema.Type;
 	excludedSourceItemIds?: ReadonlySet<IdSchema.Type>;
+	finishWithJobId?: IdSchema.Type;
 }
 
 type AttemptTerminalItemResult =
@@ -43,7 +44,7 @@ interface CompleteTerminalItemTransitionResult {
 	readonly claimedSourceItemIds?: readonly IdSchema.Type[];
 }
 
-/** Admission is the visibility boundary; a selected but rejected line does not retain its owner. */
+/** Only an accepted termination request retains its owner for termination work. */
 const enqueueSelectedTerminalLineFx = Effect.fn("enqueueSelectedTerminalLineFx")(function* ({
 	itemId,
 	lineUid,
@@ -90,6 +91,7 @@ const completeTerminalItemTransitionFx = Effect.fn("completeTerminalItemTransiti
 	itemId,
 	runtime,
 	excludedSourceItemIds,
+	finishWithJobId,
 }: AttemptTerminalItemProps) {
 	const item = runtime.items.find((candidate) => candidate.id === itemId);
 	if (item === undefined)
@@ -163,6 +165,33 @@ const completeTerminalItemTransitionFx = Effect.fn("completeTerminalItemTransiti
 					runtime: queued.request.runtime,
 					claimedSourceItemIds: queued.claimedSourceItemIds,
 				} satisfies CompleteTerminalItemTransitionResult;
+		}
+		if (finishWithJobId !== undefined && terminal.cause === "depleted") {
+			const awaitingCompletion = {
+				...runtime,
+				jobs: runtime.jobs.map((job) =>
+					job.id === finishWithJobId
+						? {
+								...job,
+								terminalCause: "depleted" as const,
+							}
+						: job,
+				),
+				jobQueue: runtime.jobQueue.filter((request) => request.ownerItemId !== item.id),
+			} satisfies RuntimeSchema.Type;
+			return {
+				type: "settled",
+				facts: [],
+				runtime: yield* reconcileOutboundDeliveriesRuntimeFx({
+					returnFromByOwnerItemId: new Map([
+						[
+							item.id,
+							item.location,
+						],
+					]),
+					runtime: awaitingCompletion,
+				}),
+			} satisfies CompleteTerminalItemTransitionResult;
 		}
 		const departed = yield* reviseRuntimeItemFx({
 			item: {
@@ -293,11 +322,13 @@ export const attemptTerminalItemFx = Effect.fn("attemptTerminalItemFx")(function
 	itemId,
 	runtime,
 	excludedSourceItemIds,
+	finishWithJobId,
 }: AttemptTerminalItemProps) {
 	return yield* completeTerminalItemTransitionFx({
 		itemId,
 		runtime,
 		excludedSourceItemIds,
+		finishWithJobId,
 	}).pipe(
 		Effect.map(
 			(completion) =>

@@ -61,9 +61,6 @@ export const inputRuntimeTestConfig = GameConfigSchema.parse({
 								max: 3,
 							},
 						},
-						{
-							type: "simple",
-						},
 					],
 					rules: [],
 				},

@@ -9,7 +9,7 @@ import { DiagnosticSeverityEnumSchema } from "~/game-config-diagnostic/schema/Di
 import { DiagnosticRecordEntityEnumSchema } from "~/game-config-diagnostic/schema/DiagnosticRecordEntityEnumSchema";
 import type { DiagnosticPathSchema } from "~/game-config-diagnostic/schema/DiagnosticPathSchema";
 import type { GameDiagnosticSchema } from "~/game-config-diagnostic/schema/GameDiagnosticSchema";
-import type { InputSchema } from "~/production-action/schema/InputSchema";
+import type { UnitsSchema } from "~/production-input/schema/UnitsSchema";
 import { TypeSchema as InputTypeSchema } from "~/production-input/schema/TypeSchema";
 import type { LineSchema } from "~/production-line/schema/LineSchema";
 import { TargetEffectSchema } from "~/item-merge/schema/TargetEffectSchema";
@@ -81,7 +81,7 @@ const validateActionReferencesFn = ({
 }: {
 	config: GameConfigSchema.Type;
 	inputs: ReadonlyArray<{
-		input: InputSchema.Type;
+		input: UnitsSchema.Type;
 		index: number;
 	}>;
 	path: DiagnosticPathSchema.Type;
@@ -94,20 +94,18 @@ const validateActionReferencesFn = ({
 	source?: string;
 }) => {
 	const inputDiagnostics = inputs.map(({ input, index }) =>
-		input.type === InputTypeSchema.enum.Simple
-			? []
-			: validateSelectorReferenceFn({
-					config,
-					selector: input.query.selector,
-					path: [
-						...path,
-						"input",
-						index,
-						"query",
-						"selector",
-					],
-					source,
-				}),
+		validateSelectorReferenceFn({
+			config,
+			selector: input.query.selector,
+			path: [
+				...path,
+				"input",
+				index,
+				"query",
+				"selector",
+			],
+			source,
+		}),
 	);
 	const ruleDiagnostics = rules.map(({ index, rule }) =>
 		rule.when.map((when, whenIndex) =>

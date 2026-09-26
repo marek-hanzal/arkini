@@ -103,11 +103,7 @@ const targetLine = ({
 	show,
 	enable: false,
 	runtimeMs: 1_000,
-	input: [
-		{
-			type: "simple" as const,
-		},
-	],
+	input: [],
 	outcome: targetOutput,
 	rules:
 		showWhen === undefined
@@ -142,11 +138,7 @@ const acquisitionLine = (id: string, outputItemId: string) => ({
 	title: id,
 	description: id,
 	runtimeMs: 1_000,
-	input: [
-		{
-			type: "simple" as const,
-		},
-	],
+	input: [],
 	outcome: guaranteedOutput(outputItemId),
 	rules: [],
 });
@@ -206,7 +198,14 @@ export const config = GameConfigSchema.parse({
 					...acquisitionLine("line:blueprint", "product"),
 					input: [
 						{
-							type: "simple",
+							type: "units" as const,
+							query: {
+								distance: "self" as const,
+								selector: {
+									type: "item" as const,
+									itemUid: "blueprint",
+								},
+							},
 							units: {
 								from: "self",
 								cost: 1,

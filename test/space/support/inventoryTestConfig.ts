@@ -64,11 +64,7 @@ export const inventoryTestConfigFn = () =>
 						title: "Enter",
 						description: "Enter",
 						runtimeMs: 0,
-						input: [
-							{
-								type: "simple",
-							},
-						],
+						input: [],
 						rules: [],
 						outcome: {
 							set: [

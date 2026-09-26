@@ -160,7 +160,14 @@ export const unitsConfig = GameConfigSchema.parse({
 					runtimeMs: 200,
 					input: [
 						{
-							type: "simple",
+							type: "units" as const,
+							query: {
+								distance: "self" as const,
+								selector: {
+									type: "item" as const,
+									itemUid: "producer:shrine",
+								},
+							},
 							units: {
 								from: "self",
 								cost: 1,
@@ -220,7 +227,14 @@ export const unitsConfig = GameConfigSchema.parse({
 					runtimeMs: 200,
 					input: [
 						{
-							type: "simple",
+							type: "units" as const,
+							query: {
+								distance: "self" as const,
+								selector: {
+									type: "item" as const,
+									itemUid: "producer:mixed-unit",
+								},
+							},
 							units: {
 								from: "self",
 								cost: 1,
@@ -262,14 +276,28 @@ export const unitsConfig = GameConfigSchema.parse({
 					runtimeMs: 200,
 					input: [
 						{
-							type: "simple",
+							type: "units" as const,
+							query: {
+								distance: "self" as const,
+								selector: {
+									type: "item" as const,
+									itemUid: "producer:overdrawn",
+								},
+							},
 							units: {
 								from: "self",
 								cost: 1,
 							},
 						},
 						{
-							type: "simple",
+							type: "units" as const,
+							query: {
+								distance: "self" as const,
+								selector: {
+									type: "item" as const,
+									itemUid: "producer:overdrawn",
+								},
+							},
 							units: {
 								from: "self",
 								cost: 1,

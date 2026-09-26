@@ -305,11 +305,7 @@ describe("Inventory", () => {
 				title: "Fixed",
 				description: "Fixed",
 				runtimeMs: 0,
-				input: [
-					{
-						type: "simple",
-					},
-				],
+				input: [],
 				rules: [],
 				outcome: {
 					set: [

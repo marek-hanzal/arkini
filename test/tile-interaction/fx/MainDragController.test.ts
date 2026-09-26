@@ -71,6 +71,24 @@ describe("main drag controller: pointer", () => {
 		expect(mounted.onDrop).not.toHaveBeenCalled();
 	});
 
+	it("restores hover at the released pointer after a right camera pan", () => {
+		const mounted = mountController();
+		mounted.setOccupant(mounted.actor.item);
+		mounted.actorEvents.emit("pointerenter", pointer(10, 20));
+		expect(mounted.actor.infoButton.visible).toBe(true);
+
+		Effect.runSync(mounted.controller.setInteractionBlockedFx(true));
+		expect(mounted.actor.infoButton.visible).toBe(false);
+		Effect.runSync(mounted.controller.setInteractionBlockedFx(false));
+		Effect.runSync(
+			mounted.controller.refreshHoverAtFx({
+				x: 10,
+				y: 20,
+			}),
+		);
+		expect(mounted.actor.infoButton.visible).toBe(true);
+	});
+
 	it("keeps the drag threshold in screen pixels and submits world coordinates after zoom and pan", () => {
 		const mounted = mountController();
 		mounted.stage.container.scale.set(0.5);

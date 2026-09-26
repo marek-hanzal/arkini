@@ -324,7 +324,6 @@ it("changing one selector retargets only its occurrence and leaves the earlier s
 	const before = compileGraphFactsFn(config);
 	const edited = structuredClone(config);
 	const input = edited.items.A!.lines[0]!.input[0];
-	if (input.type === "simple") throw new Error("Fixture must author a selector");
 	input.query.selector.itemUid = "C";
 	const after = compileGraphFactsFn(edited);
 	const changed = before.edges.filter(

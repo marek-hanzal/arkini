@@ -15,11 +15,6 @@ export namespace InputRun {
 		readonly itemId: IdSchema.Type;
 	}
 
-	export interface SimplePlan {
-		readonly type: "simple";
-		readonly units?: UnitPlan;
-	}
-
 	export interface MaterialPlan {
 		readonly type: "materials";
 		readonly mode: ModeSchema.Type;
@@ -36,12 +31,7 @@ export namespace InputRun {
 		readonly units: UnitPlan;
 	}
 
-	export type Plan = SimplePlan | MaterialPlan | UnitsPlan;
-
-	export interface SimpleResolution {
-		readonly type: "simple";
-		readonly ready: boolean;
-	}
+	export type Plan = MaterialPlan | UnitsPlan;
 
 	export interface MaterialResolution {
 		readonly type: "materials";
@@ -61,7 +51,7 @@ export namespace InputRun {
 		readonly targetItemId?: IdSchema.Type;
 	}
 
-	export type InputResolution = SimpleResolution | MaterialResolution | UnitsResolution;
+	export type InputResolution = MaterialResolution | UnitsResolution;
 
 	export interface Resolution {
 		readonly resolution: InputResolution;

@@ -4,7 +4,7 @@
 		"uid": "cqwmnos0386zfehpbx8iibfy",
 		"title": "House - Tier 1 Blueprint",
 		"description": "Proof on paper that four walls and a roof are somehow a major technological milestone.",
-		"ui": "default",
+		"ui": "simple",
 		"artwork": {
 			"scale": 1,
 			"default": [
@@ -22,6 +22,7 @@
 				"title": "House - Tier 1",
 				"artwork": "ucep41zyvgbrif6rlcqdabk1",
 				"description": "A beautiful simple house, but you'll like it!",
+				"trigger": "manual",
 				"weight": 1,
 				"default": true,
 				"show": true,

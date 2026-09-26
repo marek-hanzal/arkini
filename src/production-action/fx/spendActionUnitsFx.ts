@@ -31,8 +31,10 @@ export namespace spendActionUnitsFx {
 
 /** Pays action units; the terminal pass owns depleted identity and selected work. */
 export const spendActionUnitsFx = Effect.fn("spendActionUnitsFx")(function* ({
+	actionId,
 	cost,
 	itemId,
+	ownerItemId,
 	runtime,
 }: spendActionUnitsFx.Props) {
 	const runtimeItem = yield* readRuntimeItemByIdFx({
@@ -85,6 +87,11 @@ export const spendActionUnitsFx = Effect.fn("spendActionUnitsFx")(function* ({
 	const terminal = yield* attemptTerminalItemFx({
 		itemId: item.id,
 		runtime: spentRuntime,
+		finishWithJobId:
+			item.id === ownerItemId &&
+			spentRuntime.jobs.some((job) => job.id === actionId && job.ownerItemId === item.id)
+				? actionId
+				: undefined,
 	});
 	if (terminal.type === "blocked") return yield* Effect.fail(terminal.error);
 	return {

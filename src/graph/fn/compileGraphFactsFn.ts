@@ -337,55 +337,31 @@ export const compileGraphFactsFn = (config: GameConfigSchema.Type): GraphFacts =
 					inputIndex,
 					boardLocal: true,
 				};
-				if (input.type !== "simple") {
-					const ref = [
-						...inputPath,
-						"query",
-						"selector",
-						"itemUid",
-					];
-					edgeFn(
-						nodeFn("item", input.query.selector.itemUid, ref),
-						owner,
-						input.type === "materials" ? "line-material" : "line-unit-selector",
-						ref,
-						id,
-						annotations,
-					);
-				}
+				const selectorRef = [
+					...inputPath,
+					"query",
+					"selector",
+					"itemUid",
+				];
+				edgeFn(
+					nodeFn("item", input.query.selector.itemUid, selectorRef),
+					owner,
+					input.type === "materials" ? "line-material" : "line-unit-selector",
+					selectorRef,
+					id,
+					annotations,
+				);
 				if (input.units !== undefined) {
 					const ref = [
 						...inputPath,
 						"units",
 						"from",
 					];
-					const payer = match(input)
-						.with(
-							{
-								units: {
-									from: "self",
-								},
-							},
-							() => owner,
-						)
-						.with(
-							{
-								type: "simple",
-							},
-							() => undefined,
-						)
-						.with(
-							{
-								type: "materials",
-							},
-							{
-								type: "units",
-							},
-							({ query }) => nodeFn("item", query.selector.itemUid, ref),
-						)
-						.exhaustive();
-					if (payer !== undefined)
-						edgeFn(payer, owner, "line-unit-cost", ref, id, annotations);
+					const payer =
+						input.units.from === "self"
+							? owner
+							: nodeFn("item", input.query.selector.itemUid, ref);
+					edgeFn(payer, owner, "line-unit-cost", ref, id, annotations);
 				}
 			}
 			rulesFn(owner, id, line.rules, [

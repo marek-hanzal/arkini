@@ -22,11 +22,7 @@ const line = (id: string, title: string, isDefault = false) => ({
 	show: true,
 	enable: true,
 	runtimeMs: 1_000,
-	input: [
-		{
-			type: "simple" as const,
-		},
-	],
+	input: [],
 	rules: [],
 });
 

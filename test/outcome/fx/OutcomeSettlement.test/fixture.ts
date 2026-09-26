@@ -87,11 +87,7 @@ export const configFn = (outcome: OutcomeTableSchema.Type, width = 3) =>
 						show: true,
 						enable: true,
 						runtimeMs: 0,
-						input: [
-							{
-								type: "simple",
-							},
-						],
+						input: [],
 						rules: [],
 						outcome,
 					},

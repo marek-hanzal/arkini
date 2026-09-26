@@ -57,11 +57,7 @@ export const compileGraphAuditFn = (
 				{
 					kind: "line",
 				},
-				({ data }) =>
-					outputs.length > 0 ||
-					data.input.some(
-						(input) => input.type !== "simple" || input.units !== undefined,
-					),
+				({ data }) => outputs.length > 0 || data.input.length > 0,
 			)
 			.with(
 				{

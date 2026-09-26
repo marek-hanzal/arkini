@@ -31,11 +31,7 @@ it("does not announce a queued job erased by another job's template outcome in t
 				lines: [
 					{
 						...forge.lines[0],
-						input: [
-							{
-								type: "simple",
-							},
-						],
+						input: [],
 						outcome: {
 							set: [
 								{

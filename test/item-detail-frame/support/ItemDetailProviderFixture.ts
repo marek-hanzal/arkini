@@ -40,7 +40,10 @@ const providerGame = {
 	config: {
 		items: {},
 	},
-	getSnapshotFn: () => ({}),
+	getSnapshotFn: () => ({
+		currentSpace: 0,
+	}),
+	subscribeTransitionsFn: () => () => {},
 	id: "game:item-detail-provider",
 	readOrThrowFn: <Value>(request: Value) => request,
 } as unknown as GameEngine;
@@ -80,7 +83,7 @@ const Probe = ({ onControl }: { readonly onControl: (control: ItemDetailControl)
 	return null;
 };
 
-export const renderProvider = async () => {
+export const renderProvider = async (initialGame: Partial<GameEngine> = providerGame) => {
 	let control: ItemDetailControl | undefined;
 	const playSfxEventFn = vi.fn();
 	const requestDetailMusicFn = vi.fn();
@@ -88,7 +91,7 @@ export const renderProvider = async () => {
 	document.body.append(container);
 	const root = createRoot(container);
 	roots.push(root);
-	const render = (game: GameEngine = providerGame) =>
+	const render = (game: Partial<GameEngine> = providerGame) =>
 		root.render(
 			createElement(
 				GameAudioContext.Provider,
@@ -114,7 +117,7 @@ export const renderProvider = async () => {
 				),
 			),
 		);
-	await act(async () => render());
+	await act(async () => render(initialGame));
 	return {
 		readControl: () => {
 			if (control === undefined) throw new Error("Missing Item Detail control.");

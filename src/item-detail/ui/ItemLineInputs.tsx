@@ -12,6 +12,7 @@ import { useTranslator } from "~/translation/ui/useTranslator";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { ItemArtwork } from "~/ui/ui/ItemArtwork";
 import { Tooltip } from "~/ui/ui/Tooltip";
+import { BoardDistancePresentation } from "~/item-query/ui/QueryPresentation";
 
 /** Shared input thumbnails; unit payers stay in place while material slots support delivery and withdrawal. */
 export const ItemLineInputs = ({
@@ -111,6 +112,17 @@ export const ItemLineInputs = ({
 						content={
 							<span className="block max-w-64">
 								<strong className="block font-bold">{item.title}</strong>
+								{input.type === "units" && input.distance !== "self" ? (
+									<span className="block">
+										{translator.textFn(
+											BoardDistancePresentation[input.distance].label,
+										)}
+										:{" "}
+										{translator.textFn(
+											BoardDistancePresentation[input.distance].description,
+										)}
+									</span>
+								) : null}
 								<span className="block">{status}</span>
 								{input.canWithdraw && !disabled ? (
 									<span className="block">
@@ -163,7 +175,7 @@ export const ItemLineInputs = ({
 								})}
 							>
 								<ItemArtwork
-									className="size-[5.76rem]"
+									className="size-20"
 									sourceUrl={game.getResourceUrlFn(item.artwork.default[0])}
 									compositeUrl={
 										item.artwork.default[1] === undefined
@@ -177,12 +189,22 @@ export const ItemLineInputs = ({
 								<ItemLineInputClock clock={input.clock} />
 							) : null}
 							{total > 1 ? (
-								<span className="pointer-events-none absolute -right-1 -bottom-1 z-30 rounded-full bg-surface px-1.5 py-0.5 text-xs font-semibold text-foreground shadow-sm">
+								<span className="pointer-events-none absolute right-2 bottom-2 z-30 rounded-full bg-surface px-1.5 py-0.5 text-xs font-semibold text-foreground shadow-sm">
 									{input.filled}/{total}
 								</span>
 							) : null}
+							{input.type === "units" && input.distance !== "self" ? (
+								<span
+									className="pointer-events-none absolute -bottom-2 left-1/2 z-30 -translate-x-1/2 rounded-full bg-accent px-2 py-0.5 text-xs font-semibold whitespace-nowrap text-accent-contrast"
+									data-ui="ItemLineInputDistance"
+								>
+									{translator.textFn(
+										BoardDistancePresentation[input.distance].label,
+									)}
+								</span>
+							) : null}
 							<span
-								className="pointer-events-none absolute -top-1 -right-1 z-30 grid size-5 scale-75 place-items-center text-danger opacity-0 transition-[opacity,scale] duration-300 ease-out data-[ui-unavailable=true]:scale-100 data-[ui-unavailable=true]:opacity-100"
+								className="pointer-events-none absolute top-2 right-2 z-30 grid size-5 scale-75 place-items-center text-danger opacity-0 transition-[opacity,scale] duration-300 ease-out data-[ui-unavailable=true]:scale-100 data-[ui-unavailable=true]:opacity-100"
 								{...readDataUiFn({
 									dataUi: "ItemLineInputUnavailable",
 									state: {

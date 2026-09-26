@@ -72,6 +72,23 @@ it("separates obtainable material from the exact slot's stored fill and does not
 		canAutofill: false,
 		availableQuantity: 0,
 	});
+	expect(
+		readFn({
+			...base,
+			items: [
+				owner,
+				water,
+				{
+					...source,
+					id: "free-water",
+				},
+			],
+		})[0],
+	).toMatchObject({
+		filled: 1,
+		canAutofill: true,
+		canWithdraw: true,
+	});
 	const anotherOwner = {
 		...water,
 		location: {
@@ -186,7 +203,6 @@ it.each([
 					...material,
 					mode,
 				},
-				line.input[1],
 			],
 		} as typeof line;
 		const activeOwner = {

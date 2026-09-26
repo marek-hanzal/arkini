@@ -1,4 +1,4 @@
-import { Info } from "lucide-react";
+import { Info, Play } from "lucide-react";
 
 import { ItemInfo } from "~/item-detail/ui/ItemInfo";
 import { ItemLineInputs } from "~/item-detail/ui/ItemLineInputs";
@@ -6,6 +6,7 @@ import { useItemSimpleDefaultController } from "~/item-detail/ui/useItemSimpleDe
 import type { useItemDetailSceneController } from "~/item-detail/ui/useItemDetailSceneController";
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { PrimaryButton } from "~/ui/ui/Button";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 
 interface ItemDetailSimpleProps {
 	readonly detail: useItemDetailSceneController.Detail;
@@ -22,11 +23,13 @@ export const ItemDetailSimple = ({
 	stale,
 }: ItemDetailSimpleProps) => {
 	const line = detail.defaultLine;
-	const actionDisabled = disabled || stale || line === undefined || !detail.defaultLinePlayReady;
 	const controller = useItemSimpleDefaultController({
 		ownerItemId,
-		disabled: actionDisabled,
+		disabled: disabled || stale || line === undefined,
+		ready: detail.defaultLinePlayReady,
 	});
+	const actionDisabled =
+		disabled || stale || line === undefined || !controller.displayReady || controller.pending;
 	return (
 		<div
 			className="grid min-h-full items-center"
@@ -35,24 +38,42 @@ export const ItemDetailSimple = ({
 			<ItemInfo
 				detail={detail}
 				stale={stale}
-			>
-				{line === undefined ? null : (
-					<div
-						className="grid gap-4"
-						data-ui="ItemSimpleDefaultLine"
-					>
+				requirements={
+					!stale &&
+					line?.input.some(
+						(input) =>
+							input.type === "materials" ||
+							(input.type === "units" && input.query.distance !== "self"),
+					) ? (
 						<ItemLineInputs
 							ownerItemId={ownerItemId}
 							line={line}
 							idle={false}
 							disabled={disabled || stale}
 						/>
+					) : undefined
+				}
+			>
+				{stale || line === undefined ? null : (
+					<div
+						className="grid gap-4"
+						data-ui="ItemSimpleDefaultLine"
+					>
 						<PrimaryButton
-							className="w-full"
-							disabled={actionDisabled || controller.pending}
+							className="min-h-20 w-3/4 justify-self-center gap-3 disabled:opacity-100 data-[ui-display-ready=false]:opacity-60"
+							disabled={actionDisabled}
 							onClick={controller.startFn}
-							data-ui="ItemSimpleDefaultAction"
+							{...readDataUiFn({
+								dataUi: "ItemSimpleDefaultAction",
+								state: {
+									displayReady: controller.displayReady,
+								},
+							})}
 						>
+							<Play
+								className="size-6 shrink-0"
+								fill="currentColor"
+							/>
 							{line.title}
 						</PrimaryButton>
 						{detail.defaultLineDisabled &&

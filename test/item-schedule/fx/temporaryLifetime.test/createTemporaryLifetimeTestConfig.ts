@@ -247,11 +247,7 @@ export const createTemporaryLifetimeTestConfig = () =>
 						title: "Temporary",
 						description: "Produces one temporary item.",
 						runtimeMs: 200,
-						input: [
-							{
-								type: "simple",
-							},
-						],
+						input: [],
 						outcome: guaranteedOutput({
 							itemId: "temporaryPlain",
 						}),

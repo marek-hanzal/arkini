@@ -51,11 +51,7 @@ export const createRandomCompletionConfig = () => {
 					{
 						...line,
 						runtimeMs: 200,
-						input: [
-							{
-								type: "simple",
-							},
-						],
+						input: [],
 						outcome: {
 							set: [
 								{

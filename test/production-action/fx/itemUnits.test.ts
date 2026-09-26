@@ -14,7 +14,7 @@ import {
 } from "./itemUnits.test/fixture";
 
 describe("item units / owner lifecycle", () => {
-	it("removes a self-targeted Producer from the Board at its final spend", () => {
+	it("keeps a self-targeted Producer on the Board until its final job completes", () => {
 		const result = run(
 			Effect.gen(function* () {
 				const well = yield* spawnItemFx({
@@ -39,10 +39,11 @@ describe("item units / owner lifecycle", () => {
 					lineUid: "line:self-well:water",
 				});
 				const finalStart = yield* (yield* CommittedTransitionsFx).read;
-				expect(
-					(yield* readRuntimeFx()).items.find((item) => item.id === well.id)
-						?.remainingUnits,
-				).toBe(0);
+				const beforeCompletion = yield* readRuntimeFx();
+				expect(beforeCompletion.items.find((item) => item.id === well.id)).toMatchObject({
+					remainingUnits: 0,
+					location: board(0),
+				});
 				yield* runTickRuntimeByFx({
 					elapsedMs: 200,
 				});
@@ -64,7 +65,20 @@ describe("item units / owner lifecycle", () => {
 			previousUnits: 2,
 			resultingUnits: 1,
 		});
-		expect(result.finalStart.events).toContainEqual(
+		expect(result.finalStart.events).toContainEqual({
+			type: GameEventEnumSchema.enum.ItemUnitSpent,
+			itemId: result.well.id,
+			itemUid: "units:self-well",
+			location: board(0),
+			previousUnits: 1,
+			resultingUnits: 0,
+		});
+		expect(
+			result.finalStart.events.some(
+				(event) => event.type === GameEventEnumSchema.enum.ItemDepleted,
+			),
+		).toBe(false);
+		expect(result.finalCompletion.events).toContainEqual(
 			expect.objectContaining({
 				type: GameEventEnumSchema.enum.ItemDepleted,
 				itemId: result.well.id,
@@ -72,12 +86,6 @@ describe("item units / owner lifecycle", () => {
 				location: board(0),
 			}),
 		);
-		expect(result.finalStart.events).toContainEqual({
-			type: GameEventEnumSchema.enum.ItemDisappeared,
-			itemId: result.well.id,
-			itemUid: "units:self-well",
-			location: board(0),
-		});
 		expect(result.runtime.items.some((item) => item.id === result.well.id)).toBe(false);
 		expect(result.runtime.items.filter((item) => item.item.uid === "item:gift")).toHaveLength(
 			2,

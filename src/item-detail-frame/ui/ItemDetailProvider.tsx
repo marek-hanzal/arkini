@@ -22,6 +22,9 @@ import { useGameAudioControl } from "~/game-audio/ui/useGameAudioControl";
 import { useItemDetailMusic } from "~/item-detail-frame/ui/useItemDetailMusic";
 import { PresentationSfxEventEnumSchema } from "~/sfx-event/schema/PresentationSfxEventEnumSchema";
 
+// Cover the Board's exit, render barrier and arrival before fading its overlay.
+const boardChangeDetailExitDelayMs = 360;
+
 /**
  * Game-shell owner for one exact Item Detail target and modal lifecycle.
  * Engine-backed resolvers remain authoritative for
@@ -80,6 +83,27 @@ export const ItemDetailProvider = ({
 	);
 	const [closeResult, closeFn] = useAtom(closeAtom);
 	RendererRuntime.runSync(readSettledAsyncResultErrorFx(closeResult));
+	useEffect(() => {
+		let observedSpace = game.getSnapshotFn().currentSpace;
+		return game.subscribeTransitionsFn((transition) => {
+			const nextSpace = transition.runtime.currentSpace;
+			const spaceChanged = nextSpace !== observedSpace;
+			observedSpace = nextSpace;
+			const currentBoardReset = transition.events.some(
+				(event) => event.type === "board:template-applied" && event.space === nextSpace,
+			);
+			if (!spaceChanged && !currentBoardReset) return;
+			if (controller.getSnapshotFn().phase !== "closed")
+				closeFn({
+					restoreFocus: false,
+					exitDelayMs: boardChangeDetailExitDelayMs,
+				});
+		});
+	}, [
+		game,
+		controller,
+		closeFn,
+	]);
 	const snapshot = useSyncExternalStore(
 		controller.subscribeFn,
 		controller.getSnapshotFn,

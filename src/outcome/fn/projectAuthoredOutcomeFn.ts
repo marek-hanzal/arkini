@@ -30,6 +30,11 @@ const projectOutcomeFn = (
 			(outcome) => ({
 				type: "template",
 				templateUid: outcome.templateUid,
+				...(outcome.space === undefined
+					? {}
+					: {
+							space: outcome.space,
+						}),
 				title: templates.find((template) => template.uid === outcome.templateUid)?.title,
 				rules: outcome.rules,
 				activeRuleHints: [],

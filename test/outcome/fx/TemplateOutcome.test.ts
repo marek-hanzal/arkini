@@ -156,6 +156,76 @@ it("resets only the outcome origin space, preserving authored item/reset order a
 	expect(result.after.items.some((entry) => entry.id === spawns[0]?.itemId)).toBe(true);
 });
 
+it("creates and replaces explicit target spaces without moving the player or retargeting later outcomes", () => {
+	const result = Effect.runSync(
+		Effect.gen(function* () {
+			yield* startFx();
+			const after = yield* applyFx([
+				{
+					...template,
+					space: 0,
+				},
+				{
+					...template,
+					space: 2,
+				},
+				item,
+			]);
+			return {
+				after,
+				transition: yield* (yield* RuntimeStoreFx).read,
+			};
+		}).pipe(
+			useGameFx({
+				config,
+			}),
+		),
+	);
+	expect(result.after.currentSpace).toBe(0);
+	expect(result.after.templateUidBySpace).toEqual({
+		0: "next",
+		1: "start",
+		2: "next",
+	});
+	expect(
+		result.after.items
+			.filter((entry) => entry.location.scope === "board")
+			.map((entry) => [
+				entry.location.scope === "board" ? entry.location.space : undefined,
+				entry.item.uid,
+			]),
+	).toEqual(
+		expect.arrayContaining([
+			[
+				0,
+				"lens",
+			],
+			[
+				1,
+				"log",
+			],
+			[
+				2,
+				"lens",
+			],
+		]),
+	);
+	expect(
+		result.transition.events.filter((event) => event.type === "board:template-applied"),
+	).toEqual([
+		{
+			type: "board:template-applied",
+			space: 0,
+			templateUid: "next",
+		},
+		{
+			type: "board:template-applied",
+			space: 2,
+			templateUid: "next",
+		},
+	]);
+});
+
 it("missing template rolls back earlier outcome placements and publishes no reset", () => {
 	const result = Effect.runSync(
 		Effect.gen(function* () {

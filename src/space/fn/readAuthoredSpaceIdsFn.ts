@@ -1,7 +1,7 @@
 import type { GameConfigSchema } from "~/game-config/schema/GameConfigSchema";
 import type { OutcomeTableSchema } from "~/outcome/schema/OutcomeTableSchema";
 
-/** Every literal destination reserves its address even when its rule never runs. */
+/** Every literal navigation or Template target reserves its address even when its rule never runs. */
 export const readAuthoredSpaceIdsFn = (config: GameConfigSchema.Type): ReadonlySet<number> => {
 	const spaces = new Set([
 		config.start.currentSpace,
@@ -12,6 +12,8 @@ export const readAuthoredSpaceIdsFn = (config: GameConfigSchema.Type): ReadonlyS
 			for (const roll of set.roll)
 				for (const outcome of roll.outcome) {
 					if (outcome.type === "space" && typeof outcome.space === "number")
+						spaces.add(outcome.space);
+					if (outcome.type === "template" && outcome.space !== undefined)
 						spaces.add(outcome.space);
 				}
 	};

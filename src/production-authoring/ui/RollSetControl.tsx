@@ -55,7 +55,8 @@ const readOutcomeSummaryFn = (
 	const ruleSummary = rules === 0 ? "" : ` · ${rules} ${textFn(rules === 1 ? "rule" : "rules")}`;
 	if (outcome.type === "space")
 		return `${readSpaceDestinationLabelFn(outcome.space, textFn, templates)}${ruleSummary}`;
-	if (outcome.type === "template") return `${textFn("Template")}${ruleSummary}`;
+	if (outcome.type === "template")
+		return `${textFn("Template")}${outcome.space === undefined ? "" : ` · ${textFn("Space")} ${outcome.space}`}${ruleSummary}`;
 	const { min, max } = outcome.quantity;
 	const quantity = min === max ? `×${min}` : `×${min}–${max}`;
 	const placement = textFn(outcome.placement === "drop" ? "Local drop" : "Random");
@@ -83,17 +84,39 @@ const OutcomeFields = ({
 	return (
 		<div className="grid gap-3">
 			{value.type === "template" ? (
-				<TemplateSelector
-					templates={project.config.templates ?? []}
-					value={value.templateUid}
-					error={readEditorFormValidationErrorFn(validationIssues, "templateUid")}
-					onChangeFn={(templateUid) =>
-						onChangeFn({
-							...value,
-							templateUid,
-						})
-					}
-				/>
+				<div className="grid min-w-0 grid-cols-2 gap-x-[var(--ak-panel-padding)]">
+					<TemplateSelector
+						templates={project.config.templates ?? []}
+						value={value.templateUid}
+						error={readEditorFormValidationErrorFn(validationIssues, "templateUid")}
+						onChangeFn={(templateUid) =>
+							onChangeFn({
+								...value,
+								templateUid,
+							})
+						}
+					/>
+					<EditorNumberControl
+						label={translator.textFn("Space")}
+						description={<Mx label="Template target space help" />}
+						required={false}
+						min={0}
+						value={value.space ?? Number.NaN}
+						clearLabel={translator.textFn("Clear")}
+						error={readEditorFormValidationErrorFn(validationIssues, "space")}
+						onChangeFn={(space) => {
+							if (Number.isNaN(space)) {
+								const { space: _space, ...next } = value;
+								onChangeFn(next);
+								return;
+							}
+							onChangeFn({
+								...value,
+								space,
+							});
+						}}
+					/>
+				</div>
 			) : null}
 			{match(value)
 				.with(
@@ -247,10 +270,15 @@ const OutcomeList = ({
 							{
 								type: "template",
 							},
-							({ templateUid }) =>
-								project.config.templates?.find(
-									(template) => template.uid === templateUid,
-								)?.title ?? translator.textFn("No template selected"),
+							({ templateUid, space }) => {
+								const title =
+									project.config.templates?.find(
+										(template) => template.uid === templateUid,
+									)?.title ?? translator.textFn("No template selected");
+								return space === undefined
+									? title
+									: `${title} · ${translator.textFn("Space")} ${space}`;
+							},
 						)
 						.with(
 							{
@@ -278,7 +306,8 @@ const OutcomeList = ({
 							{
 								type: "template",
 							},
-							({ templateUid }) => templateUid,
+							({ templateUid, space }) =>
+								space === undefined ? templateUid : `${templateUid} ${space}`,
 						)
 						.with(
 							{
@@ -422,7 +451,7 @@ const OutcomeList = ({
 						id: "template",
 						label: translator.textFn("Template"),
 						description: translator.textFn(
-							"Replaces the producer's space with this template, removing its items and active production.",
+							"Replaces the outcome origin space with this template, or an explicit target space when configured.",
 						),
 						icon: <PanelsTopLeft className="size-5" />,
 						onSelectFn: () =>

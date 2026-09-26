@@ -37,11 +37,18 @@ export const readOutcomeCollectionSummaryFn = ({
 				},
 				(outcome) => {
 					const title = templates?.find(({ uid }) => uid === outcome.templateUid)?.title;
+					const target =
+						outcome.space === undefined ? "" : ` · ${textFn("Space")} ${outcome.space}`;
 					return {
-						label: title ?? textFn("No template selected"),
+						label: `${title ?? textFn("No template selected")}${target}`,
 						searchTerms: [
 							outcome.templateUid,
 							`Template ${title ?? outcome.templateUid}`,
+							...(outcome.space === undefined
+								? []
+								: [
+										`Space ${outcome.space}`,
+									]),
 						],
 					};
 				},

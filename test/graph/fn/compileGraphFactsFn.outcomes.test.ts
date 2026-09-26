@@ -317,6 +317,54 @@ it("does not invent a template destination from an earlier Space outcome", () =>
 	);
 });
 
+it("retains an explicit Template target space without treating it as board-local", () => {
+	const facts = compileGraphFactsFn(
+		configFn({
+			A: itemFn("A", {
+				lines: [
+					lineFn("L", {
+						outcome: {
+							set: [
+								{
+									rules: [],
+									roll: [
+										{
+											type: "guaranteed",
+											outcome: [
+												{
+													type: "template",
+													templateUid: "T",
+													space: 12,
+													rules: [],
+												},
+											],
+										},
+									],
+								},
+							],
+						},
+					}),
+				],
+			}),
+		}),
+	);
+	expect(facts.edges).toEqual(
+		expect.arrayContaining([
+			expect.objectContaining({
+				from: "item:A",
+				to: "template:T",
+				kind: "template-outcome",
+				annotations: expect.objectContaining({
+					boardLocal: false,
+					outcome: expect.objectContaining({
+						space: 12,
+					}),
+				}),
+			}),
+		]),
+	);
+});
+
 it("retains authored interval and termination line outcomes when clocks are disabled", () => {
 	const facts = compileGraphFactsFn(
 		configFn({

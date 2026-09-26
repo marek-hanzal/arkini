@@ -122,12 +122,20 @@ const OutcomeRoll = <Item extends OutcomeProjection.Item>({
 									)}
 								</>
 							) : (
-								renderTemplateFn(
-									item.templateUid,
-									<>
-										<Tx label="Template" /> {item.title ?? item.templateUid}
-									</>,
-								)
+								<>
+									{renderTemplateFn(
+										item.templateUid,
+										<>
+											<Tx label="Template" /> {item.title ?? item.templateUid}
+										</>,
+									)}
+									{item.space === undefined ? null : (
+										<>
+											{" · "}
+											<Tx label="Space" /> {item.space}
+										</>
+									)}
+								</>
 							)}
 						</div>
 						{item.activeRuleHints.map((hint, hintIndex) => (

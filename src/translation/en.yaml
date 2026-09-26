@@ -1704,6 +1704,9 @@ Template output:
 Template placement:
   value: Template placement
   dynamic: true
+Template target space help:
+  value: |
+    Leave empty to replace the outcome origin space. Set a number to replace or create that exact space instead.
 Templates:
   value: Templates
 Templates help:

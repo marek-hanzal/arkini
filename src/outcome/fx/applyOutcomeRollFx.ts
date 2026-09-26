@@ -115,13 +115,13 @@ export const applyOutcomeRollFx = Effect.fn("applyOutcomeRollFx")(function* ({
 						const applied = yield* applyBoardTemplateRuntimeFx({
 							runtime: draft,
 							ownershipRuntime: yield* snapshot.read,
-							space: roll.origin.space,
+							space: outcome.space,
 							templateUid: outcome.templateUid,
 						});
 						draft = applied.runtime;
 						effects.push({
 							type: "template",
-							space: roll.origin.space,
+							space: outcome.space,
 							templateUid: outcome.templateUid,
 							removed: applied.removed,
 						});

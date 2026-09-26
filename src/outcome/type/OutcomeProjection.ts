@@ -30,6 +30,7 @@ export namespace OutcomeProjection {
 	export interface Template {
 		readonly type: "template";
 		readonly templateUid: string;
+		readonly space?: number;
 		readonly title?: string;
 		readonly activeRuleHints: readonly string[];
 		readonly rules?: readonly OutcomeRuleSchema.Type[];

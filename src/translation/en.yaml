@@ -185,6 +185,8 @@ Authored queue capacity summary help:
     The active job counts too.
 Authtoken:
   value: Authtoken
+Autofill search:
+  value: Autofill search
 Autofill started:
   value: Autofill started
   dynamic: true

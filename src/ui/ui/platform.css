@@ -71,8 +71,11 @@ body {
 	--ak-full-hero-width: min(88cqw, 56rem, 87cqh);
 }
 
-button,
-input,
-select {
-	font: inherit;
+/* Keep the native font reset below component typography utilities. */
+@layer base {
+	button,
+	input,
+	select {
+		font: inherit;
+	}
 }

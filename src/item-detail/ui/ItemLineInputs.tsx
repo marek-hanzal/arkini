@@ -61,7 +61,7 @@ export const ItemLineInputs = ({
 	if (inputs.length === 0) return null;
 	return (
 		<div
-			className="flex flex-wrap items-center gap-3 data-[ui-compact=true]:w-full data-[ui-compact=true]:justify-center"
+			className="flex flex-wrap items-center gap-3 data-[ui-compact=true]:w-full"
 			{...readDataUiFn({
 				dataUi: "ItemLineInputs",
 				state: {
@@ -72,6 +72,10 @@ export const ItemLineInputs = ({
 			{inputs.map((input) => {
 				const item = game.config.items[input.itemUid];
 				const total = input.quantity.max;
+				const showDistance =
+					input.type === "materials"
+						? input.distance !== "far"
+						: input.distance !== "self";
 				const unavailable =
 					input.filled === 0 && input.availableQuantity === 0 && !input.committed;
 				const colorFraction = input.committed ? 1 : input.filled / total;
@@ -119,8 +123,11 @@ export const ItemLineInputs = ({
 						content={
 							<span className="block max-w-64">
 								<strong className="block font-bold">{item.title}</strong>
-								{input.type === "units" && input.distance !== "self" ? (
+								{showDistance ? (
 									<span className="block">
+										{input.type === "materials"
+											? `${translator.textFn("Autofill search")} · `
+											: null}
 										{translator.textFn(
 											BoardDistancePresentation[input.distance].label,
 										)}
@@ -201,7 +208,7 @@ export const ItemLineInputs = ({
 									{input.filled}/{total}
 								</span>
 							) : null}
-							{input.type === "units" && input.distance !== "self" ? (
+							{showDistance ? (
 								<span
 									className="pointer-events-none absolute -bottom-2 left-1/2 z-30 -translate-x-1/2 rounded-full bg-accent px-2 py-0.5 text-xs font-semibold whitespace-nowrap text-accent-contrast"
 									data-ui="ItemLineInputDistance"

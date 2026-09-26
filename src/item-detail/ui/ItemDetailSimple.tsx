@@ -1,4 +1,4 @@
-import { Info, ListX } from "lucide-react";
+import { Info, ListX, Play } from "lucide-react";
 import { AnimatePresence, motion, useIsPresent } from "motion/react";
 import { useEffect, useState } from "react";
 
@@ -11,6 +11,7 @@ import type { useItemDetailSceneController } from "~/item-detail/ui/useItemDetai
 import type { IdSchema } from "~/game-value/schema/IdSchema";
 import { useTranslator } from "~/translation/ui/useTranslator";
 import { LinkButton } from "~/ui/ui/LinkButton";
+import { PrimaryButton } from "~/ui/ui/Button";
 import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { Tooltip } from "~/ui/ui/Tooltip";
 
@@ -32,21 +33,18 @@ const ItemSimplePendingCancel = ({
 	const translator = useTranslator();
 	return (
 		<motion.div
-			className="w-full overflow-hidden"
+			className="w-max"
 			initial={{
-				height: 0,
 				opacity: 0,
-				y: -6,
+				x: 12,
 			}}
 			animate={{
-				height: "auto",
 				opacity: 1,
-				y: 0,
+				x: 0,
 			}}
 			exit={{
-				height: 0,
 				opacity: 0,
-				y: -6,
+				x: 12,
 			}}
 			transition={{
 				duration: 0.2,
@@ -59,12 +57,12 @@ const ItemSimplePendingCancel = ({
 				)}
 			>
 				<LinkButton
-					className="flex min-h-12 w-full items-center justify-center gap-2 text-xl text-muted hover:text-foreground disabled:hover:text-muted"
+					className="flex min-h-8 items-center gap-1.5 text-sm text-foreground/65 decoration-foreground/50 hover:text-foreground disabled:hover:text-foreground/65"
 					disabled={disabled || !present}
 					onClick={clearFn}
 					data-ui="ItemSimplePendingCancel"
 				>
-					<ListX className="size-6 shrink-0" />
+					<ListX className="size-4 shrink-0" />
 					{translator.textFn("Cancel")}
 				</LinkButton>
 			</Tooltip>
@@ -146,22 +144,6 @@ export const ItemDetailSimple = ({
 			input.type === "materials" ||
 			(input.type === "units" && input.query.distance !== "self"),
 	);
-	const action =
-		line === undefined ? null : (
-			<LinkButton
-				className="flex min-h-24 w-full min-w-0 items-center justify-center px-6 py-3 text-center text-4xl leading-tight font-semibold disabled:hover:text-muted data-[ui-visual-ready=true]:disabled:text-accent data-[ui-visual-ready=true]:disabled:hover:text-accent"
-				disabled={actionDisabled}
-				onClick={controller.startFn}
-				{...readDataUiFn({
-					dataUi: "ItemSimpleDefaultAction",
-					state: {
-						visualReady,
-					},
-				})}
-			>
-				{line.title}
-			</LinkButton>
-		);
 	const cancel =
 		line === undefined ? null : (
 			<ItemSimpleQueueCancel
@@ -186,20 +168,60 @@ export const ItemDetailSimple = ({
 						data-ui="ItemSimpleDefaultLine"
 					>
 						<div
-							className="grid justify-items-center gap-2 rounded-2xl bg-selection/75 p-4 backdrop-blur-md"
-							data-ui="ItemSimpleDefaultControls"
+							className="relative pb-9 data-[ui-has-requirements=false]:mx-auto data-[ui-has-requirements=false]:w-3/4 data-[ui-has-requirements=false]:max-w-sm"
+							{...readDataUiFn({
+								dataUi: "ItemSimpleDefaultControlGroup",
+								state: {
+									hasRequirements: Boolean(hasRequirements),
+								},
+							})}
 						>
 							{hasRequirements ? (
-								<ItemLineInputs
-									ownerItemId={ownerItemId}
-									line={line}
-									idle={false}
-									compact
-									disabled={disabled || stale}
-								/>
-							) : null}
-							{action}
-							{cancel}
+								<div
+									className="grid min-h-20 grid-cols-2 items-center gap-4 rounded-2xl bg-selection/75 px-2 py-3 backdrop-blur-md"
+									data-ui="ItemSimpleDefaultControls"
+								>
+									<ItemLineInputs
+										ownerItemId={ownerItemId}
+										line={line}
+										idle={false}
+										compact
+										disabled={disabled || stale}
+									/>
+									<LinkButton
+										className="flex min-h-16 w-fit max-w-full min-w-0 items-center justify-self-end gap-2 px-2 py-1 text-left text-lg leading-tight font-semibold disabled:hover:text-muted data-[ui-visual-ready=true]:disabled:text-accent data-[ui-visual-ready=true]:disabled:hover:text-accent"
+										disabled={actionDisabled}
+										onClick={controller.startFn}
+										{...readDataUiFn({
+											dataUi: "ItemSimpleDefaultAction",
+											state: {
+												visualReady,
+											},
+										})}
+									>
+										<Play className="size-5 shrink-0 fill-current" />
+										<span>{line.title}</span>
+									</LinkButton>
+								</div>
+							) : (
+								<PrimaryButton
+									className="flex min-h-14 w-full gap-2 px-4 py-2 text-xl leading-tight data-[ui-visual-ready=true]:disabled:opacity-100"
+									disabled={actionDisabled}
+									onClick={controller.startFn}
+									{...readDataUiFn({
+										dataUi: "ItemSimpleDefaultAction",
+										state: {
+											visualReady,
+										},
+									})}
+								>
+									<Play className="size-6 shrink-0 fill-current" />
+									<span className="min-w-0 text-center whitespace-normal">
+										{line.title}
+									</span>
+								</PrimaryButton>
+							)}
+							<div className="absolute right-3 bottom-0">{cancel}</div>
 						</div>
 						{detail.defaultLineDisabled &&
 						detail.defaultLineBlockingHint !== undefined ? (

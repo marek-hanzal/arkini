@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import type { useItemDetailSceneController } from "~/item-detail/ui/useItemDetailSceneController";
 import { useTranslator } from "~/translation/ui/useTranslator";
+import { readDataUiFn } from "~/ui/fn/readDataUiFn";
 import { formatDurationFn } from "~/ui/fn/formatDurationFn";
 import { ItemArtwork } from "~/ui/ui/ItemArtwork";
 
@@ -27,7 +28,7 @@ const ItemInfoProgress = ({
 			data-ui={dataUi}
 		>
 			<div
-				className="absolute inset-y-0 left-0 rounded-full bg-muted/70 transition-[width] duration-300 ease-out"
+				className="absolute inset-y-0 left-0 rounded-full bg-accent/75 transition-[width] duration-300 ease-out"
 				data-ui={`${dataUi}Fill`}
 				style={{
 					width: `${filledPercent}%`,
@@ -160,7 +161,15 @@ export const ItemInfo = ({ detail, stale, children }: ItemInfoProps) => {
 						</AnimatePresence>
 					) : null}
 				</div>
-				<div className="grid min-w-0 gap-8">
+				<div
+					className="grid min-w-0 gap-8 data-[ui-simple=true]:w-[115%] data-[ui-simple=true]:justify-self-center"
+					{...readDataUiFn({
+						dataUi: "ItemInfoContent",
+						state: {
+							simple,
+						},
+					})}
+				>
 					<h2 className="text-3xl font-semibold leading-tight">
 						{detail.title}
 						{stale ? ` · ${translator.textFn("Gone")}` : null}

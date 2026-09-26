@@ -1094,11 +1094,11 @@ describe("item section form session", () => {
 		expect(state.saveItem.mock.lastCall?.[0].item.lines[0].artwork).toBe("line-artwork");
 		expect(state.saveItem.mock.lastCall?.[0].item.artwork).toEqual(common.artwork);
 		await renderSection(<ProductionSection />);
-		const savedArtwork = container.querySelector<HTMLInputElement>(
-			'input[data-resource-label="Artwork"]',
+		const clearArtwork = container.querySelector<HTMLButtonElement>(
+			'[data-ui="EditorLineArtworkClear"]',
 		);
-		if (savedArtwork === null) throw new Error("Missing saved line artwork control.");
-		await changeInput(savedArtwork, "");
+		if (clearArtwork === null) throw new Error("Missing clear line artwork control.");
+		await act(async () => clearArtwork.click());
 		await act(async () => {
 			await state.unsavedSession?.saveFn();
 		});

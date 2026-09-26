@@ -1,4 +1,4 @@
-import { Star, Eye, Power } from "lucide-react";
+import { Star, Eye, Power, Trash2 } from "lucide-react";
 import { EditorRootCard } from "~/authoring-shell/ui/EditorRootCard";
 import { useFormSession } from "~/item-authoring/ui/FormContext";
 import { EditorTextControl } from "~/editor-control/ui/EditorValueControls";
@@ -16,6 +16,7 @@ import { OutcomeControl } from "~/production-authoring/ui/OutcomeControl";
 import { RulesControl } from "~/production-authoring/ui/RulesControl";
 import { EditorBooleanToggleGroup } from "~/editor-control/ui/EditorBooleanToggleGroup";
 import { ResourceReferenceControl } from "~/authoring-form/ui/ResourceAutocompleteField";
+import { EditorIconButton } from "~/editor-control/ui/EditorIconButton";
 
 const defaultLine: LineSchema.Type = {
 	uid: "",
@@ -161,24 +162,34 @@ export const LineFields = withFieldGroupFn({
 									}
 								</group.Subscribe>
 							</div>
-							<group.AppField name="artwork">
-								{(field) => (
-									<ResourceReferenceControl
-										label={translator.textFn("Artwork")}
-										emptyLabel={translator.textFn(
-											"No artwork matches this search.",
-										)}
-										resourceType="artwork"
-										optional
-										value={field.state.value ?? ""}
-										error={readEditorFieldErrorFn(field.state.meta.errors)}
-										onBlurFn={field.handleBlur}
-										onChangeFn={(value) =>
-											field.handleChange(value || undefined)
-										}
-									/>
-								)}
-							</group.AppField>
+							<div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-2">
+								<group.AppField name="artwork">
+									{(field) => (
+										<ResourceReferenceControl
+											label={translator.textFn("Artwork")}
+											emptyLabel={translator.textFn(
+												"No artwork matches this search.",
+											)}
+											resourceType="artwork"
+											optional
+											value={field.state.value ?? ""}
+											error={readEditorFieldErrorFn(field.state.meta.errors)}
+											onBlurFn={field.handleBlur}
+											onChangeFn={(value) =>
+												field.handleChange(value || undefined)
+											}
+										/>
+									)}
+								</group.AppField>
+								<EditorIconButton
+									type="button"
+									data-ui="EditorLineArtworkClear"
+									title={translator.textFn("Clear")}
+									onClick={() => group.setFieldValue("artwork", undefined)}
+								>
+									<Trash2 className="size-4" />
+								</EditorIconButton>
+							</div>
 						</div>
 						<group.AppField name="description">
 							{(field) => (

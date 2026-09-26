@@ -320,6 +320,12 @@ describe("Inventory", () => {
 											space: 2,
 											rules: [],
 										},
+										{
+											type: "template",
+											templateUid: "room",
+											space: 3,
+											rules: [],
+										},
 									],
 								},
 							],
@@ -340,6 +346,7 @@ describe("Inventory", () => {
 			0,
 			1,
 			2,
+			3,
 		]).not.toContain(runtime.currentSpace);
 		expect(runtime.items.find((item) => item.id === "first")?.inventories?.room).toBe(
 			runtime.currentSpace,

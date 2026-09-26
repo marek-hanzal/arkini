@@ -69,6 +69,19 @@ import { RollSetControl } from "~/production-authoring/ui/RollSetControl";
 	}
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
+const changeInput = async (input: HTMLInputElement, value: string) => {
+	const valueSetter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
+	if (valueSetter === undefined) throw new Error("Expected native input value setter.");
+	await act(async () => {
+		valueSetter.call(input, value);
+		input.dispatchEvent(
+			new Event("input", {
+				bubbles: true,
+			}),
+		);
+	});
+};
+
 it("adds each outcome destination and drop placement without replacing existing outcomes", async () => {
 	const initial = OutcomeTableSchema.parse({
 		set: [
@@ -181,6 +194,80 @@ it("adds each outcome destination and drop placement without replacing existing 
 				rules: [],
 			},
 		]);
+	} finally {
+		await act(async () => root.unmount());
+		container.remove();
+	}
+});
+
+it("edits and clears the optional target space on a Template outcome", async () => {
+	const initial = OutcomeTableSchema.parse({
+		set: [
+			{
+				weight: 1,
+				rules: [],
+				roll: [
+					{
+						type: "guaranteed",
+						outcome: [
+							{
+								type: "template",
+								templateUid: "default-template",
+								space: 4,
+								rules: [],
+							},
+						],
+					},
+				],
+			},
+		],
+	}).set[0];
+	const container = document.createElement("div");
+	document.body.append(container);
+	const root = createRoot(container);
+	const onChangeFn = vi.fn();
+	const renderFn = async (value: typeof initial) =>
+		act(async () =>
+			root.render(
+				<RollSetControl
+					index={0}
+					showWeight={false}
+					initialRollIndex={0}
+					initialOutcomeIndex={0}
+					value={value}
+					onChangeFn={onChangeFn}
+				/>,
+			),
+		);
+	try {
+		await renderFn(initial);
+		const spaceInput = Array.from(
+			container.querySelectorAll<HTMLInputElement>('input[type="number"]'),
+		).find((input) =>
+			input.closest('[data-ui="EditorValueField"]')?.textContent?.startsWith("Space"),
+		);
+		if (spaceInput === undefined) throw new Error("Missing Template target Space control.");
+		expect(spaceInput.value).toBe("4");
+
+		await changeInput(spaceInput, "9");
+		const edited = onChangeFn.mock.lastCall?.[0] as typeof initial;
+		expect(edited.roll[0].outcome[0]).toEqual({
+			type: "template",
+			templateUid: "default-template",
+			space: 9,
+			rules: [],
+		});
+
+		await renderFn(edited);
+		const clear = container.querySelector<HTMLButtonElement>('button[title="Clear"]');
+		if (clear === null) throw new Error("Missing Template target Space clear button.");
+		await act(async () => clear.click());
+		const cleared = onChangeFn.mock.lastCall?.[0] as typeof initial;
+		expect(cleared.roll[0].outcome[0]).toEqual({
+			type: "template",
+			templateUid: "default-template",
+			rules: [],
+		});
 	} finally {
 		await act(async () => root.unmount());
 		container.remove();

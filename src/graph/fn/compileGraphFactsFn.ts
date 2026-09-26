@@ -224,7 +224,9 @@ export const compileGraphFactsFn = (config: GameConfigSchema.Type): GraphFacts =
 						...rollAnnotations,
 						outcomeIndex,
 						outcome,
-						boardLocal: outcome.type !== "space",
+						boardLocal:
+							outcome.type === "item" ||
+							(outcome.type === "template" && outcome.space === undefined),
 					};
 					const target = match(outcome)
 						.with(

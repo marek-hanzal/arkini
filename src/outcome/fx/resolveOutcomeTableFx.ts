@@ -82,6 +82,7 @@ export const resolveOutcomeTableFx = Effect.fn("resolveOutcomeTableFx")(function
 									return undefined;
 								return {
 									type: "template",
+									space: outcome.space ?? origin.space,
 									templateUid: outcome.templateUid,
 								} satisfies ResolvedOutcome.Template;
 							}),

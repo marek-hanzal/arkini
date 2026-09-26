@@ -1106,6 +1106,10 @@
 					"description": "The board template applied by this outcome.",
 					"$ref": "urn:serakki:schema:project#/$defs/IdSchema"
 				},
+				"space": {
+					"description": "Optional explicit Board space replaced by this template; omission uses the outcome origin space.",
+					"$ref": "urn:serakki:schema:project#/$defs/NonNegativeIntegerSchema"
+				},
 				"rules": {
 					"type": "array",
 					"items": {
@@ -1119,7 +1123,7 @@
 				"rules"
 			],
 			"additionalProperties": false,
-			"description": "Replaces a Board space and its entire owned runtime state with a template."
+			"description": "Replaces an explicit Board space, or the outcome origin space when omitted, and its entire owned runtime state with a template."
 		},
 		"roll.ChanceSchema": {
 			"type": "object",

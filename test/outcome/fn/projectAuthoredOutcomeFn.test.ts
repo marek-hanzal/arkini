@@ -163,6 +163,12 @@ it("preserves mixed outcome ordering and Space-only sets in the authored project
 									space: 9,
 									rules: [],
 								},
+								{
+									type: "template",
+									templateUid: "target-template",
+									space: 12,
+									rules: [],
+								},
 							],
 						},
 					],
@@ -194,6 +200,7 @@ it("preserves mixed outcome ordering and Space-only sets in the authored project
 		"space",
 		"item",
 		"space",
+		"template",
 	]);
 	expect(result[0]?.roll[0]?.outcome[1]).toMatchObject({
 		type: "item",
@@ -202,6 +209,11 @@ it("preserves mixed outcome ordering and Space-only sets in the authored project
 			min: 1,
 			max: 2,
 		},
+	});
+	expect(result[0]?.roll[0]?.outcome[3]).toMatchObject({
+		type: "template",
+		templateUid: "target-template",
+		space: 12,
 	});
 	expect(result[1]?.roll[0]?.outcome).toEqual([
 		{

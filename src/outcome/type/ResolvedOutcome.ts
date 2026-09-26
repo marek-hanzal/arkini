@@ -16,6 +16,7 @@ export namespace ResolvedOutcome {
 	}
 	export interface Template {
 		readonly type: "template";
+		readonly space: number;
 		readonly templateUid: IdSchema.Type;
 	}
 	export interface Item {

@@ -187,7 +187,8 @@ export const readGraphFlowEvidenceFn = (
 					{
 						type: "template",
 					},
-					() => `Output: apply template ${labelFn(nodes, output.to)}`,
+					(value) =>
+						`Output: apply template ${labelFn(nodes, output.to)} to ${value.space === undefined ? "the operation origin space" : `space ${value.space}`}`,
 				)
 				.exhaustive(),
 		);

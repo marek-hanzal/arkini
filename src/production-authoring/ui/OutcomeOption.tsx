@@ -75,6 +75,12 @@ export const OutcomeOption = ({
 						{project.config.templates?.find(
 							(template) => template.uid === outcome.templateUid,
 						)?.title ?? translator.textFn("No template selected")}
+						{outcome.space === undefined ? null : (
+							<>
+								{" · "}
+								{translator.textFn("Space")} {outcome.space}
+							</>
+						)}
 					</span>
 				))}
 		</EditorCollectionOption>

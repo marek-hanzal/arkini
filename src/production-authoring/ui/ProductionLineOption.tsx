@@ -52,8 +52,9 @@ const readItemSidesFn = (line: LineSchema.Type) => {
 						{
 							type: "template",
 						},
-						({ templateUid }) => {
+						({ templateUid, space }) => {
 							templates.add(templateUid);
+							if (space !== undefined) spaces.set(String(space), space);
 						},
 					)
 					.exhaustive();

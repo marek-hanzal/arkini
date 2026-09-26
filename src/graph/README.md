@@ -42,7 +42,7 @@ Edges reference reified operation records. Full operation data preserves line in
 | `merge-source-spend`, `merge-target-spend` | Owner → spending participant. Keep source versus target/receiver roles distinct. |
 | `merge-space` | Receiver → destination space; the transported incoming item has no exact authored identity. |
 | `rule-reference` | Operation owner → item mentioned by a condition, including Count 0, show/hide and runtime rules. This is not material consumption. |
-| `space-outcome`, `template-outcome` | Outcome owner → navigation space or applied template. A template applies to the operation's origin space, even after a Space outcome in the same roll. |
+| `space-outcome`, `template-outcome` | Outcome owner → navigation space or applied template. A template applies to its explicit authored space when present, otherwise to the operation's origin space; earlier Space navigation in the same roll never changes that target. |
 | `template-item` | Template → each placement occurrence, with x/y. |
 | `start-space`, `start-template` | Start → current/configured spaces; each configured space → assigned template. |
 

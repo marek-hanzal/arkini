@@ -1458,8 +1458,8 @@ Replacement:
   dynamic: true
 Replacement item:
   value: Replacement item
-Replaces the producer's space with this template, removing its items and active production.:
-  value: Replaces the producer's space with this template, removing its items and active production.
+Replaces the outcome origin space with this template, or an explicit target space when configured.:
+  value: Replaces the outcome origin space with this template, or an explicit target space when configured.
 Required:
   value: Required
 Required by:

@@ -66,7 +66,7 @@ export const ItemDetailDialog = ({ state }: useItemDetailMotion.Props) => {
 			>
 				<button
 					type="button"
-					className="absolute top-[var(--ak-panel-padding)] right-[var(--ak-panel-padding)] z-10 grid size-14 cursor-pointer place-items-center bg-modal text-foreground transition-[color,transform] hover:scale-110 hover:text-accent disabled:cursor-not-allowed"
+					className="absolute top-1 right-1 z-10 grid size-14 cursor-pointer place-items-center bg-transparent text-foreground opacity-60 transition-opacity hover:opacity-100 disabled:cursor-not-allowed"
 					data-ui="ItemDetailCloseButton"
 					disabled={disabled}
 					onClick={() => closeItemDetailFn()}

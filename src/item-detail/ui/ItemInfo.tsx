@@ -9,7 +9,6 @@ interface ItemInfoProps {
 	readonly detail: useItemDetailSceneController.Detail;
 	readonly stale: boolean;
 	readonly children?: ReactNode;
-	readonly requirements?: ReactNode;
 }
 
 const ItemInfoProgress = ({
@@ -17,18 +16,18 @@ const ItemInfoProgress = ({
 	fraction,
 	value,
 }: {
-	readonly dataUi: "ItemLifetimeProgress" | "ItemJobProgress";
+	readonly dataUi: "ItemLifetimeProgress" | "ItemJobProgress" | "ItemUnitsProgress";
 	readonly fraction: number;
 	readonly value: string;
 }) => {
 	const filledPercent = Math.max(0, Math.min(1, fraction)) * 100;
 	return (
 		<div
-			className="relative h-10 w-full overflow-hidden rounded-full bg-surface-raised/80 shadow-inner"
+			className="relative h-10 w-full overflow-hidden rounded-full bg-selection/75 backdrop-blur-md"
 			data-ui={dataUi}
 		>
 			<div
-				className="absolute inset-y-0 left-0 rounded-full bg-muted transition-[width] duration-300 ease-out"
+				className="absolute inset-y-0 left-0 rounded-full bg-muted/70 transition-[width] duration-300 ease-out"
 				data-ui={`${dataUi}Fill`}
 				style={{
 					width: `${filledPercent}%`,
@@ -50,7 +49,7 @@ const ItemInfoProgress = ({
 };
 
 /** The player's basic item facts, without authoring controls or resource identifiers. */
-export const ItemInfo = ({ detail, stale, children, requirements }: ItemInfoProps) => {
+export const ItemInfo = ({ detail, stale, children }: ItemInfoProps) => {
 	const translator = useTranslator();
 	const colorFraction =
 		detail.units === undefined
@@ -75,6 +74,35 @@ export const ItemInfo = ({ detail, stale, children, requirements }: ItemInfoProp
 			/>
 		);
 	const simple = detail.ui === "simple";
+	const unitsProgress =
+		detail.units !== undefined && detail.units.total > 1 ? (
+			<ItemInfoProgress
+				dataUi="ItemUnitsProgress"
+				fraction={detail.units.remaining / detail.units.total}
+				value={
+					detail.units.remaining === detail.units.total
+						? String(detail.units.remaining)
+						: `${detail.units.remaining}/${detail.units.total}`
+				}
+			/>
+		) : null;
+	const artworkProgress =
+		jobProgress !== null
+			? {
+					key: "job",
+					content: jobProgress,
+				}
+			: unitsProgress !== null
+				? {
+						key: "units",
+						content: unitsProgress,
+					}
+				: lifetimeProgress !== null
+					? {
+							key: "lifetime",
+							content: lifetimeProgress,
+						}
+					: null;
 	return (
 		<section
 			className="flex items-center justify-center p-6"
@@ -91,65 +119,42 @@ export const ItemInfo = ({ detail, stale, children, requirements }: ItemInfoProp
 						compositeUrl={detail.compositeUrl}
 						colorFraction={colorFraction}
 					/>
+					{!simple && !stale && detail.units !== undefined && detail.units.total > 1 ? (
+						<span
+							className="pointer-events-none absolute top-8 right-8 z-30 rounded-full bg-selection/75 px-3.5 py-2 text-base font-semibold tabular-nums text-foreground backdrop-blur-md"
+							data-ui="ItemInfoUnits"
+						>
+							{detail.units.remaining === detail.units.total
+								? detail.units.remaining
+								: `${detail.units.remaining}/${detail.units.total}`}
+						</span>
+					) : null}
 					{simple && !stale ? (
-						<AnimatePresence initial={false}>
-							{jobProgress !== null ? (
+						<AnimatePresence
+							initial={false}
+							mode="wait"
+						>
+							{artworkProgress !== null ? (
 								<motion.div
-									key="job"
+									key={artworkProgress.key}
 									className="pointer-events-none absolute inset-x-7 bottom-2 z-30"
 									initial={{
 										opacity: 0,
+										y: 6,
 									}}
 									animate={{
 										opacity: 1,
+										y: 0,
 									}}
 									exit={{
 										opacity: 0,
+										y: -6,
 									}}
 									transition={{
-										duration: 0.2,
+										duration: 0.18,
 									}}
 								>
-									{jobProgress}
-								</motion.div>
-							) : requirements !== undefined ? (
-								<motion.div
-									key="requirements"
-									className="absolute inset-x-4 bottom-2 z-30 rounded-2xl bg-overlay-foreground/15 px-4 py-2.5 text-foreground"
-									initial={{
-										opacity: 0,
-									}}
-									animate={{
-										opacity: 1,
-									}}
-									exit={{
-										opacity: 0,
-									}}
-									transition={{
-										duration: 0.2,
-									}}
-									data-ui="ItemInfoRequirements"
-								>
-									{requirements}
-								</motion.div>
-							) : lifetimeProgress !== null ? (
-								<motion.div
-									key="lifetime"
-									className="pointer-events-none absolute inset-x-7 bottom-2 z-30"
-									initial={{
-										opacity: 0,
-									}}
-									animate={{
-										opacity: 1,
-									}}
-									exit={{
-										opacity: 0,
-									}}
-									transition={{
-										duration: 0.2,
-									}}
-								>
-									{lifetimeProgress}
+									{artworkProgress.content}
 								</motion.div>
 							) : null}
 						</AnimatePresence>

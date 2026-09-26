@@ -19,9 +19,11 @@ export const ItemLineInputs = ({
 	ownerItemId,
 	line,
 	idle,
+	compact = false,
 	disabled,
 }: Omit<readItemLineInputsFx.Props, "runtime"> & {
 	readonly idle: boolean;
+	readonly compact?: boolean;
 	readonly disabled: boolean;
 }) => {
 	const game = useGameEngine();
@@ -59,8 +61,13 @@ export const ItemLineInputs = ({
 	if (inputs.length === 0) return null;
 	return (
 		<div
-			className="flex flex-wrap items-center gap-3"
-			data-ui="ItemLineInputs"
+			className="flex flex-wrap items-center gap-3 data-[ui-compact=true]:w-full data-[ui-compact=true]:justify-center"
+			{...readDataUiFn({
+				dataUi: "ItemLineInputs",
+				state: {
+					compact,
+				},
+			})}
 		>
 			{inputs.map((input) => {
 				const item = game.config.items[input.itemUid];
@@ -166,16 +173,17 @@ export const ItemLineInputs = ({
 							data-input-index={input.inputIndex}
 						>
 							<span
-								className="block transition-opacity duration-300 ease-out data-[ui-dimmed=true]:opacity-45"
+								className="block transition-[filter,opacity] duration-300 ease-out data-[ui-dimmed=true]:opacity-45 data-[ui-empty=true]:brightness-125 data-[ui-empty=true]:opacity-85"
 								{...readDataUiFn({
 									dataUi: "ItemLineInput",
 									state: {
-										dimmed: idle || input.filled === 0,
+										dimmed: idle && input.filled > 0,
+										empty: input.filled === 0,
 									},
 								})}
 							>
 								<ItemArtwork
-									className="size-20"
+									className={compact ? "size-16" : "size-20"}
 									sourceUrl={game.getResourceUrlFn(item.artwork.default[0])}
 									compositeUrl={
 										item.artwork.default[1] === undefined

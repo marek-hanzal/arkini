@@ -1,4 +1,5 @@
 import { AnimatePresence, motion, useIsPresent } from "motion/react";
+import { Equal } from "effect";
 import { SectionEnd } from "~/ui/ui/SectionEnd";
 import { Factory, Info, Star } from "lucide-react";
 import { useCallback } from "react";
@@ -44,7 +45,7 @@ const linePresenceMotion = {
 interface ItemLineProps extends useItemLineMakeController.Props {
 	readonly line: LineSchema.Type;
 	readonly makeDisabled: boolean;
-	readonly materialsAvailable: boolean;
+	readonly materialVisualAvailable: boolean;
 	readonly playReady: boolean;
 	readonly ruleDisabled: boolean;
 	readonly blockingHint?: string;
@@ -73,25 +74,31 @@ const ItemLineProgressBackdrop = ({
 			const job = runtime.jobs.find(
 				(job) => job.ownerItemId === ownerItemId && job.lineUid === lineUid,
 			);
-			return job === undefined
-				? undefined
-				: job.durationMs === 0
-					? 1
-					: 1 - job.remainingMs / job.durationMs;
+			return {
+				progress:
+					job === undefined
+						? undefined
+						: job.durationMs === 0
+							? 1
+							: 1 - job.remainingMs / job.durationMs,
+				queued: runtime.jobQueue.some(
+					(request) => request.ownerItemId === ownerItemId && request.lineUid === lineUid,
+				),
+			};
 		},
 		[
 			ownerItemId,
 			lineUid,
 		],
 	);
-	const progress = useRuntimeSelector(game, selectorFn);
+	const { progress, queued } = useRuntimeSelector(game, selectorFn, Equal.equals);
 	return (
 		<ItemLineBackdrop
 			sourceUrl={game.getResourceUrlFn(artworkId)}
 			progress={progress}
 			colorAvailable={colorAvailable}
 			ruleDisabled={ruleDisabled}
-			playCue={playCue}
+			playCue={playCue && !queued}
 		/>
 	);
 };
@@ -99,7 +106,7 @@ const ItemLineProgressBackdrop = ({
 const ItemLine = ({
 	line,
 	makeDisabled,
-	materialsAvailable,
+	materialVisualAvailable,
 	playReady,
 	ruleDisabled,
 	blockingHint,
@@ -129,7 +136,7 @@ const ItemLine = ({
 		!ruleDisabled;
 	const colorAvailable =
 		!ruleDisabled &&
-		(!line.input.some((input) => input.type === "materials") || materialsAvailable);
+		(!line.input.some((input) => input.type === "materials") || materialVisualAvailable);
 	return (
 		<motion.div
 			{...linePresenceMotion}
@@ -242,7 +249,7 @@ export const ItemLines = ({
 	lines,
 	disabledLineUids,
 	lineBlockingHints,
-	materialReadyLineUids,
+	materialVisualAvailableLineUids,
 	playReadyLineUids,
 	ownerItemId,
 	disabled,
@@ -251,7 +258,7 @@ export const ItemLines = ({
 	readonly lines: readonly LineSchema.Type[];
 	readonly disabledLineUids: readonly string[];
 	readonly lineBlockingHints: Readonly<Record<string, string | undefined>>;
-	readonly materialReadyLineUids: readonly string[];
+	readonly materialVisualAvailableLineUids: readonly string[];
 	readonly playReadyLineUids: readonly string[];
 	readonly ownerItemId?: IdSchema.Type;
 	readonly disabled: boolean;
@@ -267,7 +274,7 @@ export const ItemLines = ({
 						key={`line:${line.uid}`}
 						line={line}
 						ruleDisabled={disabledLineUids.includes(line.uid)}
-						materialsAvailable={materialReadyLineUids.includes(line.uid)}
+						materialVisualAvailable={materialVisualAvailableLineUids.includes(line.uid)}
 						playReady={playReadyLineUids.includes(line.uid)}
 						blockingHint={lineBlockingHints[line.uid]}
 						lineUid={line.uid}

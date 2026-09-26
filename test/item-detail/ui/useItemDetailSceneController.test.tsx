@@ -75,6 +75,136 @@ it("disables Make across all lines when the owner's queue fills and enables it w
 	}
 });
 
+it("keeps a line visually ready while its last material travels to that line", async () => {
+	const base = lineRunRuntime({
+		permit: true,
+		water: 2,
+	});
+	const owner = base.items[0];
+	const lineUid = owner.item.lines[0].uid;
+	const defaultOwner = {
+		...owner,
+		item: {
+			...owner.item,
+			lines: [
+				{
+					...owner.item.lines[0],
+					default: true,
+				},
+			],
+		},
+	};
+	const water = base.items.find((item) => item.id === "runtime:water:0")!;
+	const delivery = {
+		...water,
+		id: "runtime:water:delivery",
+		revision: "revision:water:delivery",
+		location: {
+			scope: "delivery" as const,
+			phase: "outbound" as const,
+			generation: 0,
+			origin: {
+				scope: "board" as const,
+				space: 0,
+				position: {
+					x: 2,
+					y: 0,
+				},
+			},
+			remainingDurationMs: 500,
+			target: {
+				kind: "line-input" as const,
+				ownerItemId: owner.id,
+				lineUid: "another-line",
+				inputIndex: 0,
+			},
+		},
+	};
+	state.game = {
+		readFn: Effect.runSyncExit,
+		getResourceUrlFn: (id: string) => id,
+		subscribeTransitionsFn: () => () => {},
+	};
+	let output: useItemDetailSceneController.Output | undefined;
+	const Probe = () => {
+		output = useItemDetailSceneController({
+			target: {
+				kind: "runtime",
+				itemId: owner.id,
+				origin: null,
+			},
+		});
+		return null;
+	};
+	const root = createRoot(document.createElement("div"));
+	try {
+		state.runtime = {
+			...base,
+			items: [
+				defaultOwner,
+				...base.items.slice(1),
+				delivery,
+			],
+		};
+		await act(async () => root.render(<Probe />));
+		expect(output?.detail?.materialVisualAvailableLineUids).toEqual([]);
+		expect(output?.detail?.playReadyLineUids).toEqual([]);
+		expect(output?.detail?.defaultLineAutofillCovered).toBe(false);
+
+		state.runtime = {
+			...state.runtime,
+			items: state.runtime.items.map((item) =>
+				item.id === delivery.id
+					? {
+							...delivery,
+							location: {
+								...delivery.location,
+								target: {
+									...delivery.location.target,
+									lineUid,
+								},
+							},
+						}
+					: item,
+			),
+		};
+		await act(async () => root.render(<Probe />));
+		expect(output?.detail?.materialVisualAvailableLineUids).toEqual([
+			lineUid,
+		]);
+		expect(output?.detail?.playReadyLineUids).toEqual([]);
+		expect(output?.detail?.defaultLineAutofillCovered).toBe(true);
+
+		state.runtime = {
+			...state.runtime,
+			items: state.runtime.items.map((item) =>
+				item.id === delivery.id
+					? {
+							...water,
+							id: delivery.id,
+							location: {
+								scope: "input" as const,
+								ownerItemId: owner.id,
+								lineUid,
+								inputIndex: 0,
+							},
+						}
+					: item,
+			),
+		};
+		await act(async () => root.render(<Probe />));
+		expect(output?.detail?.materialVisualAvailableLineUids).toEqual([
+			lineUid,
+		]);
+		expect(output?.detail?.playReadyLineUids).toEqual([
+			lineUid,
+		]);
+		expect(output?.detail?.defaultLineAutofillCovered).toBe(false);
+	} finally {
+		await act(async () => root.unmount());
+	}
+});
+
 it("projects the live Default line for Simple without treating the UI mode as an engine rule", async () => {
 	const base = lineRunRuntime({
 		permit: true,

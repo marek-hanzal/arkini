@@ -23,7 +23,7 @@ export const ItemDetailDefault = ({ detail, disabled, stale, target }: ItemDetai
 				lines={detail.lines}
 				disabledLineUids={detail.disabledLineUids}
 				lineBlockingHints={detail.lineBlockingHints}
-				materialReadyLineUids={detail.materialReadyLineUids}
+				materialVisualAvailableLineUids={detail.materialVisualAvailableLineUids}
 				playReadyLineUids={detail.playReadyLineUids}
 				ownerItemId={target.kind === "runtime" ? target.itemId : undefined}
 				disabled={disabled}

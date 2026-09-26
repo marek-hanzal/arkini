@@ -15,6 +15,7 @@ import { resolveJobQueueFx } from "~/production-job/fx/resolveJobQueueFx";
 import { resolveLineStartFx } from "~/production-job/fx/resolveLineStartFx";
 import { assertLineEnqueueConditionsFx } from "~/production-job/fx/assertLineEnqueueConditionsFx";
 import { readLineInputAutofillCoverageFx } from "~/production-input/fx/readLineInputAutofillCoverageFx";
+import { planLineInputAutofillFx } from "~/production-input/fx/planLineInputAutofillFx";
 import { lineRulesFx } from "~/production-line/fx/lineRulesFx";
 import { resolveLineShowFn } from "~/production-line/fn/resolveLineShowFn";
 import { resolveLineEnableFn } from "~/production-line/fn/resolveLineEnableFn";
@@ -32,12 +33,13 @@ export namespace useItemDetailSceneController {
 		readonly canMake: boolean;
 		readonly disabledLineUids: readonly string[];
 		readonly lineBlockingHints: Readonly<Record<string, string | undefined>>;
-		readonly materialReadyLineUids: readonly string[];
+		readonly materialVisualAvailableLineUids: readonly string[];
 		readonly playReadyLineUids: readonly string[];
 		readonly defaultLine?: LineSchema.Type;
 		readonly defaultLineDisabled: boolean;
 		readonly defaultLineBlockingHint?: string;
 		readonly defaultLinePlayReady: boolean;
+		readonly defaultLineAutofillCovered: boolean;
 		readonly title: string;
 		readonly sourceUrl: string;
 		readonly compositeUrl?: string;
@@ -120,6 +122,8 @@ export const useItemDetailSceneController = ({
 							enabled: line.enable,
 							blockingHint: undefined,
 							materialsAvailable: false,
+							materialVisualAvailable: false,
+							autofillCovered: false,
 							playReady: false,
 						});
 					return Effect.gen(function* () {
@@ -145,6 +149,19 @@ export const useItemDetailSceneController = ({
 										runtime,
 									})).type === "complete"
 								: false;
+						const materialVisualAvailable =
+							// Own outbound claims keep the tint stable; only settled material admits a start.
+							materialsAvailable ||
+							(visible &&
+							enabled &&
+							line.input.some((input) => input.type === "materials")
+								? (yield* planLineInputAutofillFx({
+										ownerItemId: boardOwnerItemId,
+										lineUid: line.uid,
+										runtime,
+									})).remainingMissingQuantity === 0
+								: false);
+						const autofillCovered = !materialsAvailable && materialVisualAvailable;
 						let playReady = false;
 						if (
 							visible &&
@@ -185,6 +202,8 @@ export const useItemDetailSceneController = ({
 							visible,
 							enabled,
 							materialsAvailable,
+							materialVisualAvailable,
+							autofillCovered,
 							playReady,
 						};
 					});
@@ -235,6 +254,7 @@ export const useItemDetailSceneController = ({
 					!defaultLineState.enabled,
 				defaultLineBlockingHint: defaultLineState?.blockingHint,
 				defaultLinePlayReady: defaultLineState?.playReady ?? false,
+				defaultLineAutofillCovered: defaultLineState?.autofillCovered ?? false,
 				lines: visibleLines.map((state) => state.line),
 				lineBlockingHints: Object.fromEntries(
 					visibleLines.map((state) => [
@@ -242,8 +262,8 @@ export const useItemDetailSceneController = ({
 						state.blockingHint,
 					]),
 				),
-				materialReadyLineUids: visibleLines
-					.filter((state) => state.materialsAvailable)
+				materialVisualAvailableLineUids: visibleLines
+					.filter((state) => state.materialVisualAvailable)
 					.map((state) => state.line.uid),
 				playReadyLineUids: visibleLines
 					.filter((state) => state.playReady)

@@ -11,8 +11,10 @@ import { readSettledAsyncResultErrorFx } from "~/ui/fx/readSettledAsyncResultErr
 export namespace useItemSimpleDefaultController {
 	export interface Props {
 		readonly ownerItemId?: IdSchema.Type;
+		readonly lineUid?: IdSchema.Type;
 		readonly disabled: boolean;
 		readonly ready: boolean;
+		readonly autofillCovered: boolean;
 	}
 	export interface Output {
 		readonly startFn: () => void;
@@ -24,19 +26,30 @@ export namespace useItemSimpleDefaultController {
 /** Submits the current effective Default line; engine admission resolves it again on click. */
 export const useItemSimpleDefaultController = ({
 	ownerItemId,
+	lineUid,
 	disabled,
 	ready,
+	autofillCovered,
 }: useItemSimpleDefaultController.Props): useItemSimpleDefaultController.Output => {
 	const game = useGameEngine();
 	const [settled, setSettledFn] = useState({
 		ownerItemId,
+		lineUid,
 		ready,
 	});
 	useEffect(() => {
+		if (
+			autofillCovered &&
+			settled.ownerItemId === ownerItemId &&
+			settled.lineUid === lineUid &&
+			settled.ready
+		)
+			return;
 		const timeout = setTimeout(
 			() =>
 				setSettledFn({
 					ownerItemId,
+					lineUid,
 					ready,
 				}),
 			500,
@@ -44,7 +57,12 @@ export const useItemSimpleDefaultController = ({
 		return () => clearTimeout(timeout);
 	}, [
 		ownerItemId,
+		lineUid,
 		ready,
+		autofillCovered,
+		settled.ownerItemId,
+		settled.lineUid,
+		settled.ready,
 	]);
 	const commandAtom = useMemo(
 		() =>
@@ -56,10 +74,15 @@ export const useItemSimpleDefaultController = ({
 	);
 	const [result, enqueueFn] = useAtom(commandAtom);
 	RendererRuntime.runSync(readSettledAsyncResultErrorFx(result));
-	const displayReady = ready && settled.ownerItemId === ownerItemId && settled.ready;
+	const displayReady =
+		settled.ownerItemId === ownerItemId &&
+		settled.lineUid === lineUid &&
+		settled.ready &&
+		(ready || autofillCovered);
 	return {
 		startFn: () => {
-			if (disabled || !displayReady || result.waiting || ownerItemId === undefined) return;
+			if (disabled || !ready || !displayReady || result.waiting || ownerItemId === undefined)
+				return;
 			enqueueFn({
 				ownerItemId,
 			});

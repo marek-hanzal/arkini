@@ -68,7 +68,7 @@ interface Props {
 	readonly surface: MainInteractionSurface;
 }
 
-interface ActiveDragBase extends createMainDragPreviewFx.State {
+interface ActiveDrag extends createMainDragPreviewFx.State {
 	readonly activationIntent: MainActivationIntent;
 	readonly pointerId: number;
 	readonly pressX: number;
@@ -79,19 +79,8 @@ interface ActiveDragBase extends createMainDragPreviewFx.State {
 	readonly startY: number;
 	lastPointerX: number;
 	lastPointerY: number;
-}
-
-interface ActivationOnlyGesture extends ActiveDragBase {
-	readonly mode: "activation-only";
-	readonly phase: "pressed";
-}
-
-interface MovableGesture extends ActiveDragBase {
-	readonly mode: "drag";
 	phase: "dragging" | "pressed";
 }
-
-type ActiveDrag = ActivationOnlyGesture | MovableGesture;
 const removeCheatItemFx = Effect.fn("createMainDragControllerFx.removeCheatItemFx")(
 	({ game, sourceItem }: { readonly game: GameEngine; readonly sourceItem: TileActorItem }) =>
 		game
@@ -175,8 +164,6 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 		if (hoveredActor === actor) return;
 		const previous = hoveredActor;
 		hoveredActor = actor;
-		if (previous !== null && !previous.container.destroyed) previous.infoButton.visible = false;
-		if (actor !== null && !actor.container.destroyed) actor.infoButton.visible = true;
 		for (const [target, scale] of [
 			[
 				previous,
@@ -247,7 +234,6 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 		RendererRuntime.runSync(pointerSampler.cancelFx);
 		activeDrag = null;
 		releaseDragPointerFn(drag.pointerId);
-		if (drag.mode !== "drag") return;
 		RendererRuntime.runSync(surface.renderDropFeedbackFx(null, null));
 		RendererRuntime.runSync(cursorGrab.finishFx(drag.actor));
 		settleActorFn(drag.actor);
@@ -262,9 +248,6 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 	const detachActorFn = (actor: PixiTileActor) => {
 		if (hoveredActor === actor) setHoveredActorFn(null);
 		else if (actor.hoverLayer.scale.x !== 1) animateHoverScaleFn(actor, 1);
-		actor.infoButton.visible = false;
-		actor.infoButton.removeAllListeners("pointerdown");
-		actor.infoButton.removeAllListeners("pointertap");
 		RendererRuntime.runSync(dragPreview.detachTargetFx(actor));
 		if (actor.onPointerDownFn !== null) {
 			actor.container.off("pointerdown", actor.onPointerDownFn);
@@ -287,10 +270,6 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 		activeDrag = null;
 		RendererRuntime.runSync(dragPreview.clearTargetFx);
 		releaseDragPointerFn(drag.pointerId);
-		if (drag.mode !== "drag") {
-			actor.container.cursor = "default";
-			return;
-		}
 		RendererRuntime.runSync(surface.renderDropFeedbackFx(null, null));
 		RendererRuntime.runSync(cursorGrab.finishFx(actor));
 		actor.dragging = false;
@@ -320,11 +299,6 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 			return;
 		}
 		if (drag.phase === "pressed" && !thresholdCrossed) return;
-		if (drag.phase === "pressed" && drag.mode === "activation-only") {
-			activeDrag = null;
-			releaseDragPointerFn(drag.pointerId);
-			return;
-		}
 		if (drag.phase === "pressed") {
 			drag.phase = "dragging";
 			const sourceItem = RendererRuntime.runSync(dragPreview.readCurrentSourceFx(drag));
@@ -383,7 +357,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 		)
 			return;
 		// Keep admission in original screen coordinates: a world round-trip can round an exact
-		// threshold below the camera's threshold and let one right release both pan and activate.
+		// threshold below the drag threshold and mistake a held left gesture for a click.
 		thresholdCrossed =
 			Math.hypot(event.global.x - drag.pressScreenX, event.global.y - drag.pressScreenY) >=
 			dragThreshold;
@@ -530,7 +504,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 		}
 		RendererRuntime.runSync(pointerSampler.flushFx());
 		const drag = activeDrag;
-		if (drag === null || drag.mode !== "drag" || drag.phase !== "dragging") {
+		if (drag === null || drag.phase !== "dragging") {
 			return;
 		}
 		const sourceItem = RendererRuntime.runSync(dragPreview.readCurrentSourceFx(drag));
@@ -574,15 +548,12 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 				if (actor.onPointerLeaveFn !== null) {
 					actor.container.off("pointerleave", actor.onPointerLeaveFn);
 				}
-				actor.infoButton.removeAllListeners("pointerdown");
-				actor.infoButton.removeAllListeners("pointertap");
 				actor.container.eventMode = "static";
 				actor.container.cursor = readActorCursorFn({
 					phase: "idle",
 					running: actor.item.running,
 				});
 				const onPointerDownFn = (event: FederatedPointerEvent) => {
-					const gestureMode = event.button === 2 ? "activation-only" : "drag";
 					if (
 						closed ||
 						interactionBlocked ||
@@ -590,7 +561,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 						activeDrag !== null ||
 						RendererRuntime.runSync(dropSubmission.isPendingActorFx(actor.item.id)) ||
 						!event.isPrimary ||
-						(event.button !== 0 && event.button !== 2)
+						event.button !== 0
 					) {
 						return;
 					}
@@ -607,12 +578,6 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 							.returnType<MainActivationIntent>()
 							.with(
 								{
-									button: 2,
-								},
-								() => "detail",
-							)
-							.with(
-								{
 									button: 0,
 									ctrlKey: true,
 									altKey: false,
@@ -620,7 +585,17 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 								},
 								() => "fill-default-line-queue",
 							)
-							.otherwise(() => "primary"),
+							.with(
+								{
+									button: 0,
+									shiftKey: true,
+									ctrlKey: false,
+									altKey: false,
+									metaKey: false,
+								},
+								() => "primary",
+							)
+							.otherwise(() => "detail"),
 						actor,
 						pointerId: event.pointerId,
 						pressScreenX: event.global.x,
@@ -631,7 +606,6 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 						lastPointerY: point.y,
 						previewKind: null,
 						previewSource: null,
-						mode: gestureMode,
 						phase: "pressed",
 						sourceItem: actor.item,
 						startX: actor.container.x,
@@ -663,23 +637,6 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 				actor.onPointerLeaveFn = onPointerLeaveFn;
 				actor.container.on("pointerenter", onPointerEnterFn);
 				actor.container.on("pointerleave", onPointerLeaveFn);
-				actor.infoButton.on("pointerdown", (event: FederatedPointerEvent) => {
-					event.stopPropagation();
-				});
-				actor.infoButton.on("pointertap", (event: FederatedPointerEvent) => {
-					event.stopPropagation();
-					if (closed || interactionBlocked || actor.container.destroyed) return;
-					void Promise.resolve()
-						.then(() => {
-							if (closed) return;
-							const latestActor = actorStore.actors.get(actor.item.id);
-							if (latestActor !== actor || isMovingFn(actor)) return;
-							return onActivateFn(latestActor.item, "detail", application.app.canvas);
-						})
-						.catch((cause) => {
-							if (!closed) game.reportCriticalFailureFn("game-presentation", cause);
-						});
-				});
 			}),
 		),
 		cancelInteractionFx: Effect.sync(() => cancelInteractionFn()),
@@ -696,7 +653,7 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 		),
 		requestRefreshFx: Effect.gen(function* () {
 			const drag = activeDrag;
-			if (drag === null || drag.mode !== "drag" || drag.phase !== "dragging") return;
+			if (drag === null || drag.phase !== "dragging") return;
 			yield* pointerSampler.scheduleFallbackFx({
 				pointerId: drag.pointerId,
 				x: drag.lastPointerX,
@@ -715,7 +672,6 @@ export const createMainDragControllerFx = Effect.fn("createMainDragControllerFx"
 				const drag = activeDrag;
 				if (
 					drag === null ||
-					drag.mode !== "drag" ||
 					drag.phase !== "dragging" ||
 					(pointer.pointerId !== undefined && drag.pointerId !== pointer.pointerId)
 				)

@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { Container, Graphics, Rectangle } from "pixi.js";
+import { Container, Graphics } from "pixi.js";
 
 import type { TileActorItem } from "~/tile-presentation/type/TileActorItem";
 import type { PixiTileActor } from "~/tile-rendering/type/PixiTileActor";
@@ -56,41 +56,6 @@ export const createTileActorFx = Effect.fn("createTileActorFx")(
 				label: `TileActorClock:${item.id}:${instanceId}`,
 			});
 			clockRing.visible = false;
-			const infoButton = new Container({
-				eventMode: "static",
-				label: `TileActorInfo:${item.id}:${instanceId}`,
-			});
-			const infoShadow = new Graphics({
-				eventMode: "none",
-			});
-			infoShadow
-				.circle(0, 0, 11)
-				.stroke({
-					color: palette.overlay,
-					width: 1.6,
-				})
-				.circle(0, -5, 1.5)
-				.fill(palette.overlay)
-				.roundRect(-1.5, -1.5, 3, 8, 1.2)
-				.fill(palette.overlay);
-			const infoGlyph = new Graphics({
-				eventMode: "none",
-			});
-			infoGlyph
-				.circle(0, 0, 11)
-				.stroke({
-					color: palette.foreground,
-					alpha: 0.8,
-					width: 1.6,
-				})
-				.circle(0, -5, 1.5)
-				.fill(palette.foreground)
-				.roundRect(-1.5, -1.5, 3, 8, 1.2)
-				.fill(palette.foreground);
-			infoButton.addChild(infoShadow, infoGlyph);
-			infoButton.hitArea = new Rectangle(-17, -17, 34, 34);
-			infoButton.cursor = "pointer";
-			infoButton.visible = false;
 			const currentVisual = yield* createActorVisualFx({
 				frames,
 				item,
@@ -104,15 +69,13 @@ export const createTileActorFx = Effect.fn("createTileActorFx")(
 			visualLayer.addChild(currentVisual.container);
 			hoverLayer.addChild(visualLayer, progressBar, clockRing);
 			lifecycleLayer.addChild(hoverLayer);
-			container.addChild(lifecycleLayer, infoButton);
+			container.addChild(lifecycleLayer);
 
 			return {
 				instanceId,
 				container,
 				lifecycleLayer,
 				hoverLayer,
-				infoButton,
-				infoShadow,
 				visualLayer,
 				progressBar,
 				clockRing,

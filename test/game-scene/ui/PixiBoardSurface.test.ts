@@ -171,7 +171,7 @@ describe("PixiBoardSurface", () => {
 		});
 	});
 
-	it("opens Item Detail even when a left click has no default line", async () => {
+	it("opens Item Detail for unavailable Default actions", async () => {
 		await renderSurface();
 		const createProps = boardState.createProps;
 		if (createProps === null) throw new Error("Board scene did not create its runtime.");
@@ -244,7 +244,7 @@ describe("PixiBoardSurface", () => {
 		expect(boardState.openItemDetail).not.toHaveBeenCalled();
 	});
 
-	it("admits the default line without opening Detail and keeps right click detail-only", async () => {
+	it("opens Detail on plain click and admits the Default line for modifier clicks", async () => {
 		await renderSurface();
 		const createProps = boardState.createProps;
 		if (createProps === null) throw new Error("Board scene did not create its runtime.");
@@ -278,6 +278,14 @@ describe("PixiBoardSurface", () => {
 		} satisfies TileActorItem;
 
 		const canvas = document.createElement("canvas");
+		await createProps.onActivateFn(producer, "detail", canvas);
+		expect(boardState.openItemDetail).toHaveBeenCalledWith({
+			itemId: producer.id,
+			origin: canvas,
+		});
+		expect(boardState.enqueueLine).not.toHaveBeenCalled();
+		boardState.openItemDetail.mockClear();
+
 		await createProps.onActivateFn(producer, "primary", canvas);
 
 		expect(boardState.enqueueLine).toHaveBeenCalledWith({
@@ -293,14 +301,6 @@ describe("PixiBoardSurface", () => {
 		});
 		expect(boardState.enqueueLine).toHaveBeenCalledTimes(2);
 		expect(boardState.openItemDetail).not.toHaveBeenCalled();
-		await createProps.onActivateFn(producer, "detail", canvas);
-		expect(boardState.enqueueLine).toHaveBeenCalledTimes(2);
-		expect(boardState.openItemDetail).toHaveBeenCalledWith({
-			itemId: producer.id,
-			origin: canvas,
-		});
-		expect(boardState.openItemDetail).toHaveBeenCalledTimes(1);
-		boardState.openItemDetail.mockClear();
 		await createProps.onActivateFn(
 			{
 				...producer,

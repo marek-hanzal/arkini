@@ -182,7 +182,6 @@ export const mountController = ({
 	vi.spyOn(transientActorLayer, "addChild");
 	const actor = createDragActor(item);
 	const actorEvents = new FakeEmitter(actor.container);
-	const infoEvents = new FakeEmitter(actor.infoButton);
 	const actors = new Map([
 		[
 			item.id,
@@ -427,7 +426,6 @@ export const mountController = ({
 	return {
 		actor,
 		actorEvents,
-		infoEvents,
 		actors,
 		animations,
 		animateActor,

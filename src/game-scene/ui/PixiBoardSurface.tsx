@@ -18,10 +18,9 @@ import { usePixiGameRuntime } from "~/game-scene/ui/PixiGameRuntime";
 /**
  * Mounts the one Pixi-native Board scene into the React-owned game shell.
  *
- * Left click admits the effective Default line, or opens Item Detail when none exists.
- * Ctrl+left click fills that line's queue, or opens Detail when none exists. Right click
- * opens Detail alone. Queue playback owns Autofill and start; the scene owns pointer
- * and display lifecycle.
+ * Left click opens Item Detail. Shift+left admits the effective Default line, while
+ * Ctrl+left fills its queue; unavailable actions fall back to Detail. Queue playback
+ * owns Autofill and start; the scene owns pointer and display lifecycle.
  */
 export const PixiBoardSurface = () => {
 	const game = useGameEngine();

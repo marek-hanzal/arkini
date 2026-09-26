@@ -172,8 +172,6 @@ export const createActor = (item: TileActorItem): PixiTileActor => {
 		container,
 		lifecycleLayer,
 		hoverLayer,
-		infoButton: new Graphics(),
-		infoShadow: new Graphics(),
 		visualLayer,
 		progressBar,
 		clockRing: new Graphics(),

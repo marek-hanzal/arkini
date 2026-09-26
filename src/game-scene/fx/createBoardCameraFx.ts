@@ -27,7 +27,6 @@ interface Props {
 		readonly setInteractionBlockedFx: (blocked: boolean) => Effect.Effect<void>;
 	};
 	readonly dragThreshold: number;
-	readonly onScaleFn?: (zoom: number) => void;
 	readonly surfaces: readonly [
 		SurfaceLayout,
 		...SurfaceLayout[],
@@ -54,7 +53,6 @@ export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 	application,
 	drag,
 	dragThreshold,
-	onScaleFn,
 	surfaces,
 }: Props) {
 	const { app, stage, frames } = application;
@@ -98,7 +96,6 @@ export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 	};
 
 	const invalidateFn = () => {
-		onScaleFn?.(stage.scale.x);
 		// Pixi hitArea is local even though it covers the whole screen, including empty space.
 		stage.hitArea = new Rectangle(
 			-stage.x / stage.scale.x,
@@ -284,7 +281,7 @@ export const createBoardCameraFx = Effect.fn("createBoardCameraFx")(function* ({
 		if (pan === null || event.pointerId !== pan.pointerId) return;
 		if (pan.phase === "pressed") {
 			if (Math.hypot(event.clientX - pan.x, event.clientY - pan.y) < dragThreshold) return;
-			// A short right click still belongs to the tile. Only a drag takes its gesture away.
+			// Claim the right button only after the pan threshold; a short click stays inert.
 			pan.phase = "dragging";
 			updateInteractionFn();
 			canvas.setPointerCapture(event.pointerId);

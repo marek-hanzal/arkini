@@ -115,7 +115,6 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 			item,
 			palette: readPaletteFn(),
 			size: pose.size,
-			zoom: application.stage.scale.x,
 			textures,
 		});
 	});
@@ -627,7 +626,6 @@ export const createMainReconcilerFx = Effect.fn("createMainReconcilerFx")(functi
 				item: actor.item,
 				palette: readPaletteFn(),
 				size: pose.size,
-				zoom: application.stage.scale.x,
 				textures,
 			});
 		}

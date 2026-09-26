@@ -15,31 +15,19 @@ describe("main drag controller: pointer", () => {
 			button: 0,
 			ctrlKey: false,
 			shiftKey: false,
-			intent: "primary",
+			intent: "detail",
 		},
 		{
-			button: 2,
+			button: 0,
 			ctrlKey: false,
-			shiftKey: false,
-			intent: "detail",
+			shiftKey: true,
+			intent: "primary",
 		},
 		{
 			button: 0,
 			ctrlKey: true,
 			shiftKey: false,
 			intent: "fill-default-line-queue",
-		},
-		{
-			button: 2,
-			ctrlKey: false,
-			shiftKey: true,
-			intent: "detail",
-		},
-		{
-			button: 2,
-			ctrlKey: true,
-			shiftKey: false,
-			intent: "detail",
 		},
 	])("maps ordinary item clicks to $intent", async ({ button, ctrlKey, shiftKey, intent }) => {
 		const mounted = mountController();
@@ -59,13 +47,10 @@ describe("main drag controller: pointer", () => {
 		expect(mounted.onActivate.mock.calls[0]?.[1]).toBe(intent);
 	});
 
-	it("does not activate a right release exactly at the screen threshold after fractional zoom", async () => {
+	it("ignores a right click on an item so camera pan owns that button", async () => {
 		const mounted = mountController();
-		const scale = 800 / 2432;
-		mounted.stage.container.scale.set(scale);
-		mounted.stage.container.position.set((1000 - 2048 * scale) / 2, (800 - 2176 * scale) / 2);
-		mounted.actorEvents.emit("pointerdown", pointer(201, 200, 2));
-		mounted.stage.emit("pointerup", pointer(207, 200, 2));
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20, 2));
+		mounted.stage.emit("pointerup", pointer(10, 20, 2));
 		await Promise.resolve();
 		expect(mounted.onActivate).not.toHaveBeenCalled();
 		expect(mounted.onDrop).not.toHaveBeenCalled();
@@ -75,10 +60,16 @@ describe("main drag controller: pointer", () => {
 		const mounted = mountController();
 		mounted.setOccupant(mounted.actor.item);
 		mounted.actorEvents.emit("pointerenter", pointer(10, 20));
-		expect(mounted.actor.infoButton.visible).toBe(true);
+		expect(mounted.animations.at(-1)).toMatchObject({
+			channel: "hover-scale",
+			toScale: 1.08,
+		});
 
 		Effect.runSync(mounted.controller.setInteractionBlockedFx(true));
-		expect(mounted.actor.infoButton.visible).toBe(false);
+		expect(mounted.animations.at(-1)).toMatchObject({
+			channel: "hover-scale",
+			toScale: 1,
+		});
 		Effect.runSync(mounted.controller.setInteractionBlockedFx(false));
 		Effect.runSync(
 			mounted.controller.refreshHoverAtFx({
@@ -86,7 +77,10 @@ describe("main drag controller: pointer", () => {
 				y: 20,
 			}),
 		);
-		expect(mounted.actor.infoButton.visible).toBe(true);
+		expect(mounted.animations.at(-1)).toMatchObject({
+			channel: "hover-scale",
+			toScale: 1.08,
+		});
 	});
 
 	it("keeps the drag threshold in screen pixels and submits world coordinates after zoom and pan", () => {

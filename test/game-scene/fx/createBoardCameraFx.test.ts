@@ -234,7 +234,7 @@ describe.each(cases)("$name camera", ({ surfaces }) => {
 		expect(mounted.blockFn).not.toHaveBeenCalled();
 	});
 
-	it("lets short right clicks reach tiles but claims a right drag before tile activation", () => {
+	it("leaves a short right click inert and claims a right drag for camera pan", () => {
 		const mounted = mountFn(surfaces);
 		const tileDownFn = vi.fn();
 		const tileUpFn = vi.fn();

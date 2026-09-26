@@ -767,7 +767,7 @@ Item interface:
   value: Item interface
 Item interface help:
   value: |
-    **Simple** shows only item information. Board clicks can run the Default line, including filling its queue. Without a Default line, clicks do not start production. Players cannot directly select other production lines, manage inputs or queues, or change Default and Clock selections.
+    **Simple** shows only item information. A plain Board click opens Item Detail. Shift+click runs the Default line and Ctrl+click fills its queue; either opens Detail when the line is unavailable. Without a Default line, modifier clicks do not start production. Players cannot directly select other production lines, manage inputs or queues, or change Default and Clock selections.
 
     **Default** shows all sections, even without production lines, and enables ordinary manual production.
 

@@ -208,7 +208,6 @@ describe("texture readiness", () => {
 				}),
 				palette,
 				size: 80,
-				zoom: 1,
 				textures,
 			}),
 		);
@@ -246,7 +245,6 @@ describe("texture readiness", () => {
 				}),
 				palette,
 				size: 80,
-				zoom: 1,
 				textures,
 			}),
 		);
@@ -301,7 +299,6 @@ describe("texture readiness", () => {
 					item,
 					palette,
 					size: 80,
-					zoom: 1,
 					textures,
 				}),
 			);

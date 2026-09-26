@@ -22,7 +22,6 @@ import type { TextureStore } from "~/tile-rendering/fx/createTextureStoreFx";
 import type { MainActivationIntent } from "~/tile-interaction/type/MainActivationIntent";
 import { createMainReconcilerFx } from "~/game-scene/fx/createMainReconcilerFx";
 import { createBoardCameraFx } from "~/game-scene/fx/createBoardCameraFx";
-import { readTileInfoGeometryFn } from "~/tile-rendering/fn/readTileInfoGeometryFn";
 import { readMainLayoutFn } from "~/game-scene/fn/readMainLayoutFn";
 import { createMainSurfaceFx } from "~/game-scene/fx/createMainSurfaceFx";
 import { createBoardTransitionPresenterFx } from "~/game-scene/fx/createBoardTransitionPresenterFx";
@@ -171,14 +170,6 @@ export const createMainRuntimeFx = Effect.fn("createMainRuntimeFx")(function* ({
 			application,
 			drag,
 			dragThreshold,
-			onScaleFn: (zoom) => {
-				for (const actor of actorStore.actors.values()) {
-					const info = readTileInfoGeometryFn(zoom, actor.size);
-					actor.infoButton.position.set(info.inset, info.inset);
-					actor.infoButton.scale.set(info.scale);
-					actor.infoShadow.position.set(info.shadowOffset, info.shadowOffset);
-				}
-			},
 			surfaces: [
 				layout,
 			],

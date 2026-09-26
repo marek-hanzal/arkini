@@ -10,25 +10,15 @@ import {
 } from "~test/tile-interaction/fx/MainDragController.test/fixture";
 
 describe("main drag controller: motion", () => {
-	it("shows a detail target on hover and clears the scale before an item gesture", async () => {
+	it("grows the art on hover and clears the scale before an item gesture", async () => {
 		const mounted = mountController();
-		expect(mounted.actor.infoButton.visible).toBe(false);
 		mounted.actorEvents.emit("pointerenter", pointer(10, 20));
-		expect(mounted.actor.infoButton.visible).toBe(true);
 		expect(mounted.animations.at(-1)).toMatchObject({
 			channel: "hover-scale",
 			toScale: 1.08,
 		});
 
-		const infoPress = pointer(10, 20);
-		mounted.infoEvents.emit("pointerdown", infoPress);
-		mounted.infoEvents.emit("pointertap", infoPress);
-		await flushMicrotasks();
-		expect(mounted.onActivate).toHaveBeenCalledWith(item, "detail", expect.anything());
-		expect(mounted.startCursorGrab).not.toHaveBeenCalled();
-
 		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
-		expect(mounted.actor.infoButton.visible).toBe(false);
 		expect(mounted.animations.at(-1)).toMatchObject({
 			channel: "hover-scale",
 			toScale: 1,
@@ -50,7 +40,6 @@ describe("main drag controller: motion", () => {
 		});
 		mounted.actorEvents.emit("pointerenter", pointer(10, 20));
 		Effect.runSync(mounted.controller.setInteractionBlockedFx(true));
-		expect(mounted.actor.infoButton.visible).toBe(false);
 		const animationCount = mounted.animations.length;
 		mounted.actorEvents.emit("pointerenter", pointer(10, 20));
 		expect(mounted.animations).toHaveLength(animationCount);
@@ -67,7 +56,6 @@ describe("main drag controller: motion", () => {
 				y: 20,
 			}),
 		);
-		expect(mounted.actor.infoButton.visible).toBe(true);
 		expect(mounted.animations).toHaveLength(animationsBeforeZoom);
 		Effect.runSync(mounted.controller.closeFx);
 	});
@@ -216,7 +204,10 @@ describe("main drag controller: motion", () => {
 			running: false,
 		} satisfies TileActorItem;
 
-		mounted.actorEvents.emit("pointerdown", pointer(10, 20, 0));
+		mounted.actorEvents.emit("pointerdown", {
+			...pointer(10, 20, 0),
+			shiftKey: true,
+		});
 		mounted.stage.emit("pointerup", pointer(10, 20, 0));
 		mounted.setItem(completedInstantRun);
 		await flushMicrotasks();
@@ -227,7 +218,10 @@ describe("main drag controller: motion", () => {
 			expect.anything(),
 		);
 
-		mounted.actorEvents.emit("pointerdown", pointer(10, 20, 0));
+		mounted.actorEvents.emit("pointerdown", {
+			...pointer(10, 20, 0),
+			shiftKey: true,
+		});
 		mounted.stage.emit("pointerup", pointer(10, 20, 0));
 		await flushMicrotasks();
 

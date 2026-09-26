@@ -194,67 +194,275 @@ signing:update-trusted-root() {
 	tsx scripts/updateSerapackTrustedRoot.ts
 }
 
+llm_lock_hash() {
+	local root_dir
+	root_dir=$1
+	shasum -a 256 "$root_dir/package-lock.json" | awk '{print substr($1, 1, 12)}'
+}
+
+build_llm_cache_archive() {
+	local root_dir output_dir cache_dir work_dir registry lock_hash archive archive_hash
+	local -a npm_args
+	root_dir=$1
+	output_dir=$2
+	cache_dir="$root_dir/.npm-cache"
+	work_dir="$cache_dir/.work"
+	registry="https://registry.npmjs.org/"
+	npm_args=(
+		ci
+		--omit=peer
+		--registry="$registry"
+		--cache="$cache_dir"
+		--os=linux
+		--cpu=x64
+		--libc=glibc
+		--ignore-scripts
+		--no-audit
+		--no-fund
+	)
+
+	for command in npm tar shasum; do
+		if ! command -v "$command" >/dev/null 2>&1; then
+			echo "Missing required command: $command" >&2
+			return 1
+		fi
+	done
+	if [[ ! -f "$root_dir/package.json" || ! -f "$root_dir/package-lock.json" ]]; then
+		echo "package.json and package-lock.json must exist in $root_dir." >&2
+		return 1
+	fi
+
+	mkdir -p "$cache_dir" "$output_dir"
+	rm -rf "$work_dir"
+	mkdir -p "$work_dir"
+	cp "$root_dir/package.json" "$root_dir/package-lock.json" "$work_dir/"
+
+	echo "Checking Linux x64 npm cache in $cache_dir ..."
+	if (cd "$work_dir" && npm "${npm_args[@]}" --offline >/dev/null 2>&1); then
+		echo "Existing npm cache is complete; reusing it."
+	else
+		echo "Refreshing npm cache from $registry ..."
+		rm -rf "$work_dir/node_modules"
+		(cd "$work_dir" && npm "${npm_args[@]}")
+	fi
+
+	echo "Verifying cache with a network-free install ..."
+	rm -rf "$work_dir/node_modules"
+	(cd "$work_dir" && npm "${npm_args[@]}" --offline)
+
+	rm -rf "$work_dir"
+	npm cache verify --cache="$cache_dir" >/dev/null
+	rm -rf "$cache_dir/_logs"
+	rm -f "$cache_dir/_update-notifier-last-checked"
+
+	lock_hash=$(llm_lock_hash "$root_dir")
+	archive="$output_dir/serakki-npm-cache-linux-x64-$lock_hash.tgz"
+	rm -f "$archive"
+	tar -C "$root_dir" -czf "$archive" .npm-cache
+	archive_hash=$(shasum -a 256 "$archive" | awk '{print $1}')
+
+	echo
+	echo "Cache archive ready:"
+	echo "  $archive"
+	echo "  SHA-256: $archive_hash"
+}
+
 # @cmd Build and verify the offline Linux x64 npm cache for LLM environments
 llm:cache() {
 	(
-		local root_dir cache_dir work_dir registry lock_hash archive archive_hash
-		local -a npm_args
+		local root_dir work_dir
 		root_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
-		cache_dir="$root_dir/.npm-cache"
-		work_dir="$cache_dir/.work"
-		registry="https://registry.npmjs.org/"
-		npm_args=(
-			ci
-			--omit=peer
-			--registry="$registry"
-			--cache="$cache_dir"
-			--os=linux
-			--cpu=x64
-			--libc=glibc
-			--ignore-scripts
-			--no-audit
-			--no-fund
+		work_dir="$root_dir/.npm-cache/.work"
+		trap 'rm -rf "$work_dir"' EXIT
+		build_llm_cache_archive "$root_dir" "$root_dir"
+	)
+}
+
+# @cmd Build a standalone Git and npm snapshot for LLM environments
+llm:snapshot() {
+	(
+		local root_dir branch origin head head_short lock_hash snapshot_dir work_dir agent_dir verify_dir
+		local git_archive cache_archive manifest git_archive_hash cache_archive_hash old_filter old_any
+		local had_filter had_any source_config_restored
+		local -a excluded_paths
+
+		root_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+		excluded_paths=(
+			game/serakki/artwork
+			game/serakki/music
+			game/serakki/image
+			game/serakki/sfx
 		)
 
-		for command in npm tar shasum; do
+		for command in git zip unzip npm tar shasum; do
 			if ! command -v "$command" >/dev/null 2>&1; then
 				echo "Missing required command: $command" >&2
 				exit 1
 			fi
 		done
-		if [[ ! -f "$root_dir/package.json" || ! -f "$root_dir/package-lock.json" ]]; then
-			echo "package.json and package-lock.json must exist in $root_dir." >&2
+		if [[ -n "$(git -C "$root_dir" status --porcelain)" ]]; then
+			echo "LLM snapshots require a clean worktree. Commit or stash repository changes first." >&2
+			exit 1
+		fi
+		branch=$(git -C "$root_dir" branch --show-current)
+		if [[ -z "$branch" ]]; then
+			echo "LLM snapshots require a named Git branch; detached HEAD is not supported." >&2
+			exit 1
+		fi
+		origin=$(git -C "$root_dir" remote get-url origin 2>/dev/null || true)
+		if [[ -z "$origin" ]]; then
+			echo "LLM snapshots require an origin remote so the restored repository can fetch missing blobs when needed." >&2
 			exit 1
 		fi
 
-		trap 'rm -rf "$work_dir"' EXIT
-		mkdir -p "$cache_dir"
-		rm -rf "$work_dir"
+		head=$(git -C "$root_dir" rev-parse HEAD)
+		head_short=$(git -C "$root_dir" rev-parse --short=12 HEAD)
+		lock_hash=$(llm_lock_hash "$root_dir")
+		snapshot_dir="$root_dir/.llm/$head_short-$lock_hash"
+		work_dir="$snapshot_dir/.work"
+		agent_dir="$work_dir/repository"
+		verify_dir="$work_dir/verify"
+		git_archive="$snapshot_dir/serakki-agent-$head_short.zip"
+		cache_archive="$snapshot_dir/serakki-npm-cache-linux-x64-$lock_hash.tgz"
+		manifest="$snapshot_dir/manifest.txt"
+
+		rm -rf "$snapshot_dir"
 		mkdir -p "$work_dir"
-		cp "$root_dir/package.json" "$root_dir/package-lock.json" "$work_dir/"
 
-		echo "Building Linux x64 npm cache in $cache_dir ..."
-		(cd "$work_dir" && npm "${npm_args[@]}")
+		had_filter=0
+		had_any=0
+		source_config_restored=0
+		if git -C "$root_dir" config --local --get uploadpack.allowFilter >/dev/null 2>&1; then
+			had_filter=1
+			old_filter=$(git -C "$root_dir" config --local --get uploadpack.allowFilter)
+		else
+			old_filter=
+		fi
+		if git -C "$root_dir" config --local --get uploadpack.allowAnySHA1InWant >/dev/null 2>&1; then
+			had_any=1
+			old_any=$(git -C "$root_dir" config --local --get uploadpack.allowAnySHA1InWant)
+		else
+			old_any=
+		fi
 
-		echo "Verifying cache with a network-free install ..."
-		rm -rf "$work_dir/node_modules"
-		(cd "$work_dir" && npm "${npm_args[@]}" --offline)
+		restore_source_git_config() {
+			if [[ "$source_config_restored" == 1 ]]; then
+				return
+			fi
+			if [[ "$had_filter" == 1 ]]; then
+				git -C "$root_dir" config --local uploadpack.allowFilter "$old_filter"
+			else
+				git -C "$root_dir" config --local --unset-all uploadpack.allowFilter 2>/dev/null || true
+			fi
+			if [[ "$had_any" == 1 ]]; then
+				git -C "$root_dir" config --local uploadpack.allowAnySHA1InWant "$old_any"
+			else
+				git -C "$root_dir" config --local --unset-all uploadpack.allowAnySHA1InWant 2>/dev/null || true
+			fi
+			source_config_restored=1
+		}
+		cleanup_llm_snapshot() {
+			restore_source_git_config
+			rm -rf "$work_dir"
+		}
+		trap cleanup_llm_snapshot EXIT
 
-		rm -rf "$work_dir"
-		npm cache verify --cache="$cache_dir" >/dev/null
-		rm -rf "$cache_dir/_logs"
-		rm -f "$cache_dir/_update-notifier-last-checked"
+		# Serve this repository to the local partial clone without copying large media blobs.
+		git -C "$root_dir" config --local uploadpack.allowFilter true
+		git -C "$root_dir" config --local uploadpack.allowAnySHA1InWant true
 
-		lock_hash=$(shasum -a 256 "$root_dir/package-lock.json" | awk '{print substr($1, 1, 12)}')
-		archive="$root_dir/serakki-npm-cache-linux-x64-$lock_hash.tgz"
-		rm -f "$archive"
-		tar -C "$root_dir" -czf "$archive" .npm-cache
-		archive_hash=$(shasum -a 256 "$archive" | awk '{print $1}')
+		echo "Building sparse Git snapshot for $branch@$head_short ..."
+		git clone \
+			--no-local \
+			--depth=1 \
+			--single-branch \
+			--branch "$branch" \
+			--filter=blob:none \
+			--no-checkout \
+			"$root_dir" \
+			"$agent_dir"
+		git -C "$agent_dir" sparse-checkout set --no-cone \
+			'/*' \
+			'!/game/serakki/artwork/' \
+			'!/game/serakki/music/' \
+			'!/game/serakki/image/' \
+			'!/game/serakki/sfx/'
+		git -C "$agent_dir" reset --hard HEAD >/dev/null
+		git -C "$agent_dir" remote set-url origin "$origin"
+		restore_source_git_config
+
+		if [[ "$(git -C "$agent_dir" rev-parse HEAD)" != "$head" ]]; then
+			echo "Git snapshot HEAD does not match the source repository." >&2
+			exit 1
+		fi
+		if [[ "$(git -C "$agent_dir" config --get remote.origin.promisor)" != true || \
+			"$(git -C "$agent_dir" config --get remote.origin.partialclonefilter)" != blob:none ]]; then
+			echo "Git snapshot is not a blobless partial clone." >&2
+			exit 1
+		fi
+		for path in "${excluded_paths[@]}"; do
+			if [[ -e "$agent_dir/$path" ]]; then
+				echo "Excluded media path was materialized unexpectedly: $path" >&2
+				exit 1
+			fi
+		done
+		if [[ -n "$(git -C "$agent_dir" status --porcelain)" ]]; then
+			echo "Generated Git snapshot worktree is not clean." >&2
+			exit 1
+		fi
+
+		echo "Packing Git metadata and required blobs ..."
+		(cd "$agent_dir" && zip -qr "$git_archive" .git)
+
+		echo "Verifying Git archive without lazy fetching ..."
+		mkdir -p "$verify_dir"
+		unzip -q "$git_archive" -d "$verify_dir"
+		GIT_NO_LAZY_FETCH=1 git -C "$verify_dir" reset --hard HEAD >/dev/null
+		if [[ "$(git -C "$verify_dir" rev-parse HEAD)" != "$head" || \
+			-n "$(git -C "$verify_dir" status --porcelain)" ]]; then
+			echo "Git archive could not reproduce a clean source worktree offline." >&2
+			exit 1
+		fi
+		for path in "${excluded_paths[@]}"; do
+			if [[ -e "$verify_dir/$path" ]]; then
+				echo "Git archive verification materialized excluded media: $path" >&2
+				exit 1
+			fi
+		done
+		rm -rf "$verify_dir" "$agent_dir"
+
+		build_llm_cache_archive "$root_dir" "$snapshot_dir"
+
+		git_archive_hash=$(shasum -a 256 "$git_archive" | awk '{print $1}')
+		cache_archive_hash=$(shasum -a 256 "$cache_archive" | awk '{print $1}')
+		cat > "$manifest" <<EOF
+Serakki LLM snapshot
+
+branch=$branch
+head=$head
+origin=$origin
+lock_hash=$lock_hash
+
+git_archive=$(basename -- "$git_archive")
+git_sha256=$git_archive_hash
+npm_cache_archive=$(basename -- "$cache_archive")
+npm_cache_sha256=$cache_archive_hash
+
+excluded_paths=${excluded_paths[*]}
+
+Restore Git archive into an empty directory and run:
+  GIT_NO_LAZY_FETCH=1 git reset --hard HEAD
+
+Extract the npm cache archive at the repository root and install with:
+  npm ci --offline --omit=peer --cache=.npm-cache --os=linux --cpu=x64 --libc=glibc --ignore-scripts --no-audit --no-fund
+EOF
 
 		echo
-		echo "Cache archive ready:"
-		echo "  $archive"
-		echo "  SHA-256: $archive_hash"
+		echo "LLM snapshot ready:"
+		echo "  $snapshot_dir"
+		echo "  $(basename -- "$git_archive")"
+		echo "  $(basename -- "$cache_archive")"
+		echo "  $(basename -- "$manifest")"
 	)
 }
 
